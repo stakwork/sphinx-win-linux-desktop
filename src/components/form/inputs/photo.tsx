@@ -5,6 +5,7 @@ import {inputStyles} from './shared'
 import * as ImagePicker from 'expo-image-picker'
 import { AntDesign } from '@expo/vector-icons'
 import Cam from '../../utils/cam'
+import ImgSrcDialog from '../../utils/imgSrcDialog'
 
 export default function PhotoInput({name,label,required,handleChange,handleBlur,value}) {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -15,18 +16,6 @@ export default function PhotoInput({name,label,required,handleChange,handleBlur,
     setDialogOpen(false)
     setTakingPhoto(false)
     setImgURI(uri)
-  }
-
-  async function pickImage() {
-    let result:{[k:string]:any} = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1
-    })
-    if (!result.cancelled) {
-      tookPic(result.uri)
-    }
   }
 
   return <View style={{...inputStyles, ...styles.wrap}}>
@@ -48,20 +37,11 @@ export default function PhotoInput({name,label,required,handleChange,handleBlur,
       style={{ width:52, height:52, position:'absolute',right:0,top:1, borderRadius:3 }}
     />}
 
-    <Portal>
-      <Dialog visible={dialogOpen} style={{bottom:10}}
-        onDismiss={()=>setDialogOpen(false)}>
-        <Dialog.Title>Choose Image Source</Dialog.Title>
-        <Dialog.Actions style={{justifyContent:'space-between'}}>
-          <Button icon="camera" onPress={()=>setTakingPhoto(true)}>
-            Camera
-          </Button>
-          <Button icon="image" onPress={()=>pickImage()}>
-            Photo Library
-          </Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
+    <ImgSrcDialog 
+      open={dialogOpen} onClose={()=>setDialogOpen(false)}
+      onPick={res=> tookPic(res.uri)}
+      onChooseCam={()=> setTakingPhoto(true)}
+    />
 
     {takingPhoto && <Portal>
       <Cam onCancel={()=>setTakingPhoto(false)} 

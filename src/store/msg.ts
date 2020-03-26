@@ -195,8 +195,9 @@ async function decodeContent(messages: Msg[]){
   const msgs = []
   for (const m of messages) {
     if(m.message_content) {
-      const dec = await rsa.decrypt(m.message_content)
-      msgs.push({...m, message_content:dec})
+      const dcontent = await rsa.decrypt(m.message_content)
+      const dmediakey = await rsa.decrypt(m.media_key)
+      msgs.push({...m, message_content:dcontent, media_key:dmediakey})
     } else {
       msgs.push(m)
     }

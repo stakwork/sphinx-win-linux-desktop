@@ -1,6 +1,7 @@
 import React from 'react'
 import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
+import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
 import {View} from 'react-native'
 import {constantCodes, constants} from '../../../constants'
@@ -40,15 +41,9 @@ function Message(props){
   const typ = constantCodes['message_types'][props.type]
   switch (typ) {
     case 'message':
-      if(props.mediaToken){
-        if(props.mediaKey){ // media
-          return <TextMsg {...props} />
-        } else { // purchasable
-          return <TextMsg {...props} />
-        } // normal
-      } else {
-        return <TextMsg {...props} />
-      }
+      return <TextMsg {...props} />
+    case 'attachment':
+      return <MediaMsg {...props} />
     case 'invoice':
       return <Invoice {...props} />
     case 'payment':

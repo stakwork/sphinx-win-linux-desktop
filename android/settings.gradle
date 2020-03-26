@@ -1,4 +1,6 @@
 apply from: '../node_modules/react-native-unimodules/gradle.groovy'
+include ':rn-fetch-blob'
+project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/rn-fetch-blob/android')
 include ':react-native-jitsi-meet'
 project(':react-native-jitsi-meet').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-jitsi-meet/android')
 include ':react-native-share'

@@ -63,9 +63,9 @@ export default function RawInvoiceModal({visible}) {
         </View>}
 
         {hasPayreq && <View style={styles.innerWrap}>
-          <View style={styles.amtWrap}>
+          {params && <View style={styles.amtWrap}>
             <Text style={{fontSize:16}}>{`Amount: ${params.amount} sats`}</Text>
-          </View>
+          </View>}
           <View style={styles.qrWrap}>
             <QRCode value={payreq} size={250} />
           </View>

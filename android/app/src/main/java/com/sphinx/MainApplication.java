@@ -4,6 +4,7 @@ import android.app.Application;
 
 import androidx.annotation.Nullable;
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import cl.json.RNSharePackage;
 import com.horcrux.svg.SvgPackage;
@@ -52,6 +53,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFetchBlobPackage(),
             // new RNJitsiMeetPackage(),
             new RNSharePackage(),
             new SvgPackage(),

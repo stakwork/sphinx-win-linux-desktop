@@ -1,16 +1,20 @@
 import React, {useState, useRef} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, View, Text, TextInput, StyleSheet } from 'react-native'
-import {IconButton} from 'react-native-paper'
+import {IconButton, Portal} from 'react-native-paper'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import {useStores} from '../../store'
 import {Chat} from '../../store/chats'
-import PaymentModal from '../modals/payment'
+import ImgSrcDialog from '../utils/imgSrcDialog'
+import Cam from '../utils/cam'
+
 
 export default function BottomBar({chat}:{chat: Chat}) {
   const {ui,msg} = useStores()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
+  const [takingPhoto, setTakingPhoto] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const inputRef = useRef(null)
 
@@ -30,12 +34,19 @@ export default function BottomBar({chat}:{chat: Chat}) {
     setInputFocused(false)
   }
 
+  async function tookPic(img){
+    console.log(img)
+  }
+
   return useObserver(()=>
     <View style={styles.bar}>
       {!inputFocused && <IconButton icon="arrow-bottom-left" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}} 
         onPress={()=> ui.setPayMode('invoice', chat)}     
       />}
+      {!inputFocused && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+        <MaterialCommunityIcons name="plus" color="#888" size={27} />
+      </TouchableOpacity>}
       <TextInput 
         placeholder="Message..." ref={inputRef}
         style={{...styles.input,marginLeft:inputFocused?15:0}}
@@ -57,6 +68,18 @@ export default function BottomBar({chat}:{chat: Chat}) {
           <MaterialCommunityIcons name="send" size={17} color="white" />
         </TouchableOpacity>
       </View>}
+
+      <ImgSrcDialog 
+        open={dialogOpen} onClose={()=>setDialogOpen(false)}
+        onPick={res=> tookPic(res)}
+        onChooseCam={()=> setTakingPhoto(true)}
+      />
+
+      {takingPhoto && <Portal>
+        <Cam onCancel={()=>setTakingPhoto(false)} 
+          onSnap={pic=> tookPic(pic)}
+        />
+      </Portal>}
 
     </View>
   )
@@ -102,6 +125,17 @@ const styles=StyleSheet.create({
     height:38,maxHeight:38,
     borderRadius:19,
     marginTop:1,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  img:{
+    width:40,height:40,
+    borderRadius:20,
+    borderColor:'#ccc',
+    borderWidth:1,
+    backgroundColor:'whitesmoke',
+    marginRight:8,
     display:'flex',
     alignItems:'center',
     justifyContent:'center'

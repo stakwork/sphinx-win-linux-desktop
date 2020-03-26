@@ -6,6 +6,7 @@ import { contactStore } from './contacts'
 import { chatStore } from './chats'
 import { subStore } from './subs'
 import { userStore } from './user'
+import { memeStore } from './meme'
 import { create } from 'mobx-persist'
 import { AsyncStorage } from 'react-native'
 
@@ -16,6 +17,7 @@ Promise.all([
   hydrate('details', detailsStore),
   hydrate('contacts', contactStore),
   hydrate('chats', chatStore),
+  hydrate('meme', memeStore)
 ]).then(()=> {
   uiStore.setReady(true)
 })
@@ -28,6 +30,7 @@ const ctx = React.createContext({
   subs: subStore,
   ui: uiStore,
   user: userStore,
+  meme: memeStore,
 })
 
 export const useStores = () => React.useContext(ctx)

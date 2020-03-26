@@ -11,6 +11,7 @@ import Form from '../form'
 import * as ImagePicker from 'expo-image-picker'
 import Cam from '../utils/cam'
 import StatusBar from '../utils/statusBar'
+import ImgSrcDialog from '../utils/imgSrcDialog'
 
 // no contact_id!
 // http://x.x.x.x/static/uploads/undefined_profile_picture.jpeg
@@ -36,19 +37,6 @@ export default function Profile() {
       console.log(e)
     }
     setUploading(false)
-  }
-
-  async function pickImage() {
-    let result:{[k:string]:any} = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1
-    })
-    console.log(result)
-    if (!result.cancelled) {
-      tookPic(result)
-    }
   }
 
   return useObserver(() =>
@@ -87,20 +75,11 @@ export default function Profile() {
         </Card.Content>
       </Card>
 
-      <Portal>
-        <Dialog visible={dialogOpen} style={{bottom:10}}
-          onDismiss={()=>setDialogOpen(false)}>
-          <Dialog.Title>Choose Image Source</Dialog.Title>
-          <Dialog.Actions style={{justifyContent:'space-between'}}>
-            <Button icon="camera" onPress={()=>setTakingPhoto(true)}>
-              Camera
-            </Button>
-            <Button icon="image" onPress={()=>pickImage()}>
-              Photo Library
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <ImgSrcDialog 
+        open={dialogOpen} onClose={()=>setDialogOpen(false)}
+        onPick={res=> tookPic(res)}
+        onChooseCam={()=> setTakingPhoto(true)}
+      />
 
       {takingPhoto && <Portal>
         <Cam onCancel={()=>setTakingPhoto(false)} 

@@ -23,7 +23,6 @@ function App() {
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
 
-  
   useEffect(()=>{
     // AsyncStorage.clear()
 
@@ -32,7 +31,7 @@ function App() {
     if(isSignedUp){
       instantiateRelay(user.currentIP, user.authToken)
     }
-    setLoading(false)
+    setLoading(false)    
   },[])
 
   if(loading) return <Loading />

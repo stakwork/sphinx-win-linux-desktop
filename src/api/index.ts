@@ -24,8 +24,19 @@ function instantiateRelay(ip:string, authToken?:string){
   // or just one?
 }
 
+function composeMeme(host:string, authToken?:string) {
+  let meme = null
+  if(authToken) {
+    meme = new API(`https://${host}/`, 'Authorization', `Bearer ${authToken}`)
+  } else {
+    meme = new API(`https://${host}/`)
+  }
+  return meme
+}
+
 export {
   invite,
   relay,
-  instantiateRelay
+  instantiateRelay,
+  composeMeme,
 }

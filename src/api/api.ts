@@ -18,7 +18,7 @@ export default class API {
 }
 
 function addMethod(m: string, rootUrl: string): Function {
-  return async function (url: string, data: any) {
+  return async function (url: string, data: any, encoding?: string) {
     if(!data) data={}
     try {
       const skip = isPublic(rootUrl + url)
@@ -32,8 +32,17 @@ function addMethod(m: string, rootUrl: string): Function {
       }
       const opts: { [key: string]: any } = { mode: 'cors' }
       if (m === 'POST' || m === 'PUT') {
-        headers['Content-Type'] = 'application/json'
-        opts.body = JSON.stringify(data)
+        if (encoding) {
+          headers['Content-Type'] = encoding
+          if(encoding==='application/x-www-form-urlencoded') {
+            opts.body = makeSearchParams(data)
+          } else {
+            opts.body = data
+          }
+        } else {
+          headers['Content-Type'] = 'application/json'
+          opts.body = JSON.stringify(data)
+        }
       }
       if (m === 'UPLOAD') {
         headers['Content-Type'] = 'multipart/form-data'
@@ -68,6 +77,7 @@ function addMethod(m: string, rootUrl: string): Function {
         if (res.success && res.response) { // relay
           return res.response 
         }
+        return res
       }
     } catch (e) {
       throw e
@@ -82,4 +92,10 @@ function isPublic(url: string) {
 async function getToken(name: string) {
   if (!name) return ""
   // return localStorage.getItem(name)
+}
+
+function makeSearchParams(params){
+  return Object.keys(params).map((key) => {
+    return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
+  }).join('&')
 }
