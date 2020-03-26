@@ -23,6 +23,7 @@ function App() {
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
 
+  
   useEffect(()=>{
     // AsyncStorage.clear()
 

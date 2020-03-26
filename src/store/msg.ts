@@ -50,7 +50,7 @@ class MsgStore {
     }
   }
 
-  @action
+  @action // only if it contains a "chat"
   async gotNewMessage(m) {
     let newMsg = m
     if(m.message_content){
@@ -131,8 +131,20 @@ class MsgStore {
         memo: myenc,
         remote_memo: encMemo,
       }
-      const r = await relay.post('invoices', v)
+      const r = await relay.post('invoices', v) // raw invoice: 
       this.gotNewMessage(r)
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  @action
+  async createRawInvoice({amt,memo}) {
+    try {
+      const v = {amount: amt, memo}
+      const r = await relay.post('invoices', v)
+      return r
+      // r = {invoice: payment_request} // thats it
     } catch(e) {
       console.log(e)
     }

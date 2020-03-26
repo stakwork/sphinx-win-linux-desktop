@@ -79,6 +79,22 @@ class UiStore {
     this.confirmInvoiceMsg = s
   }
 
+  @observable rawInvoiceModal: boolean = false
+  @observable rawInvoiceModalParams: {[k:string]:string} = null
+  @action
+  setRawInvoiceModal(params) {
+    this.rawInvoiceModal = true
+    this.rawInvoiceModalParams = params
+  }
+
+  @action
+  clearRawInvoiceModal() {
+    this.rawInvoiceModal = false
+    setTimeout(()=>{
+      this.rawInvoiceModalParams=null
+    }, 500) // delay 
+  }
+
 }
 
 export const uiStore = new UiStore()
