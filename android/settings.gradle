@@ -9,8 +9,8 @@ include ':react-native-svg'
 project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':react-native-radial-gradient'
 project(':react-native-radial-gradient').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-radial-gradient/android')
-include ':react-native-rncryptor'
-project(':react-native-rncryptor').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-rncryptor/android')
+include ':rn-rncryptor'
+project(':rn-rncryptor').projectDir = new File(rootProject.projectDir, '../node_modules/rn-rncryptor/android')
 include ':react-native-randombytes'
 project(':react-native-randombytes').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-randombytes/android')
 include ':react-native-keychain'

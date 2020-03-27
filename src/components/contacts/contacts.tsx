@@ -6,14 +6,12 @@ import {ScrollView, View, Text, StyleSheet} from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Appbar, Searchbar, IconButton } from 'react-native-paper'
 import ContactsList from './contactList'
-import StatusBar from '../utils/statusBar'
 
 export default function Contacts() {
   const { ui } = useStores()
 
   return useObserver(() =>
     <View>
-      <StatusBar />
       <Header />
       <View style={styles.searchWrap}>
         <View style={styles.searchBarWrap}>

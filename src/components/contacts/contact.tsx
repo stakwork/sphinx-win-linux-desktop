@@ -2,11 +2,9 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import {Appbar} from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
-import StatusBar from '../utils/statusBar'
 
 export default function Contact(){
   return <View style={styles.main}>
-    <StatusBar />
     <Header />
     <Text>hi</Text>
   </View>

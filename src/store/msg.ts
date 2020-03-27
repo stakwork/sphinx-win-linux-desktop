@@ -194,13 +194,16 @@ async function makeRemoteTextMap({contact_id, text, chat_id}){
 async function decodeContent(messages: Msg[]){
   const msgs = []
   for (const m of messages) {
+    const msg = m
     if(m.message_content) {
       const dcontent = await rsa.decrypt(m.message_content)
-      const dmediakey = await rsa.decrypt(m.media_key)
-      msgs.push({...m, message_content:dcontent, media_key:dmediakey})
-    } else {
-      msgs.push(m)
+      msg.message_content = dcontent
     }
+    if(m.media_key){
+      const dmediakey = await rsa.decrypt(m.media_key)
+      m.media_key = dmediakey
+    }
+    msgs.push(msg)
   }
   return msgs
 }

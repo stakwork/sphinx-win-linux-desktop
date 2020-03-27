@@ -7,11 +7,35 @@ import {instantiateRelay} from './src/api'
 import {useObserver} from 'mobx-react-lite'
 import Loading from './src/components/loading'
 import AsyncStorage from '@react-native-community/async-storage'
+import StatusBar from './src/components/utils/statusBar'
+import * as utils from './src/components/utils/utils'
+import {Linking} from 'react-native'
 
 declare var global: {HermesInternal: null | {}}
 
 export default function Wrap(){
   const {ui} = useStores()
+
+  function deeplinkActions(j){
+    const action = j['action']
+    switch (action) {
+      case 'invoice':
+        ui.setRawInvoiceModal(j)
+      default:
+        return
+    }
+  }
+  function gotLink(e){
+    if(e && typeof e==='string'){
+      const j = utils.jsonFromUrl(e)
+      if(j['action']) deeplinkActions(j)
+    }
+  }
+  useEffect(()=>{
+    Linking.getInitialURL().then(e=> gotLink(e))
+    Linking.addEventListener('url', gotLink)
+  },[])
+
   return useObserver(()=>{
     if (ui.ready) return <App /> // hydrated!
     return <Loading /> // full screen loading
@@ -31,11 +55,12 @@ function App() {
     if(isSignedUp){
       instantiateRelay(user.currentIP, user.authToken)
     }
-    setLoading(false)    
+    setLoading(false)
   },[])
 
   if(loading) return <Loading />
   return (<PaperProvider theme={theme}>
+    <StatusBar />
     {signedUp && <Main />}
     {!signedUp && <Onboard onFinish={()=>setSignedUp(true)} />}
   </PaperProvider>)

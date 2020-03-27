@@ -28,7 +28,8 @@ export default function MsgRow(props){
     <View style={{...sharedStyles.bubble,
         alignSelf: isMe?'flex-end':'flex-start',
         backgroundColor, borderColor,
-        borderStyle:dashed?'dashed':'solid'
+        borderStyle:dashed?'dashed':'solid',
+        overflow:'hidden',
       }}>
       <Message {...props} />
     </View>

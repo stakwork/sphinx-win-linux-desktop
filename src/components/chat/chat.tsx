@@ -7,7 +7,6 @@ import {ChatRouteProp} from '../../types'
 import { useRoute } from '@react-navigation/native'
 import {useStores} from '../../store'
 import {contactForConversation} from './utils'
-import StatusBar from '../utils/statusBar'
 
 export default function Chat(){
 
@@ -23,7 +22,6 @@ export default function Chat(){
   },[])
 
   return <View style={styles.main}>
-    <StatusBar />
     <Header chat={chat} />
     <MsgList chat={chat} />
     <BottomBar chat={chat} />

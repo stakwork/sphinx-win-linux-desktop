@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import {constants} from '../../../constants'
 import { useStores } from '../../../store'
 import {calcExpiry} from './utils'
+import shared from './sharedStyles'
 
 export default function Invoice(props){
   const {ui} = useStores()
@@ -35,7 +36,7 @@ export default function Invoice(props){
     }
   }
 
-  return <View style={{...styles.bub, opacity}}>
+  return <View style={{...styles.bub, opacity, ...shared.innerPad}}>
     <View style={styles.row}>
       <View style={styles.iconWrap}>
         <MaterialCommunityIcons name="qrcode" size={22} color={color} />

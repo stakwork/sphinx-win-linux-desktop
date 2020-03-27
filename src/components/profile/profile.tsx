@@ -10,7 +10,6 @@ import {me} from '../form/schemas'
 import Form from '../form'
 import * as ImagePicker from 'expo-image-picker'
 import Cam from '../utils/cam'
-import StatusBar from '../utils/statusBar'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 
 // no contact_id!
@@ -41,7 +40,6 @@ export default function Profile() {
 
   return useObserver(() =>
     <View style={styles.wrap}>
-      <StatusBar />
       <Header />
       <View style={styles.userInfoSection}>
         <View >

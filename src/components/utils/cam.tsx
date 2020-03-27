@@ -18,7 +18,9 @@ export default function Cam({onCancel,onSnap}) {
 
   async function takePic(){
     if(camRef && camRef.current) {
-      const pic = await camRef.current.takePictureAsync()
+      const pic = await camRef.current.takePictureAsync({
+        // skipProcessing:true,
+      })
       onSnap(pic)
     }
   }

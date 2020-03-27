@@ -3,7 +3,6 @@ import Chat from '../chat/chat'
 import Dashboard from './dashboard'
 import { createStackNavigator } from '@react-navigation/stack'
 import {DashStackParamList} from '../../../src/types'
-import StatusBar from '../utils/statusBar';
 
 const Stack = createStackNavigator<DashStackParamList>()
 

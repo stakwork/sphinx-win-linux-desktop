@@ -35,7 +35,14 @@ export default function BottomBar({chat}:{chat: Chat}) {
   }
 
   async function tookPic(img){
-    console.log(img)
+    setDialogOpen(false)
+    setTimeout(()=>{
+      setTakingPhoto(false)
+      console.log(img)
+      if(img&&img.uri){
+        ui.setImgURI(img.uri)
+      }
+    },250)
   }
 
   return useObserver(()=>

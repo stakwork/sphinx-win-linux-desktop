@@ -95,6 +95,18 @@ class UiStore {
     }, 500) // delay 
   }
 
+  @observable imgData: string = ''
+  @action
+  setImgData(s: string) {
+    this.imgData = s
+  }
+
+  @observable imgURI: string = ''
+  @action
+  setImgURI(s: string) {
+    this.imgURI = s
+  }
+
 }
 
 export const uiStore = new UiStore()

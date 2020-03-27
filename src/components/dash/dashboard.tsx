@@ -6,13 +6,11 @@ import { Searchbar } from 'react-native-paper'
 import Header from './header'
 import ChatList from '../chat/chatList'
 import BottomBar from './bottomBar'
-import StatusBar from '../utils/statusBar'
 
 export default function Dashboard() {
   const {ui} = useStores()
   return useObserver(()=>
     <View style={styles.main}>
-      <StatusBar />
       <Header />
       <View style={styles.searchWrap}>
         <Searchbar
