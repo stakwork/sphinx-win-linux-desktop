@@ -95,16 +95,9 @@ class UiStore {
     }, 500) // delay 
   }
 
-  @observable imgData: string = ''
-  @action
-  setImgData(s: string) {
-    this.imgData = s
-  }
-
-  @observable imgURI: string = ''
-  @action
-  setImgURI(s: string) {
-    this.imgURI = s
+  @observable imgViewerParams: {[k:string]:any} = null
+  setImgViewerParams(obj:{[k:string]:any}) {
+    this.imgViewerParams = obj
   }
 
 }

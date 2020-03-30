@@ -8485,10 +8485,10 @@ rn-fetch-blob@^0.12.0:
     base-64 "0.1.0"
     glob "7.0.6"
 
-rn-rncryptor@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/rn-rncryptor/-/rn-rncryptor-1.0.0.tgz#246eae46020b36acb4bedbeff4c9f89c8a527733"
-  integrity sha512-DZdfWE2XBZ998msvS0Le7GZaF1LZVwc4FO/0RK9/HMUSOb3A8KtjBFYGoDW50MBeEMB2EXtQXAjZIRkuNyMuwQ==
+rn-rncryptor@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/rn-rncryptor/-/rn-rncryptor-1.0.8.tgz#ed1d73db0b94e58843c650424f92739e34c88fcc"
+  integrity sha512-p3epwCwTubNNwuE57hHuZUpfaJDfJjP1KR0mk51wJBBItr+7ghp6IwY5GjlWS8ZDqyPUEGdx/DHz6X+Krhrulw==
 
 rsvp@^4.8.4:
   version "4.8.5"

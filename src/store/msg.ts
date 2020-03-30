@@ -43,7 +43,7 @@ class MsgStore {
   async getMessages() {
     try {
       const r = await relay.get('messages')
-      const msgs = await decodeContent(r.new_messages)
+      const msgs = await decodeMessages(r.new_messages)
       this.messages = orgMsgs(msgs)
     } catch(e) {
       console.log(e)
@@ -52,11 +52,7 @@ class MsgStore {
 
   @action // only if it contains a "chat"
   async gotNewMessage(m) {
-    let newMsg = m
-    if(m.message_content){
-      const dec = await rsa.decrypt(m.message_content)
-      newMsg = {...m, message_content:dec}
-    }
+    let newMsg = await decodeSingle(m)
     if(newMsg.chat && newMsg.chat.id){
       putIn(this.messages, newMsg)
       chatStore.gotChat(newMsg.chat)
@@ -96,11 +92,35 @@ class MsgStore {
   }
 
   @action
+  async sendAttachment({contact_id, text, chat_id, muid, media_type, media_key}) {
+    try {
+      const encryptedText = await encryptText({contact_id:1, text})
+      const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
+      const media_key_map = await makeRemoteTextMap({contact_id, text:media_key, chat_id}, true)
+      const v = {
+        contact_id,
+        chat_id: chat_id||null,
+        text: encryptedText,
+        remote_text_map,
+        muid,
+        media_type,
+        media_key_map
+      }
+      const r = await relay.post('attachment', v)
+      this.gotNewMessage(r)
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  @action
   async setMessageAsReceived(m) {
     if(!(m.chat)) return
     const msgsForChat = this.messages[m.chat.id]
     const ogMessage = msgsForChat.find(msg=> msg.id===m.id)
-    ogMessage.status = constants.statuses.received
+    if(ogMessage) {
+      ogMessage.status = constants.statuses.received
+    }
   }
 
   @action
@@ -171,13 +191,17 @@ async function encryptText({contact_id, text}) {
   return encText
 }
 
-async function makeRemoteTextMap({contact_id, text, chat_id}){
+async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
   const idToKeyMap = {}
   const remoteTextMap = {}
   const chat = chat_id && chatStore.chats.find(c=> c.id===chat_id)
   if(chat){
     const contactsInChat = contactStore.contacts.filter(c=>{
-      return chat.contact_ids.includes(c.id) && c.id!==1
+      if(includeSelf){
+        return chat.contact_ids.includes(c.id)
+      } else {
+        return chat.contact_ids.includes(c.id) && c.id!==1
+      }
     })
     contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
   } else {
@@ -191,18 +215,23 @@ async function makeRemoteTextMap({contact_id, text, chat_id}){
   return remoteTextMap
 }
 
-async function decodeContent(messages: Msg[]){
+async function decodeSingle(m: Msg){
+  const msg = m
+  if(m.message_content) {
+    const dcontent = await rsa.decrypt(m.message_content)
+    msg.message_content = dcontent
+  }
+  if(m.media_key){
+    const dmediakey = await rsa.decrypt(m.media_key)
+    msg.media_key = dmediakey
+  }
+  return msg
+}
+
+async function decodeMessages(messages: Msg[]){
   const msgs = []
   for (const m of messages) {
-    const msg = m
-    if(m.message_content) {
-      const dcontent = await rsa.decrypt(m.message_content)
-      msg.message_content = dcontent
-    }
-    if(m.media_key){
-      const dmediakey = await rsa.decrypt(m.media_key)
-      m.media_key = dmediakey
-    }
+    const msg = await decodeSingle(m)
     msgs.push(msg)
   }
   return msgs

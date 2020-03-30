@@ -14,14 +14,14 @@ export default function Modals(){
     const showConfirmPayInvoice = ui.confirmInvoiceMsg&&ui.confirmInvoiceMsg.payment_request?true:false
     const showAddFriendModal = ui.addFriendModal?true:false
     const showRawInvoiceModal = ui.rawInvoiceModal
-    const showImageViewer = ui.imgData||ui.imgURI?true:false
+    const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri)?true:false
     return <>
       <AddFriend visible={showAddFriendModal} />
       <Payment visible={ui.showPayModal} />
       <ConfirmPayInvoice visible={showConfirmPayInvoice} />
       <ShareInvite visible={ui.shareInviteModal} />
       <RawInvoiceModal visible={showRawInvoiceModal} />
-      {showImageViewer && <ImageViewer data={ui.imgData} uri={ui.imgURI} />}
+      {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
     </>
   })
 }

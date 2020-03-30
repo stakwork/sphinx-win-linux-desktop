@@ -8,7 +8,6 @@ import {Chat} from '../../store/chats'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 import Cam from '../utils/cam'
 
-
 export default function BottomBar({chat}:{chat: Chat}) {
   const {ui,msg} = useStores()
   const [text,setText] = useState('')
@@ -38,9 +37,16 @@ export default function BottomBar({chat}:{chat: Chat}) {
     setDialogOpen(false)
     setTimeout(()=>{
       setTakingPhoto(false)
-      console.log(img)
       if(img&&img.uri){
-        ui.setImgURI(img.uri)
+        let contact_id=null
+        if(!chat.id){ // if no chat (new contact)
+          contact_id=chat.contact_ids.find(cid=>cid!==1)
+        }
+        ui.setImgViewerParams({
+          contact_id,
+          chat_id: chat.id||null,
+          uri: img.uri,
+        })
       }
     },250)
   }
@@ -60,8 +66,8 @@ export default function BottomBar({chat}:{chat: Chat}) {
         onFocus={()=> setInputFocused(true)}
         onBlur={()=> setInputFocused(false)}
         onChangeText={e=> setText(e)}>
-          <Text>{text}</Text>
-        </TextInput>
+        <Text>{text}</Text>
+      </TextInput>
       {/* <IconButton icon="microphone-outline" size={32} color="#666"
         style={{marginLeft:0,marginRight:-4}}
       /> */}
