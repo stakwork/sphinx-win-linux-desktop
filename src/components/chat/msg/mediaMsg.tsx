@@ -1,33 +1,61 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {View, Text, StyleSheet, Image} from 'react-native'
 import {useStores} from '../../../store'
 import shared from './sharedStyles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import {useCachedEncryptedFile} from './hooks'
 import {ActivityIndicator} from 'react-native-paper'
+import AudioPlayer from './audioPlayer'
 
 export default function MediaMsg(props){
-  console.log(props)
+  const wrapRef = useRef(null)
+  
   const {meme,ui} = useStores()
 
-  const {message_content} = props
+  const {message_content, media_type} = props
 
-  const {imgData,loading} = useCachedEncryptedFile(props)
+  const {data,uri,loading,trigger} = useCachedEncryptedFile(props)
 
-  const hasImgData = imgData?true:false
+  useEffect(()=>{
+    if(props.y && wrapRef.current){ // dont run if y=0 (beginning)
+      setTimeout(()=>{
+        wrapRef.current.measure((fx, fy, width, height, px, py)=>{
+          if(py>0) trigger()
+        })
+      },15)
+    }
+  },[props.y])
+
+  console.log(props)
+
+  const hasImgData = (data||uri)?true:false
   const hasContent = message_content?true:false
-  return <TouchableOpacity style={styles.wrap} onPress={()=>{
-    if(imgData) ui.setImgViewerParams({data:imgData})
-  }} activeOpacity={0.65}>
-    {hasImgData && !loading && <Image style={styles.img} resizeMode='cover' source={{uri:imgData}}/>}
-    {loading && <View style={styles.loading}>
-      <ActivityIndicator animating={true} color="white" />
-    </View>}
-    {hasContent && <View style={shared.innerPad}>
-      <Text style={styles.text}>{message_content}</Text>
-    </View>}
-  </TouchableOpacity>
+  const h = hasContent?249:200
+  return <View ref={wrapRef} collapsable={false}>
+    <TouchableOpacity style={{...styles.wrap, height:h, minHeight:h}} onPress={()=>{
+      if(data) ui.setImgViewerParams({data})
+    }} activeOpacity={0.65}>
+      {!hasImgData && <View style={styles.loading}>
+        {loading && <ActivityIndicator animating={true} color="white" />}
+      </View>}
+      {hasImgData && <Media type={media_type} data={data} uri={uri} />}
+      {hasContent && <View style={shared.innerPad}>
+        <Text style={styles.text}>{message_content}</Text>
+      </View>}
+    </TouchableOpacity>
+  </View>
 }
+
+function Media({type,data,uri}){
+  console.log(type,uri)
+  if(type.startsWith('image')) {
+    return <Image style={styles.img} resizeMode='cover' source={{uri:data}}/>
+  }
+  if(type.startsWith('audio')) {
+    return <AudioPlayer />
+  }
+}
+
 
 const styles = StyleSheet.create({
   text:{
@@ -36,6 +64,8 @@ const styles = StyleSheet.create({
   },
   wrap:{
     // flex:1,
+    width:200,
+    minHeight:200,
   },
   img:{
     width:200,

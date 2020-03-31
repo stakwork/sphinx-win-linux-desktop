@@ -7,6 +7,9 @@ import {useStores} from '../../store'
 import {Chat} from '../../store/chats'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 import Cam from '../utils/cam'
+import AudioRecorderPlayer from 'react-native-audio-recorder-player'
+
+const audioRecorderPlayer = new AudioRecorderPlayer()
 
 export default function BottomBar({chat}:{chat: Chat}) {
   const {ui,msg} = useStores()
@@ -14,6 +17,8 @@ export default function BottomBar({chat}:{chat: Chat}) {
   const [inputFocused, setInputFocused] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [recordSecs, setRecordSecs] = useState('0')
+  const [recording, setRecording] = useState(false)
 
   const inputRef = useRef(null)
 
@@ -51,6 +56,37 @@ export default function BottomBar({chat}:{chat: Chat}) {
     },250)
   }
 
+  async function startRecord() {
+    setRecordSecs('0')
+    setRecording(true)
+    console.log("BLAH BLAH",audioRecorderPlayer.startRecorder)
+    const result = await audioRecorderPlayer.startRecorder()
+    audioRecorderPlayer.addRecordBackListener((e) => {
+      console.log('back!!!',e.current_position)
+      setRecordSecs(audioRecorderPlayer.mmssss(
+        Math.floor(e.current_position),
+      ))
+      return
+    })
+    console.log(result)
+  }
+
+  async function stopRecord() {
+    const result = await audioRecorderPlayer.stopRecorder()
+    audioRecorderPlayer.removeRecordBackListener()
+    setRecordSecs('0')
+    setRecording(false)
+    console.log(result)
+  }
+
+  function rec(){
+    if(recording){
+      stopRecord()
+    } else {
+      startRecord()
+    }
+  }
+
   return useObserver(()=>
     <View style={styles.bar}>
       {!inputFocused && <IconButton icon="arrow-bottom-left" size={32} color="#666"
@@ -70,6 +106,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
       </TextInput>
       {/* <IconButton icon="microphone-outline" size={32} color="#666"
         style={{marginLeft:0,marginRight:-4}}
+        onPress={rec}
       /> */}
       {!inputFocused && <IconButton icon="arrow-top-right" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}}

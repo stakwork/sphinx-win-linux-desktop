@@ -4,51 +4,75 @@ import {parseLDAT} from '../../utils/ldat'
 import {useStores} from '../../../store'
 import * as aes from '../../../crypto/aes'
 
+const sess = 'all'
+
+let dirs = RNFetchBlob.fs.dirs
+
+// RNFetchBlob.fs.unlink(folder) to kill all there
+
 export function useCachedEncryptedFile(props){
   const {meme} = useStores()
-  const {media_token, media_key, media_type} = props
+  const {id, media_token, media_key, media_type} = props
 
-  const [imgData, setImgData] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState('')
+  const [uri, setURI] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  useEffect(()=>{
-    (async () => {
-      const ldat = parseLDAT(media_token)
-      if(!(ldat && ldat.host)) return
-      const url = `https://${ldat.host}/file/${media_token}`
-      const server = meme.servers.find(s=> s.host===ldat.host)
-      if(!server) return 
-      try {
-        const res = await RNFetchBlob
-        .config({fileCache:true})
-        .fetch('GET', url, {
-          Authorization : `Bearer ${server.token}`,
-        })
-        console.log('The file saved to ', res.path())
-        const path = res.path()
-        const status = res.info().status
-        if(status == 200 && path){
-          const dec = await aes.readEncryptedFile(path, media_key)
-          const dataURI = `data:${media_type};base64,${dec}`
-          console.log('got data URI', dataURI.length)
-          setImgData(dataURI)
-          setLoading(false)
-        }
-        // let status = res.info().status
-        // if(status == 200) {
-        //   let base64Str = res.base64() // native conversion
-        //   console.log('dec w pwd',media_key)
-        //   const dec = await aes.decryptToBase64(base64Str, media_key)
-        //   const dataURI = `data:${media_type};base64,${dec}`
-        //   console.log(`data:${media_type};base64,${dataURI.length}`)
-        //   setImgData(dataURI)
-        //   setLoading(false)
-        // }
-      } catch(e) {
-        console.log(e)
+  function dispose(){
+    RNFetchBlob.session(sess).dispose().then(() => { 
+      console.log(`${sess} disposed`)  
+    })
+  }
+
+  async function trigger() {
+    if(data) return // already done
+    setLoading(true)
+
+    const ldat = parseLDAT(media_token)
+    if(!(ldat && ldat.host)) return
+    const url = `https://${ldat.host}/file/${media_token}`
+    const server = meme.servers.find(s=> s.host===ldat.host)
+    if(!server) return 
+    try {
+      const res = await RNFetchBlob
+      .config({
+        path: dirs.CacheDir + `/msg_${id}`
+      })
+      .fetch('GET', url, {
+        Authorization : `Bearer ${server.token}`,
+      })
+      console.log('The file saved to ', res.path())
+
+      const path = res.path()
+      const status = res.info().status
+      // if(status == 200 && path){
+      //   const newpath = await aes.decryptFileAndSave(path, media_key)
+      //   console.log(newpath)
+      //   setURI(newpath)
+      //   setLoading(false)
+      // }
+      if(status == 200 && path){
+        const dec = await aes.readEncryptedFile(path, media_key)
+        const dataURI = `data:${media_type};base64,${dec}`
+        console.log('got data URI', dataURI.length)
+        setData(dataURI)
+        setLoading(false)
       }
-    })()
-  }, [])
 
-  return {imgData,loading}
+      // let status = res.info().status
+      // if(status == 200) {
+      //   let base64Str = res.base64() // native conversion
+      //   console.log('dec w pwd',media_key)
+      //   const dec = await aes.decryptToBase64(base64Str, media_key)
+      //   const dataURI = `data:${media_type};base64,${dec}`
+      //   console.log(`data:${media_type};base64,${dataURI.length}`)
+      //   setImgData(dataURI)
+      //   setLoading(false)
+      // }
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  return {data,uri,loading,trigger,dispose}
 }

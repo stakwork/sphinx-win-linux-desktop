@@ -60,6 +60,16 @@ export async function readEncryptedFile(filepath, pwd): Promise<string> {
   }
 }
 
+export async function decryptFileAndSave(filepath, pwd): Promise<string> {
+  try {
+    const path = await RNCryptor.decryptFileAndSave(filepath,pwd)
+    return path
+  } catch(e){
+    console.log(e)
+    return ''
+  }
+}
+
 async function testAES(){
   const msg='hi'
   const enc = await encrypt(msg,'pass')

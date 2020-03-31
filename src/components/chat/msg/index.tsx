@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useRef, useEffect} from 'react'
 import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
@@ -9,6 +9,7 @@ import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
 
 export default function MsgRow(props){
+  
   const isMe = props.sender===1
   const isInvoice = props.type===constants.message_types.invoice
   const isPaid = props.status===constants.statuses.confirmed

@@ -4,6 +4,8 @@ import android.app.Application;
 
 import androidx.annotation.Nullable;
 import com.facebook.react.ReactApplication;
+import com.dooboolab.RNAudioRecorderPlayerPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import cl.json.RNSharePackage;
@@ -53,6 +55,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNAudioRecorderPlayerPackage(),
+            new RNCWebViewPackage(),
           new RNFetchBlobPackage(),
           // new RNJitsiMeetPackage(),
           new RNSharePackage(),

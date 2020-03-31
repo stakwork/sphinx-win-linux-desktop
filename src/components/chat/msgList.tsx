@@ -10,6 +10,7 @@ import { constants } from '../../constants'
 
 export default function MsgListWrap({chat}:{chat: Chat}){
   const {msg,chats} = useStores()
+
   return useObserver(()=>{
     let theID = chat.id
     if(!theID) { // for very beginning, where chat doesnt have id
@@ -26,6 +27,8 @@ export default function MsgListWrap({chat}:{chat: Chat}){
 
 function MsgList({msgs,msgsLength}) {
   const scrollViewRef = useRef(null)
+  const [y,setY] = useState(0)
+  const [first, setFirst] = useState(true)
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(() => {
@@ -35,13 +38,18 @@ function MsgList({msgs,msgsLength}) {
 
   function scrollToBottom(contentHeight) {
     if (contentHeight > 0) {
-      scrollViewRef.current.scrollTo({y: contentHeight})
+      scrollViewRef.current.scrollToEnd({duration: 500})
+      setFirst(false)
     }
   }
 
   return useObserver(()=>
     <ScrollView style={styles.scroller}
       ref={scrollViewRef}
+      onScroll={e=> {
+        const y = e.nativeEvent.contentOffset.y
+        debounce(()=> setY(y), 50)
+      }}
       contentContainerStyle={{flexGrow:1}} horizontal={false}
       onContentSizeChange={(w, h) => scrollToBottom(h)}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
@@ -50,7 +58,7 @@ function MsgList({msgs,msgsLength}) {
           if (typeof m==='string') {
             return <DateLine key={i} dateString={m} />
           }
-          return <Message key={i} {...m} />
+          return <Message key={i} {...m} y={y} />
         })}
       </View>
     </ScrollView>
@@ -134,4 +142,12 @@ function arraysEqual(_arr1, _arr2) {
     }
   }
   return true
+}
+
+let inDebounce
+function debounce(func, delay) {
+  const context = this
+  const args = arguments
+  clearTimeout(inDebounce)
+  inDebounce = setTimeout(() => func.apply(context, args), delay)
 }

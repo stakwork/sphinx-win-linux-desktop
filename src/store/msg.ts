@@ -94,17 +94,19 @@ class MsgStore {
   @action
   async sendAttachment({contact_id, text, chat_id, muid, media_type, media_key}) {
     try {
-      const encryptedText = await encryptText({contact_id:1, text})
-      const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
       const media_key_map = await makeRemoteTextMap({contact_id, text:media_key, chat_id}, true)
-      const v = {
+      const v:{[k:string]:any} = {
         contact_id,
         chat_id: chat_id||null,
-        text: encryptedText,
-        remote_text_map,
         muid,
         media_type,
         media_key_map
+      }
+      if(text){
+        const encryptedText = await encryptText({contact_id:1, text})
+        const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
+        v.text = encryptedText
+        v.remote_text_map = remote_text_map
       }
       const r = await relay.post('attachment', v)
       this.gotNewMessage(r)

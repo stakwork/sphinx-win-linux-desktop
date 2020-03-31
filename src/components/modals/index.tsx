@@ -8,6 +8,8 @@ import ImageViewer from './imgViewer'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 
+import JitsiWebview from './jitsiWebview'
+
 export default function Modals(){
   const {ui} = useStores()
   return useObserver(()=> {
