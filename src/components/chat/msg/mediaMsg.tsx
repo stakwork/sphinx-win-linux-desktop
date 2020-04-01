@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {View, Text, StyleSheet, Image} from 'react-native'
 import {useStores} from '../../../store'
 import shared from './sharedStyles'
@@ -9,6 +9,7 @@ import AudioPlayer from './audioPlayer'
 
 export default function MediaMsg(props){
   const wrapRef = useRef(null)
+  const [first, setFirst] = useState(true)
   
   const {meme,ui} = useStores()
 
@@ -18,23 +19,25 @@ export default function MediaMsg(props){
 
   useEffect(()=>{
     if(props.y && wrapRef.current){ // dont run if y=0 (beginning)
-      setTimeout(()=>{
-        wrapRef.current.measure((fx, fy, width, height, px, py)=>{
-          if(py>0) trigger()
-        })
-      },15)
+      wrapRef.current.measure((fx, fy, width, height, px, py)=>{
+        if(py>0) trigger()
+      })
     }
   },[props.y])
 
   console.log(props)
 
+  function tap(){
+    if(media_type.startsWith('image')){
+      if(data) ui.setImgViewerParams({data})
+    }
+  }
+
   const hasImgData = (data||uri)?true:false
   const hasContent = message_content?true:false
   const h = hasContent?249:200
   return <View ref={wrapRef} collapsable={false}>
-    <TouchableOpacity style={{...styles.wrap, height:h, minHeight:h}} onPress={()=>{
-      if(data) ui.setImgViewerParams({data})
-    }} activeOpacity={0.65}>
+    <TouchableOpacity style={{...styles.wrap, height:h, minHeight:h}} onPress={tap} activeOpacity={0.65}>
       {!hasImgData && <View style={styles.loading}>
         {loading && <ActivityIndicator animating={true} color="white" />}
       </View>}
@@ -49,10 +52,10 @@ export default function MediaMsg(props){
 function Media({type,data,uri}){
   console.log(type,uri)
   if(type.startsWith('image')) {
-    return <Image style={styles.img} resizeMode='cover' source={{uri:data}}/>
+    return <Image style={styles.img} resizeMode='cover' source={{uri:uri||data}} />
   }
   if(type.startsWith('audio')) {
-    return <AudioPlayer />
+    return <AudioPlayer source={uri||data} />
   }
 }
 

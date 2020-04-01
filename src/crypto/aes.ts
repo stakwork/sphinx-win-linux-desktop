@@ -60,9 +60,9 @@ export async function readEncryptedFile(filepath, pwd): Promise<string> {
   }
 }
 
-export async function decryptFileAndSave(filepath, pwd): Promise<string> {
+export async function decryptFileAndSave(filepath, pwd, extension): Promise<string> {
   try {
-    const path = await RNCryptor.decryptFileAndSave(filepath,pwd)
+    const path = await RNCryptor.decryptFileAndSave(filepath,pwd,extension)
     return path
   } catch(e){
     console.log(e)

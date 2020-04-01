@@ -25,8 +25,9 @@ export function useCachedEncryptedFile(props){
   }
 
   async function trigger() {
-    if(data) return // already done
+    if(loading||data||uri) return // already done
     setLoading(true)
+    console.log("TRIGGER IT!!!")
 
     const ldat = parseLDAT(media_token)
     if(!(ldat && ldat.host)) return
@@ -45,19 +46,24 @@ export function useCachedEncryptedFile(props){
 
       const path = res.path()
       const status = res.info().status
-      // if(status == 200 && path){
-      //   const newpath = await aes.decryptFileAndSave(path, media_key)
-      //   console.log(newpath)
-      //   setURI(newpath)
-      //   setLoading(false)
-      // }
       if(status == 200 && path){
-        const dec = await aes.readEncryptedFile(path, media_key)
-        const dataURI = `data:${media_type};base64,${dec}`
-        console.log('got data URI', dataURI.length)
-        setData(dataURI)
+        let extension = ''
+        if(media_type.startsWith('audio')){
+          // extension = 'm4a'
+        }
+        const newpath = await aes.decryptFileAndSave(path, media_key, extension)
+        console.log(newpath)
+        setURI('file://'+newpath)
         setLoading(false)
       }
+      // if(status == 200 && path){
+      //   console.log("DECRYPT", path, media_key)
+      //   const dec = await aes.readEncryptedFile(path, media_key)
+      //   const dataURI = `data:${media_type};base64,${dec}`
+      //   console.log('got data URI', dataURI.length)
+      //   setData(dataURI)
+      //   setLoading(false)
+      // }
 
       // let status = res.info().status
       // if(status == 200) {
