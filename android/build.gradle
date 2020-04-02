@@ -36,10 +36,6 @@ allprojects {
         maven { // <---- Add this block
             url "https://github.com/jitsi/jitsi-maven-repository/raw/master/releases"
         }
-        maven {
-            // expo-camera bundles a custom com.google.android:cameraview
-            url "$rootDir/../node_modules/expo-camera/android/maven"
-        }
     }
 }
 

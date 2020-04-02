@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import StatusBar from './src/components/utils/statusBar'
 import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
+import { NavigationContainer } from '@react-navigation/native';
 
 declare var global: {HermesInternal: null | {}}
 
@@ -59,11 +60,13 @@ function App() {
   },[])
 
   if(loading) return <Loading />
-  return (<PaperProvider theme={theme}>
-    <StatusBar />
-    {signedUp && <Main />}
-    {!signedUp && <Onboard onFinish={()=>setSignedUp(true)} />}
-  </PaperProvider>)
+  return (<NavigationContainer>
+    <PaperProvider theme={theme}>
+      <StatusBar />
+      {signedUp && <Main />}
+      {!signedUp && <Onboard onFinish={()=>setSignedUp(true)} />}
+    </PaperProvider>
+  </NavigationContainer>)
 }
 
 const theme = {

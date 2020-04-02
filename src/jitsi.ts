@@ -4,8 +4,6 @@ import { NativeModules, requireNativeComponent } from 'react-native'
 export const JitsiMeetView = requireNativeComponent('RNJitsiMeetView')
 export const JitsiMeetModule = NativeModules.RNJitsiMeetModule
 
-console.log(NativeModules, NativeModules.RNJitsiMeetModule)
-
 const call = JitsiMeetModule.call;
 const audioCall = JitsiMeetModule.audioCall;
 JitsiMeetModule.call = (url:string, userInfo:{[k:string]:any}) => {

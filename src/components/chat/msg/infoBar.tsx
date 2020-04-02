@@ -2,7 +2,7 @@ import React from 'react'
 import {View, Text, StyleSheet} from 'react-native'
 import moment from 'moment'
 import { constants } from '../../../constants'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {calcExpiry} from './utils'
 
 const received = constants.statuses.received
@@ -31,11 +31,11 @@ export default function InfoBar(props){
         <Text style={styles.time}>
           {moment(props.date).format('hh:mm A')}
         </Text>
-        {showLock && <MaterialCommunityIcons 
+        {showLock && <Icon 
           name="lock" size={14} color="#AFB6BC" 
           style={{marginRight:4,marginLeft:4}}
         />}
-        {isMe && isReceived && <MaterialCommunityIcons 
+        {isMe && isReceived && <Icon 
           name="check" size={14} color="#64C684" 
           style={{marginRight:showLock?0:4}}
         />}

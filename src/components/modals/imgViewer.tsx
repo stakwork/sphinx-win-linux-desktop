@@ -3,7 +3,7 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {View, StyleSheet, Image,Dimensions,TextInput,Text,TouchableOpacity} from 'react-native'
 import {IconButton} from 'react-native-paper'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons'
 import {randString} from '../../crypto/rand'
 import RNFetchBlob from 'rn-fetch-blob'
 import * as aes from '../../crypto/aes'
@@ -102,7 +102,7 @@ export default function ImgViewer(props) {
         <View style={styles.sendButtonWrap}>
           <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
             onPress={()=> sendAttachment()} disabled={uploading}>
-            <MaterialCommunityIcons name="send" size={17} color="white" />
+            <Icon name="send" size={17} color="white" />
           </TouchableOpacity>
         </View> 
       </View>}

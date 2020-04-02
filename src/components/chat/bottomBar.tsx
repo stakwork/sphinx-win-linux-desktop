@@ -2,13 +2,12 @@ import React, {useState, useRef} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, View, Text, TextInput, StyleSheet } from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
 import {Chat} from '../../store/chats'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
-import { Audio } from 'expo-av';
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
@@ -95,7 +94,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
         onPress={()=> ui.setPayMode('invoice', chat)}     
       />}
       {!inputFocused && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
-        <MaterialCommunityIcons name="plus" color="#888" size={27} />
+        <Icon name="plus" color="#888" size={27} />
       </TouchableOpacity>}
       <TextInput 
         placeholder="Message..." ref={inputRef}
@@ -116,7 +115,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
       {inputFocused && <View style={styles.sendButtonWrap}>
         <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
           onPress={()=> sendMessage()}>
-          <MaterialCommunityIcons name="send" size={17} color="white" />
+          <Icon name="send" size={17} color="white" />
         </TouchableOpacity>
       </View>}
 

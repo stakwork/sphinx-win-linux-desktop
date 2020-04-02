@@ -1,9 +1,9 @@
 import React, {useState} from 'react'
 import {View, StyleSheet, Text} from 'react-native'
 import NumKey from './numkey'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { ActivityIndicator, Colors } from 'react-native-paper'
-import * as SecureStore from 'expo-secure-store'
+import RNSecureKeyStore, {ACCESSIBLE} from "react-native-secure-key-store";
 
 const ns = [1,2,3,4,5,6]
 export default function PIN(props) {
@@ -17,7 +17,7 @@ export default function PIN(props) {
       if(chosenPin){
         if(pin===chosenPin){ // success!
           setChecking(true)
-          await SecureStore.setItemAsync('pin', pin)
+          await RNSecureKeyStore.set('pin', pin, {accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY})
           props.onFinish()
         } else {
           setErr(true)
@@ -31,10 +31,12 @@ export default function PIN(props) {
     }
     if(props.mode==='enter') {
       setChecking(true)
-      const storedPin = await SecureStore.getItemAsync('pin')
-      if(storedPin===pin){
-        props.onFinish()
-      }
+      try {
+        const storedPin = await RNSecureKeyStore.get('pin')
+        if(storedPin===pin){
+          props.onFinish()
+        }
+      } catch(e){}
     } 
   }
   function go(v){
@@ -62,7 +64,7 @@ export default function PIN(props) {
   return <View style={styles.wrap}>
     <View style={styles.top}>
       <View style={styles.lock}>
-        <MaterialCommunityIcons name="lock-outline" color="white" size={20} />
+        <Icon name="lock-outline" color="white" size={20} />
         <Text style={styles.choose}>{txt}</Text>
       </View>
       <View style={styles.circles}>
@@ -84,9 +86,13 @@ export default function PIN(props) {
 }
 
 export async function hasUserSetPinCode(): Promise<boolean> {
-  const pin = await SecureStore.getItemAsync('pin')
-  if(pin) return true
-  else return false
+  try{
+    const pin = await RNSecureKeyStore.get('pin')
+    if(pin) return true
+    else return false
+  } catch(e) {
+    return false
+  }
 }
 
 const styles = StyleSheet.create({

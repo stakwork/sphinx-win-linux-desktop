@@ -2,8 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {Dialog, Portal, TextInput, Button} from 'react-native-paper'
 import {View, Text, TouchableWithoutFeedback, Image, TouchableOpacity} from 'react-native'
 import {inputStyles} from './shared'
-import * as ImagePicker from 'expo-image-picker'
-import { AntDesign } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/AntDesign'
 import Cam from '../../utils/cam'
 import ImgSrcDialog from '../../utils/imgSrcDialog'
 
@@ -26,7 +25,7 @@ export default function PhotoInput({name,label,required,handleChange,handleBlur,
         </Text>
       </View>
     </TouchableWithoutFeedback>
-    {!imgURI && <AntDesign
+    {!imgURI && <Icon
       name="picture"
       color="#888"
       size={25}

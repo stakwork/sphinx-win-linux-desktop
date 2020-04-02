@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, Text, StyleSheet} from 'react-native'
 import {Button} from 'react-native-paper'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {constants} from '../../../constants'
 import { useStores } from '../../../store'
 import {calcExpiry} from './utils'
@@ -39,7 +39,7 @@ export default function Invoice(props){
   return <View style={{...styles.bub, opacity, ...shared.innerPad}}>
     <View style={styles.row}>
       <View style={styles.iconWrap}>
-        <MaterialCommunityIcons name="qrcode" size={22} color={color} />
+        <Icon name="qrcode" size={22} color={color} />
       </View>
       <Text style={{...styles.label,color}}>{label}</Text>
     </View>

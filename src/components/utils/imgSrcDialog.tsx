@@ -1,20 +1,16 @@
 import React from 'react'
 import {Portal, Button, Dialog} from 'react-native-paper'
-import * as ImagePicker from 'expo-image-picker'
+import ImagePicker from 'react-native-image-picker'
 
 export default function ImgSrcDialog({open, onClose, onPick, onChooseCam}){
   async function pickImage() {
-    let result:{[k:string]:any} = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1
+    ImagePicker.launchImageLibrary({}, result=>{
+      if (!result.didCancel) {
+        onPick(result)
+      } else {
+        onClose()
+      }
     })
-    if (result && !result.cancelled) {
-      onPick(result)
-    } else {
-      onClose()
-    }
   }
   return <Portal>
     <Dialog visible={open} style={{bottom:10}}

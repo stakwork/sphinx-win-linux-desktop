@@ -3,8 +3,8 @@ import {View,StyleSheet,Text,Image} from 'react-native'
 import { useStores } from '../../store'
 import {useObserver} from 'mobx-react-lite'
 import {Button, IconButton} from 'react-native-paper'
-import * as ImagePicker from 'expo-image-picker'
 import Slider from '../utils/slider'
+import ImagePicker from 'react-native-image-picker';
 
 export default function ProfilePic({z,show,onDone,onBack}) {
   const {contacts, user} = useStores()
@@ -12,15 +12,11 @@ export default function ProfilePic({z,show,onDone,onBack}) {
   const [img, setImg] = useState(null)
 
   async function pickImage() {
-    let result:{[k:string]:any} = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
+    ImagePicker.launchImageLibrary({}, result=>{
+      if (!result.didCancel) {
+        setImg(result)
+      }
     })
-    if (!result.cancelled) {
-      setImg(result)
-    }
   }
 
   async function finish(){

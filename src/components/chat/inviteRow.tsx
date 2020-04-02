@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native'
 import {Dialog, Portal, Button} from 'react-native-paper'
 import {constantCodes} from '../../constants'
@@ -40,7 +40,7 @@ export default function InviteRow(props){
         <Dialog.Title>Pay for Invitation?</Dialog.Title>
         <Dialog.Actions style={{justifyContent:'space-between'}}>
           <Button onPress={()=>setDialogOpen(false)} labelStyle={{color:'grey'}}>
-            <MaterialCommunityIcons name="cancel" size={14} color="grey" />
+            <Icon name="cancel" size={14} color="grey" />
             <View style={{width:4,height:6}}></View>
             <Text>Cancel</Text>
           </Button>
@@ -62,15 +62,15 @@ export default function InviteRow(props){
 function inviteIcon(statusString){
   switch (statusString) {
     case 'payment_pending':
-      return <MaterialCommunityIcons 
+      return <Icon 
         name="credit-card" size={14} color="grey" style={{marginRight:4}}
       />
     case 'ready': 
-      return <MaterialCommunityIcons 
+      return <Icon 
         name="check" size={14} color="#64C684" style={{marginRight:4}}
       />
     case 'delivered': 
-      return <MaterialCommunityIcons 
+      return <Icon 
         name="check" size={14} color="#64C684" style={{marginRight:4}}
       />
     default:

@@ -2,7 +2,8 @@ import React from 'react'
 import {StyleSheet, View, Text} from 'react-native'
 import {DrawerContentScrollView,DrawerItem} from '@react-navigation/drawer'
 import {Avatar,Title,Drawer,Button} from 'react-native-paper'
-import { MaterialCommunityIcons, AntDesign, Entypo } from '@expo/vector-icons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import { useStores } from '../../store'
 import { useObserver } from 'mobx-react-lite'
 
@@ -32,7 +33,7 @@ export default function TheDrawer(props) {
       <Drawer.Section style={styles.drawerSection}>
         <DrawerItem style={itemStyle}
           icon={({ color, size }) => (
-            <Entypo name="chat" color={color} size={size} />
+            <AntDesign name="message1" color={color} size={size} />
           )}
           label="Dashboard"
           onPress={() => props.navigation.navigate('Dashboard')}

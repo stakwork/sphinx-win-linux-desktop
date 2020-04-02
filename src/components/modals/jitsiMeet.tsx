@@ -5,7 +5,7 @@ import {View, Text, StyleSheet} from 'react-native'
 import Modal from "./modalWrap"
 import { Button } from 'react-native-paper'
 import Header from './modalHeader'
-import JitsiMeet, { JitsiMeetView } from 'react-native-jitsi-meet';
+import JitsiMeet, { JitsiMeetView } from '../../jitsi';
 
 console.log("ASDF",JitsiMeet, JitsiMeetView)
 

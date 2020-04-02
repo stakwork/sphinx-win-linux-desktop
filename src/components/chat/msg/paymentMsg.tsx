@@ -1,6 +1,6 @@
 import React from 'react'
 import {View, Text, StyleSheet} from 'react-native'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import shared from './sharedStyles'
 
 export default function PaymentMsg(props){
@@ -12,7 +12,7 @@ export default function PaymentMsg(props){
   return <View style={{...styles.bub, ...shared.innerPad}}>
     <View style={styles.row}>
       <View style={{...styles.iconWrap,backgroundColor:color}}>
-        <MaterialCommunityIcons name={icon} size={15} color="white" />
+        <Icon name={icon} size={15} color="white" />
       </View>
       <Text style={{...styles.label,color}}>{label}</Text>
     </View>

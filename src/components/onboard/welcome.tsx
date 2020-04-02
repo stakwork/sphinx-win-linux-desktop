@@ -4,7 +4,7 @@ import { useStores } from '../../store'
 import {useObserver} from 'mobx-react-lite'
 import {Button} from 'react-native-paper'
 import { constants } from '../../constants'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons'
 import Slider from '../utils/slider'
 
 export default function Welcome(props) {
@@ -43,7 +43,7 @@ export default function Welcome(props) {
         style={styles.button}>
         <Text>Get Started</Text>
         <View style={{width:12,height:1}}/>
-        <MaterialCommunityIcons name="arrow-right" size={20} />
+        <Icon name="arrow-right" size={20} />
       </Button>
     </Slider>
   })

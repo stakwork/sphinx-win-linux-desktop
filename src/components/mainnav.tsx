@@ -11,14 +11,12 @@ const Drawer = createDrawerNavigator()
 
 export default function MainNav() {
   return (<>
-    <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Dashboard" 
-        drawerContent={props => <DrawerContent {...props} />}>
-        <Drawer.Screen name="Dashboard" component={DashNav} />
-        <Drawer.Screen name="Contacts" component={ContactsNav} />
-        <Drawer.Screen name="Profile" component={Profile} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <Drawer.Navigator initialRouteName="Dashboard" 
+      drawerContent={props => <DrawerContent {...props} />}>
+      <Drawer.Screen name="Dashboard" component={DashNav} />
+      <Drawer.Screen name="Contacts" component={ContactsNav} />
+      <Drawer.Screen name="Profile" component={Profile} />
+    </Drawer.Navigator>
 
     <Modals />
   </>)

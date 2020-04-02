@@ -5,10 +5,9 @@ import {View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Imag
 import { useNavigation, DrawerActions } from '@react-navigation/native'
 import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
 import { Card, Avatar, Title } from 'react-native-paper'
-import { AntDesign } from '@expo/vector-icons'
+import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
 import Form from '../form'
-import * as ImagePicker from 'expo-image-picker'
 import Cam from '../utils/cam'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 
@@ -57,7 +56,7 @@ export default function Profile() {
           <View style={styles.userBalance}>
             <Text>{details.balance}</Text>
             <Text style={{marginLeft:10,marginRight:10,color:'#c0c0c0'}}>sat</Text>
-            <AntDesign name="wallet" color="#d0d0d0" size={20} />
+            <Icon name="wallet" color="#d0d0d0" size={20} />
           </View>
         </View>
       </View>
