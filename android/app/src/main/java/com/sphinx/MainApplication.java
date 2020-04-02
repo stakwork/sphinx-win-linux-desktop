@@ -7,7 +7,7 @@ import com.facebook.react.ReactApplication;
 import com.dooboolab.RNAudioRecorderPlayerPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
-// import com.reactnativejitsimeet.RNJitsiMeetPackage;
+import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import cl.json.RNSharePackage;
 import com.horcrux.svg.SvgPackage;
 import com.surajit.rnrg.RNRadialGradientPackage;
@@ -58,7 +58,7 @@ public class MainApplication extends Application implements ReactApplication {
             new RNAudioRecorderPlayerPackage(),
             new RNCWebViewPackage(),
           new RNFetchBlobPackage(),
-          // new RNJitsiMeetPackage(),
+          new RNJitsiMeetPackage(),
           new RNSharePackage(),
           new SvgPackage(),
           new RNRadialGradientPackage(),
@@ -81,10 +81,10 @@ public class MainApplication extends Application implements ReactApplication {
       return "index";
     }
 
-    // @Override
-    // protected @Nullable String getBundleAssetName() {
-    //   return "app.bundle";
-    // }
+    @Override
+    protected @Nullable String getBundleAssetName() {
+      return "app.bundle";
+    }
   };
 
   @Override

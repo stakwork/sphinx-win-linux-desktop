@@ -8,7 +8,7 @@ import ImageViewer from './imgViewer'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 
-import JitsiWebview from './jitsiWebview'
+import JitsiMeet from './jitsiMeet'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -24,6 +24,7 @@ export default function Modals(){
       <ShareInvite visible={ui.shareInviteModal} />
       <RawInvoiceModal visible={showRawInvoiceModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
+      <JitsiMeet visible={true} />
     </>
   })
 }
