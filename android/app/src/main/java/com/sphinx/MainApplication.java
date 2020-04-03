@@ -15,7 +15,6 @@ import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import cl.json.RNSharePackage;
-import com.horcrux.svg.SvgPackage;
 import com.surajit.rnrg.RNRadialGradientPackage;
 import com.reactlibrary.RNRncryptorPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
@@ -57,7 +56,6 @@ public class MainApplication extends Application implements ReactApplication {
           new RNFetchBlobPackage(),
           new RNJitsiMeetPackage(),
           new RNSharePackage(),
-          new SvgPackage(),
           new RNRadialGradientPackage(),
           new RNRncryptorPackage(),
           new RandomBytesPackage(),
