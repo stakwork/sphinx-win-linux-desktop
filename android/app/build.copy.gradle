@@ -163,6 +163,7 @@ dependencies {
         exclude group: 'com.facebook.react',module:'react-native-vector-icons'
         exclude group: 'com.facebook.react',module:'react-native-community-async-storage'
         exclude group: 'com.facebook.react',module:'react-native-webview'
+        exclude group: 'com.facebook.react',module:'react-native-fetch-blob'
     }
     implementation project(':react-native-share')
     implementation project(':react-native-radial-gradient')

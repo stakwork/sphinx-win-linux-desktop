@@ -46,6 +46,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNGestureHandlerPackage(),
           new VectorIconsPackage(),
           new RNSecureKeyStorePackage(),
           new RNReactNativeHapticFeedbackPackage(),
@@ -65,7 +66,6 @@ public class MainApplication extends Application implements ReactApplication {
           new RNRSAPackage(),
           new SafeAreaContextPackage(),
           new ReanimatedPackage(),
-          new RNGestureHandlerPackage(),
           new RNScreensPackage()
       );
     }
