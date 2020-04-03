@@ -1,24 +1,30 @@
 import React from 'react'
-import {StyleSheet, View, Text} from 'react-native'
+import {StyleSheet, View, Text, Image} from 'react-native'
 import {DrawerContentScrollView,DrawerItem} from '@react-navigation/drawer'
 import {Avatar,Title,Drawer,Button} from 'react-native-paper'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { useStores } from '../../store'
 import { useObserver } from 'mobx-react-lite'
+import {usePicSrc} from '../utils/picSrc'
 
 const itemStyle = {height:60,paddingLeft:15}
 
 export default function TheDrawer(props) {
   const {ui, details, user} = useStores()
+
+  const uri = usePicSrc(1)
+
+  console.log(uri)
+  const hasImg = uri?true:false
   return useObserver(() =>
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
         <View style={styles.userInfoSection}>
           <View style={styles.userName}>
-            <Avatar.Image
-              source={require('../../../assets/avatar.png')}
-              size={50}
+            <Image resizeMode="cover" 
+              source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
+              style={{width:50,height:50,borderRadius:25}}
             />
             <Title style={styles.title}>{user.alias}</Title>
           </View>

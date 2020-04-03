@@ -6,17 +6,18 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import Cam from '../../utils/cam'
 import ImgSrcDialog from '../../utils/imgSrcDialog'
 
-export default function PhotoInput({name,label,required,handleChange,handleBlur,value}) {
+export default function PhotoInput({name,label,required,setValue,value}) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [imgURI, setImgURI] = useState(null)
   const [takingPhoto, setTakingPhoto] = useState(false)
 
   function tookPic(uri){
     setDialogOpen(false)
     setTakingPhoto(false)
-    setImgURI(uri)
+    setValue(uri)
   }
-
+  
+  const imgURI = value
+  const hasImgURI = imgURI?true:false
   return <View style={{...inputStyles, ...styles.wrap}}>
     <TouchableWithoutFeedback onPress={() => setDialogOpen(true)}>
       <View style={styles.box}>
@@ -25,14 +26,14 @@ export default function PhotoInput({name,label,required,handleChange,handleBlur,
         </Text>
       </View>
     </TouchableWithoutFeedback>
-    {!imgURI && <Icon
+    {!hasImgURI && <Icon
       name="picture"
       color="#888"
       size={25}
       style={{position:'absolute',right:13,top:17}}
       onPress={() => setDialogOpen(true)}
     />}
-    {imgURI && <Image source={{ uri: imgURI }} 
+    {hasImgURI && <Image source={{ uri: imgURI }} 
       style={{ width:52, height:52, position:'absolute',right:0,top:1, borderRadius:3 }}
     />}
 

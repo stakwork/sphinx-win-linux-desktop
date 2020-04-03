@@ -16,6 +16,7 @@ export default function QrInput({name,label,required,handleChange,handleBlur,set
   if(displayOnly) lab = label.en
   return <View style={{...inputStyles, ...styles.wrap}}>
     <TextInput
+      disabled={displayOnly}
       label={lab}
       onChangeText={handleChange(name)}
       onBlur={handleBlur(name)}

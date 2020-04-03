@@ -33,6 +33,27 @@ class UiStore {
     this.addFriendModal = b
   }
 
+  @observable editContactModal: boolean = false
+  @observable editContactParams: {[k:string]:any}
+  @action
+  setEditContactModal(p: {[k:string]:any}) {
+    this.editContactModal = true
+    this.editContactParams = p
+  }
+  @action
+  closeEditContactModal() {
+    this.editContactModal = false
+    setTimeout(()=>{
+      this.editContactParams = null
+    },500)
+  }
+
+  @observable newGroupModal: boolean = false
+  @action
+  setNewGroupModal(b) {
+    this.newGroupModal = b
+  }
+
   @observable pubkeyModal: boolean = false
   @action
   setPubkeyModal(b) {

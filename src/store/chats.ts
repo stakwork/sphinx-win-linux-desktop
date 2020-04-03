@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx'
 import { persist } from 'mobx-persist'
 import {Invite} from './contacts'
+import {relay} from '../api'
 
 export interface Chat {
   id: number
@@ -33,6 +34,15 @@ class ChatStore {
     if(!existing){
       this.chats.push(chat)
     }
+  }
+
+  @action 
+  async createGroup(contact_ids: number[], name: string){
+    const r = await relay.post('group', {
+      name, contact_ids
+    })
+    this.gotChat(r)
+    return r
   }
 }
 

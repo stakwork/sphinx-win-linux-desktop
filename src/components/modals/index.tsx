@@ -7,14 +7,16 @@ import RawInvoiceModal from './rawInvoiceModal'
 import ImageViewer from './imgViewer'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-
+import NewGroupModal from './newGroupModal'
 import JitsiMeet from './jitsiMeet'
+import EditContactModal from './editContact'
 
 export default function Modals(){
   const {ui} = useStores()
   return useObserver(()=> {
     const showConfirmPayInvoice = ui.confirmInvoiceMsg&&ui.confirmInvoiceMsg.payment_request?true:false
     const showAddFriendModal = ui.addFriendModal?true:false
+    const showNewGroupModal = ui.newGroupModal?true:false
     const showRawInvoiceModal = ui.rawInvoiceModal
     const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri)?true:false
     return <>
@@ -23,8 +25,10 @@ export default function Modals(){
       <ConfirmPayInvoice visible={showConfirmPayInvoice} />
       <ShareInvite visible={ui.shareInviteModal} />
       <RawInvoiceModal visible={showRawInvoiceModal} />
+      <NewGroupModal visible={showNewGroupModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
-      <JitsiMeet visible={true} />
+      {/* <JitsiMeet /> */}
+      <EditContactModal visible={ui.editContactModal} />
     </>
   })
 }

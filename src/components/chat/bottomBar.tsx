@@ -104,10 +104,10 @@ export default function BottomBar({chat}:{chat: Chat}) {
         onChangeText={e=> setText(e)}>
         <Text>{text}</Text>
       </TextInput>
-      <IconButton icon="microphone-outline" size={32} color="#666"
+      {/* <IconButton icon="microphone-outline" size={32} color="#666"
         style={{marginLeft:0,marginRight:-4}}
         onPress={rec}
-      />
+      /> */}
       {!inputFocused && <IconButton icon="arrow-top-right" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}}
         onPress={()=> ui.setPayMode('payment',chat)}

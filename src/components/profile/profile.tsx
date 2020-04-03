@@ -1,15 +1,16 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
 import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
-import { Card, Avatar, Title } from 'react-native-paper'
+import { Card, Title } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
 import Form from '../form'
 import Cam from '../utils/cam'
 import ImgSrcDialog from '../utils/imgSrcDialog'
+import {createContactPic, contactPicSrc} from '../utils/picSrc'
 
 // no contact_id!
 // http://x.x.x.x/static/uploads/undefined_profile_picture.jpeg
@@ -21,6 +22,13 @@ export default function Profile() {
   const [img, setImg] = useState(null)
   const [takingPhoto, setTakingPhoto] = useState(false)
 
+  useEffect(()=>{
+    (async () => {
+      const src = await contactPicSrc(1)
+      if(src&&src.uri) setImg(src)
+    })()
+  },[])
+
   async function tookPic(img){
     setDialogOpen(false)
     setTakingPhoto(false)
@@ -28,9 +36,10 @@ export default function Profile() {
     console.log("TOOK PIC")
     setUploading(true)
     try {
-      await contacts.uploadProfilePic(img, {
-        contact_id:1,
-      })
+      await createContactPic(1, img.uri)
+      // await contacts.uploadProfilePic(img, {
+      //   contact_id:1,
+      // })
     }catch(e){
       console.log(e)
     }
@@ -45,7 +54,7 @@ export default function Profile() {
           <TouchableOpacity onPress={()=>setDialogOpen(true)}
             style={styles.userPic}>
             <Image resizeMode="cover" 
-              source={img?{uri:img.uri}:require('../../../assets/avatar.png')}
+              source={img?{uri:'file://'+img.uri}:require('../../../assets/avatar.png')}
               style={{width:60,height:60,borderRadius:30}}
             />
             {uploading && <ActivityIndicator animating={true} color="#55D1A9" style={styles.spinner} />}

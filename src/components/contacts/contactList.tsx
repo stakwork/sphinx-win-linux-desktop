@@ -1,9 +1,10 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useStores} from '../../store'
 import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, SectionList, View, Text, StyleSheet, Image } from 'react-native'
 import {SwipeRow} from 'react-native-swipe-list-view'
 import {IconButton} from 'react-native-paper'
+import {usePicSrc} from '../utils/picSrc'
 
 export default function ContactList() {
   const {ui, contacts} = useStores()
@@ -21,7 +22,7 @@ export default function ContactList() {
           return item.alias+index
         }}
         renderItem={({ item }) => <Item contact={item} 
-          onPress={contact=> console.log('pressed',contact)} 
+          onPress={contact=> ui.setEditContactModal(contact)} 
         />}
         renderSectionHeader={({ section: { title } }) => (
           <View style={styles.section}>
@@ -35,6 +36,10 @@ export default function ContactList() {
 
 function Item({ contact, onPress }) {
   const {ui, contacts} = useStores()
+  
+  const uri = usePicSrc(contact.id)
+  
+  const hasImg = uri?true:false
   return (
     <SwipeRow disableRightSwipe={true} friction={100}
       rightOpenValue={-80} stopRightSwipe={-80}>
@@ -51,7 +56,7 @@ function Item({ contact, onPress }) {
         <TouchableOpacity style={styles.contactTouch} activeOpacity={0.5}
           onPress={()=>onPress(contact)}>
           <View style={styles.avatar}>
-            <Image source={require('../../../assets/avatar.png')} 
+            <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')} 
               style={{width:44,height:44}} resizeMode={'cover'}
             />
           </View>

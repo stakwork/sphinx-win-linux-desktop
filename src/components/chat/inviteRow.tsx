@@ -108,8 +108,8 @@ export const styles = StyleSheet.create({
     marginLeft:18,
   },
   avatar:{
-    width:44,height:44,
-    borderRadius:23,
+    width:52,height:52,
+    borderRadius:26,
     overflow:'hidden',
     backgroundColor:'transparent',
     display:'flex',

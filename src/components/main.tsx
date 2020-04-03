@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react'
 import MainNav from './mainnav'
 import PINCode, {hasUserSetPinCode} from './utils/pin'
 import {useStores} from '../store'
+import {initPicSrc} from './utils/picSrc'
 
 export default function Main() {
   const {contacts,msg,details,ui,meme} = useStores()
@@ -21,6 +22,8 @@ export default function Main() {
 
       await sleep(500)
       await meme.authenticateAll()
+
+      initPicSrc()
 
     })()
   },[])

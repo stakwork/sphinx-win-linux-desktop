@@ -3,9 +3,11 @@ import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image } from 'react-native'
 import {allChats} from './utils'
+import {Button} from 'react-native-paper'
 import InviteRow, {styles} from './inviteRow'
 import { useNavigation } from '@react-navigation/native'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
+import {useChatPicSrc} from '../utils/picSrc'
 
 export default function ChatList() {
   const {ui,chats,contacts} = useStores()
@@ -38,19 +40,37 @@ export default function ChatList() {
         if(c.invite) return <InviteRow key={i} {...c} />
         return <ChatRow key={i} {...c} />
       })}
+      <View style={moreStyles.buttonsWrap}>
+        <Button mode="contained" dark={true} icon="plus"
+          onPress={()=> ui.setAddFriendModal(true)}
+          style={{...moreStyles.button, backgroundColor:'#55D1A9'}}>
+          Friend
+        </Button>
+        <Button mode="contained" dark={true} icon="plus"
+          style={moreStyles.button}
+          onPress={()=> ui.setNewGroupModal(true)}>
+          Group
+        </Button>
+      </View>
     </ScrollView>
   })
 }
 
 function ChatRow(props){
-  const {name} = props
+  const {name,contact_ids} = props
   const navigation = useNavigation()
+
+  const uri = useChatPicSrc(props)
+
+  const hasImg = uri?true:false
   return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
     onPress={()=> navigation.navigate('Dashboard',{
       screen:'Chat', params: props
     })}>
     <View style={styles.avatar}>
-      <Image source={require('../../../assets/avatar.png')} />
+      <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
+        style={{width:52,height:52}} resizeMode={'cover'}
+      />
     </View>
     <View style={styles.chatContent}>
       <Text style={styles.chatName}>{name}</Text>
@@ -64,3 +84,21 @@ function wait(timeout) {
     setTimeout(resolve, timeout)
   })
 }
+
+const moreStyles = StyleSheet.create({
+  buttonsWrap:{
+    marginTop:40,
+    display:'flex',
+    flexDirection:'row',
+    width:'100%',
+    justifyContent:'space-around'
+  },
+  button:{
+    height:46,
+    borderRadius:23,
+    width:140,
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center'
+  }
+})

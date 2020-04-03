@@ -60,13 +60,15 @@ function App() {
   },[])
 
   if(loading) return <Loading />
-  return (<NavigationContainer>
-    <PaperProvider theme={theme}>
-      <StatusBar />
-      {signedUp && <Main />}
-      {!signedUp && <Onboard onFinish={()=>setSignedUp(true)} />}
-    </PaperProvider>
-  </NavigationContainer>)
+  return (<>
+    <NavigationContainer>
+      <PaperProvider theme={theme}>
+        <StatusBar />
+        {signedUp && <Main />}
+        {!signedUp && <Onboard onFinish={()=>setSignedUp(true)} />}
+      </PaperProvider>
+    </NavigationContainer>
+  </>)
 }
 
 const theme = {

@@ -9,11 +9,11 @@ import JitsiMeet, { JitsiMeetView } from '../../jitsi';
 
 console.log("ASDF",JitsiMeet, JitsiMeetView)
 
-export default function Jitsi({visible}) {
+export default function Jitsi() {
   const { ui } = useStores()
 
   function close(){
-    console.log('close')
+    console.log('close!')
   }
 
   function jitsiDone(){
@@ -43,8 +43,7 @@ export default function Jitsi({visible}) {
   }
 
   return useObserver(() =>
-    <Modal visible={visible} onClose={close}>
-      <Header title="Video Chat" onClose={close} />
+    <View style={styles.wrap}>
       <View style={{ backgroundColor: 'black',flex: 1 }}>
         <JitsiMeetView 
           onConferenceTerminated={jitsiDone}
@@ -60,11 +59,20 @@ export default function Jitsi({visible}) {
           Meet
         </Button>
       </View>
-    </Modal>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  wrap:{
+    flex:1,
+    position:'absolute',
+    top:0,left:0,bottom:0,right:0,
+    flexDirection:'column',
+    justifyContent:'center',
+    alignItems:'center',
+    backgroundColor:'black'
+  },
   buttonsWrap:{
     marginTop:40,
     display:'flex',

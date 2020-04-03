@@ -17,9 +17,10 @@ export default function Form(props) {
         return (<View style={styles.wrap}>
           <View style={styles.topper}>
             {props.schema.map(item=>{
+              const readOnly = props.readOnlyFields && props.readOnlyFields.includes(item.name)
               return <Input key={item.name} {...item} 
                 value={values[item.name]}
-                displayOnly={props.displayOnly}
+                displayOnly={props.displayOnly||readOnly}
                 handleChange={handleChange} 
                 handleBlur={handleBlur} 
                 setValue={data=> setFieldValue(item.name,data)} 
