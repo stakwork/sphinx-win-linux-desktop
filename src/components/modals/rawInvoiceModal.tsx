@@ -5,7 +5,7 @@ import {View, Text, Image, StyleSheet, Clipboard} from 'react-native'
 import Modal from "./modalWrap"
 import { Button, Snackbar } from 'react-native-paper'
 import Header from './modalHeader'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../utils/qrcode'
 import Share from 'react-native-share'
 
 export default function RawInvoiceModal({visible}) {
@@ -67,7 +67,12 @@ export default function RawInvoiceModal({visible}) {
             <Text style={{fontSize:16}}>{`Amount: ${params.amount} sats`}</Text>
           </View>}
           <View style={styles.qrWrap}>
-            <QRCode value={payreq} size={250} />
+            <QRCode
+              value={payreq}
+              size={250}
+              bgColor='black'
+              fgColor='white'
+            />
           </View>
           <Text style={styles.payreqText}>{payreq}</Text>
           <View style={styles.buttonsWrap}>

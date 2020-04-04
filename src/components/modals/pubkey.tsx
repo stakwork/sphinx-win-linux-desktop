@@ -4,7 +4,7 @@ import { useStores } from '../../store'
 import {View, Text, Clipboard, StyleSheet} from 'react-native'
 import Modal from "./modalWrap"
 import { Button, Snackbar } from 'react-native-paper'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../utils/qrcode'
 import Header from './modalHeader'
 import Share from 'react-native-share'
 
@@ -26,7 +26,12 @@ export default function PubKey({visible, pubkey, onClose}) {
     <Modal visible={visible} onClose={onClose}>
       <Header title="Public Key" onClose={onClose} />
       <View style={styles.qrWrap}>
-        <QRCode value={pubkey} size={250} />
+        <QRCode
+          value={pubkey}
+          size={250}
+          bgColor='black'
+          fgColor='white'
+        />
       </View>
       <Text style={styles.pubkeyText}>{pubkey}</Text>
       <View style={styles.buttonsWrap}>

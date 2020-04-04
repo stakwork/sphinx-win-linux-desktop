@@ -5,7 +5,7 @@ import {View, Text, StyleSheet, Image, Clipboard, TouchableWithoutFeedback} from
 import {Button, Portal, Snackbar} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../utils/qrcode'
 import Share from 'react-native-share'
 
 export default function ShareInvite({visible}) {
@@ -38,6 +38,7 @@ export default function ShareInvite({visible}) {
           <View style={styles.qrWrap}>
             {hasInvite && <QRCode 
               value={ui.shareInviteString} size={210} 
+              bgColor="black" fgColor="white"
             />}
           </View>
           {hasInvite && <View style={styles.inviteStringWrap}>
