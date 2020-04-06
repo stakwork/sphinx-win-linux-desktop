@@ -7,12 +7,18 @@ import {View} from 'react-native'
 import {constantCodes, constants} from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
+import GroupNotification from './groupNotification'
 
 export default function MsgRow(props){
   
   const isMe = props.sender===1
   const isInvoice = props.type===constants.message_types.invoice
   const isPaid = props.status===constants.statuses.confirmed
+
+  const isGroupNotification = props.type===constants.message_types.group_join || props.type===constants.message_types.group_leave
+  if(isGroupNotification) {
+    return <GroupNotification {...props} />
+  }
 
   let dashed = false
   let backgroundColor = isMe?'#F9FAFC':'white'

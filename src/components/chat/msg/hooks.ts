@@ -37,7 +37,7 @@ export function useCachedEncryptedFile(props){
     try {
       const res = await RNFetchBlob
       .config({
-        path: dirs.CacheDir + `/msg_${id}`
+        path: dirs.CacheDir + `/attachments/msg_${id}`
       })
       .fetch('GET', url, {
         Authorization : `Bearer ${server.token}`,

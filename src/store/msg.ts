@@ -56,7 +56,6 @@ class MsgStore {
     if(newMsg.chat && newMsg.chat.id){
       putIn(this.messages, newMsg)
       chatStore.gotChat(newMsg.chat)
-      console.log(this.messages)
     }
   }
 

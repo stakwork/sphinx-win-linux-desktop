@@ -3,7 +3,7 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {View, StyleSheet, Image,Dimensions,TextInput,Text,TouchableOpacity} from 'react-native'
 import {IconButton} from 'react-native-paper'
-import Icon from 'react-native-vector-icons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {randString} from '../../crypto/rand'
 import RNFetchBlob from 'rn-fetch-blob'
 import * as aes from '../../crypto/aes'
@@ -17,6 +17,7 @@ export default function ImgViewer(props) {
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadPercent,setUploadedPercent] = useState(0)
   const inputRef = useRef(null)
 
   const w = Math.round(Dimensions.get('window').width)
@@ -25,7 +26,7 @@ export default function ImgViewer(props) {
   const showInput = (contact_id||chat_id)?true:false
 
   async function sendFinalMsg({muid,media_key,media_type}){
-    msg.sendAttachment({contact_id,chat_id,text,muid,media_key,media_type})
+    await msg.sendAttachment({contact_id,chat_id,text,muid,media_key,media_type})
     ui.setImgViewerParams(null)
   }
 
@@ -56,16 +57,17 @@ export default function ImgViewer(props) {
     // listen to upload progress event, emit every 250ms
     .uploadProgress({ interval : 250 },(written, total) => {
         console.log('uploaded', written / total)
+        setUploadedPercent(Math.round((written / total)*100))
     })
-    .then((resp) => {
+    .then(async (resp) => {
       let json = resp.json()
       console.log('done uploading',json)
-      setUploading(false)
-      sendFinalMsg({
+      await sendFinalMsg({
         muid:json.muid,
         media_key:pwd,
         media_type:type
       })
+      setUploading(false)
     })
     .catch((err) => {
        console.log(err)
@@ -88,6 +90,9 @@ export default function ImgViewer(props) {
       />}
       {uploading && <View style={{...styles.activityWrap,width:w,height:h-180}}>
         <ActivityIndicator animating={true} color="white" size="large" />
+        <Text style={styles.progressNum}>
+          {`${uploadPercent}%`}
+        </Text>
       </View>}
 
       {showInput && <View style={styles.send}>
@@ -136,6 +141,7 @@ const styles = StyleSheet.create({
     top:'10%',
     flexDirection:'column',
     justifyContent:'center',
+    alignItems:'center'
   },
   send:{
     position:'absolute',
@@ -174,4 +180,9 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center'
   },
+  progressNum:{
+    color:'white',
+    fontSize:16,
+    marginTop:16,
+  }
 })

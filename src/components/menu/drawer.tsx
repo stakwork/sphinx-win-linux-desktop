@@ -11,11 +11,11 @@ import {usePicSrc} from '../utils/picSrc'
 const itemStyle = {height:60,paddingLeft:15}
 
 export default function TheDrawer(props) {
-  const {ui, details, user} = useStores()
+  const {ui, details, user, contacts} = useStores()
 
-  const uri = usePicSrc(1)
+  const me = contacts.contacts.find(c=> c.id===1)
+  const uri = usePicSrc(me)
 
-  console.log(uri)
   const hasImg = uri?true:false
   return useObserver(() =>
     <DrawerContentScrollView {...props}>

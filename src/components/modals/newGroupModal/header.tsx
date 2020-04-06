@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
 import {IconButton} from 'react-native-paper'
 
 export default function Header(props){
-  const {title,onClose,showNext} = props
+  const {title,onClose,showNext,nextButtonText,loading} = props
   return <View style={{...moreStyles.header, ...props.background&&{backgroundColor:props.background}}}>
     <IconButton
       icon="arrow-left"
@@ -15,8 +15,10 @@ export default function Header(props){
     <Text style={moreStyles.headerTitle}>{title}</Text>
     <View style={moreStyles.headerRighty}>
       {showNext && <TouchableOpacity style={moreStyles.button}
-        onPress={()=> props.next()}>
-        <Text style={moreStyles.buttonTxt}>Next</Text>
+        onPress={()=> props.next()} disabled={loading}>
+        <Text style={moreStyles.buttonTxt}>
+          {nextButtonText||'Next'}
+        </Text>
       </TouchableOpacity>}
     </View>
   </View>

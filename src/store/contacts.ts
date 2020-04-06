@@ -30,6 +30,8 @@ export interface Contact {
   updated_at: string
 
   invite: Invite
+
+  photo_uri: string
 }
 
 export interface Invite {
@@ -96,13 +98,24 @@ class ContactStore {
       console.log('updated contact:', r)
       this.contacts = cs.map(c=>{
         if(c.id===id){
-          return {...c,...v} // ???
+          return {...c, ...v}
         }
         return c
       })
     } catch(e) {
       console.log(e)
     }
+  }
+
+  @action
+  updatePhotoURI(id,photo_uri){
+    const cs = [...this.contacts]
+    this.contacts = cs.map(c=>{
+      if(c.id===id){
+        return {...c, photo_uri}
+      }
+      return c
+    })
   }
 
   @action

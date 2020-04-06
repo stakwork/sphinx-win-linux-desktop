@@ -59,4 +59,24 @@ export function purchase_deny(data) {
   console.log("[ws] purchase_deny", data)
 }
 
+export function group_create(data) {
+  console.log("[ws] group_create", data)
+}
 
+export function group_join(data) {
+  console.log("[ws] group_join", data)
+  const msg = data.response && data.response.message
+  if(msg && data.response.chat) {
+    msg.chat = data.response.chat
+    msgStore.gotNewMessage(msg)
+  }
+}
+
+export function group_leave(data) {
+  console.log("[ws] group_leave", data)
+  const msg = data.response && data.response.message
+  if(msg && data.response.chat) {
+    msg.chat = data.response.chat
+    msgStore.gotNewMessage(msg)
+  }
+}

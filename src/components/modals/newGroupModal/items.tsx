@@ -2,12 +2,16 @@ import React from 'react'
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native'
 import {RadioButton} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import {usePicSrc} from '../../utils/picSrc'
 
-export function Contact({contact,onPress,selected}){
+export function Contact(props){
+  const {contact,onPress,selected,unselectable} =props
+  const uri = usePicSrc(contact)
+  const hasImg = uri?true:false
   return <TouchableOpacity style={styles.contactTouch} activeOpacity={1}
     onPress={onPress}>
     <View style={styles.avatar}>
-      <Image source={require('../../../../assets/avatar.png')} 
+      <Image source={hasImg?{uri:'file://'+uri}:require('../../../../assets/avatar.png')}
         style={{width:44,height:44}} resizeMode={'cover'}
       />
     </View>
@@ -15,22 +19,25 @@ export function Contact({contact,onPress,selected}){
       <Text style={styles.contactName}>{contact.alias}</Text>
     </View>
     <View style={styles.checker}>
-      <RadioButton status={selected?'checked':'unchecked'} 
+      {!unselectable && <RadioButton status={selected?'checked':'unchecked'} 
         value="contact" color="#6289FD"
-      />
+        onPress={onPress}
+      />}
     </View>
   </TouchableOpacity>
 }
 
-export function SelectedContact({contact, onPress}){
+export function SelectedContact({contact, onPress, removable}){
+  const uri = usePicSrc(contact)
+  const hasImg = uri?true:false
   return <View style={styles.selectedContact}>
     <View style={styles.selAvatar}>
-      <Image source={require('../../../../assets/avatar.png')} 
-        style={{width:54,height:54}} resizeMode={'cover'}
+      <Image source={hasImg?{uri:'file://'+uri}:require('../../../../assets/avatar.png')} 
+        style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
       />
-      <TouchableOpacity style={styles.tinyButton} onPress={onPress}>
+      {removable && <TouchableOpacity style={styles.tinyButton} onPress={onPress}>
         <Icon name="close" color="white" size={14} />
-      </TouchableOpacity>
+      </TouchableOpacity>}
     </View>
     <Text style={styles.selName}>{contact.alias}</Text>
   </View>

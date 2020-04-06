@@ -17,6 +17,8 @@ export interface Chat {
   deleted: boolean
 
   invite: Invite
+
+  photo_uri: string
 }
 
 class ChatStore {
@@ -30,9 +32,11 @@ class ChatStore {
 
   @action
   gotChat(chat: Chat) {
-    const existing = this.chats.find(ch=>ch.id===chat.id)
-    if(!existing){
-      this.chats.push(chat)
+    const existingIndex = this.chats.findIndex(ch=>ch.id===chat.id)
+    if(existingIndex>-1){
+      this.chats[existingIndex] = chat
+    } else {
+      this.chats.unshift(chat)
     }
   }
 
@@ -43,6 +47,20 @@ class ChatStore {
     })
     this.gotChat(r)
     return r
+  }
+
+  @action
+  async addGroupMembers(chatID: number, contact_ids: number[]) {
+    await relay.put(`chat/${chatID}`, {
+      contact_ids
+    })
+  }
+
+  @action
+  async exitGroup(chatID: number){
+    await relay.del(`chat/${chatID}`)
+    const chats = [...this.chats]
+    this.chats = chats.filter(c=> c.id!==chatID)
   }
 }
 

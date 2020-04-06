@@ -10,6 +10,7 @@ import {useStores} from '../../store'
 import NewGroupModal from './newGroupModal'
 import JitsiMeet from './jitsiMeet'
 import EditContactModal from './editContact'
+import GroupModal from './newGroupModal/groupInfo'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -29,6 +30,7 @@ export default function Modals(){
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
       {/* <JitsiMeet /> */}
       <EditContactModal visible={ui.editContactModal} />
+      <GroupModal visible={ui.groupModal} />
     </>
   })
 }

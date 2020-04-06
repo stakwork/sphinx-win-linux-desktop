@@ -8,6 +8,8 @@ import {Msg} from '../../store/msg'
 import moment from 'moment'
 import { constants } from '../../constants'
 
+const group = constants.chat_types.group
+
 export default function MsgListWrap({chat}:{chat: Chat}){
   const {msg,chats} = useStores()
 
@@ -21,11 +23,11 @@ export default function MsgListWrap({chat}:{chat: Chat}){
     const msgsWithDates = msgs && injectDates(msgs)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
-    return <MsgList msgs={filtered} msgsLength={filtered.length}/>
+    return <MsgList msgs={filtered} chat={chat} />
   })
 }
 
-function MsgList({msgs,msgsLength}) {
+function MsgList({msgs, chat}) {
   const scrollViewRef = useRef(null)
   const [y,setY] = useState(0)
   const [first, setFirst] = useState(true)
@@ -43,6 +45,7 @@ function MsgList({msgs,msgsLength}) {
     }
   }
 
+  const isGroup = chat.type===group
   return useObserver(()=>
     <ScrollView style={styles.scroller}
       ref={scrollViewRef}
@@ -58,7 +61,7 @@ function MsgList({msgs,msgsLength}) {
           if (typeof m==='string') {
             return <DateLine key={i} dateString={m} />
           }
-          return <Message key={i} {...m} y={y} />
+          return <Message key={i} {...m} y={y} isGroup={isGroup} />
         })}
       </View>
     </ScrollView>

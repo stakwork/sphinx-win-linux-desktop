@@ -4,6 +4,7 @@ import moment from 'moment'
 import { constants } from '../../../constants'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {calcExpiry} from './utils'
+import {useStores} from '../../../store'
 
 const received = constants.statuses.received
 
@@ -13,6 +14,8 @@ const encryptedTypes = [
 ]
 
 export default function InfoBar(props){
+  const {contacts} = useStores()
+
   const isMe = props.sender===1
   const isReceived = props.status===received
   const showLock = encryptedTypes.includes(props.type)
@@ -22,12 +25,18 @@ export default function InfoBar(props){
   const isPaid = props.status===constants.statuses.confirmed
   const hasExpiry = (!isPaid&&expiry)?true:false
 
+  const sender = contacts.contacts.find(c=>c.id===props.sender)
+  const hasSender = sender?true:false
+
   return <View style={styles.wrap}>
     <View style={{...styles.content,
       alignSelf:isMe?'flex-end':'flex-start',
       flexDirection:isMe?'row-reverse':'row',
       }}>
       <View style={{...styles.innerContent,flexDirection:isMe?'row-reverse':'row'}}>
+        {hasSender && <Text style={styles.sender}>
+          {sender.alias}  
+        </Text>}
         <Text style={styles.time}>
           {moment(props.date).format('hh:mm A')}
         </Text>
@@ -71,5 +80,10 @@ const styles = StyleSheet.create({
   exp:{
     fontSize:10,
     color:'#aaa',
+  },
+  sender:{
+    fontSize:10,
+    // fontWeight:'bold',
+    marginRight:5
   }
 })

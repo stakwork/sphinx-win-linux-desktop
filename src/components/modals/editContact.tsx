@@ -7,7 +7,7 @@ import Form from '../form'
 import * as schemas from '../form/schemas'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
-import {createContactPic,contactPicSrc,usePicSrc} from '../utils/picSrc'
+import {createContactPic,usePicSrc} from '../utils/picSrc'
 
 export default function EditContact({visible}) {
   const { ui, contacts } = useStores()
@@ -18,22 +18,21 @@ export default function EditContact({visible}) {
   const contact = ui.editContactParams
 
   async function updateContact(values){
-    console.log(values)
     setLoading(true)
-    if(contact.alias!==values.alias){
+    if(contact.alias!==values.alias) {
       await contacts.updateContact(contact.id, {
         alias: values.alias
       })
     }
     if(values.photo){
-      const newpath = await createContactPic(contact.id, values.photo)
-      console.log(newpath)
+      await createContactPic(contact.id, values.photo)
+      contacts.updatePhotoURI(contact.id, values.photo)
     }
     setLoading(false)
     close()
   }
 
-  const uri = usePicSrc(contact&&contact.id)
+  const uri = usePicSrc(contact)
 
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>

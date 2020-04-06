@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx'
 import {Chat} from './chats'
 import {Msg} from './msg'
+import {Contact} from './contacts'
 
 class UiStore {
   @observable ready: boolean = false
@@ -34,9 +35,9 @@ class UiStore {
   }
 
   @observable editContactModal: boolean = false
-  @observable editContactParams: {[k:string]:any}
+  @observable editContactParams: Contact
   @action
-  setEditContactModal(p: {[k:string]:any}) {
+  setEditContactModal(p: Contact) {
     this.editContactModal = true
     this.editContactParams = p
   }
@@ -52,6 +53,21 @@ class UiStore {
   @action
   setNewGroupModal(b) {
     this.newGroupModal = b
+  }
+
+  @observable groupModal: boolean = false
+  @observable groupModalParams: Chat
+  @action
+  setGroupModal(g: Chat) {
+    this.groupModal = true
+    this.groupModalParams = g
+  }
+  @action
+  closeGroupModal() {
+    this.groupModal = false
+    setTimeout(()=>{
+      this.groupModalParams = null
+    },500)
   }
 
   @observable pubkeyModal: boolean = false

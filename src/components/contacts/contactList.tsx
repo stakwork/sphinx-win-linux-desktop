@@ -37,7 +37,7 @@ export default function ContactList() {
 function Item({ contact, onPress }) {
   const {ui, contacts} = useStores()
   
-  const uri = usePicSrc(contact.id)
+  const uri = usePicSrc(contact)
   
   const hasImg = uri?true:false
   return (
@@ -73,7 +73,6 @@ function grouper(data){
   // takes "alias"
   const ret = []
   const groups = data.reduce((r, e) => {
-    console.log(e)
     let title = e.alias[0]
     if(!r[title]) r[title] = {title, data:[e]}
     else r[title].data.push(e)
