@@ -34,7 +34,7 @@ export default function InfoBar(props){
       flexDirection:isMe?'row-reverse':'row',
       }}>
       <View style={{...styles.innerContent,flexDirection:isMe?'row-reverse':'row'}}>
-        {hasSender && <Text style={styles.sender}>
+        {hasSender && !isMe && <Text style={styles.sender}>
           {sender.alias}  
         </Text>}
         <Text style={styles.time}>
