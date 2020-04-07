@@ -4,6 +4,7 @@ import {contactStore} from './contacts'
 import {chatStore,Chat} from './chats'
 import * as rsa from '../crypto/rsa'
 import {constants} from '../constants'
+import {persist} from 'mobx-persist'
 
 export interface Msg {
   id: number
@@ -38,6 +39,9 @@ export interface Msg {
 class MsgStore {
   @observable // chat id: message array
   messages: {[k:number]:Msg[]} = {}
+
+  @persist('object') @observable
+  lastSeen: {[k:number]:number} = {} // {id: new Date().getTime()}
 
   @action
   async getMessages() {
@@ -180,6 +184,11 @@ class MsgStore {
     } catch(e) {
       console.log(e)
     }
+  }
+
+  @action
+  seeChat(id) {
+    this.lastSeen[id] = new Date().getTime()
   }
 
 }

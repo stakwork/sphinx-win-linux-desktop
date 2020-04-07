@@ -1,16 +1,17 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../../store'
-import {View, Text, StyleSheet, Image, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, Image, ScrollView, TouchableOpacity} from 'react-native'
 import {Portal, IconButton, Button, Dialog} from 'react-native-paper'
 import ModalWrap from '../modalWrap'
 import Header from './header'
 import FadeView from '../../utils/fadeView'
 import People from './people'
-import {useChatPicSrc} from '../../utils/picSrc'
+import {useChatPicSrc,createChatPic} from '../../utils/picSrc'
 import moment from 'moment'
 import {Contact} from './items'
-import { useNavigation } from '@react-navigation/native'
+import EE from '../../utils/ee'
+import ImagePicker from 'react-native-image-picker';
 
 export default function GroupInfo({visible}) {
   const { ui, contacts, chats } = useStores()
@@ -25,6 +26,7 @@ export default function GroupInfo({visible}) {
     ui.closeGroupModal()
     setTimeout(()=>{
       setSelected([])
+      setLeaveDialog(false)
     },200)
   }
 
@@ -38,13 +40,12 @@ export default function GroupInfo({visible}) {
     close()
   }
 
-  // const navigation = useNavigation()
   async function exitGroup(){
     setLoading(true)
     await chats.exitGroup(group.id)
     setLoading(false)
     close()
-    // navigation.navigate('Dashboard')
+    EE.emit('left-group')
   }
 
   const contactsToShow = contacts.contacts.filter(c=> {
@@ -58,7 +59,18 @@ export default function GroupInfo({visible}) {
   const hasGroup = group?true:false
   const hasImg = uri?true:false
 
-  console.log(selectedContacts)
+  function changePic(){
+    ImagePicker.launchImageLibrary({}, async img=>{
+      if (!img.didCancel) {
+        if(group && group.id && img && img.uri) {
+          await createChatPic(group.id, img.uri)
+          chats.updateChatPhotoURI(group.id, img.uri)
+          close()
+        }
+      }
+    })
+  }
+
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>
       <Header title={addPeople?'Add Contacts':'New Group'} 
@@ -71,9 +83,11 @@ export default function GroupInfo({visible}) {
 
         {hasGroup && <View style={styles.groupInfo}>
           <View style={styles.groupInfoLeft}>
-            <Image source={hasImg?{uri:'file://'+uri}:require('../../../../assets/avatar.png')} 
-              style={{width:54,height:54}} resizeMode={'cover'}
-            />
+            <TouchableOpacity onPress={changePic}>
+              <Image source={hasImg?{uri:'file://'+uri}:require('../../../../assets/avatar.png')} 
+                style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
+              />
+            </TouchableOpacity>
             <View style={styles.groupInfoText}>
               <Text style={styles.groupInfoName}>{group.name}</Text>
               <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>

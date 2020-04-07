@@ -42,6 +42,8 @@ export function useChatPicSrc(chat: Chat){
   } else {
     s = (chat&&chat.photo_uri)||''
   }
+  let id = null
+  if(chat && chat.id) id = chat.id
   useEffect(()=>{
     (async () => {
       if(!chat) {
@@ -58,7 +60,7 @@ export function useChatPicSrc(chat: Chat){
         if(src&&src.uri) setURI(src.uri+rnd())
       }
     })()
-  },[s])
+  },[s,id])
   return uri
 }
 

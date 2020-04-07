@@ -7,6 +7,8 @@ import {ChatRouteProp} from '../../types'
 import { useRoute } from '@react-navigation/native'
 import {useStores} from '../../store'
 import {contactForConversation} from './utils'
+import EE from '../utils/ee'
+import { useNavigation } from '@react-navigation/native'
 
 export default function Chat(){
 
@@ -14,11 +16,16 @@ export default function Chat(){
   const route = useRoute<ChatRouteProp>()
   const chat = route.params
 
+  const navigation = useNavigation()
+
   useEffect(()=>{ // check for contact key, exchange if none
     const contact = contactForConversation(chat, contacts.contacts)
     if(contact && !contact.contact_key) {
       contacts.exchangeKeys(contact.id)
     }
+    EE.on('left-group', ()=>{
+      navigation.navigate('Home')
+    })
   },[])
 
   return <View style={styles.main}>

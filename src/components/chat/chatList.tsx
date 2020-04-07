@@ -8,6 +8,7 @@ import InviteRow, {styles} from './inviteRow'
 import { useNavigation } from '@react-navigation/native'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {useChatPicSrc} from '../utils/picSrc'
+import moment from 'moment'
 
 export default function ChatList() {
   const {ui,chats,contacts} = useStores()
@@ -38,7 +39,7 @@ export default function ChatList() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {chatsToShow.map((c,i)=> {
         if(c.invite) return <InviteRow key={i} {...c} />
-        return <ChatRow key={i} {...c} />
+        return <ChatRow key={c.id+''} {...c} />
       })}
       <View style={moreStyles.buttonsWrap}>
         <Button mode="contained" dark={true} icon="plus"
@@ -57,26 +58,69 @@ export default function ChatList() {
 }
 
 function ChatRow(props){
-  const {name,contact_ids} = props
+  const {id,name,contact_ids} = props
   const navigation = useNavigation()
+  const {msg} = useStores()
 
   const uri = useChatPicSrc(props)
 
   const hasImg = uri?true:false
-  return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
-    onPress={()=> navigation.navigate('Dashboard',{
-      screen:'Chat', params: props
-    })}>
-    <View style={styles.avatar}>
-      <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
-        style={{width:52,height:52}} resizeMode={'cover'}
-      />
-    </View>
-    <View style={styles.chatContent}>
-      <Text style={styles.chatName}>{name}</Text>
-      {/* <Text style={styles.chatMsg}>{lastMsg}</Text> */}
-    </View>
-  </TouchableOpacity>
+  return useObserver(()=>{
+    const msgs = msg.messages[id]
+    const lastMsg = msgs&&msgs[msgs.length-1]
+    const lastMsgText = lastMessageText(lastMsg)
+    const hasLastMsg = lastMsgText?true:false
+
+    const now = new Date().getTime()
+    const lastSeen = msg.lastSeen[id] || now
+    const unseenCount = countUnseen(msgs, lastSeen)
+    const hasUnseen = unseenCount>0?true:false
+    return<TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
+      onPress={()=> {
+        msg.seeChat(props.id)
+        navigation.navigate('Dashboard',{
+          screen:'Chat', params: props
+        })
+      }}>
+      <View style={styles.avatarWrap}>
+        <View style={styles.avatar}>
+          <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
+            style={{width:52,height:52}} resizeMode={'cover'}
+          />
+        </View>
+        {hasUnseen && <View style={moreStyles.badgeWrap}>
+          <View style={moreStyles.badge}>
+            <Text style={moreStyles.badgeText}>{unseenCount}</Text>
+          </View>
+        </View>}
+      </View>
+      <View style={styles.chatContent}>
+        <Text style={styles.chatName}>{name}</Text>
+        {hasLastMsg && <Text style={{...styles.chatMsg,fontWeight:hasUnseen?'bold':'normal'}}>
+          {lastMsgText}
+        </Text>}
+      </View>
+    </TouchableOpacity>
+  })
+}
+
+function lastMessageText(msg){
+  if(!msg) return ''
+
+  if(msg.message_content) return msg.message_content
+  else if(msg.media_token) return 'Picture Received'
+
+  return ''
+}
+
+function countUnseen(msgs, lastSeen:number):number{
+  if(!msgs) return 0
+  let unseenCount = 0
+  msgs.forEach(m=>{
+    const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
+    if(unseen) unseenCount+=1
+  })
+  return Math.min(unseenCount,99)
 }
 
 function wait(timeout) {
@@ -100,5 +144,25 @@ const moreStyles = StyleSheet.create({
     display:'flex',
     justifyContent:'center',
     alignItems:'center'
+  },
+  badgeWrap:{
+    position:'absolute',
+    width:'100%',
+    height:'100%'
+  },
+  badge:{
+    position:'absolute',
+    right:0,
+    bottom:0,
+    backgroundColor:'#DB5554',
+    width:18,height:18,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    borderRadius:10
+  },
+  badgeText:{
+    color:'white',
+    fontSize:10
   }
 })

@@ -25,7 +25,7 @@ export default function MediaMsg(props){
     }
   },[props.y])
 
-  console.log(props)
+  // console.log(props)
 
   function tap(){
     if(media_type.startsWith('image')){

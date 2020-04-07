@@ -62,6 +62,18 @@ class ChatStore {
     const chats = [...this.chats]
     this.chats = chats.filter(c=> c.id!==chatID)
   }
+
+  @action
+  updateChatPhotoURI(id,photo_uri){
+    const cs = [...this.chats]
+    this.chats = cs.map(c=>{
+      if(c.id===id){
+        return {...c, photo_uri}
+      }
+      return c
+    })
+  }
+
 }
 
 export const chatStore = new ChatStore()

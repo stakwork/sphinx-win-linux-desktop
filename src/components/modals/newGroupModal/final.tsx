@@ -21,7 +21,8 @@ export default function Final({onFinish,contactIds}){
     setLoading(true)
     const group = await chats.createGroup(contactIds, text)
     if(img && img.uri) {
-      createChatPic(group.id, img.uri)
+      await createChatPic(group.id, img.uri)
+      chats.updateChatPhotoURI(group.id, img.uri)
     }
     onFinish()
     setLoading(false)
