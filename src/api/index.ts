@@ -22,8 +22,10 @@ function instantiateRelay(ip:string, authToken?:string){
   }
   console.log('=> instantiated relay!', `${protocol}://${ip}/`)
   
-  connectWebSocket(ip)
-  registerWsHandlers(wsHandlers)
+  if(authToken) { // only connect here (to avoid double) if auth token means for real
+    connectWebSocket(ip)
+    registerWsHandlers(wsHandlers)
+  }
 
   // registerHandler each msg type here?
   // or just one?
