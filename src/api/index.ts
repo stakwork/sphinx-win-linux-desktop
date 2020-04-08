@@ -9,13 +9,18 @@ let relay = null
 
 function instantiateRelay(ip:string, authToken?:string){
   if(!ip) return console.log("cant instantiate Relay, no IP")
+
+  let protocol = 'http'
+  if(ip.endsWith('nodl.it')) {
+    protocol='https'
+  }
   
   if(authToken){
-    relay = new API(`http://${ip}/`, 'x-user-token', authToken)
+    relay = new API(`${protocol}://${ip}/`, 'x-user-token', authToken)
   } else {
-    relay = new API(`http://${ip}/`)
+    relay = new API(`${protocol}://${ip}/`)
   }
-  console.log('=> instantiated relay!', `http://${ip}/`)
+  console.log('=> instantiated relay!', `${protocol}://${ip}/`)
   
   connectWebSocket(ip)
   registerWsHandlers(wsHandlers)

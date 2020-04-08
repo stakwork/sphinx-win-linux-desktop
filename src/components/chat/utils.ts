@@ -18,7 +18,7 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
         conversations.push({...chatForContact, name:contact.alias})
       } else {
         conversations.push({ // "fake" chat (first)
-          id: `contact_${contact.id}`,
+          // id: `contact_${contact.id}`,
           name: contact.alias,
           photo_url: contact.photo_url,
           updated_at: new Date().toJSON(),

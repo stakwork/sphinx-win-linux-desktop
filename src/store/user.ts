@@ -38,6 +38,7 @@ class UserStore {
       const r = await api.invite.post('signup',{
         invite_string:code
       })
+      console.log("signup r",r)
       if(!r.invite) return console.log('no invite data')
       this.currentIP = r.ip
       this.invite={

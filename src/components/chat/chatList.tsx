@@ -66,13 +66,13 @@ function ChatRow(props){
 
   const hasImg = uri?true:false
   return useObserver(()=>{
-    const msgs = msg.messages[id]
+    const msgs = msg.messages[id||'_']
     const lastMsg = msgs&&msgs[msgs.length-1]
     const lastMsgText = lastMessageText(lastMsg)
     const hasLastMsg = lastMsgText?true:false
 
     const now = new Date().getTime()
-    const lastSeen = msg.lastSeen[id] || now
+    const lastSeen = msg.lastSeen[id||'_'] || now
     const unseenCount = countUnseen(msgs, lastSeen)
     const hasUnseen = unseenCount>0?true:false
     return<TouchableOpacity style={styles.chatRow} activeOpacity={0.5}

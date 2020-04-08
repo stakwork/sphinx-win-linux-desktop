@@ -23,8 +23,12 @@ export default function SendPayment({visible}) {
   async function sendPayment(amt){
     if(!amt) return
     setLoading(true)
+    let theContactId=null
+    if(!chat.id){ // if no chat (new contact)
+      theContactId=chat.contact_ids.find(cid=>cid!==1)
+    }
     await msg.sendPayment({
-      contact_id,
+      contact_id:theContactId,
       amt,
       chat_id: chat.id||null,
       destination_key:''
@@ -36,8 +40,12 @@ export default function SendPayment({visible}) {
   async function sendInvoice(amt,text) {
     if(!amt) return
     setLoading(true)
+    let theContactId=null
+    if(!chat.id){ // if no chat (new contact)
+      theContactId=chat.contact_ids.find(cid=>cid!==1)
+    }
     await msg.sendInvoice({
-      contact_id,
+      contact_id:theContactId,
       amt,
       memo: text,
       chat_id: chat.id||null,

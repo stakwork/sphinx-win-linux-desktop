@@ -188,6 +188,7 @@ class MsgStore {
 
   @action
   seeChat(id) {
+    if(!id) return
     this.lastSeen[id] = new Date().getTime()
   }
 
@@ -215,8 +216,9 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
     })
     contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
   } else {
+    console.log(contactStore.contacts, contact_id)
     const contact = contactStore.contacts.find(c=> c.id===contact_id)
-    idToKeyMap[contact_id] = contact.contact_key
+    if(contact) idToKeyMap[contact_id] = contact.contact_key
   }
   for (let [id, key] of Object.entries(idToKeyMap)) {
     const encText = await rsa.encrypt(text, key)
