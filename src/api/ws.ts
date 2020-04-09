@@ -11,17 +11,23 @@ export function registerWsHandlers(hs: {[k: string]: DataHandler}) {
 let ws: WebSocket | null = null
 
 export function connectWebSocket(ip: string) {
-  if(ws) ws.close() // restart
+  if(ws) return // dont reconnect if already exists
 
   const uri = 'ws://' + ip + '/socket' 
 
-  ws = new WebSocket(uri)
+  const thews = new WebSocket(uri)
 
-  // ws.onopen = onOpen
-  // ws.onclose = onClose
-  // ws.onerror = onError
+  thews.onopen = function(){
+    ws = thews
+  }
+  thews.onclose = function(){
+    ws = null
+  }
+  thews.onerror = function(){
+    ws = null
+  }
 
-  ws.onmessage = (e) => {
+  thews.onmessage = (e) => {
     let msg: WSMessage = JSON.parse(e.data)
     let handler = handlers[msg.type]
     if (handler) {

@@ -31,6 +31,11 @@ function instantiateRelay(ip:string, authToken?:string){
   // or just one?
 }
 
+function reconnectWebsocket(ip:string){
+  connectWebSocket(ip)
+  registerWsHandlers(wsHandlers)
+}
+
 function composeMeme(host:string, authToken?:string) {
   let meme = null
   if(authToken) {
@@ -46,4 +51,5 @@ export {
   relay,
   instantiateRelay,
   composeMeme,
+  reconnectWebsocket,
 }

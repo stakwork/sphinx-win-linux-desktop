@@ -16,7 +16,7 @@ export default function Main() {
       if (pinSet) setHasPin(true)
 
       await contacts.getContacts()
-      await msg.getMessages()
+      await msg.getAllMessages()
       await details.getBalance()
       // HERE auth with meme server
 

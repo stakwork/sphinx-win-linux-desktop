@@ -78,6 +78,11 @@ class UserStore {
       console.log('could not finish invite', e)
     }
   }
+
+  @action
+  async reconnectWebsocket(){
+    api.reconnectWebsocket(this.currentIP)
+  }
 }
 
 export const userStore = new UserStore()

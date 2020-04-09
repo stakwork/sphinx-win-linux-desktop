@@ -60,7 +60,7 @@ export default function ChatList() {
 function ChatRow(props){
   const {id,name,contact_ids} = props
   const navigation = useNavigation()
-  const {msg} = useStores()
+  const {msg,user} = useStores()
 
   const uri = useChatPicSrc(props)
 
@@ -78,6 +78,8 @@ function ChatRow(props){
     return<TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
       onPress={()=> {
         msg.seeChat(props.id)
+        user.reconnectWebsocket()
+        msg.getMessages()
         navigation.navigate('Dashboard',{
           screen:'Chat', params: props
         })

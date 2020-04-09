@@ -29,6 +29,15 @@ export function useCachedEncryptedFile(props){
     setLoading(true)
     console.log("TRIGGER IT!!!")
 
+    // if img already exists return it
+    const existingPath = dirs.CacheDir + `/attachments/msg_${id}_decrypted`
+    const exists = await RNFetchBlob.fs.exists(existingPath)
+    if(exists) {
+      setURI('file://'+existingPath)
+      setLoading(false)
+      return
+    }
+
     const ldat = parseLDAT(media_token)
     if(!(ldat && ldat.host)) return
     const url = `https://${ldat.host}/file/${media_token}`
@@ -52,7 +61,6 @@ export function useCachedEncryptedFile(props){
           // extension = 'm4a'
         }
         const newpath = await aes.decryptFileAndSave(path, media_key, extension)
-        console.log(newpath)
         setURI('file://'+newpath)
         setLoading(false)
       }

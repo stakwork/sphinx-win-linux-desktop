@@ -5,6 +5,7 @@ import {chatStore,Chat} from './chats'
 import * as rsa from '../crypto/rsa'
 import {constants} from '../constants'
 import {persist} from 'mobx-persist'
+import moment from 'moment'
 
 export interface Msg {
   id: number
@@ -43,12 +44,33 @@ class MsgStore {
   @persist('object') @observable
   lastSeen: {[k:number]:number} = {} // {id: new Date().getTime()}
 
+  @persist @observable
+  lastFetched: number
+
   @action
-  async getMessages() {
+  async getAllMessages() {
     try {
       const r = await relay.get('messages')
       const msgs = await decodeMessages(r.new_messages)
       this.messages = orgMsgs(msgs)
+      this.lastFetched = new Date().getTime()
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  @action
+  async getMessages() {
+    let route = 'messages'
+    if(this.lastFetched) {
+      const dateq = moment(this.lastFetched).format('YYYY-MM-DD%20HH:mm:ss')
+      route += `?date=${dateq}`
+    }
+    try {
+      const r = await relay.get(route)
+      const msgs = await decodeMessages(r.new_messages)
+      this.messages = orgMsgsFromExisting(this.messages, msgs)
+      this.lastFetched = new Date().getTime()
     } catch(e) {
       console.log(e)
     }
@@ -259,10 +281,21 @@ function orgMsgs(messages: Msg[]) {
   return orged
 }
 
+function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
+  const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(allMsgs))
+  messages.forEach(msg=>{
+    if(msg.chat && msg.chat.id){
+      putIn(allms, msg)
+    }
+  })
+  return allms
+}
+
 function putIn(orged, msg){
   if(msg.chat){
     if(orged[msg.chat.id]){
-      orged[msg.chat.id].push(msg)
+      const existing = orged[msg.chat.id].find(m=>m.id===msg.id)
+      if(!existing) orged[msg.chat.id].push(msg)
     } else {
       orged[msg.chat.id] = [msg]
     }

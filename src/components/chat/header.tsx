@@ -10,7 +10,7 @@ import { constants } from '../../constants'
 const conversation = constants.chat_types.conversation
 
 export default function Header({chat}:{chat: Chat}) {
-  const {contacts,ui,msg} = useStores()
+  const {contacts,ui,msg,details} = useStores()
   const navigation = useNavigation()
 
   function clickTitle(){
@@ -27,6 +27,7 @@ export default function Header({chat}:{chat: Chat}) {
     <Appbar.Header style={{width:'100%',backgroundColor:'white',elevation:5}}>
       <Appbar.BackAction onPress={()=>{
         msg.seeChat(chat.id)
+        details.getBalance()
         navigation.goBack()
       }} />
       <Appbar.Content title={name} onPress={clickTitle} />
