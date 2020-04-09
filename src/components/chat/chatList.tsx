@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState,useCallback} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image } from 'react-native'
@@ -13,8 +13,8 @@ import moment from 'moment'
 export default function ChatList() {
   const {ui,chats,contacts} = useStores()
 
-  const [refreshing, setRefreshing] = React.useState(false)
-  const onRefresh = React.useCallback(async() => {
+  const [refreshing, setRefreshing] = useState(false)
+  const onRefresh = useCallback(async() => {
     ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
       ignoreAndroidSystemSettings: false
@@ -35,7 +35,7 @@ export default function ChatList() {
       if(a.invite) return -1
       return 0
     })
-    return <ScrollView style={{width:'100%',height:'100%'}}
+    return <ScrollView style={{width:'100%',flex:1}}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {chatsToShow.map((c,i)=> {
         if(c.invite) return <InviteRow key={i} {...c} />

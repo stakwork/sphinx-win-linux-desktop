@@ -24,7 +24,7 @@ export default function Dashboard() {
         />
       </View>
       <ChatList />
-      <BottomBar />
+      {/* <BottomBar /> */}
     </View>
   )
 }
@@ -32,6 +32,7 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   main:{
     width:'100%',
+    flex:1,
     backgroundColor:'#f3f3f3',
   },
   searchWrap:{
