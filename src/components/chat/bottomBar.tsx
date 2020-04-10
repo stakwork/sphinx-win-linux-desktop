@@ -8,6 +8,9 @@ import {Chat} from '../../store/chats'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
+import { constants } from '../../constants'
+
+const conversation = constants.chat_types.conversation
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
@@ -87,10 +90,12 @@ export default function BottomBar({chat}:{chat: Chat}) {
     }
   }
 
+  const isConversation = chat.type===conversation
   return useObserver(()=>
     <View style={styles.bar}>
       {!inputFocused && <IconButton icon="arrow-bottom-left" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}} 
+        disabled={!isConversation}
         onPress={()=> ui.setPayMode('invoice', chat)}     
       />}
       {!inputFocused && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
@@ -110,6 +115,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
       /> */}
       {!inputFocused && <IconButton icon="arrow-top-right" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}}
+        disabled={!isConversation}
         onPress={()=> ui.setPayMode('payment',chat)}
       />}
       {inputFocused && <View style={styles.sendButtonWrap}>

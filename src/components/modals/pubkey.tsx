@@ -26,12 +26,7 @@ export default function PubKey({visible, pubkey, onClose}) {
     <Modal visible={visible} onClose={onClose}>
       <Header title="Public Key" onClose={onClose} />
       <View style={styles.qrWrap}>
-        <QRCode
-          value={pubkey}
-          size={250}
-          bgColor='black'
-          fgColor='white'
-        />
+        <QRCode value={pubkey} size={250} />
       </View>
       <Text style={styles.pubkeyText}>{pubkey}</Text>
       <View style={styles.buttonsWrap}>
@@ -62,7 +57,7 @@ const styles = StyleSheet.create({
     padding:20,
     width:'100%',
     alignItems:'center',
-    marginTop:50
+    marginTop:50,
   },
   pubkeyText:{
     padding:20,

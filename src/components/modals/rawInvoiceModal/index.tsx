@@ -1,17 +1,15 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
-import {View, Text, Image, StyleSheet, Clipboard} from 'react-native'
-import Modal from "./modalWrap"
-import { Button, Snackbar } from 'react-native-paper'
-import Header from './modalHeader'
-import QRCode from '../utils/qrcode'
-import Share from 'react-native-share'
+import { useStores } from '../../../store'
+import {View, Text, Image, StyleSheet} from 'react-native'
+import Modal from "../modalWrap"
+import { Button } from 'react-native-paper'
+import Header from '../modalHeader'
+import ShowRawInvoice from './showRawInvoice'
 
 export default function RawInvoiceModal({visible}) {
   const { ui,msg } = useStores()
   const [loading, setLoading] = useState(false)
-  const [copied, setCopied] = useState(false)
   const [payreq, setPayreq] = useState('')
 
   function close(){
@@ -27,16 +25,6 @@ export default function RawInvoiceModal({visible}) {
       setPayreq(r.invoice)
     }
     setLoading(false)
-  }
-
-  function copy(){
-    Clipboard.setString(payreq)
-    setCopied(true)
-  }
-  async function share(){
-    try{
-      await Share.open({message:payreq})
-    } catch(e){}
   }
 
   return useObserver(() => {
@@ -62,33 +50,10 @@ export default function RawInvoiceModal({visible}) {
           </View>
         </View>}
 
-        {hasPayreq && <View style={styles.innerWrap}>
-          {params && <View style={styles.amtWrap}>
-            <Text style={{fontSize:16}}>{`Amount: ${params.amount} sats`}</Text>
-          </View>}
-          <View style={styles.qrWrap}>
-            <QRCode
-              value={payreq}
-              size={250}
-              bgColor='black'
-              fgColor='white'
-            />
-          </View>
-          <Text style={styles.payreqText}>{payreq}</Text>
-          <View style={styles.buttonsWrap}>
-            <Button mode="contained" dark={true} 
-              onPress={()=> share()} style={styles.button}>
-              Share
-            </Button>
-            <Button mode="contained" dark={true}
-              onPress={()=> copy()} style={styles.button}>
-              Copy
-            </Button>
-          </View>
-          <Snackbar visible={copied} onDismiss={()=> setCopied(false)}>
-            Payment Request Copied!
-          </Snackbar>
-        </View>}
+        {hasPayreq && <ShowRawInvoice
+          amount={params&&params.amount}
+          payreq={payreq}
+        />}
 
       </View>
     </Modal>
@@ -98,6 +63,7 @@ export default function RawInvoiceModal({visible}) {
 const styles = StyleSheet.create({
   wrap:{
     flex:1,
+    width:'100%',
     alignItems:'center',
     justifyContent:'flex-end',
     minHeight:'90%',
@@ -146,40 +112,4 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     borderRadius:20,
   },
-
-  amtWrap:{
-    display:'flex',
-    width:'100%',
-    justifyContent:'center',
-    flexDirection:'row',
-    marginTop:5,
-  },
-  qrWrap:{
-    display:'flex',
-    flexDirection:'column',
-    padding:20,
-    width:'100%',
-    alignItems:'center',
-    marginTop:5
-  },
-  payreqText:{
-    padding:20,
-    width:'100%',
-    flexWrap:'wrap',
-  },
-  buttonsWrap:{
-    marginTop:20,
-    display:'flex',
-    flexDirection:'row',
-    width:'100%',
-    justifyContent:'space-around'
-  },
-  button:{
-    height:46,
-    borderRadius:23,
-    width:120,
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center'
-  }
 })

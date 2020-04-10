@@ -24,7 +24,7 @@ export default function Dashboard() {
         />
       </View>
       <ChatList />
-      {/* <BottomBar /> */}
+      <BottomBar />
     </View>
   )
 }

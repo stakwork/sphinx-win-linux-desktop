@@ -16,6 +16,16 @@ class DetailsStore {
       console.log(e)
     }
   }
+
+  @action
+  async getPayments() {
+    try {
+      const r = await relay.get('payments')
+      return r
+    } catch(e) {
+      console.log(e)
+    }
+  }
 }
 
 export const detailsStore = new DetailsStore()

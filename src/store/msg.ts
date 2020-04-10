@@ -154,13 +154,13 @@ class MsgStore {
   async sendPayment({contact_id, amt, chat_id, destination_key}) {
     try {
       const v = {
-        contact_id,
+        contact_id: contact_id||null,
         chat_id: chat_id||null,
         amount: amt,
         destination_key
       }
       const r = await relay.post('payment', v)
-      this.gotNewMessage(r)
+      if(contact_id||chat_id) this.gotNewMessage(r)
     } catch(e) {
       console.log(e)
     }

@@ -11,6 +11,7 @@ import NewGroupModal from './newGroupModal'
 import JitsiMeet from './jitsiMeet'
 import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
+import PaymentHistory from './paymentHistory'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -31,6 +32,7 @@ export default function Modals(){
       {/* <JitsiMeet /> */}
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
+      <PaymentHistory visible={ui.paymentHistory} />
     </>
   })
 }

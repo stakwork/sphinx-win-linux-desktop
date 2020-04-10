@@ -116,6 +116,11 @@ class UiStore {
     this.confirmInvoiceMsg = s
   }
 
+  @observable paymentHistory: boolean
+  @action setPaymentHistory(b: boolean){
+    this.paymentHistory = b
+  }
+
   @observable rawInvoiceModal: boolean = false
   @observable rawInvoiceModalParams: {[k:string]:string} = null
   @action
