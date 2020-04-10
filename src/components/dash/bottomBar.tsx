@@ -29,10 +29,14 @@ export default function BottomTabs() {
           {scanning && <QR 
             onCancel={()=>setScanning(false)}
             onScan={data=>{
-              if(data.startsWith('ln')) {
+              if(isLN(data)) {
                 let inv:any
-                try{inv = ln.decode(data)} catch(e){ }
-                if(!inv&&inv.human_readable_part)return
+                let theData = data
+                if(data.indexOf(':')>=0){ // some are like "lightning:ln....""
+                  theData = data.split(':')[1]
+                }
+                try{inv = ln.decode(theData.toLowerCase())} catch(e){}
+                if(!(inv&&inv.human_readable_part))return
                 const millisats = inv.human_readable_part.amount
                 const sats = millisats && Math.round(millisats/1000)
                 ui.setConfirmInvoiceMsg({payment_request:data,amount:sats})
@@ -46,6 +50,12 @@ export default function BottomTabs() {
       </Portal>
     </View>
   )
+}
+
+const lnPrefixes = ['ln','LIGHTNING:ln']
+function isLN(s){
+  const ok = lnPrefixes.find(p=>s.toLowerCase().startsWith(p.toLowerCase()))
+  return ok?true:false
 }
 
 const styles=StyleSheet.create({

@@ -5,7 +5,7 @@ import NumKey from '../../utils/numkey'
 import {usePicSrc} from '../../utils/picSrc'
 import { useStores } from '../../../store'
 
-export default function Main({chat,contact,loading,confirmOrContinue,contactless}){
+export default function Main({contact,loading,confirmOrContinue,contactless}){
   const {ui} = useStores()
   const [amt, setAmt] = useState('0')
   const [text, setText] = useState('')

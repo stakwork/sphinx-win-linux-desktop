@@ -40,18 +40,8 @@ export default function PaymentHistory({visible}) {
   </ModalWrap>)
 }
 
-/*
-{
-  amount:10,
-  payment_hash:'',
-  pubkey:'',
-  type:'payment'|'invoice',
-  date: 1234567890
-}
-*/
 function Payment(props){
   const { contacts } = useStores()
-  console.log(props)
   const {amount, type, date, pubkey, payment_hash} = props
   const params = {
     payment: {

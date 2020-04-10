@@ -20,12 +20,9 @@ export default function Scan({pay,loading}){
           handleBarCodeScanned={scanned}
         />
       </View>
-      <View style={styles.labelWrap}>
-        <Text>Scan Address or Enter Manually</Text>
-      </View>
       <View style={styles.inputWrap}>
         <TextInput
-          label="Enter Address"
+          label="Scan or Enter Address"
           style={styles.input}
           onChangeText={e=> setAddy(e)}
           value={addy}

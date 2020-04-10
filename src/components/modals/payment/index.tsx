@@ -34,10 +34,10 @@ export default function SendPayment({visible}) {
     setLoading(true)
     let theContactId=null
     if(!(chat&&chat.id)){ // if no chat (new contact)
-      theContactId=chat&&chat.contact_ids.find(cid=>cid!==1)
+      theContactId=contact_id
     }
     await msg.sendPayment({
-      contact_id:theContactId,
+      contact_id:theContactId||null,
       amt,
       chat_id: (chat&&chat.id)||null,
       destination_key:''
@@ -51,10 +51,10 @@ export default function SendPayment({visible}) {
     setLoading(true)
     let theContactId=null
     if(!(chat && chat.id)){ // if no chat (new contact)
-      theContactId = chat && chat.contact_ids.find(cid=>cid!==1)
+      theContactId=contact_id
     }
     const inv = await msg.sendInvoice({
-      contact_id:theContactId,
+      contact_id:theContactId||null,
       amt,
       memo: text,
       chat_id: (chat&&chat.id)||null,
@@ -116,7 +116,7 @@ export default function SendPayment({visible}) {
       <Header title={label} onClose={()=>close()} />
 
       <FadeView opacity={next===''?1:0} style={styles.content}>
-        {main && <Main chat={chat}
+        {main && <Main
           contactless={!chat?true:false}
           contact={contact}
           loading={loading}
