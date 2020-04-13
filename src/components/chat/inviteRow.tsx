@@ -14,7 +14,7 @@ export default function InviteRow(props){
   const statusString = constantCodes['invite_statuses'][invite.status]
 
   const yesterday = moment().utc().add(-24,'hours')
-  const isExpired = moment(invite.created_at).utc().isBefore(yesterday)
+  const isExpired = moment(invite.created_at||(new Date())).utc().isBefore(yesterday)
   if(isExpired) return <></>
   
   const actions = {
