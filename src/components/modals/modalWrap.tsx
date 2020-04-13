@@ -4,9 +4,11 @@ import Modal from 'react-native-modal'
 
 export default function Wrap(props) {
   const {visible,onClose,children,noSwipe} = props
+
   return <Modal isVisible={visible} coverScreen={true} 
     onSwipeComplete={()=>onClose()} style={styles.modal}
     swipeDirection={noSwipe?null:'down'} 
+    onBackButtonPress={()=>onClose()}
     swipeThreshold={20}>
     <View style={styles.main}>
       {children}

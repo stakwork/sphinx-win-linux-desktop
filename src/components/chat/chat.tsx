@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react'
-import { View, StyleSheet } from 'react-native'
+import React, {useEffect,useState} from 'react'
+import { View, StyleSheet, InteractionManager, BackHandler } from 'react-native'
 import Header from './header'
 import MsgList from './msgList'
 import BottomBar from './bottomBar'
@@ -9,9 +9,10 @@ import {useStores} from '../../store'
 import {contactForConversation} from './utils'
 import EE from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
+import {ActivityIndicator} from 'react-native-paper'
 
 export default function Chat(){
-
+  const [show,setShow] = useState(false)
   const {contacts} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chat = route.params
@@ -26,12 +27,25 @@ export default function Chat(){
     EE.on('left-group', ()=>{
       navigation.navigate('Home')
     })
+    // setTimeout(()=>{
+    //   setShow(true)
+    // },1)
+    InteractionManager.runAfterInteractions(() => {
+      setShow(true)
+    })
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      navigation.navigate('Home')
+      return false
+    })
   },[])
 
   return <View style={styles.main}>
     <Header chat={chat} />
-    <MsgList chat={chat} />
-    <BottomBar chat={chat} />
+    {!show && <View style={styles.loadWrap}>
+      <ActivityIndicator animating={true} color="grey" />
+    </View>}
+    {show && <MsgList chat={chat} />}
+    {show && <BottomBar chat={chat} />}
   </View>
 }
 
@@ -40,5 +54,10 @@ const styles = StyleSheet.create({
     display:'flex',
     width:'100%',height:'100%',
     backgroundColor:'white'
+  },
+  loadWrap:{
+    flex:1,
+    alignItems:'center',
+    justifyContent:'center'
   }
 })

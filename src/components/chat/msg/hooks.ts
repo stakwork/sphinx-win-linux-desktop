@@ -10,9 +10,9 @@ let dirs = RNFetchBlob.fs.dirs
 
 // RNFetchBlob.fs.unlink(folder) to kill all there
 
-export function useCachedEncryptedFile(props){
+export function useCachedEncryptedFile(props, ldat){
   const {meme} = useStores()
-  const {id, media_token, media_key, media_type} = props
+  const {id, media_key, media_type, media_token} = props
 
   const [data, setData] = useState('')
   const [uri, setURI] = useState('')
@@ -26,6 +26,13 @@ export function useCachedEncryptedFile(props){
 
   async function trigger() {
     if(loading||data||uri) return // already done
+    if(!(ldat&&ldat.host)) {
+      return
+    }
+    if(!ldat.sig){
+      return
+    }
+
     setLoading(true)
     console.log("TRIGGER IT!!!")
 
@@ -38,8 +45,6 @@ export function useCachedEncryptedFile(props){
       return
     }
 
-    const ldat = parseLDAT(media_token)
-    if(!(ldat && ldat.host)) return
     const url = `https://${ldat.host}/file/${media_token}`
     const server = meme.servers.find(s=> s.host===ldat.host)
     if(!server) return 

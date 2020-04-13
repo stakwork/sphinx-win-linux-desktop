@@ -4,18 +4,25 @@ import {useStores} from '../../../store'
 import shared from './sharedStyles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import {useCachedEncryptedFile} from './hooks'
-import {ActivityIndicator} from 'react-native-paper'
+import {ActivityIndicator,Button} from 'react-native-paper'
 import AudioPlayer from './audioPlayer'
+import {parseLDAT} from '../../utils/ldat'
 
-export default function MediaMsg(props){
+export default function MediaMsg(props){  
+  const {meme,ui,msg} = useStores()
   const wrapRef = useRef(null)
-  const [first, setFirst] = useState(true)
-  
-  const {meme,ui} = useStores()
+  const [buying,setBuying] = useState(false)
+  const {message_content, media_type, chat, media_token} = props
 
-  const {message_content, media_type} = props
+  const ldat = parseLDAT(media_token)
 
-  const {data,uri,loading,trigger} = useCachedEncryptedFile(props)
+  let amt = null
+  let purchased = false
+  if(ldat.meta&&ldat.meta.amt) {
+    amt = ldat.meta.amt
+    if(ldat.sig) purchased=true
+  }
+  const {data,uri,loading,trigger} = useCachedEncryptedFile(props,ldat)
 
   useEffect(()=>{
     if(props.y && wrapRef.current){ // dont run if y=0 (beginning)
@@ -23,7 +30,19 @@ export default function MediaMsg(props){
         if(py>0) trigger()
       })
     }
-  },[props.y])
+  },[props.y, props.media_token]) // refresh when scroll, or when purchase accepted
+
+  async function buy(amount){
+    setBuying(true)
+    const contact_id=chat.contact_ids && chat.contact_ids.find(cid=>cid!==1)
+    await msg.purchaseMedia({
+      chat_id: chat.id,
+      media_token,
+      amount,
+      contact_id,
+    })
+    setBuying(false)
+  }
 
   // console.log(props)
 
@@ -35,7 +54,9 @@ export default function MediaMsg(props){
 
   const hasImgData = (data||uri)?true:false
   const hasContent = message_content?true:false
-  const h = hasContent?249:200
+  let h = 200
+  if(hasContent) h+=49
+  if(amt) h+=37
   return <View ref={wrapRef} collapsable={false}>
     <TouchableOpacity style={{...styles.wrap, height:h, minHeight:h}} onPress={tap} activeOpacity={0.65}>
       {!hasImgData && <View style={styles.loading}>
@@ -45,12 +66,18 @@ export default function MediaMsg(props){
       {hasContent && <View style={shared.innerPad}>
         <Text style={styles.text}>{message_content}</Text>
       </View>}
+      {amt && <Button style={styles.payButton} mode="contained" dark={true}
+        onPress={()=>buy(amt)}
+        loading={buying}
+        icon={purchased?'check':'arrow-top-right'}>
+        {purchased?'Purchased':`Pay ${amt} sat`}
+      </Button>}
     </TouchableOpacity>
   </View>
 }
 
 function Media({type,data,uri}){
-  console.log(type,uri)
+  // console.log(type,uri)
   if(type.startsWith('image')) {
     return <Image style={styles.img} resizeMode='cover' source={{uri:uri||data}} />
   }
@@ -58,7 +85,6 @@ function Media({type,data,uri}){
     return <AudioPlayer source={uri||data} />
   }
 }
-
 
 const styles = StyleSheet.create({
   text:{
@@ -82,5 +108,12 @@ const styles = StyleSheet.create({
     flexDirection:'column',
     alignItems:'center',
     justifyContent:'center'
+  },
+  payButton:{
+    backgroundColor:'#4AC998',
+    width:'100%',
+    borderRadius:5,
+    borderTopLeftRadius:0,
+    borderTopRightRadius:0,
   }
 })

@@ -4,15 +4,19 @@ import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native'
 import {Dialog, Portal, Button} from 'react-native-paper'
 import {constantCodes} from '../../constants'
 import {useStores} from '../../store'
+import moment from 'moment'
 
 export default function InviteRow(props){
   const {contacts,ui} = useStores()
   const {name, invite} = props
   const [dialogOpen, setDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  console.log("INVITE",invite)
   const statusString = constantCodes['invite_statuses'][invite.status]
 
+  const yesterday = moment().utc().add(-24,'hours')
+  const isExpired = moment(invite.created_at).utc().isBefore(yesterday)
+  if(isExpired) return <></>
+  
   const actions = {
     'payment_pending': ()=> setDialogOpen(true),
     'ready': ()=> ui.setShareInviteModal(invite.invite_string),

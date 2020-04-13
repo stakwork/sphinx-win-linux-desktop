@@ -70,7 +70,7 @@ function Payment(props){
       <Icon name="message-text-outline" color="#bbb" size={18} 
         style={{marginLeft:15}}
       />
-      <Text style={styles.contact}>{text}</Text>
+      <Text style={styles.contact} numberOfLines={1}>{text}</Text>
     </View>
     <View style={styles.amountWrap}>
       <Text style={styles.amount}>{amount}</Text>
@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
   },
   amountWrap:{
     marginRight:10,
+    marginLeft:40,
     display:'flex',
     alignItems:'center',
     justifyContent:'center',

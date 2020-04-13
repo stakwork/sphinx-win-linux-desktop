@@ -6,7 +6,8 @@ import {Chat} from '../../store/chats'
 import Message from './msg'
 import {Msg} from '../../store/msg'
 import moment from 'moment'
-import { constants } from '../../constants'
+import { constants,constantCodes } from '../../constants'
+import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
 
 const group = constants.chat_types.group
 
@@ -20,7 +21,8 @@ export default function MsgListWrap({chat}:{chat: Chat}){
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
-    const msgsWithDates = msgs && injectDates(msgs)
+    const messages = processMsgs(msgs)
+    const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
     return <MsgList msgs={filtered} chat={chat} />
@@ -61,6 +63,8 @@ function MsgList({msgs, chat}) {
           if (typeof m==='string') {
             return <DateLine key={i} dateString={m} />
           }
+          const msg=m
+          if(!m.chat) msg.chat = chat
           return <Message key={i} {...m} y={y} isGroup={isGroup} />
         })}
       </View>
@@ -114,6 +118,34 @@ function wait(timeout) {
   return new Promise(resolve => {
     setTimeout(resolve, timeout)
   })
+}
+
+const hideTypes=['purchase','purchase_accept','purchase_deny']
+function processMsgs(msgs: Msg[]){
+  const ms = []
+  if(!msgs) return ms
+  for(let i=0; i<msgs.length; i++){
+    let skip = false
+    const msg = msgs[i]
+    const typ = constantCodes['message_types'][msg.type]
+    if(typ==='attachment'){
+      const ldat = parseLDAT(msg.media_token)
+      if(ldat.muid&&ldat.meta&&ldat.meta.amt) {
+        const accepted = msgs.find(m=>{
+          const mtype = constantCodes['message_types'][m.type]
+          const start = urlBase64FromAscii(ldat.host)+"."+ldat.muid
+          return mtype==='purchase_accept'&&m.media_token.startsWith(start)
+        })
+        if(accepted){
+          msg.media_token = accepted.media_token
+          msg.media_key = accepted.media_key
+        }
+      }
+    }
+    if(hideTypes.includes(typ)) skip=true
+    if(!skip) ms.push(msg)
+  }
+  return ms
 }
 
 function injectDates(msgs: Msg[]){

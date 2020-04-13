@@ -18,6 +18,11 @@ class DetailsStore {
   }
 
   @action
+  async addToBalance(x: number) {
+    this.balance = this.balance+x
+  }
+
+  @action
   async getPayments() {
     try {
       const r = await relay.get('payments')

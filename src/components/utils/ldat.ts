@@ -42,12 +42,12 @@ function deserializeMeta(str){
   return ret
 }
 
-function urlBase64(buf){
+export function urlBase64(buf){
   return buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }
 function urlBase64FromBytes(buf){
   return Buffer.from(buf).toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }
-function urlBase64FromAscii(ascii){
+export function urlBase64FromAscii(ascii){
   return Buffer.from(ascii,'ascii').toString('base64').replace(/\//g, '_').replace(/\+/g, '-')
 }

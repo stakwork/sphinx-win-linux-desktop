@@ -1,11 +1,18 @@
-import React, { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import React, { useState,useEffect } from 'react'
+import { StyleSheet, View, BackHandler } from 'react-native'
 import Header from '../modals/modalHeader'
 import Scanner from './scanner'
 
 export default function QR({onCancel,onScan}) {
   const [hasPermission, setHasPermission] = useState(null)
   const [scanned, setScanned] = useState(false)
+
+  useEffect(()=>{
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      onCancel()
+      return false
+    })
+  },[])
 
   // useEffect(() => {
   //   (async () => {

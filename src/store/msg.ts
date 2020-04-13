@@ -2,6 +2,7 @@ import { observable, action } from 'mobx'
 import {relay} from '../api'
 import {contactStore} from './contacts'
 import {chatStore,Chat} from './chats'
+import {detailsStore} from './details'
 import * as rsa from '../crypto/rsa'
 import {constants} from '../constants'
 import {persist} from 'mobx-persist'
@@ -96,6 +97,7 @@ class MsgStore {
         }
       }
     }
+    if(m.amount) detailsStore.addToBalance(m.amount)
   }
 
   @action
@@ -161,6 +163,23 @@ class MsgStore {
       }
       const r = await relay.post('payment', v)
       if(contact_id||chat_id) this.gotNewMessage(r)
+      if(r.amount) detailsStore.addToBalance(r.amount)
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  @action
+  async purchaseMedia({contact_id, amount, chat_id, media_token}) {
+    try {
+      const v = {
+        contact_id: contact_id||null,
+        chat_id: chat_id||null,
+        amount: amount,
+        media_token: media_token
+      }
+      const r = await relay.post('purchase', v)
+      console.log(r)
     } catch(e) {
       console.log(e)
     }

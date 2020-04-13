@@ -49,14 +49,17 @@ export function attachment(data) {
 
 export function purchase(data) {
   console.log("[ws] purchase", data)
+  msgStore.gotNewMessage(data.response)
 }
 
 export function purchase_accept(data) {
   console.log("[ws] purchase_accept", data)
+  msgStore.gotNewMessage(data.response)
 }
 
 export function purchase_deny(data) {
   console.log("[ws] purchase_deny", data)
+  msgStore.gotNewMessage(data.response)
 }
 
 export function group_create(data) {

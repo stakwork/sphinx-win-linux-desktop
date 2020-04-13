@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-import {View,StyleSheet,TouchableOpacity} from 'react-native'
+import {View,StyleSheet} from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
 import * as ln from '../utils/decode'
@@ -9,6 +9,7 @@ import * as ln from '../utils/decode'
 export default function BottomTabs() {
   const {ui} = useStores()
   const [scanning, setScanning] = useState(false)
+
   return useObserver(()=>
     <View style={styles.bar}>
       <IconButton icon="arrow-bottom-left" size={32} color="#666"
