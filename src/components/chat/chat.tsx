@@ -53,7 +53,8 @@ const styles = StyleSheet.create({
   main:{
     display:'flex',
     width:'100%',height:'100%',
-    backgroundColor:'white'
+    backgroundColor:'white',
+    position:'relative',
   },
   loadWrap:{
     flex:1,

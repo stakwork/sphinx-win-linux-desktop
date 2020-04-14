@@ -1,6 +1,6 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, View, Text, TextInput, StyleSheet } from 'react-native'
+import { TouchableOpacity, View, Text, TextInput, StyleSheet, Dimensions, Keyboard } from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
@@ -22,6 +22,8 @@ export default function BottomBar({chat}:{chat: Chat}) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [recordSecs, setRecordSecs] = useState('0')
   const [recording, setRecording] = useState(false)
+  const [bottom,setBottom] = useState(0)
+  const [textInputHeight, setTextInputHeight] = useState(40)
 
   const inputRef = useRef(null)
 
@@ -90,9 +92,19 @@ export default function BottomBar({chat}:{chat: Chat}) {
     }
   }
 
+  useEffect(()=>{
+    Keyboard.addListener('keyboardDidShow', (e)=>{
+      setBottom(8)
+    })
+    Keyboard.addListener('keyboardDidHide', (e)=>{
+      setBottom(0)
+    })
+  },[])
+
   const isConversation = chat.type===conversation
-  return useObserver(()=>
-    <View style={styles.bar}>
+  return useObserver(()=> <>
+    <View style={{...styles.spacer,height:textInputHeight+20}} />
+    <View style={{...styles.bar,height:textInputHeight+20,bottom}}>
       {!inputFocused && <IconButton icon="arrow-bottom-left" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}} 
         disabled={!isConversation}
@@ -101,13 +113,25 @@ export default function BottomBar({chat}:{chat: Chat}) {
       {!inputFocused && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
         <Icon name="plus" color="#888" size={27} />
       </TouchableOpacity>}
-      <TextInput 
+      <TextInput textAlignVertical="top"
+        numberOfLines={4}
+        multiline={true} blurOnSubmit={true}
+        onContentSizeChange={e=>{
+          let h = e.nativeEvent.contentSize.height
+          if(h<44) h=44
+          if(h<108) setTextInputHeight(h)
+        }}
         placeholder="Message..." ref={inputRef}
-        style={{...styles.input,marginLeft:inputFocused?15:0}}
+        style={{...styles.input,
+          marginLeft:inputFocused?15:0,
+          height:textInputHeight,
+          maxHeight:98
+        }}
         onFocus={()=> setInputFocused(true)}
         onBlur={()=> setInputFocused(false)}
-        onChangeText={e=> setText(e)}>
-        <Text>{text}</Text>
+        onChangeText={e=> setText(e)}
+        value={text}>
+        {/* <Text>{text}</Text> */}
       </TextInput>
       {/* <IconButton icon="microphone-outline" size={32} color="#666"
         style={{marginLeft:0,marginRight:-4}}
@@ -138,19 +162,20 @@ export default function BottomBar({chat}:{chat: Chat}) {
       </Portal>}
 
     </View>
-  )
+  </>)
 }
 
 const styles=StyleSheet.create({
+  spacer:{
+    width:'100%',
+    maxWidth:'100%',
+  },
   bar:{
     flex:1,
     width:'100%',
     maxWidth:'100%',
     flexDirection:'row',
     alignItems:'center',
-    height:60,
-    maxHeight:60,
-    minHeight:60,
     backgroundColor:'white',
     elevation:5,
     borderWidth: 2,
@@ -158,16 +183,17 @@ const styles=StyleSheet.create({
     borderBottomWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,
+    position:'absolute',
+    zIndex:999,
   },
   input:{
     flex:1,
-    borderRadius:20,
+    borderRadius:22,
     borderColor:'#ccc',
     backgroundColor:'whitesmoke',
     paddingLeft:18,
     paddingRight:18,
     borderWidth:1,
-    height:40,
     fontSize:17,
     lineHeight:20,
   },

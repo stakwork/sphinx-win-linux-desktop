@@ -155,10 +155,11 @@ export const styles = StyleSheet.create({
   chatMsgWrap:{
     display:'flex',
     flexDirection:'row',
-    alignItems:'center'
+    alignItems:'center',
   },
   chatMsg:{
     color:'#7e7e7e',
     fontSize:13,
+    width:'60%'
   },
 })

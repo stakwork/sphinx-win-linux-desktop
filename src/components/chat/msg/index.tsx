@@ -21,7 +21,7 @@ export default function MsgRow(props){
   }
 
   let dashed = false
-  let backgroundColor = isMe?'#F9FAFC':'white'
+  let backgroundColor = isMe?'whitesmoke':'white'
   let borderColor = '#DADFE2'
   if(isInvoice && !isPaid) {
     backgroundColor='white'

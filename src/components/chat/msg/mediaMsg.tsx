@@ -60,11 +60,8 @@ export default function MediaMsg(props){
   const showStats = isMe&&amt
   const sold = props.sold
 
-  let h = 200
-  if(hasContent) h+=49
-  if(showPurchaseButton) h+=37
   return <View ref={wrapRef} collapsable={false}>
-    <TouchableOpacity style={{...styles.wrap, height:h, minHeight:h}} onPress={tap} activeOpacity={0.65}>
+    <TouchableOpacity style={{...styles.wrap}} onPress={tap} activeOpacity={0.65}>
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
         <Text style={{...styles.satStats,opacity:sold?1:0}}>Purchased</Text>
