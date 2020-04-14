@@ -128,6 +128,7 @@ export default function SendPayment({visible}) {
         {hasRawInvoice && <ShowRawInvoice 
           amount={rawInvoice.amount}
           payreq={rawInvoice.invoice}
+          paid={rawInvoice.invoice===ui.lastPaidInvoice}
         />}
       </FadeView>
 
@@ -145,6 +146,8 @@ const styles=StyleSheet.create({
     width:'100%',
     alignItems:'center',
     justifyContent:'center',
+    position:'absolute',
+    top:50,
   },
 })
 

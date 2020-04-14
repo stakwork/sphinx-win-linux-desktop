@@ -13,6 +13,7 @@ export default function MediaMsg(props){
   const wrapRef = useRef(null)
   const [buying,setBuying] = useState(false)
   const {message_content, media_type, chat, media_token} = props
+  const isMe = props.sender===1
 
   const ldat = parseLDAT(media_token)
 
@@ -49,16 +50,25 @@ export default function MediaMsg(props){
   function tap(){
     if(media_type.startsWith('image')){
       if(data) ui.setImgViewerParams({data})
+      if(uri) ui.setImgViewerParams({uri})
     }
   }
 
   const hasImgData = (data||uri)?true:false
   const hasContent = message_content?true:false
+  const showPurchaseButton = amt&&!isMe?true:false
+  const showStats = isMe&&amt
+  const sold = props.sold
+
   let h = 200
   if(hasContent) h+=49
-  if(amt) h+=37
+  if(showPurchaseButton) h+=37
   return <View ref={wrapRef} collapsable={false}>
     <TouchableOpacity style={{...styles.wrap, height:h, minHeight:h}} onPress={tap} activeOpacity={0.65}>
+      {showStats && <View style={styles.stats}>
+        <Text style={styles.satStats}>{`${amt} sat`}</Text>
+        <Text style={{...styles.satStats,opacity:sold?1:0}}>Purchased</Text>
+      </View>}
       {!hasImgData && <View style={styles.loading}>
         {loading && <ActivityIndicator animating={true} color="white" />}
       </View>}
@@ -66,11 +76,13 @@ export default function MediaMsg(props){
       {hasContent && <View style={shared.innerPad}>
         <Text style={styles.text}>{message_content}</Text>
       </View>}
-      {amt && <Button style={styles.payButton} mode="contained" dark={true}
+      {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
         onPress={()=>buy(amt)}
         loading={buying}
         icon={purchased?'check':'arrow-top-right'}>
-        {purchased?'Purchased':`Pay ${amt} sat`}
+        <Text style={{fontSize:11}}>
+          {purchased?'Purchased':`Pay ${amt} sat`}
+        </Text>
       </Button>}
     </TouchableOpacity>
   </View>
@@ -115,5 +127,34 @@ const styles = StyleSheet.create({
     borderRadius:5,
     borderTopLeftRadius:0,
     borderTopRightRadius:0,
+    height:38,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center'
+  },
+  stats:{
+    position:'absolute',
+    width:'100%',
+    top:0,left:0,right:0,
+    display:'flex',
+    flexDirection:'row',
+    padding:7,
+    justifyContent:'space-between',
+  },
+  satStats:{
+    color:'white',
+    backgroundColor:'#55D1A9',
+    paddingLeft:8,
+    paddingRight:8,
+    paddingTop:2,
+    paddingBottom:2,
+    position:'relative',
+    zIndex:9,
+    fontSize:12,
+    fontWeight:'bold',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    borderRadius:4,
   }
 })

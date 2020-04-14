@@ -1,13 +1,14 @@
 import React, {useState, useRef} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores } from '../../../store'
 import {View, StyleSheet, Image,Dimensions,TextInput,Text,TouchableOpacity} from 'react-native'
 import {IconButton} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {randString} from '../../crypto/rand'
+import {randString} from '../../../crypto/rand'
 import RNFetchBlob from 'rn-fetch-blob'
-import * as aes from '../../crypto/aes'
+import * as aes from '../../../crypto/aes'
 import {ActivityIndicator} from 'react-native-paper'
+import SetPrice from './setPrice'
 
 export default function ImgViewer(props) {
   const {params} = props
@@ -15,6 +16,7 @@ export default function ImgViewer(props) {
   const { ui,meme,msg } = useStores()
 
   const [text,setText] = useState('')
+  const [price, setPrice] = useState(0)
   const [inputFocused, setInputFocused] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadPercent,setUploadedPercent] = useState(0)
@@ -25,8 +27,8 @@ export default function ImgViewer(props) {
   const showImg = (uri||data)?true:false
   const showInput = (contact_id||chat_id)?true:false
 
-  async function sendFinalMsg({muid,media_key,media_type}){
-    await msg.sendAttachment({contact_id,chat_id,text,muid,media_key,media_type})
+  async function sendFinalMsg({muid,media_key,media_type,price}){
+    await msg.sendAttachment({contact_id,chat_id,text,muid,media_key,media_type,price})
     ui.setImgViewerParams(null)
   }
 
@@ -65,7 +67,8 @@ export default function ImgViewer(props) {
       await sendFinalMsg({
         muid:json.muid,
         media_key:pwd,
-        media_type:type
+        media_type:type,
+        price
       })
       setUploading(false)
     })
@@ -85,6 +88,7 @@ export default function ImgViewer(props) {
           ui.setImgViewerParams({data:'',uri:''})
         }}
       />
+      <SetPrice setAmount={amt=> setPrice(amt)} />
       {showImg && <Image resizeMode='cover' source={{uri:uri||data}}
         style={{...styles.img,width:w,height:h-180}} 
       />}
@@ -184,5 +188,6 @@ const styles = StyleSheet.create({
     color:'white',
     fontSize:16,
     marginTop:16,
-  }
+  },
+
 })

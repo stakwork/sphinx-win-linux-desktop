@@ -35,7 +35,7 @@ export default function Chat(){
     })
     BackHandler.addEventListener('hardwareBackPress', function() {
       navigation.navigate('Home')
-      return false
+      return true
     })
   },[])
 

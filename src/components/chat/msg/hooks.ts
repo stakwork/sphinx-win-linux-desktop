@@ -34,7 +34,7 @@ export function useCachedEncryptedFile(props, ldat){
     }
 
     setLoading(true)
-    console.log("TRIGGER IT!!!")
+    // console.log("TRIGGER IT!!!")
 
     // if img already exists return it
     const existingPath = dirs.CacheDir + `/attachments/msg_${id}_decrypted`

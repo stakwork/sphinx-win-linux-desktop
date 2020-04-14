@@ -36,6 +36,8 @@ export interface Msg {
   text: string,
 
   chat: Chat
+
+  sold: boolean // this is a marker to tell if a media has been sold
 }
 
 class MsgStore {
@@ -97,7 +99,7 @@ class MsgStore {
         }
       }
     }
-    if(m.amount) detailsStore.addToBalance(m.amount)
+    if(m.amount) detailsStore.addToBalance(m.amount*-1)
   }
 
   @action
@@ -119,7 +121,7 @@ class MsgStore {
   }
 
   @action
-  async sendAttachment({contact_id, text, chat_id, muid, media_type, media_key}) {
+  async sendAttachment({contact_id, text, chat_id, muid, media_type, media_key, price}) {
     try {
       const media_key_map = await makeRemoteTextMap({contact_id, text:media_key, chat_id}, true)
       const v:{[k:string]:any} = {
@@ -129,6 +131,7 @@ class MsgStore {
         media_type,
         media_key_map
       }
+      if(price) v.price=price
       if(text){
         const encryptedText = await encryptText({contact_id:1, text})
         const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
@@ -210,18 +213,18 @@ class MsgStore {
       const v = {amount: amt, memo}
       const r = await relay.post('invoices', v)
       return r
-      // r = {invoice: payment_request} // thats it
+      // r = {invoice: payment_request}
     } catch(e) {
       console.log(e)
     }
   }
 
   @action
-  async payInvoice({payment_request}) {
+  async payInvoice({payment_request,amount}) {
     try {
       const v = {payment_request}
       const r = await relay.put('invoices', v)
-      this.invoicePaid(r)
+      this.invoicePaid({...r,amount})
     } catch(e) {
       console.log(e)
     }

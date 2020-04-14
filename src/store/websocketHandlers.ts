@@ -1,5 +1,6 @@
 import {msgStore} from './msg'
 import {contactStore} from './contacts'
+import {uiStore} from './ui'
 
 export function contact(data){ // on contact_key msg
   console.log('[ws] contact', data)
@@ -9,6 +10,13 @@ export function contact(data){ // on contact_key msg
 export function invite(data){
   console.log('[ws] invite', data)
   contactStore.updateInvite(data.response)
+}
+
+export function invoice_payment(data){
+  console.log('[ws] invoice_payment', data.response)
+  if(data.response&&data.response.invoice){
+    uiStore.setLastPaidInvoice(data.response.invoice)
+  }
 }
 
 /* sphinx types */
@@ -29,7 +37,7 @@ export function invoice(data) {
 }
 
 export function payment(data) {
-  console.log("[ws] invoice", data)
+  console.log("[ws] payment", data)
   msgStore.invoicePaid(data.response)
 }
 

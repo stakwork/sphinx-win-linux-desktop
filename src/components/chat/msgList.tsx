@@ -128,7 +128,7 @@ function processMsgs(msgs: Msg[]){
     let skip = false
     const msg = msgs[i]
     const typ = constantCodes['message_types'][msg.type]
-    if(typ==='attachment'){
+    if(typ==='attachment' && msg.sender!==1){ // not from me
       const ldat = parseLDAT(msg.media_token)
       if(ldat.muid&&ldat.meta&&ldat.meta.amt) {
         const accepted = msgs.find(m=>{
@@ -139,6 +139,19 @@ function processMsgs(msgs: Msg[]){
         if(accepted){
           msg.media_token = accepted.media_token
           msg.media_key = accepted.media_key
+        }
+      }
+    }
+    if(typ==='attachment' && msg.sender===1) { // from me
+      const ldat = parseLDAT(msg.media_token)
+      if(ldat.muid&&ldat.meta&&ldat.meta.amt) {
+        const purchase = msgs.find(m=>{
+          const mtype = constantCodes['message_types'][m.type]
+          const start = urlBase64FromAscii(ldat.host)+"."+ldat.muid
+          return mtype==='purchase'&&m.media_token.startsWith(start)
+        })
+        if(purchase) {
+          msg.sold = true
         }
       }
     }

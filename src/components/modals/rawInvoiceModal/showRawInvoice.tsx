@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
-import {View,Text,StyleSheet,Clipboard} from 'react-native'
+import {View,Text,StyleSheet,Clipboard,Dimensions} from 'react-native'
 import {Button,Snackbar} from 'react-native-paper'
 import QRCode from '../../utils/qrcode'
 import Share from 'react-native-share'
 
-export default function ShowRawInvoice({amount,payreq}){
+export default function ShowRawInvoice({amount,payreq,paid}){
   const [copied, setCopied] = useState(false)
   function copy(){
     Clipboard.setString(payreq)
@@ -15,12 +15,17 @@ export default function ShowRawInvoice({amount,payreq}){
       await Share.open({message:payreq})
     } catch(e){}
   }
-  return <View style={styles.innerWrap}>
+  const {height,width} = Dimensions.get('window')
+  const h = height-80
+  return <View style={{...styles.innerWrap,minHeight:h,maxHeight:h}}>
     {amount && <View style={styles.amtWrap}>
       <Text style={{fontSize:16}}>{`Amount: ${amount} sats`}</Text>
     </View>}
     <View style={styles.qrWrap}>
-      <QRCode value={payreq} size={250} />
+      <QRCode value={payreq} size={width-30} />
+      {paid && <View style={styles.paidWrap}>
+        <Text style={styles.paid}>PAID</Text>
+      </View>}
     </View>
     <Text style={styles.payreqText}>{payreq}</Text>
     <View style={styles.buttonsWrap}>
@@ -42,6 +47,7 @@ export default function ShowRawInvoice({amount,payreq}){
 const styles = StyleSheet.create({
   innerWrap:{
     flex:1,
+    display:'flex',
     alignItems:'center',
     justifyContent:'center',
     width:'100%',
@@ -51,18 +57,18 @@ const styles = StyleSheet.create({
     width:'100%',
     justifyContent:'center',
     flexDirection:'row',
-    marginTop:5,
   },
   qrWrap:{
     display:'flex',
     flexDirection:'column',
-    padding:20,
     width:'100%',
     alignItems:'center',
     marginTop:5,
+    position:'relative',
   },
   payreqText:{
-    padding:20,
+    paddingLeft:20,
+    paddingRight:20,
     width:'100%',
     flexWrap:'wrap',
   },
@@ -80,5 +86,26 @@ const styles = StyleSheet.create({
     display:'flex',
     justifyContent:'center',
     alignItems:'center'
+  },
+  paidWrap:{
+    position:'absolute',
+    top:0,left:0,right:0,bottom:0,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    zIndex:1001
+  },
+  paid:{
+    color:'#55D1A9',
+    borderWidth:4,
+    height:41,width:80,
+    borderColor:'#55D1A9',
+    backgroundColor:'white',
+    fontWeight:'bold',
+    fontSize:28,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    textAlign:'center'
   }
 })

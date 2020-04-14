@@ -10,7 +10,7 @@ export default function QR({onCancel,onScan}) {
   useEffect(()=>{
     BackHandler.addEventListener('hardwareBackPress', function() {
       onCancel()
-      return false
+      return true
     })
   },[])
 

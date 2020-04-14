@@ -127,6 +127,7 @@ class UiStore {
   setRawInvoiceModal(params) {
     this.rawInvoiceModal = true
     this.rawInvoiceModalParams = params
+    this.lastPaidInvoice = ''
   }
 
   @action
@@ -134,7 +135,14 @@ class UiStore {
     this.rawInvoiceModal = false
     setTimeout(()=>{
       this.rawInvoiceModalParams=null
+      this.lastPaidInvoice = ''
     }, 500) // delay 
+  }
+
+  @observable lastPaidInvoice:string = ''
+  @action
+  setLastPaidInvoice(s:string){
+    this.lastPaidInvoice = s
   }
 
   @observable imgViewerParams: {[k:string]:any} = null

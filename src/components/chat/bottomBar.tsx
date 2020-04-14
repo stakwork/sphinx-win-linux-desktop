@@ -150,6 +150,7 @@ const styles=StyleSheet.create({
     alignItems:'center',
     height:60,
     maxHeight:60,
+    minHeight:60,
     backgroundColor:'white',
     elevation:5,
     borderWidth: 2,

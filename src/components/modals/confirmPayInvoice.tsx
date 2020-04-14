@@ -16,7 +16,7 @@ export default function ConfirmPayInvoice({visible}) {
     const req = ui.confirmInvoiceMsg && ui.confirmInvoiceMsg.payment_request
     if(!req) return
     setLoading(true)
-    await msg.payInvoice({payment_request:req})
+    await msg.payInvoice(ui.confirmInvoiceMsg)
     setLoading(false)
     close()
   }

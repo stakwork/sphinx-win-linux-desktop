@@ -53,6 +53,7 @@ export default function RawInvoiceModal({visible}) {
         {hasPayreq && <ShowRawInvoice
           amount={params&&params.amount}
           payreq={payreq}
+          paid={payreq===ui.lastPaidInvoice}
         />}
 
       </View>
