@@ -40,7 +40,7 @@ export default function BottomTabs() {
                 if(!(inv&&inv.human_readable_part))return
                 const millisats = inv.human_readable_part.amount
                 const sats = millisats && Math.round(millisats/1000)
-                ui.setConfirmInvoiceMsg({payment_request:data,amount:sats})
+                ui.setConfirmInvoiceMsg({payment_request:theData,amount:sats})
                 setTimeout(()=>{
                   setScanning(false)
                 },1500)

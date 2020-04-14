@@ -1,1 +1,1 @@
-April 13 at 3pm PST
+April 13 at 6pm PST
