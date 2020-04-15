@@ -9,6 +9,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import * as aes from '../../../crypto/aes'
 import {ActivityIndicator} from 'react-native-paper'
 import SetPrice from './setPrice'
+import EE from '../../utils/ee'
 
 export default function ImgViewer(props) {
   const {params} = props
@@ -82,6 +83,10 @@ export default function ImgViewer(props) {
       ui.setImgViewerParams(null)
       return true
     })
+    return () => {
+      EE.emit('left-image-viewer')
+      BackHandler.removeEventListener('hardwareBackPress', ()=>{})
+    }
   },[])
 
   return useObserver(() =>

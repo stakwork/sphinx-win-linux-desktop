@@ -13,11 +13,18 @@ import {ActivityIndicator} from 'react-native-paper'
 
 export default function Chat(){
   const [show,setShow] = useState(false)
-  const {contacts} = useStores()
+  const {contacts,ui} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chat = route.params
 
   const navigation = useNavigation()
+
+  function handleBack(){
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      navigation.navigate('Home',{params:{rnd:Math.random()}})
+      return true
+    })
+  }
 
   useEffect(()=>{ // check for contact key, exchange if none
     const contact = contactForConversation(chat, contacts.contacts)
@@ -27,16 +34,14 @@ export default function Chat(){
     EE.on('left-group', ()=>{
       navigation.navigate('Home',{params:{rnd:Math.random()}})
     })
-    // setTimeout(()=>{
-    //   setShow(true)
-    // },1)
+    EE.on('left-image-viewer', ()=>{
+      handleBack()
+    })
     InteractionManager.runAfterInteractions(() => {
       setShow(true)
     })
-    BackHandler.addEventListener('hardwareBackPress', function() {
-      navigation.navigate('Home',{params:{rnd:Math.random()}})
-      return true
-    })
+
+    handleBack()
   },[])
 
   return <View style={styles.main}>
