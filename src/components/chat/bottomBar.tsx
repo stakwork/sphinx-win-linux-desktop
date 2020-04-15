@@ -102,15 +102,16 @@ export default function BottomBar({chat}:{chat: Chat}) {
   },[])
 
   const isConversation = chat.type===conversation
+  const hideArrows = (inputFocused||text)?true:false
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:textInputHeight+20}} />
     <View style={{...styles.bar,height:textInputHeight+20,bottom}}>
-      {!inputFocused && <IconButton icon="arrow-bottom-left" size={32} color="#666"
+      {!hideArrows && <IconButton icon="arrow-bottom-left" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}} 
         disabled={!isConversation}
         onPress={()=> ui.setPayMode('invoice', chat)}     
       />}
-      {!inputFocused && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+      {!hideArrows && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
         <Icon name="plus" color="#888" size={27} />
       </TouchableOpacity>}
       <TextInput textAlignVertical="top"
@@ -123,7 +124,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
         }}
         placeholder="Message..." ref={inputRef}
         style={{...styles.input,
-          marginLeft:inputFocused?15:0,
+          marginLeft:hideArrows?15:0,
           height:textInputHeight,
           maxHeight:98
         }}
@@ -137,12 +138,12 @@ export default function BottomBar({chat}:{chat: Chat}) {
         style={{marginLeft:0,marginRight:-4}}
         onPress={rec}
       /> */}
-      {!inputFocused && <IconButton icon="arrow-top-right" size={32} color="#666"
+      {!hideArrows && <IconButton icon="arrow-top-right" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}}
         disabled={!isConversation}
         onPress={()=> ui.setPayMode('payment',chat)}
       />}
-      {inputFocused && <View style={styles.sendButtonWrap}>
+      {hideArrows && <View style={styles.sendButtonWrap}>
         <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
           onPress={()=> sendMessage()}>
           <Icon name="send" size={17} color="white" />

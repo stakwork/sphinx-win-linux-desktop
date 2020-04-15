@@ -1,7 +1,7 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../../store'
-import {View, StyleSheet, Image,Dimensions,TextInput,Text,TouchableOpacity} from 'react-native'
+import {View, StyleSheet, Image,Dimensions,TextInput,Text,TouchableOpacity,BackHandler} from 'react-native'
 import {IconButton} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {randString} from '../../../crypto/rand'
@@ -77,6 +77,13 @@ export default function ImgViewer(props) {
     })
   }
 
+  useEffect(()=>{
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      ui.setImgViewerParams(null)
+      return true
+    })
+  },[])
+
   return useObserver(() =>
     <View style={styles.wrap}>
       <IconButton
@@ -88,7 +95,7 @@ export default function ImgViewer(props) {
           ui.setImgViewerParams({data:'',uri:''})
         }}
       />
-      <SetPrice setAmount={amt=> setPrice(amt)} />
+      {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
       {showImg && <Image resizeMode='cover' source={{uri:uri||data}}
         style={{...styles.img,width:w,height:h-180}} 
       />}

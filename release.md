@@ -1,1 +1,1 @@
-April 14 at 3:30 pm PST
+April 15 at 12 noon PST

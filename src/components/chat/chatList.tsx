@@ -1,7 +1,7 @@
 import React, {useState,useCallback} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image } from 'react-native'
+import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image, Dimensions } from 'react-native'
 import {allChats} from './utils'
 import {Button} from 'react-native-paper'
 import InviteRow, {styles} from './inviteRow'
@@ -25,7 +25,9 @@ export default function ChatList() {
   }, [refreshing])
 
   return useObserver(()=>{
-    const theChats = allChats(chats.chats, contacts.contacts)
+    const _chats = chats.chats
+    const _contacts = contacts.contacts
+    const theChats = allChats(_chats, _contacts)
     const chatsToShow = theChats.filter(c=> {
       if (!ui.searchTerm) return true
       return (c.invite?true:false) || 
@@ -38,7 +40,9 @@ export default function ChatList() {
     return <ScrollView style={{width:'100%',flex:1}}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {chatsToShow.map((c,i)=> {
-        if(c.invite) return <InviteRow key={i} {...c} />
+        let showInvite = false
+        if(c.invite && c.invite.status!==4) showInvite=true
+        if(showInvite) return <InviteRow key={i} {...c} />
         return <ChatRow key={c.id+''} {...c} />
       })}
       <View style={moreStyles.buttonsWrap}>
@@ -75,7 +79,9 @@ function ChatRow(props){
     const lastSeen = msg.lastSeen[id||'_'] || now
     const unseenCount = countUnseen(msgs, lastSeen)
     const hasUnseen = unseenCount>0?true:false
-    return<TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
+
+    const w = Math.round(Dimensions.get('window').width)
+    return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
       onPress={()=> {
         msg.seeChat(props.id)
         user.reconnectWebsocket()
@@ -99,7 +105,10 @@ function ChatRow(props){
       <View style={styles.chatContent}>
         <Text style={styles.chatName}>{name}</Text>
         {hasLastMsg && <Text numberOfLines={1} 
-          style={{...styles.chatMsg,fontWeight:hasUnseen?'bold':'normal'}}>
+          style={{...styles.chatMsg,
+            fontWeight:hasUnseen?'bold':'normal',
+            maxWidth:w-105
+          }}>
           {lastMsgText}
         </Text>}
       </View>
@@ -111,7 +120,10 @@ function lastMessageText(msg){
   if(!msg) return ''
 
   if(msg.message_content) return msg.message_content
-  else if(msg.media_token) return 'Picture Received'
+  if(msg.media_token) {
+    if(msg.sender===1) return 'Picture Sent'
+    return 'Picture Received'
+  }
 
   return ''
 }
@@ -120,8 +132,10 @@ function countUnseen(msgs, lastSeen:number):number{
   if(!msgs) return 0
   let unseenCount = 0
   msgs.forEach(m=>{
-    const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
-    if(unseen) unseenCount+=1
+    if(m.sender!==1){
+      const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
+      if(unseen) unseenCount+=1
+    }
   })
   return Math.min(unseenCount,99)
 }

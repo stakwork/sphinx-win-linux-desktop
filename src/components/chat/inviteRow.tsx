@@ -13,9 +13,10 @@ export default function InviteRow(props){
   const [loading, setLoading] = useState(false)
   const statusString = constantCodes['invite_statuses'][invite.status]
 
+  const expiredStatus = props.invite.status===5
   const yesterday = moment().utc().add(-24,'hours')
   const isExpired = moment(invite.created_at||(new Date())).utc().isBefore(yesterday)
-  if(isExpired) return <></>
+  if(isExpired || expiredStatus) return <></>
   
   const actions = {
     'payment_pending': ()=> setDialogOpen(true),
@@ -160,6 +161,5 @@ export const styles = StyleSheet.create({
   chatMsg:{
     color:'#7e7e7e',
     fontSize:13,
-    width:'60%'
   },
 })

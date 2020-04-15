@@ -25,7 +25,7 @@ export default function Chat(){
       contacts.exchangeKeys(contact.id)
     }
     EE.on('left-group', ()=>{
-      navigation.navigate('Home')
+      navigation.navigate('Home',{params:{rnd:Math.random()}})
     })
     // setTimeout(()=>{
     //   setShow(true)
@@ -34,7 +34,7 @@ export default function Chat(){
       setShow(true)
     })
     BackHandler.addEventListener('hardwareBackPress', function() {
-      navigation.navigate('Home')
+      navigation.navigate('Home',{params:{rnd:Math.random()}})
       return true
     })
   },[])

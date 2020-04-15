@@ -7,13 +7,13 @@ export default function Scan({pay,loading}){
   const [addy, setAddy] = useState('')
   const [focused, setFocused] = useState(false)
   function scanned({ type, data }){
-    setAddy(data)
+    if(data.length===66) setAddy(data)
   }
   const w = Dimensions.get('screen').width
   const h = Dimensions.get('screen').height
 
   const hasAddy=addy?true:false
-  return <View style={styles.wrap}>
+  return <View style={{...styles.wrap,height:h-125}}>
     <View style={styles.top}>
       <View style={{...styles.scannerWrap,width:w,height:w,maxWidth:w,maxHeight:w}}>
         <Scanner height={w} scanned={hasAddy}
@@ -22,7 +22,7 @@ export default function Scan({pay,loading}){
       </View>
       <View style={styles.inputWrap}>
         <TextInput
-          label="Scan or Enter Address"
+          label="Scan or Enter Public Key"
           style={styles.input}
           onChangeText={e=> setAddy(e)}
           value={addy}

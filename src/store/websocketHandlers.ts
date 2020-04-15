@@ -1,6 +1,7 @@
 import {msgStore} from './msg'
 import {contactStore} from './contacts'
 import {uiStore} from './ui'
+import {chatStore} from './chats'
 
 export function contact(data){ // on contact_key msg
   console.log('[ws] contact', data)
@@ -72,6 +73,7 @@ export function purchase_deny(data) {
 
 export function group_create(data) {
   console.log("[ws] group_create", data)
+  chatStore.gotChat(data.response.chat)
 }
 
 export function group_join(data) {

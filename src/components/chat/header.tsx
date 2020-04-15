@@ -28,7 +28,7 @@ export default function Header({chat}:{chat: Chat}) {
       <Appbar.BackAction onPress={()=>{
         msg.seeChat(chat.id)
         details.getBalance()
-        navigation.goBack()
+        navigation.navigate('Home', {params:{rnd:Math.random()}})
       }} />
       <Appbar.Content title={name} onPress={clickTitle} />
       {/* <Appbar.Action icon="bell-outline" onPress={handleMore} /> */}
