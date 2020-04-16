@@ -1,6 +1,6 @@
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useRef} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, View, Text, TextInput, StyleSheet, Dimensions, Keyboard } from 'react-native'
+import { TouchableOpacity, View, Text, TextInput, StyleSheet } from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
@@ -22,7 +22,6 @@ export default function BottomBar({chat}:{chat: Chat}) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [recordSecs, setRecordSecs] = useState('0')
   const [recording, setRecording] = useState(false)
-  const [bottom,setBottom] = useState(0)
   const [textInputHeight, setTextInputHeight] = useState(40)
 
   const inputRef = useRef(null)
@@ -92,20 +91,11 @@ export default function BottomBar({chat}:{chat: Chat}) {
     }
   }
 
-  useEffect(()=>{
-    Keyboard.addListener('keyboardDidShow', (e)=>{
-      setBottom(8)
-    })
-    Keyboard.addListener('keyboardDidHide', (e)=>{
-      setBottom(0)
-    })
-  },[])
-
   const isConversation = chat.type===conversation
   const hideArrows = (inputFocused||text)?true:false
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:textInputHeight+20}} />
-    <View style={{...styles.bar,height:textInputHeight+20,bottom}}>
+    <View style={{...styles.bar,height:textInputHeight+20,bottom:0}}>
       {!hideArrows && <IconButton icon="arrow-bottom-left" size={32} color="#666"
         style={{marginLeft:0,marginRight:0}} 
         disabled={!isConversation}

@@ -2,7 +2,8 @@ package com.sphinx;
 
 import android.app.Application;
 
-import androidx.annotation.Nullable;
+import com.oney.WebRTCModule.WebRTCModulePackage;
+
 import com.facebook.react.ReactApplication;
 import org.linusu.RNGetRandomValuesPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -14,7 +15,6 @@ import org.reactnative.camera.RNCameraPackage;
 import com.dooboolab.RNAudioRecorderPlayerPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
-import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import cl.json.RNSharePackage;
 import com.surajit.rnrg.RNRadialGradientPackage;
 import com.reactlibrary.RNRncryptorPackage;
@@ -46,9 +46,10 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
+          new WebRTCModulePackage(),
           new MainReactPackage(),
-            new RNGetRandomValuesPackage(),
-            new RNGestureHandlerPackage(),
+          new RNGetRandomValuesPackage(),
+          new RNGestureHandlerPackage(),
           new VectorIconsPackage(),
           new RNSecureKeyStorePackage(),
           new RNReactNativeHapticFeedbackPackage(),
@@ -57,7 +58,6 @@ public class MainApplication extends Application implements ReactApplication {
           new RNAudioRecorderPlayerPackage(),
           new RNCWebViewPackage(),
           new RNFetchBlobPackage(),
-          new RNJitsiMeetPackage(),
           new RNSharePackage(),
           new RNRadialGradientPackage(),
           new RNRncryptorPackage(),
@@ -77,10 +77,10 @@ public class MainApplication extends Application implements ReactApplication {
       return "index";
     }
 
-    @Override
-    protected @Nullable String getBundleAssetName() {
-      return "app.bundle";
-    }
+    // @Override
+    // protected @Nullable String getBundleAssetName() {
+    //   return "app.bundle";
+    // }
   };
 
   @Override

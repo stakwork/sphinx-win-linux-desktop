@@ -22,6 +22,10 @@ export default function Header({chat}:{chat: Chat}) {
     }
   }
 
+  function launchVideo(){
+    console.log('vid')
+  }
+
   const {name} = chat
   return useObserver(()=>
     <Appbar.Header style={{width:'100%',backgroundColor:'white',elevation:5}}>
@@ -31,7 +35,7 @@ export default function Header({chat}:{chat: Chat}) {
         navigation.navigate('Home', {params:{rnd:Math.random()}})
       }} />
       <Appbar.Content title={name} onPress={clickTitle} />
-      {/* <Appbar.Action icon="bell-outline" onPress={handleMore} /> */}
+      <Appbar.Action icon="video" onPress={launchVideo} color="grey" />
     </Appbar.Header>
   )
 }

@@ -8,7 +8,7 @@ import ImageViewer from './imgViewer'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import NewGroupModal from './newGroupModal'
-import JitsiMeet from './jitsiMeet'
+import Ion from './ion'
 import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
@@ -29,7 +29,7 @@ export default function Modals(){
       <RawInvoiceModal visible={showRawInvoiceModal} />
       <NewGroupModal visible={showNewGroupModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
-      {/* <JitsiMeet /> */}
+      <Ion />
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />
