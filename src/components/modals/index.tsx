@@ -29,7 +29,7 @@ export default function Modals(){
       <RawInvoiceModal visible={showRawInvoiceModal} />
       <NewGroupModal visible={showNewGroupModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
-      <Ion />
+      {/* <Ion /> */}
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />

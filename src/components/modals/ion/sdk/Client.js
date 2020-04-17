@@ -120,9 +120,6 @@ export default class Client extends EventEmitter {
         var promise = new Promise(async (resolve, reject) => {
             try {
                 let pc = await this._createReceiver(mid, tracks);
-                pc.ontrack = (track) => {
-                    console.log("ON TRACK",track)
-                }
                 var sub_mid = "";
                 pc.onaddstream = (e) => {
                     console.log("ON ADD STREAM CALLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -281,6 +278,9 @@ export default class Client extends EventEmitter {
         //         pc.addStream(new MediaStream(track))
         //     })
         // }
+        pc.addStream(new MediaStream())
+        const s = pc.remoteDescription
+        console.log(pc)
         // pc.addTransceiver('audio', { 'direction': 'recvonly' });
         // pc.addTransceiver('video', { 'direction': 'recvonly' });
         let desc = await pc.createOffer();

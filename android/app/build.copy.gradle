@@ -74,7 +74,7 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     entryFile: "index.js",
-    bundleAssetName: "app.bundle",
+    // bundleAssetName: "app.bundle",
     enableHermes: false,
     bundleInRelease: true,
     resourcesDirRelease: "src/release/res",
@@ -149,6 +149,9 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", false);
 
 dependencies {
+    compile project(':WebRTCModule')
+    
+    implementation project(':react-native-get-random-values')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-secure-key-store')
@@ -159,13 +162,6 @@ dependencies {
     implementation project(':react-native-audio-recorder-player')
     implementation project(':react-native-webview')
     implementation project(':rn-fetch-blob')
-    implementation(project(':react-native-jitsi-meet')) {
-        exclude group: 'com.facebook.react',module:'react-native-vector-icons'
-        exclude group: 'com.facebook.react',module:'react-native-community-async-storage'
-        exclude group: 'com.facebook.react',module:'react-native-webview'
-        exclude group: 'com.facebook.react',module:'react-native-fetch-blob'
-        exclude group: 'com.facebook.react',module:'react-native-gesture-handler'
-    }
     implementation project(':react-native-share')
     implementation project(':react-native-radial-gradient')
     implementation project(':rn-rncryptor')
