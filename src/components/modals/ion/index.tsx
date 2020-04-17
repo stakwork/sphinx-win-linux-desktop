@@ -8,15 +8,15 @@ import Header from '../modalHeader'
 
 import {RTCView} from 'react-native-webrtc'
 import {Client, Stream} from './sdk'
+import { fileURLToPath } from 'url'
 
 let client:any
 
 export default function ION() {
   const { ui } = useStores()
-  const [initted,setInitted] = useState(false)
   const [joined,setJoined] = useState(false)
   const [localStream, setLocalStream] = useState(null)
-  const [localStreamURL, setLocalStreamURL] = useState(null)
+  const [remoteStreamURL, setRemoteStreamURL] = useState(null)
 
   function close(){
     console.log('close!')
@@ -40,30 +40,35 @@ export default function ION() {
         "Stream Add",
         "rid => " + rid + ", mid => " + mid + ", name => " + info.name
       )
-      // var stream = await client.subscribe(rid, mid, tracks)
-      // console.log("STREAM",stream)
+      let stream = await client.subscribe(rid, mid, tracks);
+      console.log("THIS IS A NEW STREAM",stream)
+      // if(tracks){ // wtf i dunno
+      //   for (let [k,v] of Object.entries(tracks)) {
+      //     const confs = v
+      //     const conf:{[k:string]:any} = confs[0]
+      //     console.log("CONF",conf)
+      //     if(conf&&conf.type==='video') setRemoteStreamURL(conf.id)
+      //   }
+      // }
     })
     client.on("stream-remove", (id, rid) => {
       console.log("Stream Remove", "id => " + id + ", rid => " + rid)
     });
   }
-  function meet(){
-    console.log('meet')
-    console.log(navigator)
-    client = new Client()
-    console.log(client)
-    client.init()
-    setInitted(true)
-    setupNotifications()
-  }
 
   async function join(){
-    try {
-      await client.join('hi', { name: 'Droid' })
-      setJoined(true)
-      publish()
-    } catch(e) {
-      console.log(e)
+    if(!client) {
+      client = new Client()
+      client.init()
+      setupNotifications()
+    } else {
+      try {
+        await client.join('hi', { name: 'Droid' })
+        setJoined(true)
+        publish()
+      } catch(e) {
+        console.log(e)
+      }
     }
   }
 
@@ -77,10 +82,9 @@ export default function ION() {
       screen: false,
     })
     setLocalStream(stream.stream)
-    console.log(stream.stream)
+    console.log("STREAM=",stream.stream)
     console.log(stream.stream.toURL())
-    setLocalStreamURL(stream.stream.toURL())
-    console.log(stream.mid)
+    console.log(stream.stream)
   }
 
   async function leave(){
@@ -89,6 +93,7 @@ export default function ION() {
       await client.unpublish(localStream.mid);
     }
     setJoined(false)
+    setLocalStream(null)
   }
 
   useEffect(()=>{
@@ -98,23 +103,18 @@ export default function ION() {
   },[])
 
   const hasLocalStream = localStream?true:false
+  const hasRemoteStream = remoteStreamURL?true:false
+
   return useObserver(() =>
     <View style={styles.wrap}>
-      <View style={{ backgroundColor: 'black',flex: 1 }}>
-        {hasLocalStream && <RTCView streamURL={localStream.toURL()} 
-          style={{flex:1}}
-        />}
-      </View>
+      {hasLocalStream && <RTCView streamURL={localStream.toURL()} 
+        style={{...styles.full}}
+      />}
+      {/* {hasRemoteStream && <RTCView streamURL={remoteStreamURL} 
+        style={{...styles.full}}
+      />} */}
 
-      {!initted && !joined && <View style={styles.buttonsWrap}>
-        <Button mode="contained" dark={true}
-          style={styles.button}
-          onPress={()=> meet()}>
-          Init
-        </Button>
-      </View>}
-
-      {initted && !joined && <View style={styles.buttonsWrap}>
+      {!joined && <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true}
           style={styles.button}
           onPress={()=> join()}>
@@ -122,7 +122,7 @@ export default function ION() {
         </Button>
       </View>}
 
-      {initted && joined && <View style={styles.buttonsWrap}>
+      {joined && <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true}
           style={{...styles.button,backgroundColor:'#55D1A9'}}
           onPress={()=> leave()}>
@@ -157,5 +157,9 @@ const styles = StyleSheet.create({
     display:'flex',
     justifyContent:'center',
     alignItems:'center'
+  },
+  full:{
+    flex:1,position:'absolute',
+    top:0,left:0,right:0,bottom:0,
   }
 })

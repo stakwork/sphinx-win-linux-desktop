@@ -80,7 +80,6 @@ export default class Client extends EventEmitter {
                 let stream = new Stream();
                 await stream.init(true, { audio: options.audio, video: options.video, screen: options.screen, resolution: options.resolution });
                 let pc = await this._createSender(stream.stream, options.codec);
-
                 pc.onicecandidate = async (e) => {
                     if (!pc.sendOffer) {
                         var offer = pc.localDescription;
@@ -120,9 +119,13 @@ export default class Client extends EventEmitter {
         console.log('subscribe rid => %s, mid => %s', rid, mid);
         var promise = new Promise(async (resolve, reject) => {
             try {
-                let pc = await this._createReceiver(mid);
+                let pc = await this._createReceiver(mid, tracks);
+                pc.ontrack = (track) => {
+                    console.log("ON TRACK",track)
+                }
                 var sub_mid = "";
                 pc.onaddstream = (e) => {
+                    console.log("ON ADD STREAM CALLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                     var stream = new Stream(sub_mid, e.stream);
                     console.log('Stream::pc::onaddstream', stream.mid);
                     this._streams[sub_mid] = stream;
@@ -134,6 +137,7 @@ export default class Client extends EventEmitter {
                 }
                 pc.onicecandidate = async (e) => {
                     if (!pc.sendOffer) {
+                        console.log("O?N ICE CANDIATEEEEEEEEEEEEEEEEEEE")
                         var jsep = pc.localDescription;
                         console.log('Send offer sdp => ' + jsep.sdp);
                         pc.sendOffer = true
@@ -262,16 +266,21 @@ export default class Client extends EventEmitter {
         pc.addStream(stream);
         let offer = await
             pc.createOffer({ offerToReceiveVideo: false, offerToReceiveAudio: false });
+            // pc.createOffer()
         let desc = this._payloadModify(offer, codec);
         pc.setLocalDescription(desc);
         return pc;
     }
 
-    async _createReceiver(uid) {
+    async _createReceiver(uid,tracks) {
         console.log('create receiver => %s', uid);
         let pc = new RTCPeerConnection({ iceServers: [{ urls: ices }] });
         pc.sendOffer = false;
-        console.log(pc)
+        // if(tracks){
+        //     tracks.forEach(track=>{
+        //         pc.addStream(new MediaStream(track))
+        //     })
+        // }
         // pc.addTransceiver('audio', { 'direction': 'recvonly' });
         // pc.addTransceiver('video', { 'direction': 'recvonly' });
         let desc = await pc.createOffer();
@@ -300,7 +309,7 @@ export default class Client extends EventEmitter {
 
     _getProtooUrl(pid) {
         const hostname = 'rtc.sphinx.chat' //window.location.hostname;
-        const websocketProtocol = 'https' //location.protocol === 'https:' ? 'wss' : 'ws'
+        const websocketProtocol = 'wss' //location.protocol === 'https:' ? 'wss' : 'ws'
         let url = `${websocketProtocol}://${hostname}:${this._port}/ws?peer=${pid}`;
         return url;
     }
@@ -329,6 +338,9 @@ export default class Client extends EventEmitter {
                 }
             case 'stream-add':
                 {
+                    console.log('=========>')
+                    console.log('FULL STREAM ADD',data)
+                    console.log('=========>')
                     const { rid, mid, info, tracks } = data;
                     console.log('stream-add peer rid => %s, mid => %s', rid, mid);
                     this.emit('stream-add', rid, mid, info, tracks);
