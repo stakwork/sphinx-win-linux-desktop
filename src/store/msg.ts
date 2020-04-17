@@ -41,11 +41,11 @@ export interface Msg {
 }
 
 class MsgStore {
-  @observable // chat id: message array
+  @persist('object') @observable // chat id: message array
   messages: {[k:number]:Msg[]} = {}
 
   @persist('object') @observable
-  lastSeen: {[k:number]:number} = {} // {id: new Date().getTime()}
+  lastSeen: {[k:number]:number} = {} // {chat_id: new Date().getTime()}
 
   @persist @observable
   lastFetched: number
@@ -234,6 +234,15 @@ class MsgStore {
   seeChat(id) {
     if(!id) return
     this.lastSeen[id] = new Date().getTime()
+  }
+
+  @action
+  initLastSeen() {
+    const obj = this.lastSeen?{...this.lastSeen}:{}
+    chatStore.chats.forEach(c=>{
+      if(!obj[c.id]) obj[c.id] = new Date().getTime()
+    })
+    this.lastSeen = obj
   }
 
 }

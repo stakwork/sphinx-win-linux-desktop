@@ -53,7 +53,7 @@ export default function SetPrice({setAmount}) {
 const styles = StyleSheet.create({
   priceButton:{
     position:'absolute',
-    top:100,right:10,
+    top:90,right:10,
     height:32,minWidth:90,
     backgroundColor:'#55D1A9',
     zIndex:999,

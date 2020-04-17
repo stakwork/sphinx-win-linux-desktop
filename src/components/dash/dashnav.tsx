@@ -3,6 +3,7 @@ import Chat from '../chat/chat'
 import Dashboard from './dashboard'
 import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack'
 import {DashStackParamList} from '../../../src/types'
+import {setTint} from '../utils/statusBar'
 
 const Stack = createStackNavigator<DashStackParamList>()
 
@@ -12,8 +13,12 @@ export default function DashNav() {
   }
   return (
     <Stack.Navigator initialRouteName="Home" headerMode="none" screenOptions={opts}>
-      <Stack.Screen name="Home" component={Dashboard} />
-      <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name="Home" component={Dashboard} 
+        listeners={{focus:()=>setTint('dark')}} 
+      />
+      <Stack.Screen name="Chat" component={Chat} 
+        listeners={{focus:()=>setTint('light')}} 
+      />
     </Stack.Navigator>
   )
 }

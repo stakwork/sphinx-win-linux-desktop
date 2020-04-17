@@ -7,7 +7,7 @@ const group = constants.chat_types.group
 const expiredInvite = constants.invite_statuses.expired
 
 export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
-  const groupChats = chats.filter(c=> c.type===group)
+  const groupChats = chats.filter(c=> c.type===group).map(c=> ({...c}))
   const conversations = []
   contacts.forEach(contact=>{
     if(contact.id!==1) {
@@ -18,7 +18,6 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
         conversations.push({...chatForContact, name:contact.alias})
       } else {
         conversations.push({ // "fake" chat (first)
-          // id: `contact_${contact.id}`,
           name: contact.alias,
           photo_url: contact.photo_url,
           updated_at: new Date().toJSON(),
@@ -30,7 +29,6 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
   })
   const convs = conversations.filter(c=> !(c.invite&&c.invite.status===expiredInvite))
   const all = groupChats.concat(convs)
-  all.sort((a,b)=> Date.parse(a.updated_at||'') - Date.parse(b.updated_at||''))
   return all
 }
 

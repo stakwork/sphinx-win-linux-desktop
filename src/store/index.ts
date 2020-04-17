@@ -17,7 +17,8 @@ Promise.all([
   hydrate('details', detailsStore),
   hydrate('contacts', contactStore),
   hydrate('chats', chatStore),
-  hydrate('meme', memeStore)
+  hydrate('meme', memeStore),
+  hydrate('msg', msgStore)
 ]).then(()=> {
   uiStore.setReady(true)
 })

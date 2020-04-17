@@ -23,6 +23,8 @@ export default function Main() {
       await sleep(500)
       await meme.authenticateAll()
 
+      msg.initLastSeen()
+
       initPicSrc()
 
     })()

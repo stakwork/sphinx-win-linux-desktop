@@ -102,7 +102,7 @@ export default function ImgViewer(props) {
       />
       {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
       {showImg && <Image resizeMode='cover' source={{uri:uri||data}}
-        style={{...styles.img,width:w,height:h-180}} 
+        style={{...styles.img,width:w,height:h-130,top:80}} 
       />}
       {uploading && <View style={{...styles.activityWrap,width:w,height:h-180}}>
         <ActivityIndicator animating={true} color="white" size="large" />
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     position:'absolute',
     top:0,left:0,bottom:0,right:0,
     flexDirection:'column',
-    justifyContent:'center',
+    justifyContent:'flex-start',
     alignItems:'center',
     backgroundColor:'black'
   },
@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
     left:4,top:31
   },
   img:{
-    height:'80%',
     width:'100%'
   },
   activityWrap:{

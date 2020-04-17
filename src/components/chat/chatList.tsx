@@ -11,7 +11,7 @@ import {useChatPicSrc} from '../utils/picSrc'
 import moment from 'moment'
 
 export default function ChatList() {
-  const {ui,chats,contacts} = useStores()
+  const {ui,chats,contacts,msg} = useStores()
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async() => {
@@ -33,8 +33,18 @@ export default function ChatList() {
       return (c.invite?true:false) || 
         c.name.toLowerCase().includes(ui.searchTerm.toLowerCase())
     })
+    chatsToShow.sort((a,b)=>{
+      const amsgs = msg.messages[a.id]
+      const alastMsg = amsgs&&amsgs[amsgs.length-1]
+      const then = moment(new Date()).add(30, 'days')
+      const adate = alastMsg&&alastMsg.date?moment(alastMsg.date):then
+      const bmsgs = msg.messages[b.id]
+      const blastMsg = bmsgs&&bmsgs[bmsgs.length-1]
+      const bdate = blastMsg&&blastMsg.date?moment(blastMsg.date):then
+      return adate.isBefore(bdate) ? 0 : -1
+    })
     chatsToShow.sort(a=>{
-      if(a.invite) return -1
+      if(a.invite && a.invite.status!==4) return -1
       return 0
     })
     return <ScrollView style={{width:'100%',flex:1}}

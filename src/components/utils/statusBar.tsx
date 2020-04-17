@@ -28,3 +28,13 @@ const styles = StyleSheet.create({
 })
 
 export default GeneralStatusBarColor
+
+export function setTint(s='light'){
+  if(s==='light') {
+    StatusBar.setBarStyle('dark-content')
+    StatusBar.setBackgroundColor('white')
+  } else {
+    StatusBar.setBarStyle('light-content')
+    StatusBar.setBackgroundColor('#6289FD')
+  }
+}
