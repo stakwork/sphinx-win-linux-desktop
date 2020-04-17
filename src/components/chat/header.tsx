@@ -35,7 +35,7 @@ export default function Header({chat}:{chat: Chat}) {
         navigation.navigate('Home', {params:{rnd:Math.random()}})
       }} />
       <Appbar.Content title={name} onPress={clickTitle} />
-      <Appbar.Action icon="video" onPress={launchVideo} color="grey" />
+      {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
     </Appbar.Header>
   )
 }

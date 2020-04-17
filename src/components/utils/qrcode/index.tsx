@@ -1,4 +1,4 @@
-
+ 
 import React from 'react'
 import Canvas from './canvas'
 import {View} from 'react-native'

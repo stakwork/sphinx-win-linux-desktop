@@ -6,7 +6,10 @@ React-Native Android client for Sphinx network
 
 ### contributing
 
-Rename `android/app/build.copy.gradle` to `android/app/build.gradle`
+1. clone the repo
+2. `npm install`
+3. Rename `android/app/build.copy.gradle` to `android/app/build.gradle`
+4. `react-native run-android`
 
 - Each merge request should include documentation:
   - purpose of changes
