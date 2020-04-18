@@ -129,12 +129,16 @@ function ChatRow(props){
 function lastMessageText(msg){
   if(!msg) return ''
 
+  if(msg.amount) {
+    if(msg.sender===1) return `Payment Sent: ${msg.amount} sat`
+    return `Payment Received: ${msg.amount} sat`
+  }
   if(msg.message_content) return msg.message_content
   if(msg.media_token) {
     if(msg.sender===1) return 'Picture Sent'
     return 'Picture Received'
   }
-
+  
   return ''
 }
 

@@ -8,7 +8,7 @@ import ImageViewer from './imgViewer'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import NewGroupModal from './newGroupModal'
-import IonWeb from './ionweb/try'
+import Peer from './peer'
 import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
@@ -30,6 +30,7 @@ export default function Modals(){
       <NewGroupModal visible={showNewGroupModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
       {/* <IonWeb /> */}
+      {/* <Peer /> */}
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />

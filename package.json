@@ -55,6 +55,7 @@
     "react-native-modal": "^11.5.4",
     "react-native-os": "^1.2.6",
     "react-native-paper": "^3.6.0",
+    "react-native-peerjs": "^1.0.4",
     "react-native-qrcode": "^0.2.7",
     "react-native-radial-gradient": "^1.0.6",
     "react-native-randombytes": "^3.5.3",
