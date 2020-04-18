@@ -2,13 +2,23 @@ import React from 'react'
 import {View, Text, StyleSheet} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import shared from './sharedStyles'
+import { constants } from '../../../constants'
 
 export default function PaymentMsg(props){
-  const {amount} = props
+  const {amount, status} = props
   const isMe = props.sender===1
-  const icon = isMe?'arrow-top-right':'arrow-bottom-left'
-  const label = isMe?'SENT':'RECEIVED'
-  const color = isMe?'#555':'#74ABFF'
+
+  let icon, label, color
+  if (isMe) {
+    icon = 'arrow-top-right'
+    label = status === constants.statuses.failed ? 'FAILED' : 'SENT'
+    color = status === constants.statuses.failed ? '#F00' : '#555'
+  } else {
+    icon = 'arrow-bottom-left'
+    label = 'RECEIVED'
+    color = '#74ABFF'
+  } 
+
   return <View style={{...styles.bub, ...shared.innerPad}}>
     <View style={styles.row}>
       <View style={{...styles.iconWrap,backgroundColor:color}}>
