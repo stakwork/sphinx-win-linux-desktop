@@ -12,7 +12,7 @@ export default function PaymentMsg(props){
   if (isMe) {
     icon = 'arrow-top-right'
     label = status === constants.statuses.failed ? 'FAILED' : 'SENT'
-    color = status === constants.statuses.failed ? '#F00' : '#555'
+    color = status === constants.statuses.failed ? '#DB5554' : '#555'
   } else {
     icon = 'arrow-bottom-left'
     label = 'RECEIVED'

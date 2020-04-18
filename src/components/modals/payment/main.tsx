@@ -7,7 +7,7 @@ import { useStores } from '../../../store'
 
 export default function Main({contact,loading,confirmOrContinue,contactless}){
   const {ui, details} = useStores()
-  const [amt, setAmt] = useState(0)
+  const [amt, setAmt] = useState('0')
   const [text, setText] = useState('')
   const [inputFocused,setInputFocused] = useState(false)
 
@@ -16,9 +16,10 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
   const hasImg = uri?true:false
 
   function go(n){
-    setAmt(prevAmt => {
-      const newAmount = prevAmt * 10 + n
-      if (ui.payMode === 'payment' && details.balance < newAmount) {
+    if(amt==='0') setAmt(`${n}`)
+    else setAmt(prevAmt => {
+      const newAmount = `${amt}${n}`
+      if (ui.payMode === 'payment' && details.balance < parseInt(newAmount)) {
         return prevAmt
       }
       return newAmount
@@ -26,7 +27,12 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
   }
 
   function backspace(){
-    setAmt(prevAmt => prevAmt / 10)
+    if(amt.length===1){
+      setAmt('0')
+    } else {
+      const newAmt = amt.substr(0, amt.length-1)
+      setAmt(newAmt)
+    }
   }
   return <View style={{...styles.wrap,maxHeight:height,minHeight:height,
     justifyContent:contact?'space-around':'center'
@@ -52,9 +58,9 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
 
     <View style={styles.bottom}>
       <View style={styles.confirmWrap}>
-        {amt != 0 &&<Button style={styles.confirm}
+        {amt !=='0' && <Button style={styles.confirm}
           loading={loading}
-          onPress={()=> confirmOrContinue(amt,text)}
+          onPress={()=> confirmOrContinue(parseInt(amt),text)}
           mode="contained" dark={true}>
           {contactless?'CONTINUE':'CONFIRM'}
         </Button>}
