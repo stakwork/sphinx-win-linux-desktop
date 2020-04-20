@@ -2,40 +2,47 @@ import React, {useState,useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../../store'
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
-import { Button } from 'react-native-paper'
+import { Button, ActivityIndicator } from 'react-native-paper'
 import Peer from 'react-native-peerjs';
 import {RTCView} from 'react-native-webrtc'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
-export default function PeerChat() {
+export default function PeerChat({params}) {
   const { ui } = useStores()
   const [joined,setJoined] = useState(false)
-  const [ls, setLocalStream] = useState(null)
+  const [open,setOpen] = useState(false)
+  const [thePeer,setPeer] = useState(null)
   const [localStreamURL, setLocalStreamURL] = useState(null)
   const [remoteStreamURL, setRemoteStreamURL] = useState(null)
 
-  function close(){
-    console.log('close!')
-  }
   async function start(){
-    const peer = new Peer('droid');
-    const localStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: { width: { ideal: 960 }, height: { ideal: 540 } }
-    })
-    setLocalStream(localStream)
-    setJoined(true)
-    return {peer,localStream}
+    const id = JSON.parse(JSON.stringify(params.id))
+    if(!id) return
+    console.log("NEW ID:",params.id)
+    const peer = new Peer(id);
+    try {
+      const localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: { width: { ideal: 960 }, height: { ideal: 540 } }
+      })
+      setLocalStreamURL(localStream.id)
+      setJoined(true)
+      return {peer,localStream}
+    } catch(e){
+      console.log(e)
+      return {}
+    }
   }
   async function join(){
     console.log('join')
 
     const {peer,localStream} = await start()
+    if(!peer) return
 
-    console.log('localPeer',peer)
-
+    console.log('peer',peer)
     peer.on('open', lpid=>{
       console.log('local peer open! id:',lpid)
+      setOpen(true)
     })
 
     peer.on('error', console.log);
@@ -45,6 +52,7 @@ export default function PeerChat() {
       try {
         call.answer(localStream); // Answer the call with an A/V stream.
         call.on('stream', (remoteStream) => {
+          setLocalStreamURL(null)
           setRemoteStreamURL(remoteStream.toURL())
           console.log(localStream)
           const lsurl = localStream.id
@@ -54,38 +62,43 @@ export default function PeerChat() {
         console.log(e)
       }
     })
+
+    setPeer(peer)
   }
   function leave(){
-
+    console.log('leave',thePeer)
+    // if(thePeer) thePeer.destroy()
+    ui.setRtcParams(null)
   }
 
-  // useEffect(()=>{
-  //   join()
-  //   return ()=> {
-  //     leave()
-  //   }
-  // },[])
+  useEffect(()=>{
+    setTimeout(()=>join(), 150)
+  },[])
 
   const hasLocalStream = localStreamURL?true:false
-  const hasRemoteStream=remoteStreamURL?true:false
+  const hasRemoteStream = remoteStreamURL?true:false
 
   return useObserver(() =>
     <View style={styles.wrap}>
       {hasLocalStream && <SmallVid streamURL={localStreamURL} />}
 
       {hasRemoteStream && <BigVid streamURL={remoteStreamURL}/>}
+      
+      {joined && !hasRemoteStream && <ActivityIndicator 
+        color={open?'white':'grey'} animating={true}
+      />}
 
       <View style={styles.toolbar}>
-        <HangUpButton />
+        <HangUpButton onPress={leave} />
       </View>
 
-      {!joined && <View style={styles.buttonsWrap}>
+      {/*!joined && <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true}
           style={styles.button}
           onPress={()=> join()}>
           Join
         </Button>
-      </View>}
+      </View>*/}
 
       {/*joined && <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true}
@@ -98,9 +111,9 @@ export default function PeerChat() {
   )
 }
 
-function HangUpButton({}){
+function HangUpButton({onPress}){
   return <TouchableOpacity style={{...styles.round,
-    backgroundColor:'#DB5554'}}>
+    backgroundColor:'#DB5554'}} onPress={onPress}>
     <Icon name="phone-hangup" color="white" size={31} />
   </TouchableOpacity>
 }
@@ -177,8 +190,8 @@ const styles = StyleSheet.create({
     overflow:'hidden'
   },
   smallVid:{
-    height:180,
-    width:180,
+    height:150,
+    width:150,
     borderColor:'white',
     borderWidth:1,
     position:'absolute',

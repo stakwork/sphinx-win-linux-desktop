@@ -150,6 +150,11 @@ class UiStore {
     this.imgViewerParams = obj
   }
 
+  @observable rtcParams: {[k:string]:any} = null
+  setRtcParams(obj:{[k:string]:any}) {
+    this.rtcParams = obj
+  }
+
 }
 
 export const uiStore = new UiStore()

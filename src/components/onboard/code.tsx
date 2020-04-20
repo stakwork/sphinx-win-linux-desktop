@@ -4,6 +4,7 @@ import {Title,IconButton,ActivityIndicator} from 'react-native-paper'
 import QR from '../utils/qr'
 import { useStores } from '../../store'
 import RadialGradient from 'react-native-radial-gradient'
+import {decode as atob} from 'base-64'
 
 export default function Code(props) {
   const {onDone,z} = props
@@ -14,18 +15,36 @@ export default function Code(props) {
   const [checking, setChecking] = useState(false)
 
   async function scan(data){
-    console.log(data)
     setCode(data)
     setScanning(false)
+    try {
+      const ip = atob(data)
+      if(ip.startsWith('ip:')){
+        signupWithIP(ip)
+        return
+      }
+    } catch(e){}
+    // else
     setTimeout(()=>{
       checkInvite(data)
     }, 333)   
   }
 
+  async function signupWithIP(s){
+    const a = s.split(':')
+    if(a.length===1) return
+    setChecking(true)
+    const ip = a[1]
+    await user.signupWithIP(ip)
+    await sleep(200)
+    const token = await user.generateToken()
+    if(token) onDone()
+    setChecking(false)
+  }
+
   async function checkInvite(theCode){
     if(!theCode || checking) return
     setChecking(true)
-    console.log("CHECK INVITE",theCode)
     const ip = await user.signupWithCode(theCode)
     await sleep(200)
     if (ip) {

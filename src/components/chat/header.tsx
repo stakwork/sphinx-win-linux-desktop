@@ -6,6 +6,7 @@ import {Chat} from '../../store/chats'
 import {useStores} from '../../store'
 import {contactForConversation} from './utils'
 import { constants } from '../../constants'
+import {randAscii} from '../../crypto/rand'
 
 const conversation = constants.chat_types.conversation
 
@@ -22,8 +23,9 @@ export default function Header({chat}:{chat: Chat}) {
     }
   }
 
-  function launchVideo(){
-    console.log('vid')
+  async function launchVideo(){
+    const id = await randAscii()
+    ui.setRtcParams({id})
   }
 
   const {name} = chat
@@ -35,7 +37,8 @@ export default function Header({chat}:{chat: Chat}) {
         navigation.navigate('Home', {params:{rnd:Math.random()}})
       }} />
       <Appbar.Content title={name} onPress={clickTitle} />
-      {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
+      <Appbar.Action icon="video" onPress={launchVideo} color="grey" />
     </Appbar.Header>
   )
 }
+

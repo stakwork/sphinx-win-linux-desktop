@@ -21,7 +21,9 @@ export default function Modals(){
     const showNewGroupModal = ui.newGroupModal?true:false
     const showRawInvoiceModal = ui.rawInvoiceModal
     const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri)?true:false
+    const showPeer = ui.rtcParams?true:false
     return <>
+      {showPeer && <Peer params={ui.rtcParams} />}  
       <AddFriend visible={showAddFriendModal} />
       <Payment visible={ui.showPayModal} />
       <ConfirmPayInvoice visible={showConfirmPayInvoice} />
@@ -30,7 +32,6 @@ export default function Modals(){
       <NewGroupModal visible={showNewGroupModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
       {/* <IonWeb /> */}
-      {/* <Peer /> */}
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />

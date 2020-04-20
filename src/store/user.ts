@@ -46,8 +46,24 @@ class UserStore {
         inviterPubkey: r.invite.pubkey,
         welcomeMessage: r.invite.message
       }
-      api.instantiateRelay(r.ip) // just token
+      api.instantiateRelay(r.ip) // no token
       return r.ip
+    } catch(e) {
+      console.log("Error:",e)
+    }
+  }
+
+  @action
+  async signupWithIP(ip:string) {
+    try {
+      this.currentIP = ip
+      this.invite={
+        inviterNickname: 'Sphinx Support',
+        inviterPubkey: '0292052c3ab594f7b5e997099f66e8ed51b4342126dcb5c3caa76b38adb725dcdb',
+        welcomeMessage: 'Welcome to Sphinx!'
+      }
+      api.instantiateRelay(ip) // no token
+      return ip
     } catch(e) {
       console.log("Error:",e)
     }

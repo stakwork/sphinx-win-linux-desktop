@@ -13,6 +13,15 @@ function randString(l): Promise<string> {
   })
 }
 
+async function randAscii(){
+  const rnd = await randString(20)
+  const one = replaceAll(rnd,'=','')
+  const two = replaceAll(one,'+','')
+  const three = replaceAll(two,'/','')
+  return three
+}
+
+
 // async function randStringFromBuffer(length) {
 //   const chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 //   var charsLength = chars.length
@@ -28,4 +37,10 @@ function randString(l): Promise<string> {
 //   return result.join('')
 // }
 
-export {randString}
+
+function replaceAll(str0, str1, str2) {
+  const ignore = false
+  return str0.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+} 
+
+export {randString,randAscii}
