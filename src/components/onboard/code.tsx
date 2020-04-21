@@ -35,9 +35,10 @@ export default function Code(props) {
     if(a.length===1) return
     setChecking(true)
     const ip = a[1]
+    const pwd = a.length>2?a[2]:''
     await user.signupWithIP(ip)
     await sleep(200)
-    const token = await user.generateToken()
+    const token = await user.generateToken(pwd)
     if(token) onDone()
     setChecking(false)
   }
@@ -48,7 +49,7 @@ export default function Code(props) {
     const ip = await user.signupWithCode(theCode)
     await sleep(200)
     if (ip) {
-      const token = await user.generateToken()
+      const token = await user.generateToken('')
       if(token) onDone()
     }
     setChecking(false)

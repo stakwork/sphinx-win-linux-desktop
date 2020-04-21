@@ -70,10 +70,10 @@ class UserStore {
   }
 
   @action
-  async generateToken() {
+  async generateToken(pwd:string) {
     try {
       const token = await randString(20)
-      await api.relay.post(`contacts/tokens`,{
+      await api.relay.post(`contacts/tokens?pwd=${pwd}`,{
         token
       })
       this.authToken = token
