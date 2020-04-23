@@ -1,1 +1,1 @@
-April 21 at 2 pm PST
+April 23 at 3:30 pm PST
