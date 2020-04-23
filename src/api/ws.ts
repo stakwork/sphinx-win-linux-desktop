@@ -1,3 +1,5 @@
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
 type WSMessage = {[k: string]: any}
 
 type DataHandler = (data: any) => void
@@ -8,26 +10,26 @@ export function registerWsHandlers(hs: {[k: string]: DataHandler}) {
   handlers = hs
 }
 
-let ws: WebSocket | null = null
+let ws: any = null
 
 export function connectWebSocket(ip: string) {
   if(ws) return // dont reconnect if already exists
 
   const uri = 'ws://' + ip + '/socket' 
 
-  const thews = new WebSocket(uri)
+  const rws = new ReconnectingWebSocket(uri);
 
-  thews.onopen = function(){
-    ws = thews
+  rws.onopen = function(){
+    ws = rws
   }
-  thews.onclose = function(){
+  rws.onclose = function(){
     ws = null
   }
-  thews.onerror = function(){
+  rws.onerror = function(){
     ws = null
   }
 
-  thews.onmessage = (e) => {
+  rws.onmessage = (e) => {
     let msg: WSMessage = JSON.parse(e.data)
     let handler = handlers[msg.type]
     if (handler) {

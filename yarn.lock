@@ -998,6 +998,13 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.7.tgz#a65ce0702f55cb67fd777995de6fc7b3e5781903"
   integrity sha512-9KbP7LTLFz9dx1heURJbO6nuVMdSjDez8znlrUzaB1nUwKVsTTwlKRuHxGUYIIkReLWrJQeCv9tidy+84z2eCw==
 
+"@react-native-community/push-notification-ios@^1.0.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/push-notification-ios/-/push-notification-ios-1.1.1.tgz#80d5684d05d211a832f88d78720d63e53119a027"
+  integrity sha512-kgm8BKlru5OjwxxynReC1MM/JXwXZ/zOSGYORhbmnrBC8LTlogYA1ZMJ9HY9ltEpw6gDndQEsfFOkXHYeAPSCw==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-navigation/core@^3.7.5":
   version "3.7.5"
   resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-3.7.5.tgz#2b8d464574edc7bcab8be226375d8227e9814ad2"
@@ -7222,6 +7229,13 @@ react-native-peerjs@^1.0.4:
   resolved "https://registry.yarnpkg.com/react-native-peerjs/-/react-native-peerjs-1.0.4.tgz#94df5bf13b1ab6373bc123fc6d1109840f67fd78"
   integrity sha512-Z3pPtV6B0tiW8TiRXBtyUwWBAi+sYz2/bMaae07zkBogEnF2PzwFlK9+eZZbJHSVeRohtDE9RnED5Q6QI07TFg==
 
+react-native-push-notification@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-push-notification/-/react-native-push-notification-3.2.1.tgz#d902fdb639b8b357d417767f4b81d8702d299fc4"
+  integrity sha512-k1sRGGt+tcMPw4vEdJX+SooYMKY1oOShFnp16jyNynoIvFOCmOrUuDkto0vmjXTHsHjsSH/XQ0G3vBQv/ED9Ug==
+  dependencies:
+    "@react-native-community/push-notification-ios" "^1.0.1"
+
 react-native-qrcode@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/react-native-qrcode/-/react-native-qrcode-0.2.7.tgz#d103166fb1a5b53643e8bf7b88c0672e689ac4f8"
@@ -7588,6 +7602,11 @@ realpath-native@^1.1.0:
   dependencies:
     util.promisify "^1.0.0"
 
+reconnecting-websocket@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/reconnecting-websocket/-/reconnecting-websocket-4.4.0.tgz#3b0e5b96ef119e78a03135865b8bb0af1b948783"
+  integrity sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==
+
 regenerate-unicode-properties@^8.2.0:
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-8.2.0.tgz#e5de7111d655e7ba60c057dbe9ff37c87e65cdec"
@@ -7830,10 +7849,10 @@ rn-fetch-blob@^0.12.0:
     base-64 "0.1.0"
     glob "7.0.6"
 
-rn-rncryptor@^1.0.11:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/rn-rncryptor/-/rn-rncryptor-1.0.11.tgz#b658028aea5198aab56f62656f6a2c3fc2e0d9de"
-  integrity sha512-SP4wrlkKus3WNQ6DrNnJZKeprwSmF6DyX3I4UmxGztpOHyRZ2Of0maGcFxe8wq6PlUaD5J9k2EN9tU2SZU72kg==
+rn-rncryptor@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/rn-rncryptor/-/rn-rncryptor-1.0.12.tgz#b7c689d6f1f008bc3fa1310023c3ce920b9bd977"
+  integrity sha512-XhPfIcfvIskTgqRSPs7Z611OjdMgoyYpsf9FLu7++GtunTfNRlbUKC8jdAfmZzNh/9bSTKF9i6kwFEZswhXziw==
 
 rsvp@^4.8.4:
   version "4.8.5"

@@ -6,6 +6,7 @@ import android.webkit.WebView;
 import com.oney.WebRTCModule.WebRTCModulePackage;
 
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -49,6 +50,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new WebRTCModulePackage(),
           new MainReactPackage(),
+            new ReactNativePushNotificationPackage(),
           new RNGetRandomValuesPackage(),
           new RNGestureHandlerPackage(),
           new VectorIconsPackage(),

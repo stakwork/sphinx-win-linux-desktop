@@ -13,9 +13,13 @@ const group = constants.chat_types.group
 
 export default function MsgListWrap({chat}:{chat: Chat}){
   const {msg,chats} = useStores()
-  const [ok, setOK] = useState(false)
+  const [max, setMax] = useState(0)
   useEffect(()=>{
-    setOK(true)
+    (async () => {
+      setMax(10) // first render just 10
+      await sleep(150)
+      setMax(Infinity) // then the rest
+    })()
   },[])
   return useObserver(()=>{
     let theID = chat.id
@@ -28,7 +32,9 @@ export default function MsgListWrap({chat}:{chat: Chat}){
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
-    return <MsgList msgs={ok?filtered:[]} chat={chat} />
+    let final = []
+    if(max) final = filtered.slice(0).slice(max * -1)
+    return <MsgList msgs={final} chat={chat} />
   })
 }
 
@@ -52,7 +58,6 @@ function MsgList({msgs, chat}) {
     setTimeout(()=>{
       scrollViewRef.current.scrollToEnd({duration: 500})
     },500)
-    
   },[msgs.length])
 
   const isGroup = chat.type===group
@@ -173,10 +178,22 @@ function processMsgs(msgs: Msg[]){
   }
   return ms
 }
+
+// need to filter out purchase, purchase_accept, purchase_deny
+const filterOut = ['purchase','purchase_accept','purchase_deny']
+function getPrevious(msgs: Msg[], i:number){
+  if(i===0) return null
+  const previous = msgs[i-1]
+  const mtype = constantCodes['message_types'][previous.type]
+  if(filterOut.includes(mtype)) {
+    return getPrevious(msgs, i-1)
+  }
+  return previous
+}
 // only show info bar if first in a group from contact
 function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number){
-  if(i===0) return true
-  const previous = msgs[i-1]
+  const previous = getPrevious(msgs, i)
+  if(previous===null) return true
   if(previous.sender===msg.sender) {
     return false
   }
@@ -220,4 +237,8 @@ function debounce(func, delay) {
   const args = arguments
   clearTimeout(inDebounce)
   inDebounce = setTimeout(() => func.apply(context, args), delay)
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }

@@ -45,8 +45,6 @@ export default function MediaMsg(props){
     setBuying(false)
   }
 
-  // console.log(props)
-
   function tap(){
     if(media_type.startsWith('image')){
       if(data) ui.setImgViewerParams({data})
@@ -60,25 +58,31 @@ export default function MediaMsg(props){
   const showStats = isMe&&amt
   const sold = props.sold
 
-  let loadingHeight = 200
+  let minHeight = 200
   let showPayToUnlockMessage = false
   if(media_type==='text/plain'){
-    loadingHeight = isMe?72:42
+    minHeight = isMe?72:42
     if(!isMe&&!loading&&!paidMessageText) showPayToUnlockMessage=true
   }
 
+  let wrapHeight = minHeight
+  if(showPurchaseButton) wrapHeight+=38
+
   return <View ref={wrapRef} collapsable={false}>
-    <TouchableOpacity style={{...styles.wrap}} onPress={tap} activeOpacity={0.65}>
+    <TouchableOpacity style={{...styles.wrap, minHeight:wrapHeight}} 
+      onPress={tap} activeOpacity={0.65}>
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
         <Text style={{...styles.satStats,opacity:sold?1:0}}>Purchased</Text>
       </View>}
-      {!hasImgData && <View style={{minHeight:loadingHeight,...styles.loading}}>
-        {loading && <ActivityIndicator animating={true} color="grey" />}
-        {paidMessageText && <View style={{minHeight:loadingHeight,...styles.paidAttachmentText}}>
+      {!hasImgData && <View style={{minHeight,...styles.loading}}>
+        {loading && <View style={{minHeight,...styles.loadingWrap}}>
+          <ActivityIndicator animating={true} color="grey" />
+        </View>}
+        {paidMessageText && <View style={{minHeight,...styles.paidAttachmentText}}>
           <Text>{paidMessageText}</Text>
         </View>}
-        {showPayToUnlockMessage && <View style={{...styles.paidAttachmentText,alignItems:'center',paddingBottom:0}}>
+        {showPayToUnlockMessage && <View style={{...styles.paidAttachmentText,alignItems:'center'}}>
           <Text style={styles.payToUnlockMessage}>Pay to unlock message</Text>
         </View>}
       </View>}
@@ -87,7 +91,9 @@ export default function MediaMsg(props){
         <Text style={styles.text}>{message_content}</Text>
       </View>}
       {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
-        onPress={()=>buy(amt)}
+        onPress={()=>{
+          if(!purchased) buy(amt)
+        }}
         loading={buying}
         icon={purchased?'check':'arrow-top-right'}>
         <Text style={{fontSize:11}}>
@@ -109,10 +115,6 @@ function Media({type,data,uri}){
   }
 }
 
-function EncryptedText({source}){
-  return <Text>hi</Text>
-}
-
 const styles = StyleSheet.create({
   text:{
     color:'#333',
@@ -122,6 +124,8 @@ const styles = StyleSheet.create({
     // flex:1,
     width:200,
     // minHeight:200,
+    display:'flex',
+    justifyContent:'flex-end',
   },
   img:{
     width:200,
@@ -129,12 +133,12 @@ const styles = StyleSheet.create({
   },
   loading:{
     width:200,
-    minHeight:42,
-    backgroundColor:'rgba(255,255,255,0.8)',
+    minHeight:48,
     display:'flex',
     flexDirection:'column',
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
+    position:'relative',
   },
   payButton:{
     backgroundColor:'#4AC998',
@@ -145,7 +149,9 @@ const styles = StyleSheet.create({
     height:38,
     display:'flex',
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
+    // position:'absolute',
+    // bottom:0,
   },
   stats:{
     position:'absolute',
@@ -180,10 +186,20 @@ const styles = StyleSheet.create({
     justifyContent:'flex-start',
     alignItems:'flex-end',
     paddingLeft:10,
-    paddingBottom:13
+    paddingBottom:13,
+    paddingTop:13,
   },
   payToUnlockMessage:{
     fontSize:12,
-    fontWeight:'bold'
+    fontWeight:'bold',
+    minHeight:18
+  },
+  loadingWrap:{
+    height:'100%',
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+    position:'absolute',
+    top:0,left:0,right:0,bottom:0,
   }
 })
