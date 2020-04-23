@@ -3,89 +3,35 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../../store'
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
 import { Button, ActivityIndicator } from 'react-native-paper'
-import Peer from 'react-native-peerjs';
 import {RTCView} from 'react-native-webrtc'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { usePeer } from './usePeer'
 
 export default function PeerChat({params}) {
   const { ui } = useStores()
-  const [joined,setJoined] = useState(false)
-  const [open,setOpen] = useState(false)
-  const [thePeer,setPeer] = useState(null)
-  const [localStreamURL, setLocalStreamURL] = useState(null)
-  const [remoteStreamURL, setRemoteStreamURL] = useState(null)
 
-  async function start(){
-    const id = JSON.parse(JSON.stringify(params.id))
-    if(!id) return
-    console.log("NEW ID:",params.id)
-    const peer = new Peer(id);
-    try {
-      const localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: { width: { ideal: 960 }, height: { ideal: 540 } }
-      })
-      setLocalStreamURL(localStream.id)
-      setJoined(true)
-      return {peer,localStream}
-    } catch(e){
-      console.log(e)
-      return {}
-    }
-  }
-  async function join(){
-    console.log('join')
+  const peer = usePeer()
 
-    const {peer,localStream} = await start()
-    if(!peer) return
-
-    console.log('peer',peer)
-    peer.on('open', lpid=>{
-      console.log('local peer open! id:',lpid)
-      setOpen(true)
-    })
-
-    peer.on('error', console.log);
-    
-    peer.on('call', (call) => {
-      console.log('on call!')
-      try {
-        call.answer(localStream); // Answer the call with an A/V stream.
-        call.on('stream', (remoteStream) => {
-          setLocalStreamURL(null)
-          setRemoteStreamURL(remoteStream.toURL())
-          console.log(localStream)
-          const lsurl = localStream.id
-          setLocalStreamURL(lsurl)
-        })
-      } catch(e) {
-        console.log(e)
-      }
-    })
-
-    setPeer(peer)
-  }
   function leave(){
-    console.log('leave',thePeer)
-    // if(thePeer) thePeer.destroy()
+    peer.destroy()
     ui.setRtcParams(null)
   }
 
   useEffect(()=>{
-    setTimeout(()=>join(), 150)
+    setTimeout(()=>peer.join(), 150)
   },[])
 
-  const hasLocalStream = localStreamURL?true:false
-  const hasRemoteStream = remoteStreamURL?true:false
+  const hasLocalStream = peer.localStreamID?true:false
+  const hasRemoteStream = peer.remoteStreamID?true:false
 
   return useObserver(() =>
     <View style={styles.wrap}>
-      {hasLocalStream && <SmallVid streamURL={localStreamURL} />}
+      {hasLocalStream && <SmallVid streamURL={peer.localStreamID} />}
 
-      {hasRemoteStream && <BigVid streamURL={remoteStreamURL}/>}
+      {hasRemoteStream && <BigVid streamURL={peer.remoteStreamID}/>}
       
-      {joined && !hasRemoteStream && <ActivityIndicator 
-        color={open?'white':'grey'} animating={true}
+      {peer.joined && !hasRemoteStream && <ActivityIndicator 
+        color={peer.open?'white':'grey'} animating={true}
       />}
 
       <View style={styles.toolbar}>

@@ -1,5 +1,7 @@
 import RNCryptor from 'rn-rncryptor'
 
+// https://github.com/Evanfeenstra/rn-rncryptor
+
 export async function encrypt(txt, pwd): Promise<string> {
   try {
     const encryptedbase64 = await RNCryptor.encrypt(txt,pwd)
