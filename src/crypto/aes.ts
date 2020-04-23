@@ -70,6 +70,16 @@ export async function decryptFileAndSave(filepath, pwd, extension): Promise<stri
   }
 }
 
+export async function decryptFileAndSaveReturningContent(filepath, pwd, extension): Promise<string> {
+  try {
+    const content = await RNCryptor.decryptFileAndSaveReturningContent(filepath,pwd,extension)
+    return content
+  } catch(e){
+    console.log(e)
+    return ''
+  }
+}
+
 async function testAES(){
   const msg='hi'
   const enc = await encrypt(msg,'pass')

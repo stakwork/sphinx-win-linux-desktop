@@ -23,7 +23,7 @@ export default function MediaMsg(props){
     amt = ldat.meta.amt
     if(ldat.sig) purchased=true
   }
-  const {data,uri,loading,trigger} = useCachedEncryptedFile(props,ldat)
+  const {data,uri,loading,trigger,paidMessageText} = useCachedEncryptedFile(props,ldat)
 
   useEffect(()=>{
     if(props.y && wrapRef.current){ // dont run if y=0 (beginning)
@@ -60,14 +60,27 @@ export default function MediaMsg(props){
   const showStats = isMe&&amt
   const sold = props.sold
 
+  let loadingHeight = 200
+  let showPayToUnlockMessage = false
+  if(media_type==='text/plain'){
+    loadingHeight = isMe?72:42
+    if(!isMe&&!loading&&!paidMessageText) showPayToUnlockMessage=true
+  }
+
   return <View ref={wrapRef} collapsable={false}>
     <TouchableOpacity style={{...styles.wrap}} onPress={tap} activeOpacity={0.65}>
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
         <Text style={{...styles.satStats,opacity:sold?1:0}}>Purchased</Text>
       </View>}
-      {!hasImgData && <View style={styles.loading}>
-        {loading && <ActivityIndicator animating={true} color="white" />}
+      {!hasImgData && <View style={{minHeight:loadingHeight,...styles.loading}}>
+        {loading && <ActivityIndicator animating={true} color="grey" />}
+        {paidMessageText && <View style={{minHeight:loadingHeight,...styles.paidAttachmentText}}>
+          <Text>{paidMessageText}</Text>
+        </View>}
+        {showPayToUnlockMessage && <View style={{...styles.paidAttachmentText,alignItems:'center',paddingBottom:0}}>
+          <Text style={styles.payToUnlockMessage}>Pay to unlock message</Text>
+        </View>}
       </View>}
       {hasImgData && <Media type={media_type} data={data} uri={uri} />}
       {hasContent && <View style={shared.innerPad}>
@@ -87,12 +100,17 @@ export default function MediaMsg(props){
 
 function Media({type,data,uri}){
   // console.log(type,uri)
+  if(type==='text/plain') return <></>
   if(type.startsWith('image')) {
     return <Image style={styles.img} resizeMode='cover' source={{uri:uri||data}} />
   }
   if(type.startsWith('audio')) {
     return <AudioPlayer source={uri||data} />
   }
+}
+
+function EncryptedText({source}){
+  return <Text>hi</Text>
 }
 
 const styles = StyleSheet.create({
@@ -103,7 +121,7 @@ const styles = StyleSheet.create({
   wrap:{
     // flex:1,
     width:200,
-    minHeight:200,
+    // minHeight:200,
   },
   img:{
     width:200,
@@ -111,8 +129,8 @@ const styles = StyleSheet.create({
   },
   loading:{
     width:200,
-    height:200,
-    backgroundColor:'rgba(0,0,0,0.8)',
+    minHeight:42,
+    backgroundColor:'rgba(255,255,255,0.8)',
     display:'flex',
     flexDirection:'column',
     alignItems:'center',
@@ -153,5 +171,19 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     borderRadius:4,
+  },
+  paidAttachmentText:{
+    width:'100%',
+    color:'grey',
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'flex-start',
+    alignItems:'flex-end',
+    paddingLeft:10,
+    paddingBottom:13
+  },
+  payToUnlockMessage:{
+    fontSize:12,
+    fontWeight:'bold'
   }
 })

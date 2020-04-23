@@ -3,6 +3,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import {parseLDAT} from '../../utils/ldat'
 import {useStores} from '../../../store'
 import * as aes from '../../../crypto/aes'
+import {decode as atob} from 'base-64'
 
 const sess = 'all'
 
@@ -17,6 +18,8 @@ export function useCachedEncryptedFile(props, ldat){
   const [data, setData] = useState('')
   const [uri, setURI] = useState('')
   const [loading, setLoading] = useState(false)
+  const [paidMessageText, setPaidMessageText] = useState(null)
+  const isPaidMessage = media_type==='text/plain'
 
   function dispose(){
     RNFetchBlob.session(sess).dispose().then(() => { 
@@ -25,7 +28,7 @@ export function useCachedEncryptedFile(props, ldat){
   }
 
   async function trigger() {
-    if(loading||data||uri) return // already done
+    if(loading||data||uri||paidMessageText) return // already done
     if(!(ldat&&ldat.host)) {
       return
     }
@@ -33,20 +36,24 @@ export function useCachedEncryptedFile(props, ldat){
       return
     }
 
-    setLoading(true)
-    // console.log("TRIGGER IT!!!")
+    const url = `https://${ldat.host}/file/${media_token}`
+    const server = meme.servers.find(s=> s.host===ldat.host)
 
+    setLoading(true)
     // if img already exists return it
     const existingPath = dirs.CacheDir + `/attachments/msg_${id}_decrypted`
     const exists = await RNFetchBlob.fs.exists(existingPath)
     if(exists) {
-      setURI('file://'+existingPath)
+      if(isPaidMessage){
+        const txt = await parsePaidMsg(id)
+        setPaidMessageText(txt)
+      } else {
+        setURI('file://'+existingPath)
+      }
       setLoading(false)
       return
     }
 
-    const url = `https://${ldat.host}/file/${media_token}`
-    const server = meme.servers.find(s=> s.host===ldat.host)
     if(!server) return 
     try {
       const res = await RNFetchBlob
@@ -65,8 +72,13 @@ export function useCachedEncryptedFile(props, ldat){
         if(media_type.startsWith('audio')){
           // extension = 'm4a'
         }
-        const newpath = await aes.decryptFileAndSave(path, media_key, extension)
-        setURI('file://'+newpath)
+        if(isPaidMessage) {
+          const txt = await aes.decryptFileAndSaveReturningContent(path, media_key, extension)
+          setPaidMessageText(txt)
+        } else {
+          const newpath = await aes.decryptFileAndSave(path, media_key, extension)
+          setURI('file://'+newpath)
+        }
         setLoading(false)
       }
       // if(status == 200 && path){
@@ -93,5 +105,15 @@ export function useCachedEncryptedFile(props, ldat){
     }
   }
 
-  return {data,uri,loading,trigger,dispose}
+  return {data,uri,loading,trigger,dispose,paidMessageText}
+}
+
+async function parsePaidMsg(id){
+  try {
+    const path = dirs.CacheDir + `/attachments/msg_${id}_decrypted`
+    const data = await RNFetchBlob.fs.readFile(path, 'base64')
+    return atob(data)
+  } catch(e) {
+    console.log(e)
+  }
 }

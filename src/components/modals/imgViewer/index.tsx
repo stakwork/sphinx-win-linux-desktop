@@ -27,9 +27,15 @@ export default function ImgViewer(props) {
   const h = Math.round(Dimensions.get('window').height)
   const showImg = (uri||data)?true:false
   const showInput = (contact_id||chat_id)?true:false
+  const showMsgMessage = params.msg?true:false
 
   async function sendFinalMsg({muid,media_key,media_type,price}){
-    await msg.sendAttachment({contact_id,chat_id,text,muid,media_key,media_type,price})
+    await msg.sendAttachment({
+      contact_id, chat_id,
+      muid, price,
+      media_key, media_type,
+      text:showMsgMessage?'':text,
+    })
     ui.setImgViewerParams(null)
   }
 
@@ -39,23 +45,28 @@ export default function ImgViewer(props) {
     setUploading(true)
     inputRef.current.blur()
 
-    const type = 'image/jpg'
+    const type = showMsgMessage?'text/plain':'image/jpg'
+    const name = showMsgMessage?'Message.txt':'Image.jpg'
     const pwd = await randString(32)
-    const server = meme.servers.find(s=> s.host==='memes.sphinx.chat')
-    if(!server || !uri) return
+    const server = meme.getDefaultServer()
+    if(!server) return
+    if(!(uri || (showMsgMessage&&text))) return
 
-    const enc = await aes.encryptFile(uri, pwd)
-    RNFetchBlob.fetch('POST', 'https://memes.sphinx.chat/file', {
+    let enc
+    if (showMsgMessage) {
+      enc = await aes.encrypt(text, pwd)
+    } else {
+      enc = await aes.encryptFile(uri, pwd)
+    }
+    RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
       Authorization: `Bearer ${server.token}`,
       'Content-Type': 'multipart/form-data'
-    }, [
-      {
+    }, [{
         name:'file',
-        filename:'Image.jpg',
+        filename:name,
         type: type,
         data: enc,
-      },
-      {name:'name', data:'Image.jpg'}
+      }, {name:'name', data:name}
     ])
     // listen to upload progress event, emit every 250ms
     .uploadProgress({ interval : 250 },(written, total) => {
@@ -89,6 +100,8 @@ export default function ImgViewer(props) {
     }
   },[])
 
+  const boxStyles = {width:w,height:h-130,top:80}
+  const disabled = uploading || (showMsgMessage&&!price)
   return useObserver(() =>
     <View style={styles.wrap}>
       <IconButton
@@ -100,10 +113,16 @@ export default function ImgViewer(props) {
           ui.setImgViewerParams({data:'',uri:''})
         }}
       />
+
       {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
+
       {showImg && <Image resizeMode='cover' source={{uri:uri||data}}
-        style={{...styles.img,width:w,height:h-130,top:80}} 
+        style={{...styles.img,...boxStyles}} 
       />}
+      {showMsgMessage && !uploading && <View style={{...styles.msgMessage,...boxStyles}}>
+        <Text style={styles.msgMessageText}>Set a price and enter your message</Text>
+      </View>}
+
       {uploading && <View style={{...styles.activityWrap,width:w,height:h-180}}>
         <ActivityIndicator animating={true} color="white" size="large" />
         <Text style={styles.progressNum}>
@@ -119,10 +138,10 @@ export default function ImgViewer(props) {
           onBlur={()=> setInputFocused(false)}
           onChangeText={e=> setText(e)}>
           <Text>{text}</Text>
-        </TextInput> 
+        </TextInput>
         <View style={styles.sendButtonWrap}>
           <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
-            onPress={()=> sendAttachment()} disabled={uploading}>
+            onPress={()=> sendAttachment()} disabled={disabled}>
             <Icon name="send" size={17} color="white" />
           </TouchableOpacity>
         </View> 
@@ -200,5 +219,12 @@ const styles = StyleSheet.create({
     fontSize:16,
     marginTop:16,
   },
-
+  msgMessage:{
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+  },
+  msgMessageText:{
+    color:'white'
+  }
 })

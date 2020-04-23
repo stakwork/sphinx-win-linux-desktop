@@ -4,6 +4,8 @@ import { useStores } from '../../../store'
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native'
 import {Contact, SelectedContact} from './items'
 
+
+
 export default function People(props) {
   const { contacts } = useStores()
   const [selected, setTheSelected] = useState([])
@@ -17,8 +19,10 @@ export default function People(props) {
     if(sel.includes(id)) {
       setSelected(sel.filter(x=> x!==id))
     } else {
-      sel.push(id)
-      setSelected(sel)
+      if(sel.length<props.limit||20) {
+        sel.push(id)
+        setSelected(sel)
+      }
     }
   }
 

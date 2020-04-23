@@ -20,7 +20,7 @@ export default function Modals(){
     const showAddFriendModal = ui.addFriendModal?true:false
     const showNewGroupModal = ui.newGroupModal?true:false
     const showRawInvoiceModal = ui.rawInvoiceModal
-    const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri)?true:false
+    const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri||ui.imgViewerParams.msg)?true:false
     const showPeer = ui.rtcParams?true:false
     return <>
       {showPeer && <Peer params={ui.rtcParams} />}  

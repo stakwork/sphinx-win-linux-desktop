@@ -1,4 +1,4 @@
-import React, {useRef, useState, useCallback} from 'react'
+import React, {useRef, useState, useCallback, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import { ScrollView, RefreshControl, View, Text, StyleSheet, Image } from 'react-native'
@@ -13,7 +13,10 @@ const group = constants.chat_types.group
 
 export default function MsgListWrap({chat}:{chat: Chat}){
   const {msg,chats} = useStores()
-
+  const [ok, setOK] = useState(false)
+  useEffect(()=>{
+    setOK(true)
+  },[])
   return useObserver(()=>{
     let theID = chat.id
     if(!theID) { // for very beginning, where chat doesnt have id
@@ -25,14 +28,13 @@ export default function MsgListWrap({chat}:{chat: Chat}){
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
-    return <MsgList msgs={filtered} chat={chat} />
+    return <MsgList msgs={ok?filtered:[]} chat={chat} />
   })
 }
 
 function MsgList({msgs, chat}) {
   const scrollViewRef = useRef(null)
   const [y,setY] = useState(0)
-  const [first, setFirst] = useState(true)
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(() => {
@@ -43,9 +45,15 @@ function MsgList({msgs, chat}) {
   function scrollToBottom(contentHeight) {
     if (contentHeight > 0) {
       scrollViewRef.current.scrollToEnd({duration: 500})
-      setFirst(false)
     }
   }
+
+  useEffect(()=>{
+    setTimeout(()=>{
+      scrollViewRef.current.scrollToEnd({duration: 500})
+    },500)
+    
+  },[msgs.length])
 
   const isGroup = chat.type===group
   return useObserver(()=>
@@ -56,7 +64,7 @@ function MsgList({msgs, chat}) {
         debounce(()=> setY(y), 50)
       }}
       contentContainerStyle={{flexGrow:1}} horizontal={false}
-      onContentSizeChange={(w, h) => scrollToBottom(h)}
+      // onContentSizeChange={(w, h) => scrollToBottom(h)}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <View style={styles.msgList}>
         {msgs.map((m,i)=> {
@@ -67,6 +75,7 @@ function MsgList({msgs, chat}) {
           if(!m.chat) msg.chat = chat
           return <Message key={i} {...m} y={y} isGroup={isGroup} />
         })}
+        <View style={{height:20,width:'100%'}} />
       </View>
     </ScrollView>
   )
@@ -127,7 +136,10 @@ function processMsgs(msgs: Msg[]){
   for(let i=0; i<msgs.length; i++){
     let skip = false
     const msg = msgs[i]
+    msg.showInfoBar = calcShowInfoBar(msgs, msg, i)
     const typ = constantCodes['message_types'][msg.type]
+
+    // attachment logic
     if(typ==='attachment' && msg.sender!==1){ // not from me
       const ldat = parseLDAT(msg.media_token)
       if(ldat.muid&&ldat.meta&&ldat.meta.amt) {
@@ -155,10 +167,20 @@ function processMsgs(msgs: Msg[]){
         }
       }
     }
+
     if(hideTypes.includes(typ)) skip=true
     if(!skip) ms.push(msg)
   }
   return ms
+}
+// only show info bar if first in a group from contact
+function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number){
+  if(i===0) return true
+  const previous = msgs[i-1]
+  if(previous.sender===msg.sender) {
+    return false
+  }
+  return true
 }
 
 function injectDates(msgs: Msg[]){

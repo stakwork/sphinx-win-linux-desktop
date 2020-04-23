@@ -8,11 +8,18 @@ export interface Server {
   token: string
 }
 
+const DEFAULT_MEME_SERVER = 'memes.sphinx.chat'
+
 class MemeStore {
   @persist('list') @observable
   servers: Server[] = [
-    {host:'memes.sphinx.chat',token:''}
+    {host:DEFAULT_MEME_SERVER,token:''}
   ]
+
+  @action getDefaultServer(): Server {
+    const server = this.servers.find(s=> s.host===DEFAULT_MEME_SERVER)
+    return server
+  }
 
   @action
   async authenticateAll() {

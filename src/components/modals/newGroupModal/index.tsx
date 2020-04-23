@@ -9,6 +9,8 @@ import FadeView from '../../utils/fadeView'
 import Final from './final'
 import People from './people'
 
+const GROUP_SIZE_LIMIT = 20
+
 export default function NewGroup({visible}) {
   const { ui, contacts } = useStores()
   const [selected, setSelected] = useState([])
@@ -32,7 +34,7 @@ export default function NewGroup({visible}) {
       />
 
       <FadeView opacity={next?0:1} style={styles.content}>
-        <People setSelected={setSelected} />
+        <People setSelected={setSelected} limit={GROUP_SIZE_LIMIT} />
       </FadeView>
 
       <FadeView opacity={next?1:0} style={styles.content}>

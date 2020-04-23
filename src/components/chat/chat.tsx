@@ -48,7 +48,7 @@ export default function Chat(){
     <Header chat={chat} />
     {!show && <View style={styles.loadWrap}>
       <ActivityIndicator animating={true} color="grey" />
-    </View>}
+    </View>} 
     {show && <MsgList chat={chat} />}
     {show && <BottomBar chat={chat} />}
   </View>

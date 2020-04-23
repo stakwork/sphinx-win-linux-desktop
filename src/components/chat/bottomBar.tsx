@@ -5,10 +5,10 @@ import {IconButton, Portal} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
 import {Chat} from '../../store/chats'
-import ImgSrcDialog from '../utils/imgSrcDialog'
 import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import { constants } from '../../constants'
+import AttachmentDialog from './attachmentDialog'
 
 const conversation = constants.chat_types.conversation
 
@@ -47,17 +47,26 @@ export default function BottomBar({chat}:{chat: Chat}) {
     setTimeout(()=>{
       setTakingPhoto(false)
       if(img&&img.uri){
-        let contact_id=null
-        if(!chat.id){ // if no chat (new contact)
-          contact_id=chat.contact_ids.find(cid=>cid!==1)
-        }
-        ui.setImgViewerParams({
-          contact_id,
-          chat_id: chat.id||null,
-          uri: img.uri,
-        })
+        openImgViewer({uri: img.uri})
       }
     },250)
+  }
+
+  function openImgViewer(obj){
+    let contact_id=null
+    if(!chat.id){ // if no chat (new contact)
+      contact_id=chat.contact_ids.find(cid=>cid!==1)
+    }
+    ui.setImgViewerParams({
+      contact_id,
+      chat_id: chat.id||null,
+      ...obj
+    })
+  }
+
+  async function doPaidMessage() {
+    setDialogOpen(false)
+    openImgViewer({msg: true})
   }
 
   async function startRecord() {
@@ -140,10 +149,11 @@ export default function BottomBar({chat}:{chat: Chat}) {
         </TouchableOpacity>
       </View>}
 
-      <ImgSrcDialog 
+      <AttachmentDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}
         onPick={res=> tookPic(res)}
         onChooseCam={()=> setTakingPhoto(true)}
+        doPaidMessage={()=> doPaidMessage()}
       />
 
       {takingPhoto && <Portal>

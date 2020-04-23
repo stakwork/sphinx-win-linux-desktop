@@ -31,7 +31,7 @@ export default function Code(props) {
   }
 
   async function signupWithIP(s){
-    const a = s.split(':')
+    const a = s.split('::')
     if(a.length===1) return
     setChecking(true)
     const ip = a[1]

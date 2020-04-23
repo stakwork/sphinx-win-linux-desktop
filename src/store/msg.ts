@@ -38,6 +38,7 @@ export interface Msg {
   chat: Chat
 
   sold: boolean // this is a marker to tell if a media has been sold
+  showInfoBar: boolean // marks whether to show the date and name
 }
 
 class MsgStore {

@@ -30,8 +30,10 @@ export default function MsgRow(props){
     if(!isMe) borderColor='#4AC998'
   }
 
-  return <View style={{display:'flex',width:'100%',marginBottom:20}}>
-    <InfoBar {...props} />
+  return <View style={{display:'flex',width:'100%',
+      marginTop:props.showInfoBar?20:0
+    }}>
+    {props.showInfoBar && <InfoBar {...props} />}
     <View style={{...sharedStyles.bubble,
         alignSelf: isMe?'flex-end':'flex-start',
         backgroundColor, borderColor,
