@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import {useStores} from '../../store'
 import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, SectionList, View, Text, StyleSheet, Image } from 'react-native'

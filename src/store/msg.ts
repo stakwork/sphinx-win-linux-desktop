@@ -3,7 +3,7 @@ import {relay} from '../api'
 import {contactStore} from './contacts'
 import {chatStore,Chat} from './chats'
 import {detailsStore} from './details'
-import * as rsa from '../crypto/rsa'
+import * as e2e from '../crypto/e2e'
 import {constants} from '../constants'
 import {persist} from 'mobx-persist'
 import moment from 'moment'
@@ -252,7 +252,7 @@ async function encryptText({contact_id, text}) {
   if(!text) return ''
   const contact = contactStore.contacts.find(c=> c.id===contact_id)
   if(!contact) return ''
-  const encText = await rsa.encrypt(text, contact.contact_key)
+  const encText = await e2e.encryptPublic(text, contact.contact_key)
   return encText
 }
 
@@ -275,7 +275,7 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
     if(contact) idToKeyMap[contact_id] = contact.contact_key
   }
   for (let [id, key] of Object.entries(idToKeyMap)) {
-    const encText = await rsa.encrypt(text, key)
+    const encText = await e2e.encryptPublic(text, String(key))
     remoteTextMap[id] = encText
   }
   return remoteTextMap
@@ -284,11 +284,11 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
 async function decodeSingle(m: Msg){
   const msg = m
   if(m.message_content) {
-    const dcontent = await rsa.decrypt(m.message_content)
+    const dcontent = await e2e.decryptPrivate(m.message_content)
     msg.message_content = dcontent
   }
   if(m.media_key){
-    const dmediakey = await rsa.decrypt(m.media_key)
+    const dmediakey = await e2e.decryptPrivate(m.media_key)
     msg.media_key = dmediakey
   }
   return msg

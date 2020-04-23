@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {randString} from '../../../crypto/rand'
 import RNFetchBlob from 'rn-fetch-blob'
 import * as aes from '../../../crypto/aes'
+import * as e2e from '../../../crypto/e2e'
 import {ActivityIndicator} from 'react-native-paper'
 import SetPrice from './setPrice'
 import EE from '../../utils/ee'
@@ -54,9 +55,9 @@ export default function ImgViewer(props) {
 
     let enc
     if (showMsgMessage) {
-      enc = await aes.encrypt(text, pwd)
+      enc = await e2e.encrypt(text, pwd)
     } else {
-      enc = await aes.encryptFile(uri, pwd)
+      enc = await e2e.encryptFile(uri, pwd)
     }
     RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
       Authorization: `Bearer ${server.token}`,
