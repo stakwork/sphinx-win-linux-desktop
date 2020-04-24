@@ -21,6 +21,9 @@ class UserStore {
   @persist @observable
   authToken: string = ''//'Th/PW7RMUsxBbHozqsLMctf2ak4='
 
+  @persist @observable
+  deviceId: string = ''
+
   @action
   setAlias(alias){
     this.alias = alias
@@ -32,14 +35,29 @@ class UserStore {
   }
 
   @action
-  async signupWithCode(code:string) {
+  async registerMyDeviceId(device_id) {
+    try {
+      const r = await api.relay.put(`contacts/1`, {device_id})
+      if(r.device_id) {
+        this.deviceId = r.device_id
+      }
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  @action
+  async signupWithCode(code:string): Promise<{[k:string]:string}> {
     try {
       this.code = code
       const r = await api.invite.post('signup',{
         invite_string:code
       })
       console.log("signup r",r)
-      if(!r.invite) return console.log('no invite data')
+      if(!r.invite) {
+        console.log('no invite data')
+        return 
+      }
       this.currentIP = r.ip
       this.invite={
         inviterNickname: r.invite.nickname,
@@ -47,7 +65,7 @@ class UserStore {
         welcomeMessage: r.invite.message
       }
       api.instantiateRelay(r.ip) // no token
-      return r.ip
+      return {ip: r.ip, password: r.password}
     } catch(e) {
       console.log("Error:",e)
     }

@@ -8,6 +8,7 @@ ios
 /android/app/build/
 /android/build/
 /android/app/build.gradle
+/android/app/google-services.json
 
 # Xcode
 !**/*.xcodeproj

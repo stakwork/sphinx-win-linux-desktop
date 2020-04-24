@@ -46,10 +46,10 @@ export default function Code(props) {
   async function checkInvite(theCode){
     if(!theCode || checking) return
     setChecking(true)
-    const ip = await user.signupWithCode(theCode)
+    const {ip,password} = await user.signupWithCode(theCode)
     await sleep(200)
     if (ip) {
-      const token = await user.generateToken('')
+      const token = await user.generateToken(password||'')
       if(token) onDone()
     }
     setChecking(false)

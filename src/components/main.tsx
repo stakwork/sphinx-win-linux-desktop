@@ -4,9 +4,10 @@ import MainNav from './mainnav'
 import PINCode, {hasUserSetPinCode} from './utils/pin'
 import {useStores} from '../store'
 import {initPicSrc} from './utils/picSrc'
+import * as push from './push'
 
 export default function Main() {
-  const {contacts,msg,details,ui,meme} = useStores()
+  const {contacts,msg,details,user,meme} = useStores()
   const [hasPin, setHasPin] = useState(false)
   const [loggedIn, setLoggedIn] = useState(true) // set to false!
 
@@ -15,17 +16,22 @@ export default function Main() {
       const pinSet = await hasUserSetPinCode()
       if (pinSet) setHasPin(true)
 
-      await contacts.getContacts()
-      await msg.getAllMessages()
-      await details.getBalance()
+      contacts.getContacts()
+      msg.getAllMessages()
+      details.getBalance()
       // HERE auth with meme server
 
-      await sleep(500)
-      await meme.authenticateAll()
+      meme.authenticateAll()
 
       msg.initLastSeen()
 
       initPicSrc()
+
+      push.configure((t)=>{
+        if(!user.deviceId) {
+          user.registerMyDeviceId(t.token)
+        }
+      })
 
     })()
   },[])

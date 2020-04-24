@@ -45,11 +45,17 @@ export default function MediaMsg(props){
     setBuying(false)
   }
 
-  function tap(){
+  function showTooltip(){
+    console.log("TOOLTIP")
+  }
+  function press(){
     if(media_type.startsWith('image')){
       if(data) ui.setImgViewerParams({data})
       if(uri) ui.setImgViewerParams({uri})
     }
+  }
+  function longPress(){
+    console.log('longpress')
   }
 
   const hasImgData = (data||uri)?true:false
@@ -70,7 +76,10 @@ export default function MediaMsg(props){
 
   return <View ref={wrapRef} collapsable={false}>
     <TouchableOpacity style={{...styles.wrap, minHeight:wrapHeight}} 
-      onPress={tap} activeOpacity={0.65}>
+      //onPressIn={tap} onPressOut={untap} 
+      // onLongPress={()=>longPress()}
+      onPress={()=>press()}
+      activeOpacity={0.65}>
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
         <Text style={{...styles.satStats,opacity:sold?1:0}}>Purchased</Text>
