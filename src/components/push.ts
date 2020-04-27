@@ -1,7 +1,6 @@
 import * as PushNotification from 'react-native-push-notification'
 
 export function configure(callback){
-  console.log("configure")
   PushNotification.configure({
     // (optional) Called when Token is generated (iOS and Android)
     onRegister: function (token) {
@@ -12,6 +11,8 @@ export function configure(callback){
     onNotification: function (notification) {
       console.log("NOTIFICATION:", notification);
       // process the notification
+      // notification.finish()
+      notify(notification.default)
     },
 
     // ANDROID ONLY: FCM Sender ID (product_number) (optional - not required for local notifications, but is need to receive remote push notifications)
@@ -27,6 +28,14 @@ export function configure(callback){
      * - if not, you must call PushNotificationsHandler.requestPermissions() later
      */
     requestPermissions: true,
-  });
+  })
+}
 
+function notify(txt){
+  PushNotification.localNotification({
+    ignoreInForeground: true,
+    message: txt, // (required)
+    playSound: false, // (optional) default: true
+    soundName: "default",
+  })
 }

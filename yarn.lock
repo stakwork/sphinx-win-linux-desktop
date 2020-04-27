@@ -7893,6 +7893,11 @@ react-native-touch-id@^4.4.1:
   resolved "https://registry.yarnpkg.com/react-native-touch-id/-/react-native-touch-id-4.4.1.tgz#8b1bb2d04c30bac36bb9696d2d723e719c4a8b08"
   integrity sha512-1jTl8fC+0fxvqegy/XXTyo6vMvPhjzkoDdaqoYZx0OH8AT250NuXnNPyKktvigIcys3+2acciqOeaCall7lrvg==
 
+react-native-translucent-modal@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-translucent-modal/-/react-native-translucent-modal-1.1.2.tgz#f260446f4a3af8a71018151486f9f5301d8da1fd"
+  integrity sha512-4f8D8hYFr2vQxnF6nUnpHwX1/apn80qZ6IlYdpPyquWatZynYSHTvJ9wDivbqjuPAZ/zAGHWdKhy3rfjKKXeig==
+
 react-native-udp@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.7.0.tgz#d04c5100fcbff343f8a2bf35a3025743d8960f93"

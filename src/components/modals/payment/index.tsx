@@ -8,6 +8,7 @@ import { StyleSheet, Text } from 'react-native'
 import FadeView from '../../utils/fadeView'
 import ShowRawInvoice from '../rawInvoiceModal/showRawInvoice'
 import Scan from './scan'
+import {setTint} from '../../utils/statusBar'
 
 export default function SendPayment({visible}) {
   const {ui,msg,contacts} = useStores()
@@ -90,16 +91,18 @@ export default function SendPayment({visible}) {
     setTimeout(()=>{
       setAmtToPay(null)
       setNext('')
-      setRawInvoice(null)
+      setRawInvoice(null)      
     })
   }
   async function confirmOrContinue(amt,text){
     if(!chat){
       sendContactless(amt,text)
+      setTimeout(()=> setTint('dark'), 150)
       return
     }
     if(ui.payMode==='payment') await sendPayment(amt)
     if(ui.payMode==='invoice') await sendInvoice(amt, text)
+    setTimeout(()=> setTint('light'), 150)
     clearOut()
   }
   function close(){
