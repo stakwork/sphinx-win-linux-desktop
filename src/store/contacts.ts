@@ -123,6 +123,8 @@ class ContactStore {
     const ei = this.contacts.findIndex(c=>c.id===contact.id)
     if(ei>=0){
       this.contacts[ei] = contact
+    } else {
+      this.contacts.unshift(contact)
     }
   }
 

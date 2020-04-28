@@ -10,6 +10,7 @@ export default function Wrap(props) {
     onSwipeComplete={()=>onClose()} 
     swipeDirection={noSwipe?null:'down'} 
     onBackButtonPress={()=>onClose()}
+    useNativeDriver={true}
     // deviceHeight={Dimensions.get('screen').height}
     swipeThreshold={20}>
     <View style={styles.main}>
