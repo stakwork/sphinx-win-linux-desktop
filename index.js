@@ -18,7 +18,7 @@ YellowBox.ignoreWarnings([
 
 AppRegistry.registerComponent('Sphinx', () => App)
 
-// if (Platform.OS === 'web') {
-//   const rootTag = document.getElementById('root') || document.getElementById('main')
-//   AppRegistry.runApplication('Sphinx', { rootTag })
-// }
+if (Platform.OS === 'web') {
+  const rootTag = document.getElementById('root') || document.getElementById('main')
+  AppRegistry.runApplication('Sphinx', { rootTag })
+}

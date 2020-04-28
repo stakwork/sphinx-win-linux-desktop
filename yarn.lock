@@ -7724,6 +7724,11 @@ react-native-crypto@^2.2.0:
     public-encrypt "^4.0.0"
     randomfill "^1.0.3"
 
+react-native-device-time-format@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-device-time-format/-/react-native-device-time-format-2.3.0.tgz#87f4c91a90b8a0ca2dc059cf82d3063c823126fc"
+  integrity sha512-al4m6MXD1nT+W8p7UsJpyc4aaNRwh85oLC+sNe+PfCxlxVUDmriBN8dEDLjaDxfnX2yDub3PHLcLmuZqcI6jrw==
+
 react-native-gesture-handler@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.6.1.tgz#678e2dce250ed66e93af409759be22cd6375dd17"

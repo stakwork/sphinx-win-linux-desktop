@@ -14,7 +14,7 @@ const encryptedTypes = [
 ]
 
 export default function InfoBar(props){
-  const {contacts} = useStores()
+  const {contacts,ui} = useStores()
 
   const isMe = props.sender===1
   const isReceived = props.status===received
@@ -28,6 +28,7 @@ export default function InfoBar(props){
   const sender = contacts.contacts.find(c=>c.id===props.sender)
   const hasSender = sender?true:false
 
+  const timeFormat = ui.is24HourFormat?'HH:mm A':'hh:mm A'
   return <View style={styles.wrap}>
     <View style={{...styles.content,
       alignSelf:isMe?'flex-end':'flex-start',
@@ -38,7 +39,7 @@ export default function InfoBar(props){
           {sender.alias}  
         </Text>}
         <Text style={styles.time}>
-          {moment(props.date).format('hh:mm A')}
+          {moment(props.date).format(timeFormat)}
         </Text>
         {showLock && <Icon 
           name="lock" size={14} color="#AFB6BC" 

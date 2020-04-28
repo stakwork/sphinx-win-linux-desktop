@@ -7,7 +7,7 @@ import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
 
 export default function Main() {
-  const {contacts,msg,details,user,meme} = useStores()
+  const {contacts,msg,details,user,meme,ui} = useStores()
   const [hasPin, setHasPin] = useState(false)
   const [loggedIn, setLoggedIn] = useState(true) // set to false!
 
@@ -32,6 +32,8 @@ export default function Main() {
           user.registerMyDeviceId(t.token)
         }
       })
+
+      ui.initIs24HourFormat()
 
     })()
   },[])

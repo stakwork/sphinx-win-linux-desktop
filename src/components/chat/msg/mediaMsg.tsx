@@ -140,15 +140,6 @@ const styles = StyleSheet.create({
     width:200,
     height:200
   },
-  loading:{
-    width:200,
-    minHeight:48,
-    display:'flex',
-    flexDirection:'column',
-    alignItems:'center',
-    justifyContent:'center',
-    position:'relative',
-  },
   payButton:{
     backgroundColor:'#4AC998',
     width:'100%',
@@ -203,12 +194,19 @@ const styles = StyleSheet.create({
     fontWeight:'bold',
     minHeight:18
   },
+  loading:{
+    width:200,
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    justifyContent:'center',
+    position:'relative',
+  },
   loadingWrap:{
-    height:'100%',
     display:'flex',
     justifyContent:'center',
     alignItems:'center',
     position:'absolute',
     top:0,left:0,right:0,bottom:0,
-  }
+  },
 })

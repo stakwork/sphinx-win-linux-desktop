@@ -2,6 +2,7 @@ import { observable, action } from 'mobx'
 import {Chat} from './chats'
 import {Msg} from './msg'
 import {Contact} from './contacts'
+import { is24HourFormat } from 'react-native-device-time-format'
 
 class UiStore {
   @observable ready: boolean = false
@@ -153,6 +154,12 @@ class UiStore {
   @observable rtcParams: {[k:string]:any} = null
   setRtcParams(obj:{[k:string]:any}) {
     this.rtcParams = obj
+  }
+
+  @observable is24HourFormat: boolean
+  @action async initIs24HourFormat() {
+    const is24Hour = await is24HourFormat()
+    this.is24HourFormat = is24Hour
   }
 
 }

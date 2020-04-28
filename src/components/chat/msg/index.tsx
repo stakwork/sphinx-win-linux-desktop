@@ -1,16 +1,28 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
-import {View} from 'react-native'
+import {View, Clipboard, Text} from 'react-native'
 import {constantCodes, constants} from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
 import GroupNotification from './groupNotification'
+import Popup from './popup'
+import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 
 export default function MsgRow(props){
-  
+  const [copied, setCopied] = useState(false)
+  function onCopy(msg){
+    ReactNativeHapticFeedback.trigger("impactLight", {
+      enableVibrateFallback: true,
+      ignoreAndroidSystemSettings: false
+    })
+    Clipboard.setString(msg||'')
+    setCopied(true)
+    setTimeout(()=> setCopied(false), 2000)
+  }
+
   const isMe = props.sender===1
   const isInvoice = props.type===constants.message_types.invoice
   const isPaid = props.status===constants.statuses.confirmed
@@ -35,13 +47,14 @@ export default function MsgRow(props){
     }}>
     {props.showInfoBar && <InfoBar {...props} />}
     <View style={{...sharedStyles.bubble,
-        alignSelf: isMe?'flex-end':'flex-start',
-        backgroundColor, borderColor,
-        borderStyle:dashed?'dashed':'solid',
-        overflow:'hidden',
-      }}>
-      <Message {...props} />
+      alignSelf: isMe?'flex-end':'flex-start',
+      backgroundColor, borderColor,
+      borderStyle:dashed?'dashed':'solid',
+      overflow:'hidden',
+    }}>
+      <Message {...props} onCopy={onCopy}/>
     </View>
+    {copied && <Popup {...props} />}
   </View>
 }
 
