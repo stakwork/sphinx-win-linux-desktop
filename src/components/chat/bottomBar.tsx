@@ -9,6 +9,7 @@ import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import { constants } from '../../constants'
 import AttachmentDialog from './attachmentDialog'
+import EE from '../utils/ee'
 
 const conversation = constants.chat_types.conversation
 
@@ -127,7 +128,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
           height:textInputHeight,
           maxHeight:98
         }}
-        onFocus={()=> setInputFocused(true)}
+        onFocus={(e)=> setInputFocused(true)}
         onBlur={()=> setInputFocused(false)}
         onChangeText={e=> setText(e)}
         value={text}>

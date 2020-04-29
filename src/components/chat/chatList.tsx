@@ -36,7 +36,7 @@ export default function ChatList() {
     chatsToShow.sort((a,b)=>{
       const amsgs = msg.messages[a.id]
       const alastMsg = amsgs&&amsgs[amsgs.length-1]
-      const then = moment(new Date()).add(30, 'days')
+      const then = moment(new Date()).add(-30, 'days')
       const adate = alastMsg&&alastMsg.date?moment(alastMsg.date):then
       const bmsgs = msg.messages[b.id]
       const blastMsg = bmsgs&&bmsgs[bmsgs.length-1]

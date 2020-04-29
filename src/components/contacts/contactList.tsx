@@ -13,7 +13,7 @@ export default function ContactList() {
       if (!ui.contactsSearchTerm) return true
       return c.alias.toLowerCase().includes(ui.contactsSearchTerm.toLowerCase())
     })
-    const contactsNotMe = contactsToShow.filter(c=> c.id!==1)
+    const contactsNotMe = contactsToShow.filter(c=> c.id!==1).sort((a,b)=> a.alias>b.alias?1:-1)
     return <View style={styles.container}>
       <SectionList
         style={styles.list}

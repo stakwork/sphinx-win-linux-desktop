@@ -1,7 +1,7 @@
 import React, {useRef, useState, useCallback, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-import { ScrollView, RefreshControl, View, Text, StyleSheet, Image } from 'react-native'
+import { ScrollView, RefreshControl, View, Text, StyleSheet, Keyboard } from 'react-native'
 import {Chat} from '../../store/chats'
 import Message from './msg'
 import {Msg} from '../../store/msg'
@@ -58,17 +58,23 @@ function MsgList({msgs, chat}) {
     setTimeout(()=>{
       scrollViewRef.current.scrollToEnd({duration: 500})
     },500)
+    Keyboard.addListener('keyboardDidShow', e=>{
+      if(scrollViewRef.current) {
+        scrollViewRef.current.scrollToEnd({duration: 500})
+      }
+    })
   },[msgs.length])
 
   const isGroup = chat.type===group
-  return useObserver(()=>
+  return useObserver(()=> 
     <ScrollView style={styles.scroller}
+      contentContainerStyle={{flexGrow:1}} // add paddingBottom?
       ref={scrollViewRef}
       onScroll={e=> {
         const y = e.nativeEvent.contentOffset.y
         debounce(()=> setY(y), 50)
       }}
-      contentContainerStyle={{flexGrow:1}} horizontal={false}
+      horizontal={false}
       // onContentSizeChange={(w, h) => scrollToBottom(h)}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <View style={styles.msgList}>
