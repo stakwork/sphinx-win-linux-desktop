@@ -29,10 +29,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
 
   function sendMessage(){
     if(!text) return
-    let contact_id=null
-    if(!chat.id){ // if no chat (new contact)
-      contact_id=chat.contact_ids.find(cid=>cid!==1)
-    }
+    let contact_id=chat.contact_ids.find(cid=>cid!==1)
     msg.sendMessage({
       contact_id,
       text,

@@ -192,6 +192,7 @@ class MsgStore {
   @action
   async sendInvoice({contact_id, amt, chat_id, memo}) {
     try {
+      console.log("CONTACT ID",contact_id)
       const myenc = await encryptText({contact_id:1, text:memo})
       const encMemo = await encryptText({contact_id, text:memo})
       const v = {
