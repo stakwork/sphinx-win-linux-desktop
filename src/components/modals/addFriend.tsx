@@ -35,7 +35,7 @@ export default function AddFriend({visible}) {
             setTimeout(()=> setInviteNewUser(true), 100)
           }}
           style={{backgroundColor:'#55D1A9',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center'}}>
-          Invite New User
+          New to Sphinx
         </Button>
         <Button mode="contained" dark={true}
           onPress={() => {
@@ -43,7 +43,7 @@ export default function AddFriend({visible}) {
             setTimeout(()=> setAddContact(true), 100)
           }}
           style={{backgroundColor:'#6289FD',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center',marginTop:28}}>
-          Add Contact
+          Already on Sphinx
         </Button>
       </FadeView>
 

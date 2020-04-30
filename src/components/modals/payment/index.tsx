@@ -29,7 +29,6 @@ export default function SendPayment({visible}) {
   const contact_id = chat && chat.contact_ids && chat.contact_ids.find(cid=>cid!==1)
 
   const contact = contact_id && contacts.contacts.find(c=> c.id===contact_id)
-  console.log(contact_id,chat)
 
   async function sendPayment(amt){
     if(!amt) return
