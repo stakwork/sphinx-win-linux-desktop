@@ -69,6 +69,9 @@ class MsgStore {
     if(this.lastFetched) {
       const dateq = moment(this.lastFetched).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
+    } else {
+      const start = moment(0).format('YYYY-MM-DD%20HH:mm:ss')
+      route += `?date=${start}`
     }
     try {
       const r = await relay.get(route)
