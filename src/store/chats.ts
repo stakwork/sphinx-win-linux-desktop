@@ -49,6 +49,19 @@ class ChatStore {
     return r
   }
 
+  @action 
+  async createTribe(name: string, description:string, tags:string[]){
+    const r = await relay.post('group', {
+      name, description, tags:tags||[],
+      is_tribe: true, is_listed:true,
+      price_per_message: 0,
+      price_to_join: 0,
+      img: '',
+    })
+    this.gotChat(r)
+    return r
+  }
+
   @action
   async addGroupMembers(chatID: number, contact_ids: number[]) {
     await relay.put(`chat/${chatID}`, {

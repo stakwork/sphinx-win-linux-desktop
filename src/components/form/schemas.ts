@@ -57,6 +57,29 @@ const subscribe = [
 
 ]
 
+const tribe = [
+  {
+    name:'name',
+    type:'text',
+    label:{
+      en:'Name',
+      es:'Nombre'
+    },
+    required: true,
+    validator: Yup.string().required(rq),
+  },
+  {
+    name:'description',
+    type:'text',
+    label:{
+      en:'Description',
+      es:'Description'
+    },
+    required: true,
+    validator: Yup.string().required(rq),
+  },
+]
+
 export {
-  contact, subscribe, me,
+  contact, subscribe, me, tribe,
 }
