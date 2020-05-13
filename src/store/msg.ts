@@ -117,6 +117,7 @@ class MsgStore {
         text: encryptedText,
         remote_text_map
       }
+      console.log(v)
       const r = await relay.post('messages', v)
       this.gotNewMessage(r)
     } catch(e) {

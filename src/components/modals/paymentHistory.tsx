@@ -34,7 +34,7 @@ export default function PaymentHistory({visible}) {
         {loading && <View style={styles.loading}>
           <ActivityIndicator animating={true} color="grey" />  
         </View>}
-        {!loading && payments.map((invoice,i)=> <Payment key={i} {...invoice} />)}
+        {!loading && payments && payments.map((invoice,i)=> <Payment key={i} {...invoice} />)}
       </ScrollView>
     </View>
   </ModalWrap>)

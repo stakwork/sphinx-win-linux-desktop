@@ -40,7 +40,7 @@ export default function NewGroup({visible}) {
         <Begin setMode={setMode} />
       </FadeView>
 
-      <FadeView opacity={mode==='tribe'?1:0} style={styles.content}>
+      <FadeView opacity={mode==='tribe'?1:0} style={styles.contentVerticallyCentered}>
         <NewTribe onFinish={close} />
       </FadeView>
 
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     flex:1,
     alignItems:'center',
     justifyContent:'center',
-    marginBottom:40,
   },
 })
 

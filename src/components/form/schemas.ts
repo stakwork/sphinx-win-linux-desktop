@@ -78,6 +78,36 @@ const tribe = [
     required: true,
     validator: Yup.string().required(rq),
   },
+  {
+    name:'tags',
+    type:'tags',
+    label:{
+      en:'Tags',
+      es:'Tags'
+    },
+    required: true,
+    validator: Yup.array(),
+  },
+  {
+    name:'price_to_join',
+    type:'number',
+    label:{
+      en:'Price to Join',
+      es:'Price to Join'
+    },
+    required: true,
+    validator: Yup.number(),
+  },
+  {
+    name:'price_per_message',
+    type:'number',
+    label:{
+      en:'Price per Message',
+      es:'Price per Message'
+    },
+    required: true,
+    validator: Yup.number(),
+  },
 ]
 
 export {

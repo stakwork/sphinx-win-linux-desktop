@@ -3,11 +3,11 @@ import {Contact} from '../../store/contacts'
 import { constants } from '../../constants'
 
 const conversation = constants.chat_types.conversation
-const group = constants.chat_types.group
+const group = constants.chat_types.conversation
 const expiredInvite = constants.invite_statuses.expired
 
 export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
-  const groupChats = chats.filter(c=> c.type===group).map(c=> ({...c}))
+  const groupChats = chats.filter(c=> c.type!==conversation).map(c=> ({...c}))
   const conversations = []
   contacts.forEach(contact=>{
     if(contact.id!==1) {

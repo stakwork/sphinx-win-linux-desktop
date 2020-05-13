@@ -91,6 +91,7 @@ class UserStore {
   async generateToken(pwd:string) {
     try {
       const token = await randString(20)
+      console.log("OK NOW!",this.currentIP,pwd)
       await api.relay.post(`contacts/tokens?pwd=${pwd}`,{
         token
       })

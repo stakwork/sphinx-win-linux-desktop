@@ -19,7 +19,9 @@ export default function Code(props) {
     setScanning(false)
     try {
       const ip = atob(data)
+      console.log(ip)
       if(ip.startsWith('ip:')){
+        console.log("IPIIPPPPPPP",ip)
         signupWithIP(ip)
         return
       }
@@ -36,6 +38,7 @@ export default function Code(props) {
     setChecking(true)
     const ip = a[1]
     const pwd = a.length>2?a[2]:''
+    console.log("IP HERE",ip)
     await user.signupWithIP(ip)
     await sleep(200)
     const token = await user.generateToken(pwd)

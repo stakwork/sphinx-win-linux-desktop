@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, Image, TouchableOpacity, StyleSheet, TextInput} from 'react-native'
+import {View, ScrollView, TouchableOpacity, StyleSheet, TextInput} from 'react-native'
 import {Button} from 'react-native-paper'
 import ImagePicker from 'react-native-image-picker';
 import { useStores } from '../../../store'
@@ -22,7 +22,7 @@ export default function NewTribe({onFinish}){
 
   async function finish(v){
     setLoading(true)
-    const group = await chats.createTribe(v.name, v.description, [])
+    const group = await chats.createTribe(v)
     // if(img && img.uri) {
     //   await createChatPic(group.id, img.uri)
     //   chats.updateChatPhotoURI(group.id, img.uri)
@@ -32,7 +32,7 @@ export default function NewTribe({onFinish}){
   }
   const showDone = true
   return <View style={styles.wrap}>
-    <View style={styles.mid}>
+    <ScrollView style={styles.scroller} contentContainerStyle={styles.container}>
       {/* <TouchableOpacity onPress={pickImage}>
         {img && <Image source={{uri: img.uri}} 
           style={{width:180,height:180,borderRadius:90}} resizeMode={'cover'}
@@ -45,7 +45,7 @@ export default function NewTribe({onFinish}){
         buttonText="Create Group"
         onSubmit={finish}
       />
-    </View>
+    </ScrollView>
   </View>
 }
 
@@ -56,13 +56,16 @@ const styles=StyleSheet.create({
     justifyContent:'center',
     alignItems:'center',
     width:'100%',
-    minHeight:400
+    minHeight:400,
   },
-  mid:{
+  scroller:{
     width:'100%',
+    flex:1,
     display:'flex',
-    alignItems:'center',
-    justifyContent:'center'
+  },
+  container:{
+    width:'100%',
+    paddingBottom:20,
   },
   buttonWrap:{
     position:'absolute',

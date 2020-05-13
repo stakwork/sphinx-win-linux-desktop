@@ -62,6 +62,7 @@ const styles=StyleSheet.create({
     width:'100%',
     flex:1,
     padding:25,
+    paddingBottom:75,
   },
   buttonWrap:{
     width:'100%',

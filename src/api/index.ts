@@ -14,6 +14,9 @@ function instantiateRelay(ip:string, authToken?:string){
   if(ip.endsWith('nodl.it')) {
     protocol='https'
   }
+  if(ip.endsWith('nodes.sphinx.chat')) {
+    protocol='https'
+  }
   
   if(authToken){
     relay = new API(`${protocol}://${ip}/`, 'x-user-token', authToken)
