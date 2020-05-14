@@ -62,6 +62,15 @@ class ChatStore {
     return r
   }
 
+  @action 
+  async joinTribe({name, uuid, group_key, host}){
+    const r = await relay.post('tribe', {
+      name, uuid, group_key, host,
+    })
+    this.gotChat(r)
+    return r
+  }
+
   @action
   async addGroupMembers(chatID: number, contact_ids: number[]) {
     await relay.put(`chat/${chatID}`, {

@@ -12,6 +12,7 @@ import Peer from './peer'
 import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
+import JoinTribe from './joinTribe'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -22,6 +23,7 @@ export default function Modals(){
     const showRawInvoiceModal = ui.rawInvoiceModal
     const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri||ui.imgViewerParams.msg)?true:false
     const showPeer = ui.rtcParams?true:false
+    const showJoinTribe = ui.joinTribeParams?true:false
     return <>
       {showPeer && <Peer params={ui.rtcParams} />}  
       <AddFriend visible={showAddFriendModal} />
@@ -35,6 +37,7 @@ export default function Modals(){
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />
+      <JoinTribe visible={showJoinTribe} />
     </>
   })
 }

@@ -1,10 +1,12 @@
 import React, {useState} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
+import {UiStore} from '../../store/ui'
 import {View,StyleSheet} from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
 import * as ln from '../utils/decode'
+import * as utils from '../utils/utils'
 
 export default function BottomTabs() {
   const {ui} = useStores()
@@ -29,7 +31,7 @@ export default function BottomTabs() {
         <View style={styles.qrWrap}>
           {scanning && <QR 
             onCancel={()=>setScanning(false)}
-            onScan={data=>{
+            onScan={async data=>{
               if(isLN(data)) {
                 let inv:any
                 let theData = data
@@ -44,6 +46,9 @@ export default function BottomTabs() {
                 setTimeout(()=>{
                   setScanning(false)
                 },1500)
+              } else if(data.startsWith('sphinx.chat://')) {
+                await parseSphinxQR(data, ui)
+                setScanning(false)
               }
             }}
           />}
@@ -51,6 +56,33 @@ export default function BottomTabs() {
       </Portal>
     </View>
   )
+}
+
+async function parseSphinxQR(data:string, ui:UiStore){
+  const j = utils.jsonFromUrl(data)
+  switch(j.action) {
+    case 'tribe':
+      const tribeParams = await getTribeDetails(j.host,j.uuid)
+      if(tribeParams) ui.setJoinTribeParams(tribeParams)
+    default:
+      return
+  }
+}
+
+async function getTribeDetails(host:string,uuid:string){
+  if(!host || !uuid) return
+  console.log(host,uuid)
+  const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
+  try{
+    console.log(`GO NOW => https://${theHost}/tribes/${uuid}`)
+    const r = await fetch(`https://${theHost}/tribes/${uuid}`)
+    const j = await r.json()
+    console.log(j)
+    // ui.setJoinTribeParams(j)
+    return j
+  }catch(e){
+    console.log(e)
+  }
 }
 
 const lnPrefixes = ['ln','LIGHTNING:ln']
