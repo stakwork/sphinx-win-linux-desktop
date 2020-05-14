@@ -76,7 +76,7 @@ function ChatRow(props){
   const navigation = useNavigation()
   const {msg,user} = useStores()
 
-  const uri = useChatPicSrc(props)
+  let uri = useChatPicSrc(props)
 
   const hasImg = uri?true:false
   return useObserver(()=>{
@@ -102,7 +102,7 @@ function ChatRow(props){
       }}>
       <View style={styles.avatarWrap}>
         <View style={styles.avatar}>
-          <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
+          <Image source={hasImg?{uri}:require('../../../assets/avatar.png')}
             style={{width:52,height:52}} resizeMode={'cover'}
           />
         </View>

@@ -40,12 +40,16 @@ export function useChatPicSrc(chat: Chat){
     const contact = contacts.contacts.find(c=>c.id===cid)
     s = (contact&&contact.photo_uri)||''
   } else {
-    s = (chat&&chat.photo_uri)||''
+    s = (chat&&chat.photo_url)||''
   }
   let id = null
   if(chat && chat.id) id = chat.id
   useEffect(()=>{
     (async () => {
+      if(s) {
+        setURI(s)
+        return
+      }
       if(!chat) {
         setURI('')
         return
@@ -54,10 +58,10 @@ export function useChatPicSrc(chat: Chat){
       if(isConversation) {
         const cid = chat.contact_ids.find(id=>id!==1)
         const src = await contactPicSrc(cid)
-        if(src&&src.uri) setURI(src.uri+rnd())
+        if(src&&src.uri) setURI('file://'+src.uri+rnd())
       } else {
         const src = await chatPicSrc(chat.id)
-        if(src&&src.uri) setURI(src.uri+rnd())
+        if(src&&src.uri) setURI('file://'+src.uri+rnd())
       }
     })()
   },[s,id])

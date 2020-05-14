@@ -4,6 +4,7 @@ import QrInput from './qrInput'
 import Photo from './photo'
 import Tags from './tags'
 import Number from './number'
+import PhotoURI from './photoURI'
 
 export default function Input(props){
   switch (props.type) {
@@ -17,6 +18,8 @@ export default function Input(props){
       return <Tags {...props} />
     case 'number':
       return <Number {...props} />
+    case 'photoURI':
+      return <PhotoURI {...props} />
     default:
       return <TextInput {...props} />
   }

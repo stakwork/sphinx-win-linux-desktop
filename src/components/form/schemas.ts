@@ -69,6 +69,14 @@ const tribe = [
     validator: Yup.string().required(rq),
   },
   {
+    name:'img',
+    type:'photoURI',
+    label:{
+      en:'Group Image',
+      es:'Group Image'
+    }
+  },
+  {
     name:'description',
     type:'text',
     label:{
@@ -85,7 +93,6 @@ const tribe = [
       en:'Tags',
       es:'Tags'
     },
-    required: true,
     validator: Yup.array(),
   },
   {
@@ -95,7 +102,6 @@ const tribe = [
       en:'Price to Join',
       es:'Price to Join'
     },
-    required: true,
     validator: Yup.number(),
   },
   {
@@ -105,7 +111,6 @@ const tribe = [
       en:'Price per Message',
       es:'Price per Message'
     },
-    required: true,
     validator: Yup.number(),
   },
 ]
