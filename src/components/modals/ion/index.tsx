@@ -40,8 +40,8 @@ export default function ION() {
         "Stream Add",
         "rid => " + rid + ", mid => " + mid + ", name => " + info.name
       )
-      let stream = await client.subscribe(rid, mid, tracks);
-      console.log("THIS IS A NEW STREAM",stream)
+      let stream = await client.subscribe(rid, mid);
+      // console.log("THIS IS A NEW STREAM",stream)
       // if(tracks){ // wtf i dunno
       //   for (let [k,v] of Object.entries(tracks)) {
       //     const confs = v
@@ -57,10 +57,13 @@ export default function ION() {
   }
 
   async function join(){
+    console.log("JOINNNNN")
     if(!client) {
+      let url = `wss://rtc.sphinx.chat:8443`;
       client = new Client()
       client.init()
       setupNotifications()
+      console.log(client)
     } else {
       try {
         await client.join('hi', { name: 'Droid' })

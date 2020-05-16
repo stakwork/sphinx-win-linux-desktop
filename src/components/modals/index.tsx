@@ -9,6 +9,7 @@ import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import NewGroupModal from './newGroupModal'
 import Peer from './peer'
+import Ion from './ion'
 import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
@@ -25,7 +26,7 @@ export default function Modals(){
     const showPeer = ui.rtcParams?true:false
     const showJoinTribe = ui.joinTribeParams?true:false
     return <>
-      {showPeer && <Peer params={ui.rtcParams} />}  
+      {/* {showPeer && <Peer params={ui.rtcParams} />}   */}
       <AddFriend visible={showAddFriendModal} />
       <Payment visible={ui.showPayModal} />
       <ConfirmPayInvoice visible={showConfirmPayInvoice} />
@@ -33,7 +34,7 @@ export default function Modals(){
       <RawInvoiceModal visible={showRawInvoiceModal} />
       <NewGroupModal visible={showNewGroupModal} />
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
-      {/* <IonWeb /> */}
+      {showPeer && <Ion />}
       <EditContactModal visible={ui.editContactModal} />
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />

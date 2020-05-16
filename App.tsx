@@ -11,7 +11,7 @@ import StatusBar from './src/components/utils/statusBar'
 import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
-import {registerGlobals} from 'react-native-webrtc'
+import * as RNWebRTC from 'react-native-webrtc'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -36,7 +36,8 @@ export default function Wrap(){
   useEffect(()=>{
     Linking.getInitialURL().then(e=> gotLink(e))
     Linking.addEventListener('url', gotLink)
-    registerGlobals()
+    RNWebRTC.registerGlobals()
+    console.log(RNWebRTC)
   },[])
 
   return useObserver(()=>{
