@@ -16,6 +16,11 @@ export interface Chat {
   updated_at: string
   deleted: boolean
 
+  group_key: string
+  host: string
+  price_to_join: number
+  price_per_message: number
+
   invite: Invite
 
   photo_uri: string
@@ -28,6 +33,7 @@ class ChatStore {
   @action
   setChats(chats: Chat[]) {
     this.chats = chats
+    console.log("THIS CHATS",chats)
   }
 
   @action
@@ -63,9 +69,12 @@ class ChatStore {
   }
 
   @action 
-  async joinTribe({name, uuid, group_key, host}){
+  async joinTribe({name, uuid, group_key, host, amount}){
+    console.log("JOIN TRIBE PARAMS",{
+      name, uuid, group_key, host, amount,
+    })
     const r = await relay.post('tribe', {
-      name, uuid, group_key, host,
+      name, uuid, group_key, amount, host
     })
     this.gotChat(r)
     return r

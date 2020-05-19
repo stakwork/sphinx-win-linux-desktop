@@ -265,14 +265,19 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
   const remoteTextMap = {}
   const chat = chat_id && chatStore.chats.find(c=> c.id===chat_id)
   if(chat){
-    const contactsInChat = contactStore.contacts.filter(c=>{
-      if(includeSelf){
-        return chat.contact_ids.includes(c.id)
-      } else {
-        return chat.contact_ids.includes(c.id) && c.id!==1
-      }
-    })
-    contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
+    // TRIBE
+    if(chat.type===constants.chat_types.tribe && chat.group_key) {
+      idToKeyMap[chat_id] = chat.group_key
+    } else { // NON TRIBE
+      const contactsInChat = contactStore.contacts.filter(c=>{
+        if(includeSelf){
+          return chat.contact_ids.includes(c.id)
+        } else {
+          return chat.contact_ids.includes(c.id) && c.id!==1
+        }
+      })
+      contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
+    }
   } else {
     console.log(contactStore.contacts, contact_id)
     const contact = contactStore.contacts.find(c=> c.id===contact_id)

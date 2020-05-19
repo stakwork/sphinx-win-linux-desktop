@@ -6,7 +6,7 @@ import {Button, Portal} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
 
-export default function EditContact({visible}) {
+export default function JoinTribe({visible}) {
   const { ui, chats } = useStores()
   const [loading,setLoading] = useState(false)
 
@@ -20,11 +20,20 @@ export default function EditContact({visible}) {
     await chats.joinTribe({
       name: params.name,
       group_key: params.groupKey,
-      host: params.host,
+      host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
+      ...params.priceToJoin && {amount:params.priceToJoin}
     })
     setLoading(false)
     close()
+  }
+
+  let prices = []
+  if(params){
+    prices = [
+      {label:'Price to Join', value:params.priceToJoin},
+      {label:'Price per Message', value:params.pricePerMessage},
+    ]
   }
 
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
@@ -44,9 +53,14 @@ export default function EditContact({visible}) {
           {params.description}
         </Text>
 
-        <Text style={{marginBottom:10}}>Price to Join: {params.priceToJoin||0}</Text>
-
-        <Text style={{marginBottom:10}}>Price per Message: {params.pricePerMessage||0}</Text>
+        <View style={styles.table}>
+          {prices && prices.map((p,i)=>{
+            return <View key={i} style={{...styles.tableRow,borderBottomWidth:i===prices.length-1?0:1}}>
+              <Text style={styles.tableRowLabel}>{`${p.label}:`}</Text>
+              <Text style={styles.tableRowValue}>{p.value||0}</Text>
+            </View>
+          })}
+        </View>
 
         <Button onPress={joinTribe} mode="contained"
           dark={true} style={styles.button} loading={loading}>
@@ -76,5 +90,32 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     position:'absolute',
     bottom:35,
+  },
+  table:{
+    borderWidth:1,
+    borderColor:'#ccc',
+    borderRadius:5,
+    marginTop:15,
+  },
+  tableRow:{
+    borderBottomWidth:1,
+    borderBottomColor:'#ccc',
+    paddingLeft:10,
+    paddingRight:10,
+    paddingTop:5,
+    paddingBottom:5,
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+  },
+  tableRowLabel:{
+    minWidth:150,
+  },
+  tableRowValue:{
+    fontWeight:'bold',
+    display:'flex',
+    alignItems:'center',
+    minWidth:42,
+    textAlign:'center'
   }
 })

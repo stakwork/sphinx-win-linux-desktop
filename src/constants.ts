@@ -47,7 +47,8 @@ const constants = {
   },
   chat_types: {
     conversation: 0,
-    group: 1
+    group: 1,
+    tribe: 2
   }
 }
 
