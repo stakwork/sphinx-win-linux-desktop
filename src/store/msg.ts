@@ -143,6 +143,7 @@ class MsgStore {
         v.text = encryptedText
         v.remote_text_map = remote_text_map
       }
+
       const r = await relay.post('attachment', v)
       this.gotNewMessage(r)
     } catch(e) {
@@ -267,7 +268,11 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
   if(chat){
     // TRIBE
     if(chat.type===constants.chat_types.tribe && chat.group_key) {
-      idToKeyMap[chat_id] = chat.group_key
+      idToKeyMap['chat'] = chat.group_key // "chat" is the key for tribes
+      if(includeSelf) {
+        const me = contactStore.contacts.find(c=> c.id===1) // add in my own self (for media_key_map)
+        if(me) idToKeyMap[1] = me.contact_key
+      }
     } else { // NON TRIBE
       const contactsInChat = contactStore.contacts.filter(c=>{
         if(includeSelf){

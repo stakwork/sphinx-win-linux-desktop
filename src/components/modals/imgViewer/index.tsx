@@ -6,16 +6,16 @@ import {IconButton} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {randString} from '../../../crypto/rand'
 import RNFetchBlob from 'rn-fetch-blob'
-import * as aes from '../../../crypto/aes'
 import * as e2e from '../../../crypto/e2e'
 import {ActivityIndicator} from 'react-native-paper'
 import SetPrice from './setPrice'
 import EE from '../../utils/ee'
+import { constants } from '../../../constants'
 
 export default function ImgViewer(props) {
   const {params} = props
   const {data, uri, chat_id, contact_id} = params
-  const { ui,meme,msg } = useStores()
+  const { ui,meme,msg,chats } = useStores()
 
   const [text,setText] = useState('')
   const [price, setPrice] = useState(0)
@@ -103,6 +103,9 @@ export default function ImgViewer(props) {
 
   const boxStyles = {width:w,height:h-130,top:80}
   const disabled = uploading || (showMsgMessage&&!price)
+
+  const theChat = chats.chats.find(c=> c.id===chat_id)
+  const isTribe = theChat.type===constants.chat_types.tribe
   return useObserver(() =>
     <View style={styles.wrap}>
       <IconButton
@@ -115,7 +118,7 @@ export default function ImgViewer(props) {
         }}
       />
 
-      {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
+      {showInput && !isTribe && <SetPrice setAmount={amt=> setPrice(amt)} />}
 
       {showImg && <Image resizeMode='cover' source={{uri:uri||data}}
         style={{...styles.img,...boxStyles}} 

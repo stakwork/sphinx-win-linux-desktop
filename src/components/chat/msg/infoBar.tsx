@@ -25,8 +25,13 @@ export default function InfoBar(props){
   const isPaid = props.status===constants.statuses.confirmed
   const hasExpiry = (!isPaid&&expiry)?true:false
 
-  const sender = contacts.contacts.find(c=>c.id===props.sender)
-  const hasSender = sender?true:false
+  let senderAlias
+  if(props.isTribe) {
+    senderAlias = props.senderAlias
+  } else {
+    const sender = contacts.contacts.find(c=>c.id===props.sender)
+    senderAlias = sender.alias
+  }
 
   const timeFormat = ui.is24HourFormat?'HH:mm A':'hh:mm A'
   return <View style={styles.wrap}>
@@ -35,8 +40,8 @@ export default function InfoBar(props){
       flexDirection:isMe?'row-reverse':'row',
       }}>
       <View style={{...styles.innerContent,flexDirection:isMe?'row-reverse':'row'}}>
-        {hasSender && !isMe && <Text style={styles.sender}>
-          {sender.alias}  
+        {senderAlias && !isMe && <Text style={styles.sender}>
+          {senderAlias}  
         </Text>}
         <Text style={styles.time}>
           {moment(props.date).format(timeFormat)}

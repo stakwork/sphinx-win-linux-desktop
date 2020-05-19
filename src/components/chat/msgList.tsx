@@ -10,6 +10,7 @@ import { constants,constantCodes } from '../../constants'
 import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
 
 const group = constants.chat_types.group
+const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({chat}:{chat: Chat}){
   const {msg,chats} = useStores()
@@ -66,6 +67,7 @@ function MsgList({msgs, chat}) {
   },[msgs.length])
 
   const isGroup = chat.type===group
+  const isTribe = chat.type===tribe
   return useObserver(()=> 
     <ScrollView style={styles.scroller}
       contentContainerStyle={{flexGrow:1}} // add paddingBottom?
@@ -84,7 +86,7 @@ function MsgList({msgs, chat}) {
           }
           const msg=m
           if(!m.chat) msg.chat = chat
-          return <Message key={i} {...m} y={y} isGroup={isGroup} />
+          return <Message key={i} {...m} y={y} isGroup={isGroup} isTribe={isTribe} />
         })}
         <View style={{height:20,width:'100%'}} />
       </View>

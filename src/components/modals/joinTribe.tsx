@@ -22,6 +22,7 @@ export default function JoinTribe({visible}) {
       group_key: params.groupKey,
       host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
+      img: params.img,
       ...params.priceToJoin && {amount:params.priceToJoin}
     })
     setLoading(false)
