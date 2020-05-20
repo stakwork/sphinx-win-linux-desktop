@@ -32,6 +32,7 @@ export interface Msg {
   seen: boolean
   created_at: string
   updated_at: string,
+  sender_alias: string,
 
   text: string,
 

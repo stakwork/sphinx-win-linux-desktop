@@ -6,15 +6,21 @@ import {useStores} from '../../../store'
 export default function InfoBar(props){
   const {contacts} = useStores()
 
+  let senderAlias = 'Unknown'
+  if(props.isTribe) {
+    senderAlias = props.sender_alias
+  } else {
+    const sender = contacts.contacts.find(c=>c.id===props.sender)
+    senderAlias = sender.alias
+  }
+
   const isJoin = props.type===constants.message_types.group_join
-  const sender = contacts.contacts.find(c=>c.id===props.sender)
-  const hasSender = sender?true:false
   
   return <View style={styles.wrap}>
     <View style={styles.content}>
-      {hasSender && <Text style={styles.text}>
-        {`${sender.alias} has ${isJoin?'joined':'left'} the group`}
-      </Text>}
+      <Text style={styles.text}>
+        {`${senderAlias} has ${isJoin?'joined':'left'} the group`}
+      </Text>
     </View>
   </View>
 }

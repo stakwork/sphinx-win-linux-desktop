@@ -12,6 +12,7 @@ import moment from 'moment'
 import {Contact} from './items'
 import EE from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
+import { constants } from '../../../constants'
 
 export default function GroupInfo({visible}) {
   const { ui, contacts, chats } = useStores()
@@ -71,6 +72,8 @@ export default function GroupInfo({visible}) {
     })
   }
 
+  const isTribe = group && group.type===constants.chat_types.tribe
+
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>
       <Header title={addPeople?'Add Contacts':'New Group'} 
@@ -99,7 +102,7 @@ export default function GroupInfo({visible}) {
           />
         </View>}
 
-        <View style={styles.members}>
+        {!isTribe && <View style={styles.members}>
           <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
           <ScrollView style={styles.scroller}>
             {contactsToShow.map((c,i)=>{
@@ -113,7 +116,7 @@ export default function GroupInfo({visible}) {
             style={styles.addPeople}>
             Add People
           </Button>
-        </View>
+        </View>}
        
       </FadeView>
 

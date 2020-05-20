@@ -27,7 +27,7 @@ export default function InfoBar(props){
 
   let senderAlias
   if(props.isTribe) {
-    senderAlias = props.senderAlias
+    senderAlias = props.sender_alias
   } else {
     const sender = contacts.contacts.find(c=>c.id===props.sender)
     senderAlias = sender.alias
