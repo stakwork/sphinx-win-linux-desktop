@@ -16,7 +16,7 @@ import * as RNWebRTC from 'react-native-webrtc'
 declare var global: {HermesInternal: null | {}}
 
 export default function Wrap(){
-  const {ui} = useStores()
+  const {ui,user} = useStores()
 
   function deeplinkActions(j){
     const action = j['action']

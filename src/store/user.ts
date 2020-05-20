@@ -35,6 +35,16 @@ class UserStore {
   }
 
   @action
+  setCurrentIP(ip){
+    this.currentIP = ip
+  }
+
+  @action
+  setAuthToken(t){
+    this.authToken = t
+  }
+
+  @action
   async registerMyDeviceId(device_id) {
     try {
       const r = await api.relay.put(`contacts/1`, {device_id})
