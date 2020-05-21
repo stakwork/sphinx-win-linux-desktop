@@ -33,7 +33,6 @@ class ChatStore {
   @action
   setChats(chats: Chat[]) {
     this.chats = chats
-    console.log("THIS CHATS",chats)
   }
 
   @action

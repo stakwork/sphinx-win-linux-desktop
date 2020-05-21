@@ -22,14 +22,16 @@ export default function MsgListWrap({chat}:{chat: Chat}){
       setMax(Infinity) // then the rest
     })()
   },[])
+
+  const isTribe = chat.type===tribe
   return useObserver(()=>{
     let theID = chat.id
     if(!theID) { // for very beginning, where chat doesnt have id
-      const theChat = chats.chats.find(ch=>arraysEqual(ch.contact_ids, chat.contact_ids))
+      const theChat = chats.chats.find(ch=>ch.type===0 && arraysEqual(ch.contact_ids, chat.contact_ids)) // this is the problem
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
-    const messages = processMsgs(msgs)
+    const messages = processMsgs(msgs, isTribe)
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
@@ -143,13 +145,13 @@ function wait(timeout) {
 }
 
 const hideTypes=['purchase','purchase_accept','purchase_deny']
-function processMsgs(msgs: Msg[]){
+function processMsgs(msgs: Msg[], isTribe:boolean){
   const ms = []
   if(!msgs) return ms
   for(let i=0; i<msgs.length; i++){
     let skip = false
     const msg = msgs[i]
-    msg.showInfoBar = calcShowInfoBar(msgs, msg, i)
+    msg.showInfoBar = calcShowInfoBar(msgs, msg, i, isTribe)
     const typ = constantCodes['message_types'][msg.type]
 
     // attachment logic
@@ -199,11 +201,17 @@ function getPrevious(msgs: Msg[], i:number){
   return previous
 }
 // only show info bar if first in a group from contact
-function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number){
+function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number, isTribe:boolean){
   const previous = getPrevious(msgs, i)
   if(previous===null) return true
-  if(previous.sender===msg.sender) {
-    return false
+  if(isTribe && msg.sender!==1) { // for self msgs, do normal way
+    if(previous.sender_alias===msg.sender_alias) {
+      return false
+    }
+  } else {
+    if(previous.sender===msg.sender) {
+      return false
+    }
   }
   return true
 }

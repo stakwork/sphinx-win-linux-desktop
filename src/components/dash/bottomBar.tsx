@@ -48,7 +48,9 @@ export default function BottomTabs() {
                 },1500)
               } else if(data.startsWith('sphinx.chat://')) {
                 await parseSphinxQR(data, ui)
-                setScanning(false)
+                setTimeout(()=>{
+                  setScanning(false)
+                },150)
               }
             }}
           />}
@@ -80,7 +82,7 @@ async function getTribeDetails(host:string,uuid:string){
     console.log(j)
     // ui.setJoinTribeParams(j)
     return j
-  }catch(e){
+  } catch(e){
     console.log(e)
   }
 }

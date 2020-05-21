@@ -332,7 +332,7 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
   const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(allMsgs))
   messages.forEach(msg=>{
     if(msg.chat && msg.chat.id){
-      putIn(allms, msg)
+      putIn(allms, msg) // THIS IS TOO HEAVY in a for each
     }
   })
   return allms

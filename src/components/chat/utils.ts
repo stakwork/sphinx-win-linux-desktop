@@ -23,6 +23,7 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
           updated_at: new Date().toJSON(),
           contact_ids: [1, contact.id],
           invite: contact.invite,
+          type: conversation,
         })
       }
     }

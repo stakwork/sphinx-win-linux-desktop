@@ -25,12 +25,12 @@ export default function InfoBar(props){
   const isPaid = props.status===constants.statuses.confirmed
   const hasExpiry = (!isPaid&&expiry)?true:false
 
-  let senderAlias
+  let senderAlias = ''
   if(props.isTribe) {
     senderAlias = props.sender_alias
   } else {
     const sender = contacts.contacts.find(c=>c.id===props.sender)
-    senderAlias = sender.alias
+    senderAlias = sender && sender.alias
   }
 
   const timeFormat = ui.is24HourFormat?'HH:mm A':'hh:mm A'

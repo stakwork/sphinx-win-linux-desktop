@@ -3,7 +3,7 @@ import {View, Text, StyleSheet} from 'react-native'
 import { constants } from '../../../constants'
 import {useStores} from '../../../store'
 
-export default function InfoBar(props){
+export default function GroupNotification(props){
   const {contacts} = useStores()
 
   let senderAlias = 'Unknown'
@@ -11,7 +11,7 @@ export default function InfoBar(props){
     senderAlias = props.sender_alias
   } else {
     const sender = contacts.contacts.find(c=>c.id===props.sender)
-    senderAlias = sender.alias
+    senderAlias = sender && sender.alias
   }
 
   const isJoin = props.type===constants.message_types.group_join

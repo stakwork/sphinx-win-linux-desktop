@@ -104,8 +104,8 @@ export default function ImgViewer(props) {
   const boxStyles = {width:w,height:h-130,top:80}
   const disabled = uploading || (showMsgMessage&&!price)
 
-  const theChat = chats.chats.find(c=> c.id===chat_id)
-  const isTribe = theChat.type===constants.chat_types.tribe
+  const theChat = chat_id && chats.chats.find(c=> c.id===chat_id)
+  const isTribe = theChat && theChat.type===constants.chat_types.tribe
   return useObserver(() =>
     <View style={styles.wrap}>
       <IconButton
