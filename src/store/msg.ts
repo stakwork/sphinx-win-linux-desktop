@@ -32,6 +32,7 @@ export interface Msg {
   seen: boolean
   created_at: string
   updated_at: string,
+  sender_alias: string,
 
   text: string,
 
@@ -107,7 +108,7 @@ class MsgStore {
   }
 
   @action
-  async sendMessage({contact_id, text, chat_id}) {
+  async sendMessage({contact_id, text, chat_id, amount}) {
     try {
       const encryptedText = await encryptText({contact_id:1, text})
       const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
@@ -115,8 +116,10 @@ class MsgStore {
         contact_id,
         chat_id: chat_id||null,
         text: encryptedText,
-        remote_text_map
+        remote_text_map,
+        amount:amount||0
       }
+      console.log(v)
       const r = await relay.post('messages', v)
       this.gotNewMessage(r)
     } catch(e) {
@@ -142,6 +145,7 @@ class MsgStore {
         v.text = encryptedText
         v.remote_text_map = remote_text_map
       }
+
       const r = await relay.post('attachment', v)
       this.gotNewMessage(r)
     } catch(e) {
@@ -264,14 +268,23 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
   const remoteTextMap = {}
   const chat = chat_id && chatStore.chats.find(c=> c.id===chat_id)
   if(chat){
-    const contactsInChat = contactStore.contacts.filter(c=>{
-      if(includeSelf){
-        return chat.contact_ids.includes(c.id)
-      } else {
-        return chat.contact_ids.includes(c.id) && c.id!==1
+    // TRIBE
+    if(chat.type===constants.chat_types.tribe && chat.group_key) {
+      idToKeyMap['chat'] = chat.group_key // "chat" is the key for tribes
+      if(includeSelf) {
+        const me = contactStore.contacts.find(c=> c.id===1) // add in my own self (for media_key_map)
+        if(me) idToKeyMap[1] = me.contact_key
       }
-    })
-    contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
+    } else { // NON TRIBE
+      const contactsInChat = contactStore.contacts.filter(c=>{
+        if(includeSelf){
+          return chat.contact_ids.includes(c.id)
+        } else {
+          return chat.contact_ids.includes(c.id) && c.id!==1
+        }
+      })
+      contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
+    }
   } else {
     console.log(contactStore.contacts, contact_id)
     const contact = contactStore.contacts.find(c=> c.id===contact_id)
@@ -320,7 +333,7 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
   const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(allMsgs))
   messages.forEach(msg=>{
     if(msg.chat && msg.chat.id){
-      putIn(allms, msg)
+      putIn(allms, msg) // THIS IS TOO HEAVY in a for each
     }
   })
   return allms

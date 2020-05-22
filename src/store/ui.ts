@@ -4,7 +4,7 @@ import {Msg} from './msg'
 import {Contact} from './contacts'
 import { is24HourFormat } from 'react-native-device-time-format'
 
-class UiStore {
+export class UiStore {
   @observable ready: boolean = false
   @action
   setReady(ready){
@@ -144,6 +144,11 @@ class UiStore {
   @action
   setLastPaidInvoice(s:string){
     this.lastPaidInvoice = s
+  }
+
+  @observable joinTribeParams: {[k:string]:any} = null
+  setJoinTribeParams(obj:{[k:string]:any}) {
+    this.joinTribeParams = obj
   }
 
   @observable imgViewerParams: {[k:string]:any} = null

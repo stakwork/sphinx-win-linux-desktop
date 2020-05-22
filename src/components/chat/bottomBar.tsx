@@ -15,7 +15,8 @@ const conversation = constants.chat_types.conversation
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
-export default function BottomBar({chat}:{chat: Chat}) {
+export default function BottomBar(props) {
+  const {chat,pricePerMessage} = props
   const {ui,msg} = useStores()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
@@ -27,6 +28,8 @@ export default function BottomBar({chat}:{chat: Chat}) {
 
   const inputRef = useRef(null)
 
+  console.log("PRICE PER MESSAGE",pricePerMessage)
+
   function sendMessage(){
     if(!text) return
     let contact_id=chat.contact_ids.find(cid=>cid!==1)
@@ -34,6 +37,7 @@ export default function BottomBar({chat}:{chat: Chat}) {
       contact_id,
       text,
       chat_id: chat.id||null,
+      amount:pricePerMessage||0
     })
     setText('')
     inputRef.current.blur()

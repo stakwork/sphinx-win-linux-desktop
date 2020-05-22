@@ -50,10 +50,11 @@ export default function ChatList() {
     return <ScrollView style={{width:'100%',flex:1}}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {chatsToShow.map((c,i)=> {
+        const chatID = (c.id||rando())+''
         let showInvite = false
         if(c.invite && c.invite.status!==4) showInvite=true
         if(showInvite) return <InviteRow key={i} {...c} />
-        return <ChatRow key={c.id+''} {...c} />
+        return <ChatRow key={chatID} {...c} />
       })}
       <View style={moreStyles.buttonsWrap}>
         <Button mode="contained" dark={true} icon="plus"
@@ -76,7 +77,7 @@ function ChatRow(props){
   const navigation = useNavigation()
   const {msg,user} = useStores()
 
-  const uri = useChatPicSrc(props)
+  let uri = useChatPicSrc(props)
 
   const hasImg = uri?true:false
   return useObserver(()=>{
@@ -102,7 +103,7 @@ function ChatRow(props){
       }}>
       <View style={styles.avatarWrap}>
         <View style={styles.avatar}>
-          <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
+          <Image source={hasImg?{uri}:require('../../../assets/avatar.png')}
             style={{width:52,height:52}} resizeMode={'cover'}
           />
         </View>
@@ -163,6 +164,7 @@ function wait(timeout) {
 const moreStyles = StyleSheet.create({
   buttonsWrap:{
     marginTop:40,
+    marginBottom:25,
     display:'flex',
     flexDirection:'row',
     width:'100%',
@@ -197,3 +199,7 @@ const moreStyles = StyleSheet.create({
     fontSize:10
   }
 })
+
+function rando(){
+  return Math.random().toString(36).substring(7);
+}

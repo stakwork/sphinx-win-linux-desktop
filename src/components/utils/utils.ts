@@ -2,7 +2,7 @@ import {decode as atob} from 'base-64'
 
 const base64Fields=['imgurl']
 
-export function jsonFromUrl(url) {
+export function jsonFromUrl(url): {[k:string]:any} {
   const qIndex = url.indexOf('?')
   var query = url.substr(qIndex+1)
   var result = {}

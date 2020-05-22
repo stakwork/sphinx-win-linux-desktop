@@ -16,12 +16,18 @@ export interface Chat {
   updated_at: string
   deleted: boolean
 
+  group_key: string
+  host: string
+  price_to_join: number
+  price_per_message: number
+  owner_pubkey: string
+
   invite: Invite
 
   photo_uri: string
 }
 
-class ChatStore {
+export class ChatStore {
   @persist('list') @observable
   chats: Chat[] = []
 
@@ -44,6 +50,31 @@ class ChatStore {
   async createGroup(contact_ids: number[], name: string){
     const r = await relay.post('group', {
       name, contact_ids
+    })
+    this.gotChat(r)
+    return r
+  }
+
+  @action 
+  async createTribe({name, description, tags, img, price_per_message, price_to_join}){
+    const r = await relay.post('group', {
+      name, description, tags:tags||[],
+      is_tribe: true, is_listed:true,
+      price_per_message: price_per_message||0,
+      price_to_join: price_to_join||0,
+      img: img||'',
+    })
+    this.gotChat(r)
+    return r
+  }
+
+  @action 
+  async joinTribe({name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey}){
+    console.log("JOIN TRIBE PARAMS",{
+      name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey
+    })
+    const r = await relay.post('tribe', {
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey
     })
     this.gotChat(r)
     return r
@@ -72,6 +103,22 @@ class ChatStore {
       }
       return c
     })
+  }
+
+  @action 
+  async getTribeDetails(host:string,uuid:string){
+    if(!host || !uuid) return
+    console.log(host,uuid)
+    const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
+    try{
+      console.log(`GO NOW => https://${theHost}/tribes/${uuid}`)
+      const r = await fetch(`https://${theHost}/tribes/${uuid}`)
+      const j = await r.json()
+      console.log(j)
+      return j
+    } catch(e){
+      console.log(e)
+    }
   }
 
 }

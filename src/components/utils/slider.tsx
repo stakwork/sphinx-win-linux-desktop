@@ -11,11 +11,13 @@ export default function Slider(props){
       Animated.timing(x, {
         toValue: 0,
         duration:600,
+        useNativeDriver: true,
       }).start()
     } else {
       Animated.timing(x, {
         toValue: screenWidth,
         duration:600,
+        useNativeDriver: true,
       }).start()
     }
   },[props.show])

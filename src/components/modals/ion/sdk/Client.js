@@ -115,14 +115,13 @@ export default class Client extends EventEmitter {
         }
     }
 
-    async subscribe(rid, mid, tracks) {
+    async subscribe(rid, mid) {
         console.log('subscribe rid => %s, mid => %s', rid, mid);
         var promise = new Promise(async (resolve, reject) => {
             try {
-                let pc = await this._createReceiver(mid, tracks);
+                let pc = await this._createReceiver(mid);
                 var sub_mid = "";
                 pc.onaddstream = (e) => {
-                    console.log("ON ADD STREAM CALLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                     var stream = new Stream(sub_mid, e.stream);
                     console.log('Stream::pc::onaddstream', stream.mid);
                     this._streams[sub_mid] = stream;
@@ -134,13 +133,12 @@ export default class Client extends EventEmitter {
                 }
                 pc.onicecandidate = async (e) => {
                     if (!pc.sendOffer) {
-                        console.log("O?N ICE CANDIATEEEEEEEEEEEEEEEEEEE")
                         var jsep = pc.localDescription;
-                        console.log('Send offer sdp => ' + jsep.sdp);
+                        // console.log('Send offer sdp => ' + jsep.sdp);
                         pc.sendOffer = true
                         let result = await this._protoo.request('subscribe', { rid, jsep, mid });
                         sub_mid = result['mid'];
-                        console.log('subscribe success => result(mid: ' + sub_mid + ') sdp => ' + result.jsep.sdp);
+                        // console.log('subscribe success => result(mid: ' + sub_mid + ') sdp => ' + result.jsep.sdp);
                         await pc.setRemoteDescription(result.jsep);
                     }
                 }
@@ -270,19 +268,12 @@ export default class Client extends EventEmitter {
     }
 
     async _createReceiver(uid,tracks) {
-        console.log('create receiver => %s', uid);
+        console.log('create receiver =>', uid);
         let pc = new RTCPeerConnection({ iceServers: [{ urls: ices }] });
         pc.sendOffer = false;
-        // if(tracks){
-        //     tracks.forEach(track=>{
-        //         pc.addStream(new MediaStream(track))
-        //     })
-        // }
-        pc.addStream(new MediaStream())
-        const s = pc.remoteDescription
-        console.log(pc)
-        // pc.addTransceiver('audio', { 'direction': 'recvonly' });
-        // pc.addTransceiver('video', { 'direction': 'recvonly' });
+        console.log(pc.addTransceiver)
+        pc.addTransceiver('audio', { 'direction': 'recvonly' });
+        pc.addTransceiver('video', { 'direction': 'recvonly' });
         let desc = await pc.createOffer();
         pc.setLocalDescription(desc);
         this._pcs[uid] = pc;
@@ -338,9 +329,6 @@ export default class Client extends EventEmitter {
                 }
             case 'stream-add':
                 {
-                    console.log('=========>')
-                    console.log('FULL STREAM ADD',data)
-                    console.log('=========>')
                     const { rid, mid, info, tracks } = data;
                     console.log('stream-add peer rid => %s, mid => %s', rid, mid);
                     this.emit('stream-add', rid, mid, info, tracks);

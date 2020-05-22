@@ -57,6 +57,64 @@ const subscribe = [
 
 ]
 
+const tribe = [
+  {
+    name:'name',
+    type:'text',
+    label:{
+      en:'Name',
+      es:'Nombre'
+    },
+    required: true,
+    validator: Yup.string().required(rq),
+  },
+  {
+    name:'img',
+    type:'photoURI',
+    label:{
+      en:'Group Image',
+      es:'Group Image'
+    }
+  },
+  {
+    name:'description',
+    type:'text',
+    label:{
+      en:'Description',
+      es:'Description'
+    },
+    required: true,
+    validator: Yup.string().required(rq),
+  },
+  {
+    name:'tags',
+    type:'tags',
+    label:{
+      en:'Tags',
+      es:'Tags'
+    },
+    validator: Yup.array(),
+  },
+  {
+    name:'price_to_join',
+    type:'number',
+    label:{
+      en:'Price to Join',
+      es:'Price to Join'
+    },
+    validator: Yup.number(),
+  },
+  {
+    name:'price_per_message',
+    type:'number',
+    label:{
+      en:'Price per Message',
+      es:'Price per Message'
+    },
+    validator: Yup.number(),
+  },
+]
+
 export {
-  contact, subscribe, me,
+  contact, subscribe, me, tribe,
 }

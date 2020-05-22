@@ -12,9 +12,10 @@ import moment from 'moment'
 import {Contact} from './items'
 import EE from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
+import { constants } from '../../../constants'
 
 export default function GroupInfo({visible}) {
-  const { ui, contacts, chats } = useStores()
+  const { ui, contacts, chats, user } = useStores()
   const [selected, setSelected] = useState([])
   const [addPeople, setAddPeople] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -71,6 +72,9 @@ export default function GroupInfo({visible}) {
     })
   }
 
+  const isTribe = group && group.type===constants.chat_types.tribe
+  const isTribeAdmin = isTribe && group.owner_pubkey===user.publicKey
+
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>
       <Header title={addPeople?'Add Contacts':'New Group'} 
@@ -84,7 +88,7 @@ export default function GroupInfo({visible}) {
         {hasGroup && <View style={styles.groupInfo}>
           <View style={styles.groupInfoLeft}>
             <TouchableOpacity onPress={changePic}>
-              <Image source={hasImg?{uri:'file://'+uri}:require('../../../../assets/avatar.png')} 
+              <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')} 
                 style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
               />
             </TouchableOpacity>
@@ -93,13 +97,13 @@ export default function GroupInfo({visible}) {
               <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>
             </View>
           </View>
-          <IconButton icon="dots-vertical" size={32} color="#666"
+          {!isTribeAdmin && <IconButton icon="dots-vertical" size={32} color="#666"
             style={{marginLeft:0,marginRight:0}} 
             onPress={()=>setLeaveDialog(true)}
-          />
+          />}
         </View>}
 
-        <View style={styles.members}>
+        {(!isTribe || isTribeAdmin) && <View style={styles.members}>
           <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
           <ScrollView style={styles.scroller}>
             {contactsToShow.map((c,i)=>{
@@ -108,12 +112,12 @@ export default function GroupInfo({visible}) {
               />
             })}
           </ScrollView>
-          <Button mode="contained" dark={true} icon="plus"
+          {!isTribeAdmin && <Button mode="contained" dark={true} icon="plus"
             onPress={()=> setAddPeople(true)}
             style={styles.addPeople}>
             Add People
-          </Button>
-        </View>
+          </Button>}
+        </View>}
        
       </FadeView>
 
@@ -131,7 +135,10 @@ export default function GroupInfo({visible}) {
             <Button icon="cancel" onPress={()=>setLeaveDialog(false)} color="#888">
               Cancel
             </Button>
-            <Button icon="exit-to-app" onPress={()=>exitGroup()} color="#DB5554">
+            <Button icon="exit-to-app" onPress={()=>{
+              if(!loading) exitGroup()
+            }} 
+              loading={loading} color="#DB5554">
               Exit Group
             </Button>
           </Dialog.Actions>

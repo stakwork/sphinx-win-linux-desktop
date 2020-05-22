@@ -9,11 +9,14 @@ import {useStores} from '../../store'
 import {contactForConversation} from './utils'
 import EE from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
-import {ActivityIndicator} from 'react-native-paper'
+import {ActivityIndicator,Snackbar} from 'react-native-paper'
+import { constants } from '../../constants'
 
 export default function Chat(){
   const [show,setShow] = useState(false)
-  const {contacts,ui} = useStores()
+  const [pricePerMessage, setPricePerMessage] = useState(0)
+  const [showPricePerMessage, setShowPricePerMessage] = useState(false)
+  const {contacts,user,chats} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chat = route.params
 
@@ -42,15 +45,35 @@ export default function Chat(){
     })
 
     handleBack()
+
+    fetchTribeParams()
   },[])
+
+  async function fetchTribeParams(){
+    const isTribe = chat.type===constants.chat_types.tribe
+    const isTribeAdmin = isTribe && chat.owner_pubkey===user.publicKey
+    if(isTribe && !isTribeAdmin){
+      const params = await chats.getTribeDetails(chat.host,chat.uuid)
+      if(params){
+        setPricePerMessage(params.pricePerMessage)
+        setShowPricePerMessage(true)
+      }
+    }
+  }
 
   return <View style={styles.main}>
     <Header chat={chat} />
     {!show && <View style={styles.loadWrap}>
       <ActivityIndicator animating={true} color="grey" />
-    </View>} 
+    </View>}
     {show && <MsgList chat={chat} />}
-    {show && <BottomBar chat={chat} />}
+    {show && <BottomBar chat={chat} pricePerMessage={pricePerMessage} />}
+    <Snackbar
+      visible={showPricePerMessage}
+      duration={1000}
+      onDismiss={()=> setShowPricePerMessage(false)}>
+      {`Price per Message: ${pricePerMessage} sat`}
+    </Snackbar>
   </View>
 }
 

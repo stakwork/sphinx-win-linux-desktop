@@ -10,17 +10,24 @@ let relay = null
 function instantiateRelay(ip:string, authToken?:string){
   if(!ip) return console.log("cant instantiate Relay, no IP")
 
-  let protocol = 'http'
+  let protocol = 'http://'
   if(ip.endsWith('nodl.it')) {
-    protocol='https'
+    protocol='https://'
+  }
+  if(ip.endsWith('nodes.sphinx.chat')) {
+    protocol='https://' 
+  }
+
+  if(ip.startsWith('https://') || ip.startsWith('http://')) {
+    protocol=''
   }
   
   if(authToken){
-    relay = new API(`${protocol}://${ip}/`, 'x-user-token', authToken)
+    relay = new API(`${protocol}${ip}/`, 'x-user-token', authToken)
   } else {
-    relay = new API(`${protocol}://${ip}/`)
+    relay = new API(`${protocol}${ip}/`)
   }
-  console.log('=> instantiated relay!', `${protocol}://${ip}/`)
+  console.log('=> instantiated relay!', `${protocol}${ip}/`)
   
   if(authToken) { // only connect here (to avoid double) if auth token means for real
     connectWebSocket(ip)
