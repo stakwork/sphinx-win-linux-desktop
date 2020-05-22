@@ -104,15 +104,15 @@ const tribe = [
     },
     validator: Yup.number(),
   },
-  // {
-  //   name:'price_per_message',
-  //   type:'number',
-  //   label:{
-  //     en:'Price per Message',
-  //     es:'Price per Message'
-  //   },
-  //   validator: Yup.number(),
-  // },
+  {
+    name:'price_per_message',
+    type:'number',
+    label:{
+      en:'Price per Message',
+      es:'Price per Message'
+    },
+    validator: Yup.number(),
+  },
 ]
 
 export {

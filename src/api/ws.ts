@@ -15,7 +15,15 @@ let ws: any = null
 export function connectWebSocket(ip: string) {
   if(ws) return // dont reconnect if already exists
 
-  const uri = 'ws://' + ip + '/socket' 
+  let theIP = ip
+  if(ip.startsWith('https://')) {
+    theIP=ip.replace('https://','')
+  }
+  if(ip.startsWith('http://')) {
+    theIP=ip.replace('http://','')
+  }
+
+  const uri = 'ws://' + theIP + '/socket' 
 
   const rws = new ReconnectingWebSocket(uri);
 

@@ -14,12 +14,15 @@ export default function JoinTribe({visible}) {
     ui.setJoinTribeParams(null)
   }
   const params = ui.joinTribeParams
+  console.log(params)
 
   async function joinTribe(){
     setLoading(true)
     await chats.joinTribe({
       name: params.name,
       group_key: params.groupKey,
+      owner_alias: params.ownerAlias,
+      owner_pubkey: params.ownerPubkey,
       host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
       img: params.img,

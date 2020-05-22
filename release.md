@@ -1,1 +1,1 @@
-April 30 at 11 am PST
+May 22 at noon PST

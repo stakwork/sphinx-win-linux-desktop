@@ -108,7 +108,7 @@ class MsgStore {
   }
 
   @action
-  async sendMessage({contact_id, text, chat_id}) {
+  async sendMessage({contact_id, text, chat_id, amount}) {
     try {
       const encryptedText = await encryptText({contact_id:1, text})
       const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
@@ -116,7 +116,8 @@ class MsgStore {
         contact_id,
         chat_id: chat_id||null,
         text: encryptedText,
-        remote_text_map
+        remote_text_map,
+        amount:amount||0
       }
       console.log(v)
       const r = await relay.post('messages', v)

@@ -28,6 +28,7 @@ export interface Contact {
   device_id: string
   created_at: string
   updated_at: string
+  from_group: boolean
 
   invite: Invite
 
@@ -84,7 +85,13 @@ class ContactStore {
     try {
       if(!v.public_key) return console.log('no pub key')
       const r = await relay.post('contacts', {...v,status:1})
-      this.contacts = [...this.contacts, r]
+      const existingContact = this.contacts.find(c=> c.id===r.id)
+      if(existingContact) {
+        if(r.alias) existingContact.alias = r.alias
+        existingContact.from_group = r.fromGroup||false
+      } else {
+        this.contacts = [...this.contacts, r]
+      }
     } catch(e) {
       console.log(e)
     }

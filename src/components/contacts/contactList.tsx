@@ -1,7 +1,7 @@
 import React from 'react'
 import {useStores} from '../../store'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, SectionList, View, Text, StyleSheet, Image } from 'react-native'
+import { TouchableOpacity, ScrollView, SectionList, View, Text, StyleSheet, Image } from 'react-native'
 import {SwipeRow} from 'react-native-swipe-list-view'
 import {IconButton} from 'react-native-paper'
 import {usePicSrc} from '../utils/picSrc'
@@ -14,10 +14,11 @@ export default function ContactList() {
       return c.alias.toLowerCase().includes(ui.contactsSearchTerm.toLowerCase())
     })
     const contactsNotMe = contactsToShow.filter(c=> c.id!==1).sort((a,b)=> a.alias>b.alias?1:-1)
+    const contactsNotFromGroups = contactsNotMe.filter(c=> !c.from_group)
     return <View style={styles.container}>
       <SectionList
         style={styles.list}
-        sections={grouper(contactsNotMe)}
+        sections={grouper(contactsNotFromGroups)}
         keyExtractor={(item:{[k:string]:any}, index) => {
           return item.alias+index
         }}
@@ -86,8 +87,8 @@ function grouper(data){
 
 const styles = StyleSheet.create({
   container:{
-    height:'100%',
-    backgroundColor:'white'
+    backgroundColor:'white',
+    flex:1,
   },
   list:{
     flex:1

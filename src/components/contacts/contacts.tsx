@@ -5,13 +5,13 @@ import { useStores } from '../../store'
 import {ScrollView, View, Text, StyleSheet} from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Appbar, Searchbar, IconButton } from 'react-native-paper'
-import ContactsList from './contactList'
+import ContactList from './contactList'
 
 export default function Contacts() {
   const { ui } = useStores()
 
   return useObserver(() =>
-    <View>
+    <View style={{flex:1}}>
       <Header />
       <View style={styles.searchWrap}>
         <View style={styles.searchBarWrap}>
@@ -34,7 +34,7 @@ export default function Contacts() {
           />
         </View>
       </View>
-      <ContactsList />
+      <ContactList />
     </View>
   )
 }
