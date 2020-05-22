@@ -28,8 +28,6 @@ export default function BottomBar(props) {
 
   const inputRef = useRef(null)
 
-  console.log("PRICE PER MESSAGE",pricePerMessage)
-
   function sendMessage(){
     if(!text) return
     let contact_id=chat.contact_ids.find(cid=>cid!==1)
@@ -103,6 +101,7 @@ export default function BottomBar(props) {
   }
 
   const isConversation = chat.type===conversation
+  const isTribe = chat.type===constants.chat_types.tribe
   const hideArrows = (inputFocused||text)?true:false
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:textInputHeight+20}} />
@@ -156,6 +155,7 @@ export default function BottomBar(props) {
         onPick={res=> tookPic(res)}
         onChooseCam={()=> setTakingPhoto(true)}
         doPaidMessage={()=> doPaidMessage()}
+        hidePaidMessage={isTribe}
       />
 
       {takingPhoto && <Portal>

@@ -63,7 +63,7 @@ function Begin({setMode}){
       style={{backgroundColor:'#55D1A9',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center'}}>
       Private Group
     </Button>
-    <Button mode="contained" dark={true}
+    <Button mode="contained" dark={true} disabled={true}
       onPress={() => setMode('tribe')}
       style={{backgroundColor:'#6289FD',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center',marginTop:28}}>
       Public Group

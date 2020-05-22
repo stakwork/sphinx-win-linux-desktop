@@ -2,7 +2,7 @@ import React from 'react'
 import {Portal, Button, Dialog} from 'react-native-paper'
 import ImagePicker from 'react-native-image-picker'
 
-export default function AttachmentDialog({open, onClose, onPick, onChooseCam, doPaidMessage}){
+export default function AttachmentDialog({open, onClose, onPick, onChooseCam, doPaidMessage, hidePaidMessage}){
   async function pickImage() {
     ImagePicker.launchImageLibrary({}, result=>{
       if (!result.didCancel) {
@@ -27,9 +27,9 @@ export default function AttachmentDialog({open, onClose, onPick, onChooseCam, do
         <Button icon="image" onPress={()=>pickImage()} style={{width:'100%',alignItems:'flex-start'}}>
           Photo Library
         </Button>
-        <Button icon="message" onPress={()=>doPaidMessage()} style={{width:'100%',alignItems:'flex-start'}}>
+        {!hidePaidMessage && <Button icon="message" onPress={()=>doPaidMessage()} style={{width:'100%',alignItems:'flex-start'}}>
           Paid Message
-        </Button>
+        </Button>}
       </Dialog.Actions>
     </Dialog>
   </Portal>
