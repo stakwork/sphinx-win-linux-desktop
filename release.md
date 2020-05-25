@@ -1,1 +1,1 @@
-May 22 at 1pm PST
+May 25 at 10 am PST
