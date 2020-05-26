@@ -51,20 +51,22 @@ export class UiStore {
   }
 
   @observable newGroupModal: boolean = false
-  @action
-  setNewGroupModal(b) {
+  @action setNewGroupModal(b) {
     this.newGroupModal = b
+  }
+
+  @observable editTribeParams: {[k:string]:any} = null
+  @action setEditTribeParams(o) {
+    this.editTribeParams = o
   }
 
   @observable groupModal: boolean = false
   @observable groupModalParams: Chat
-  @action
-  setGroupModal(g: Chat) {
+  @action setGroupModal(g: Chat) {
     this.groupModal = true
     this.groupModalParams = g
   }
-  @action
-  closeGroupModal() {
+  @action closeGroupModal() {
     this.groupModal = false
     setTimeout(()=>{
       this.groupModalParams = null
@@ -72,21 +74,18 @@ export class UiStore {
   }
 
   @observable pubkeyModal: boolean = false
-  @action
-  setPubkeyModal(b) {
+  @action setPubkeyModal(b) {
     this.pubkeyModal = b
   }
 
   @observable shareInviteModal: boolean = false
   @observable shareInviteString: string = ''
-  @action
-  setShareInviteModal(s: string) {
+  @action setShareInviteModal(s: string) {
     this.shareInviteModal = true
     this.shareInviteString = s
   }
 
-  @action
-  clearShareInviteModal() {
+  @action clearShareInviteModal() {
     this.shareInviteModal = false
     setTimeout(()=>{
       this.shareInviteString = ''
@@ -96,15 +95,13 @@ export class UiStore {
   @observable showPayModal: boolean = false
   @observable payMode: string = ''
   @observable chatForPayModal: Chat | null
-  @action
-  setPayMode(m,c) {
+  @action setPayMode(m,c) {
     this.payMode = m
     this.chatForPayModal = c
     this.showPayModal = true
   }
 
-  @action
-  clearPayModal() {
+  @action clearPayModal() {
     this.showPayModal = false
     setTimeout(()=>{
       this.payMode=''
@@ -124,15 +121,13 @@ export class UiStore {
 
   @observable rawInvoiceModal: boolean = false
   @observable rawInvoiceModalParams: {[k:string]:string} = null
-  @action
-  setRawInvoiceModal(params) {
+  @action setRawInvoiceModal(params) {
     this.rawInvoiceModal = true
     this.rawInvoiceModalParams = params
     this.lastPaidInvoice = ''
   }
 
-  @action
-  clearRawInvoiceModal() {
+  @action clearRawInvoiceModal() {
     this.rawInvoiceModal = false
     setTimeout(()=>{
       this.rawInvoiceModalParams=null
@@ -141,23 +136,22 @@ export class UiStore {
   }
 
   @observable lastPaidInvoice:string = ''
-  @action
-  setLastPaidInvoice(s:string){
+  @action setLastPaidInvoice(s:string){
     this.lastPaidInvoice = s
   }
 
   @observable joinTribeParams: {[k:string]:any} = null
-  setJoinTribeParams(obj:{[k:string]:any}) {
+  @action setJoinTribeParams(obj:{[k:string]:any}) {
     this.joinTribeParams = obj
   }
 
   @observable imgViewerParams: {[k:string]:any} = null
-  setImgViewerParams(obj:{[k:string]:any}) {
+  @action setImgViewerParams(obj:{[k:string]:any}) {
     this.imgViewerParams = obj
   }
 
   @observable rtcParams: {[k:string]:any} = null
-  setRtcParams(obj:{[k:string]:any}) {
+  @action setRtcParams(obj:{[k:string]:any}) {
     this.rtcParams = obj
   }
 

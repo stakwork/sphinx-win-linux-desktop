@@ -8,7 +8,7 @@ import Form from '../../form'
 import {tribe} from '../../form/schemas'
 
 export default function NewTribe({onFinish}){
-  const { chats } = useStores()
+  const { ui, chats } = useStores()
   const [loading, setLoading] = useState(false)
   const [img, setImg] = useState(null)
 
@@ -22,7 +22,14 @@ export default function NewTribe({onFinish}){
 
   async function finish(v){
     setLoading(true)
-    const group = await chats.createTribe(v)
+    if(ui.editTribeParams){
+      await chats.editTribe({
+        ...v,
+        uuid: ui.editTribeParams.uuid
+      })
+    } else {
+      await chats.createTribe(v)
+    }
     // if(img && img.uri) {
     //   await createChatPic(group.id, img.uri)
     //   chats.updateChatPhotoURI(group.id, img.uri)
@@ -31,6 +38,7 @@ export default function NewTribe({onFinish}){
     setLoading(false)
   }
   const showDone = true
+
   return <View style={styles.wrap}>
     <ScrollView style={styles.scroller} contentContainerStyle={styles.container}>
       {/* <TouchableOpacity onPress={pickImage}>
@@ -42,8 +50,9 @@ export default function NewTribe({onFinish}){
         />}
       </TouchableOpacity> */}
       <Form schema={tribe} loading={loading} 
-        buttonText="Create Group"
+        buttonText={(ui.editTribeParams?'Edit':'Create')+' Group'}
         onSubmit={finish}
+        initialValues={ui.editTribeParams}
       />
     </ScrollView>
   </View>

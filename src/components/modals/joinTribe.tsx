@@ -14,7 +14,6 @@ export default function JoinTribe({visible}) {
     ui.setJoinTribeParams(null)
   }
   const params = ui.joinTribeParams
-  console.log(params)
 
   async function joinTribe(){
     setLoading(true)

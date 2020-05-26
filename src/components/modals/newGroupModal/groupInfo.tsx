@@ -20,6 +20,8 @@ export default function GroupInfo({visible}) {
   const [addPeople, setAddPeople] = useState(false)
   const [loading, setLoading] = useState(false)
   const [leaveDialog, setLeaveDialog] = useState(false)
+  const [editDialog, setEditDialog] = useState(false)
+  const [loadingTribe, setLoadingTribe] = useState(false)
 
   const group = ui.groupModalParams
 
@@ -97,10 +99,13 @@ export default function GroupInfo({visible}) {
               <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>
             </View>
           </View>
-          {!isTribeAdmin && <IconButton icon="dots-vertical" size={32} color="#666"
+          <IconButton icon="dots-vertical" size={32} color="#666"
             style={{marginLeft:0,marginRight:0}} 
-            onPress={()=>setLeaveDialog(true)}
-          />}
+            onPress={()=>{
+              if(isTribeAdmin) setEditDialog(true)
+              else setLeaveDialog(true)
+            }}
+          />
         </View>}
 
         {(!isTribe || isTribeAdmin) && <View style={styles.members}>
@@ -140,6 +145,27 @@ export default function GroupInfo({visible}) {
             }} 
               loading={loading} color="#DB5554">
               Exit Group
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      <Portal>
+        <Dialog visible={editDialog} style={{bottom:10,zIndex:99}}
+          onDismiss={()=> setEditDialog(false)}>
+          <Dialog.Title>Edit Group?</Dialog.Title>
+          <Dialog.Actions style={{justifyContent:'space-between'}}>
+            <Button icon="cancel" onPress={()=>setEditDialog(false)} color="#888">
+              Cancel
+            </Button>
+            <Button loading={loadingTribe} icon="pencil" onPress={async()=>{
+              setLoadingTribe(true)
+              const params = await chats.getTribeDetails(group.host,group.uuid)
+              if(params) ui.setEditTribeParams(params)
+              setEditDialog(false)
+              setLoadingTribe(false)
+            }}>
+              Edit Group
             </Button>
           </Dialog.Actions>
         </Dialog>

@@ -20,13 +20,12 @@ export default function Modals(){
   return useObserver(()=> {
     const showConfirmPayInvoice = ui.confirmInvoiceMsg&&ui.confirmInvoiceMsg.payment_request?true:false
     const showAddFriendModal = ui.addFriendModal?true:false
-    const showNewGroupModal = ui.newGroupModal?true:false
+    const showNewGroupModal = ui.newGroupModal||ui.editTribeParams?true:false
     const showRawInvoiceModal = ui.rawInvoiceModal
     const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri||ui.imgViewerParams.msg)?true:false
     const showPeer = ui.rtcParams?true:false
     const showJoinTribe = ui.joinTribeParams?true:false
     return <>
-      {/* {showPeer && <Peer params={ui.rtcParams} />}   */}
       <AddFriend visible={showAddFriendModal} />
       <Payment visible={ui.showPayModal} />
       <ConfirmPayInvoice visible={showConfirmPayInvoice} />

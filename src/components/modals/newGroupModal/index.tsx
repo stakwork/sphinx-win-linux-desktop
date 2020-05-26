@@ -16,10 +16,11 @@ export default function NewGroup({visible}) {
   const { ui, contacts } = useStores()
   const [selected, setSelected] = useState([])
   const [next, setNext] = useState(false)
-  const [mode, setMode] = useState('')
+  const [theMode, setMode] = useState('')
 
   function close(){
     ui.setNewGroupModal(false)
+    ui.setEditTribeParams(null)
     setTimeout(()=>{
       setNext(false)
       setMode('')
@@ -30,9 +31,15 @@ export default function NewGroup({visible}) {
   const selectedContacts = contactsToShow.filter(c=> selected.includes(c.id))
   const showSelectedContacts = selectedContacts.length>0
 
+  let mode=theMode
+  if(ui.editTribeParams) mode='tribe'
+
+  let title="New Group"
+  if(mode==='tribe') title='New Public Group'
+  if(ui.editTribeParams) title='Edit Public Group'
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>
-      <Header title="New Group" onClose={()=>close()} 
+      <Header title={title} onClose={()=>close()} 
         showNext={!next && showSelectedContacts} next={()=>setNext(true)}
       />
 

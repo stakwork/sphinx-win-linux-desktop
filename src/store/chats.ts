@@ -69,10 +69,20 @@ export class ChatStore {
   }
 
   @action 
-  async joinTribe({name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey}){
-    console.log("JOIN TRIBE PARAMS",{
-      name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey
+  async editTribe({uuid, name, description, tags, img, price_per_message, price_to_join}){
+    const r = await relay.put('tribe', {
+      uuid, name, description, tags:tags||[],
+      is_listed:true,
+      price_per_message: price_per_message||0,
+      price_to_join: price_to_join||0,
+      img: img||'',
     })
+    this.gotChat(r)
+    return r
+  }
+
+  @action 
+  async joinTribe({name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey}){
     const r = await relay.post('tribe', {
       name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey
     })
@@ -108,13 +118,10 @@ export class ChatStore {
   @action 
   async getTribeDetails(host:string,uuid:string){
     if(!host || !uuid) return
-    console.log(host,uuid)
     const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
     try{
-      console.log(`GO NOW => https://${theHost}/tribes/${uuid}`)
       const r = await fetch(`https://${theHost}/tribes/${uuid}`)
       const j = await r.json()
-      console.log(j)
       return j
     } catch(e){
       console.log(e)
