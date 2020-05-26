@@ -55,7 +55,7 @@ export default function Chat(){
     if(isTribe && !isTribeAdmin){
       const params = await chats.getTribeDetails(chat.host,chat.uuid)
       if(params){
-        setPricePerMessage(params.pricePerMessage)
+        setPricePerMessage(params.price_per_message)
         setShowPricePerMessage(true)
       }
     }

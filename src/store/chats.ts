@@ -69,9 +69,9 @@ export class ChatStore {
   }
 
   @action 
-  async editTribe({uuid, name, description, tags, img, price_per_message, price_to_join}){
-    const r = await relay.put('tribe', {
-      uuid, name, description, tags:tags||[],
+  async editTribe({id, name, description, tags, img, price_per_message, price_to_join}){
+    const r = await relay.put(`group/${id}`, {
+      name, description, tags:tags||[],
       is_listed:true,
       price_per_message: price_per_message||0,
       price_to_join: price_to_join||0,

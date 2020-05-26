@@ -25,7 +25,7 @@ export default function JoinTribe({visible}) {
       host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
       img: params.img,
-      ...params.priceToJoin && {amount:params.priceToJoin}
+      ...params.price_to_join && {amount:params.price_to_join}
     })
     setLoading(false)
     close()
@@ -34,8 +34,8 @@ export default function JoinTribe({visible}) {
   let prices = []
   if(params){
     prices = [
-      {label:'Price to Join', value:params.priceToJoin},
-      {label:'Price per Message', value:params.pricePerMessage},
+      {label:'Price to Join', value:params.price_to_join},
+      {label:'Price per Message', value:params.price_per_message},
     ]
   }
 

@@ -161,7 +161,7 @@ export default function GroupInfo({visible}) {
             <Button loading={loadingTribe} icon="pencil" onPress={async()=>{
               setLoadingTribe(true)
               const params = await chats.getTribeDetails(group.host,group.uuid)
-              if(params) ui.setEditTribeParams(params)
+              if(params) ui.setEditTribeParams({id:group.id,...params})
               setEditDialog(false)
               setLoadingTribe(false)
             }}>

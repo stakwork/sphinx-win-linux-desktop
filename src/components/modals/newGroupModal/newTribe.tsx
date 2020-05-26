@@ -25,7 +25,7 @@ export default function NewTribe({onFinish}){
     if(ui.editTribeParams){
       await chats.editTribe({
         ...v,
-        uuid: ui.editTribeParams.uuid
+        id: ui.editTribeParams.id
       })
     } else {
       await chats.createTribe(v)
