@@ -19,13 +19,13 @@ export default function JoinTribe({visible}) {
     setLoading(true)
     await chats.joinTribe({
       name: params.name,
-      group_key: params.groupKey,
-      owner_alias: params.ownerAlias,
-      owner_pubkey: params.ownerPubkey,
+      group_key: params.group_key,
+      owner_alias: params.owner_alias,
+      owner_pubkey: params.owner_pubkey,
       host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
       img: params.img,
-      ...params.price_to_join && {amount:params.price_to_join}
+      amount:params.price_to_join||0
     })
     setLoading(false)
     close()

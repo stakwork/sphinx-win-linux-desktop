@@ -66,6 +66,7 @@ async function parseSphinxQR(data:string, ui:UiStore, chats:ChatStore){
   switch(j.action) {
     case 'tribe':
       const tribeParams = await chats.getTribeDetails(j.host,j.uuid)
+      // console.log(tribeParams)
       if(tribeParams) ui.setJoinTribeParams(tribeParams)
     default:
       return
