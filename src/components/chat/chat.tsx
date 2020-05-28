@@ -18,7 +18,8 @@ export default function Chat(){
   const [showPricePerMessage, setShowPricePerMessage] = useState(false)
   const {contacts,user,chats} = useStores()
   const route = useRoute<ChatRouteProp>()
-  const chat = route.params
+  const chatID = route.params.id
+  const chat = chats.chats.find(c=>c.id===chatID)
 
   const navigation = useNavigation()
 
@@ -62,7 +63,7 @@ export default function Chat(){
   }
 
   return <View style={styles.main}>
-    <Header chat={chat} />
+    <Header chatID={chatID} />
     {!show && <View style={styles.loadWrap}>
       <ActivityIndicator animating={true} color="grey" />
     </View>}

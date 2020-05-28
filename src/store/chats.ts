@@ -37,6 +37,19 @@ export class ChatStore {
   }
 
   @action
+  async muteChat(chatID:number, muted: boolean) {
+    relay.post(`chats/${chatID}/${muted?'mute':'unmute'}`)
+    const chats = this.chats.map(c=>{
+      if(c.id===chatID) {
+        console.log("CHAT CHAT TO muted",muted)
+        return {...c, is_muted:muted}
+      }
+      return c
+    })
+    this.chats = chats
+  }
+
+  @action
   gotChat(chat: Chat) {
     const existingIndex = this.chats.findIndex(ch=>ch.id===chat.id)
     if(existingIndex>-1){
