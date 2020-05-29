@@ -340,7 +340,7 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
 }
 
 function putIn(orged, msg){
-  if(msg.chat){
+  if(msg.chat&&msg.chat.id){
     if(orged[msg.chat.id]){
       const existing = orged[msg.chat.id].find(m=>m.id===msg.id)
       if(!existing) orged[msg.chat.id].push(msg)

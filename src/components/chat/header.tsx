@@ -16,10 +16,13 @@ export default function Header({chatID}) {
 
   return useObserver(()=> {
     const chat = chats.chats.find(c=> c.id===chatID)
+    let contact
+    if(chat && chat.type===conversation){
+      contact = contactForConversation(chat, contacts.contacts)
+    }
 
     function clickTitle(){
       if(chat.type===conversation){
-        const contact = contactForConversation(chat, contacts.contacts)
         if(contact) ui.setEditContactModal(contact)
       } else {
         ui.setGroupModal(chat)
@@ -32,12 +35,10 @@ export default function Header({chatID}) {
     }
 
     async function muteChat(){
-      console.log("OK CANGE NOW",chat.is_muted?false:true)
       chats.muteChat(chat.id, chat.is_muted?false:true)
     }
 
-    const {name,is_muted} = chat
-    console.log("IS MUTED!",is_muted)
+    const name = (chat&&chat.name) || (contact&&contact.alias)
     return (
       <Appbar.Header style={{width:'100%',backgroundColor:'white',elevation:5}}>
         <Appbar.BackAction onPress={()=>{
