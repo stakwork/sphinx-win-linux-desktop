@@ -48,7 +48,7 @@ export default function Header({chatID}) {
         }} />
         <Appbar.Content title={name} onPress={clickTitle} />
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
-        <Appbar.Action icon={chat.is_muted?'bell-off':'bell'} onPress={muteChat} color="grey" />
+        <Appbar.Action icon={chat&&chat.is_muted?'bell-off':'bell'} onPress={muteChat} color="grey" />
       </Appbar.Header>
     )
   })

@@ -12,6 +12,7 @@ export interface Msg {
   id: number
   chat_id: number
   type: number
+  uuid: string
   sender: number
   receiver: number
   amount: number
@@ -298,6 +299,9 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
 }
 
 async function decodeSingle(m: Msg){
+  if(m.id===609){
+    console.log("MESSAGE 609!!!!!!")
+  }
   const msg = m
   if(m.message_content) {
     const dcontent = await e2e.decryptPrivate(m.message_content)

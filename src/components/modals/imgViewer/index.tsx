@@ -118,7 +118,8 @@ export default function ImgViewer(props) {
         }}
       />
 
-      {showInput && !isTribe && <SetPrice setAmount={amt=> setPrice(amt)} />}
+      {/* {showInput && !isTribe && <SetPrice setAmount={amt=> setPrice(amt)} />} */}
+      {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
 
       {showImg && <Image resizeMode='cover' source={{uri:uri||data}}
         style={{...styles.img,...boxStyles}} 

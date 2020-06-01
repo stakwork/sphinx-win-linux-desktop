@@ -44,7 +44,6 @@ class MemeStore {
       id: r.id, sig: r2.sig, pubkey
     }, 'application/x-www-form-urlencoded')
     if(!(r3&&r3.token)) return
-
     server.token = r3.token
   }
 
