@@ -155,7 +155,6 @@ export default function BottomBar(props) {
         onPick={res=> tookPic(res)}
         onChooseCam={()=> setTakingPhoto(true)}
         doPaidMessage={()=> doPaidMessage()}
-        hidePaidMessage={isTribe} // isTribe
       />
 
       {takingPhoto && <Portal>

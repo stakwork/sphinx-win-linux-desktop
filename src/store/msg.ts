@@ -35,6 +35,8 @@ export interface Msg {
   updated_at: string,
   sender_alias: string,
 
+  original_muid: string,
+
   text: string,
 
   chat: Chat
@@ -52,6 +54,10 @@ class MsgStore {
 
   @persist @observable
   lastFetched: number
+
+  @action clearAllMessages(){
+    this.messages = {}
+  }
 
   @action
   async getAllMessages() {

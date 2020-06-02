@@ -161,7 +161,8 @@ function processMsgs(msgs: Msg[], isTribe:boolean){
         const accepted = msgs.find(m=>{
           const mtype = constantCodes['message_types'][m.type]
           const start = urlBase64FromAscii(ldat.host)+"."+ldat.muid
-          return mtype==='purchase_accept'&&m.media_token.startsWith(start)
+          return (mtype==='purchase_accept'&&m.media_token.startsWith(start)) ||
+            (isTribe&&mtype==='purchase_accept'&&m.original_muid===ldat.muid)
         })
         if(accepted){
           msg.media_token = accepted.media_token
@@ -205,11 +206,11 @@ function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number, isTribe:boolean){
   const previous = getPrevious(msgs, i)
   if(previous===null) return true
   if(isTribe && msg.sender!==1) { // for self msgs, do normal way
-    if(previous.sender_alias===msg.sender_alias) {
+    if(previous.sender_alias===msg.sender_alias && previous.type!==constants.message_types.group_join) {
       return false
     }
   } else {
-    if(previous.sender===msg.sender) {
+    if(previous.sender===msg.sender && previous.type!==constants.message_types.group_join) {
       return false
     }
   }

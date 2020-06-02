@@ -47,12 +47,13 @@ export default function Wrap(){
 }
 
 function App() {
-  const {user} = useStores()
+  const {user,msg} = useStores()
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
 
   useEffect(()=>{
     // AsyncStorage.clear()
+    // msg.clearAllMessages()
 
     const isSignedUp = (user.currentIP && user.authToken)?true:false
     setSignedUp(isSignedUp)

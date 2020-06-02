@@ -35,7 +35,10 @@ export default function MediaMsg(props){
 
   async function buy(amount){
     setBuying(true)
-    const contact_id=chat.contact_ids && chat.contact_ids.find(cid=>cid!==1)
+    let contact_id=props.sender
+    if(!contact_id) {
+      contact_id=chat.contact_ids && chat.contact_ids.find(cid=>cid!==1)
+    }
     await msg.purchaseMedia({
       chat_id: chat.id,
       media_token,
