@@ -60,7 +60,7 @@ export default function InviteNewUser({done}){
       </View> : <View></View>}
       <Button style={{backgroundColor:'#55D1A9',borderRadius:30,width:200,height:58,display:'flex',justifyContent:'center'}}
         mode="contained" dark={true} loading={loading}
-        disabled={!hasPrice}
+        // disabled={!hasPrice}
         onPress={()=> invite()}>
         Create Invitation
       </Button>
