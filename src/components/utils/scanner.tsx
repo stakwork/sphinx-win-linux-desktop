@@ -3,12 +3,13 @@ import { StyleSheet, View, Dimensions } from 'react-native'
 import {RNCamera} from 'react-native-camera'
 
 export default function Scanner(props){
-  const {handleBarCodeScanned,height,scanned} = props
+  const {handleBarCodeScanned,height,scanned,smaller} = props
+  const less = smaller?310:130
   let w = Dimensions.get('screen').width
-  let h = height || Dimensions.get('screen').height-130
+  let h = height || Dimensions.get('screen').height-less
   if(w===0) w=280
 
-  return <View style={styles.scannerWrap}>
+  return <View style={{...styles.scannerWrap,maxHeight:h,marginTop:35}}>
     <RNCamera
       style={{flex:1}}
       type={RNCamera.Constants.Type.back}

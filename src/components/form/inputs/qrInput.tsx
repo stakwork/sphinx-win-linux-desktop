@@ -34,6 +34,7 @@ export default function QrInput({name,label,required,handleChange,handleBlur,set
     {scanning && !displayOnly && <Portal>
       <QR onCancel={()=>setScanning(false)}
         onScan={data=>scan(data)}
+        showPaster={false}
       />
     </Portal>}
 

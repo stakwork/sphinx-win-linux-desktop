@@ -1,1 +1,1 @@
-May 28 at 5 pm PST
+June 3 at 1:30 pm PST

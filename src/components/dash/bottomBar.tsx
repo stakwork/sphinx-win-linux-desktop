@@ -30,7 +30,8 @@ export default function BottomTabs() {
 
       <Portal>
         <View style={styles.qrWrap}>
-          {scanning && <QR 
+          {scanning && <QR
+            showPaster
             onCancel={()=>setScanning(false)}
             onScan={async data=>{
               if(isLN(data)) {

@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, TextInput} from 'react-native'
+import {View, StyleSheet} from 'react-native'
 import {Button, Portal} from 'react-native-paper'
 import FadeView from '../utils/fadeView'
 import Form from '../form'

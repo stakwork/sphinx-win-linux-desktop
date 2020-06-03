@@ -91,7 +91,7 @@ export default function Code(props) {
       </View>
     </RadialGradient>
     {scanning && <View style={styles.qrWrap}>
-      <QR 
+      <QR showPaster={false}
         onCancel={()=>setScanning(false)}
         onScan={data=>scan(data)}
       />
