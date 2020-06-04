@@ -60,7 +60,8 @@ export default function BottomBar(props) {
     ui.setImgViewerParams({
       contact_id,
       chat_id: chat.id||null,
-      ...obj
+      ...obj,
+      pricePerMessage,
     })
   }
 

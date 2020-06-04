@@ -14,7 +14,7 @@ import { constants } from '../../../constants'
 
 export default function ImgViewer(props) {
   const {params} = props
-  const {data, uri, chat_id, contact_id} = params
+  const {data, uri, chat_id, contact_id, pricePerMessage} = params
   const { ui,meme,msg,chats } = useStores()
 
   const [text,setText] = useState('')
@@ -36,6 +36,7 @@ export default function ImgViewer(props) {
       muid, price,
       media_key, media_type,
       text:showMsgMessage?'':text,
+      amount:pricePerMessage||0
     })
     ui.setImgViewerParams(null)
   }

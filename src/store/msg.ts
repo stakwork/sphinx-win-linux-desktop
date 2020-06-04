@@ -135,7 +135,7 @@ class MsgStore {
   }
 
   @action
-  async sendAttachment({contact_id, text, chat_id, muid, media_type, media_key, price}) {
+  async sendAttachment({contact_id, text, chat_id, muid, media_type, media_key, price, amount}) {
     try {
       const media_key_map = await makeRemoteTextMap({contact_id, text:media_key, chat_id}, true)
       const v:{[k:string]:any} = {
@@ -143,7 +143,8 @@ class MsgStore {
         chat_id: chat_id||null,
         muid,
         media_type,
-        media_key_map
+        media_key_map,
+        amount:amount||0
       }
       if(price) v.price=price
       if(text){
