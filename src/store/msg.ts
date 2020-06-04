@@ -36,6 +36,7 @@ export interface Msg {
   sender_alias: string,
 
   original_muid: string,
+  reply_uuid: string,
 
   text: string,
 
@@ -115,7 +116,7 @@ class MsgStore {
   }
 
   @action
-  async sendMessage({contact_id, text, chat_id, amount}) {
+  async sendMessage({contact_id, text, chat_id, amount, reply_uuid}) {
     try {
       const encryptedText = await encryptText({contact_id:1, text})
       const remote_text_map = await makeRemoteTextMap({contact_id, text, chat_id})
@@ -124,7 +125,8 @@ class MsgStore {
         chat_id: chat_id||null,
         text: encryptedText,
         remote_text_map,
-        amount:amount||0
+        amount:amount||0,
+        reply_uuid
       }
       console.log(v)
       const r = await relay.post('messages', v)

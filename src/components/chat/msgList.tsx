@@ -12,8 +12,8 @@ import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
-export default function MsgListWrap({chat}:{chat: Chat}){
-  const {msg,chats} = useStores()
+export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,setReplyUUID,replyUuid}){
+  const {msg,chats,ui} = useStores()
   const [max, setMax] = useState(0)
   useEffect(()=>{
     (async () => {
@@ -37,11 +37,11 @@ export default function MsgListWrap({chat}:{chat: Chat}){
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
     let final = []
     if(max) final = filtered.slice(0).slice(max * -1)
-    return <MsgList msgs={final} chat={chat} />
+    return <MsgList msgs={final} chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />
   })
 }
 
-function MsgList({msgs, chat}) {
+function MsgList({msgs, chat, setReplyUUID, replyUuid}) {
   const scrollViewRef = useRef(null)
   const [y,setY] = useState(0)
 
@@ -88,7 +88,9 @@ function MsgList({msgs, chat}) {
           }
           const msg=m
           if(!m.chat) msg.chat = chat
-          return <Message key={i} {...m} y={y} isGroup={isGroup} isTribe={isTribe} />
+          return <Message key={i} {...m} y={y} isGroup={isGroup} isTribe={isTribe} 
+            setReplyUUID={setReplyUUID} replyUuid={replyUuid}
+          />
         })}
         <View style={{height:20,width:'100%'}} />
       </View>

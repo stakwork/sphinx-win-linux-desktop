@@ -35,9 +35,11 @@ export default function BottomBar(props) {
       contact_id,
       text,
       chat_id: chat.id||null,
-      amount:pricePerMessage||0
+      amount:pricePerMessage||0,
+      reply_uuid:props.replyUuid||''
     })
     setText('')
+    props.setReplyUUID('')
     inputRef.current.blur()
     setInputFocused(false)
   }

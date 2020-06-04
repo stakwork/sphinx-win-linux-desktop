@@ -16,6 +16,7 @@ export default function Chat(){
   const [show,setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [showPricePerMessage, setShowPricePerMessage] = useState(false)
+  const [replyUuid, setReplyUUID] = useState('')
   const {contacts,user,chats} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -67,8 +68,10 @@ export default function Chat(){
     {!show && <View style={styles.loadWrap}>
       <ActivityIndicator animating={true} color="grey" />
     </View>}
-    {show && <MsgList chat={chat} />}
-    {show && <BottomBar chat={chat} pricePerMessage={pricePerMessage} />}
+    {show && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
+    {show && <BottomBar chat={chat} pricePerMessage={pricePerMessage} 
+      replyUuid={replyUuid} setReplyUUID={setReplyUUID}
+    />}
     <Snackbar
       visible={showPricePerMessage}
       duration={1000}

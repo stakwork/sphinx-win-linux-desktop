@@ -161,6 +161,11 @@ export class UiStore {
     this.is24HourFormat = is24Hour
   }
 
+  @observable replyUUID: string
+  @action async setReplyUUID(s) {
+    this.replyUUID = s
+  }
+
 }
 
 export const uiStore = new UiStore()

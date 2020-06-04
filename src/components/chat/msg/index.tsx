@@ -1,18 +1,21 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
-import {View, Clipboard, Text} from 'react-native'
+import {View, Clipboard, StyleSheet} from 'react-native'
 import {constantCodes, constants} from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
 import GroupNotification from './groupNotification'
 import Popup from './popup'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
-
+import {SwipeRow} from 'react-native-swipe-list-view'
+import {IconButton} from 'react-native-paper'
+ 
 export default function MsgRow(props){
   const [copied, setCopied] = useState(false)
+  const [showReply, setShowReply] = useState(false)
   function onCopy(msg){
     ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
@@ -26,6 +29,15 @@ export default function MsgRow(props){
   const isMe = props.sender===1
   const isInvoice = props.type===constants.message_types.invoice
   const isPaid = props.status===constants.statuses.confirmed
+
+  const swipeRowRef = useRef<any>(null)
+  useEffect(()=>{
+    if(!props.replyUuid && showReply) {
+      const sr = swipeRowRef.current
+      if(sr&&sr.closeRow) sr.closeRow()
+      setShowReply(false)
+    }
+  },[props.replyUuid])
 
   const isGroupNotification = props.type===constants.message_types.group_join || props.type===constants.message_types.group_leave
   if(isGroupNotification) {
@@ -46,14 +58,33 @@ export default function MsgRow(props){
       marginTop:props.showInfoBar?20:0
     }}>
     {props.showInfoBar && <InfoBar {...props} />}
-    <View style={{...sharedStyles.bubble,
-      alignSelf: isMe?'flex-end':'flex-start',
-      backgroundColor, borderColor,
-      borderStyle:dashed?'dashed':'solid',
-      overflow:'hidden',
-    }}>
-      <Message {...props} onCopy={onCopy}/>
-    </View>
+    <SwipeRow 
+      ref={swipeRowRef}
+      disableRightSwipe={true} friction={100}
+      rightOpenValue={-60} stopRightSwipe={-60}
+      onRowOpen={()=> {
+        if(props.setReplyUUID&&props.message_content) props.setReplyUUID(props.uuid)
+        setShowReply(true)
+      }}
+      onRowClose={()=> {
+        if(props.setReplyUUID) props.setReplyUUID('')
+        setShowReply(false)
+      }}
+      >
+      <View style={styles.replyWrap}>
+        {showReply && <IconButton icon="reply" size={32} color="#aaa"
+          style={{marginLeft:0,marginRight:15}} 
+        />}
+      </View>
+      <View style={{...sharedStyles.bubble,
+        alignSelf: isMe?'flex-end':'flex-start',
+        backgroundColor, borderColor,
+        borderStyle:dashed?'dashed':'solid',
+        overflow:'hidden',
+      }}>
+        <Message {...props} onCopy={onCopy}/>
+      </View>
+    </SwipeRow>
     {copied && <Popup {...props} />}
   </View>
 }
@@ -80,3 +111,12 @@ function Message(props){
   }
 }
 
+const styles = StyleSheet.create({
+  replyWrap:{
+    width:'100%',
+    display:'flex',
+    justifyContent:'flex-end',
+    flexDirection:'row',
+    alignItems:'center',
+  }
+})
