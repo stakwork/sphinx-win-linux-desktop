@@ -44,6 +44,9 @@ export interface Msg {
 
   sold: boolean // this is a marker to tell if a media has been sold
   showInfoBar: boolean // marks whether to show the date and name
+
+  reply_message_content: string
+  reply_message_sender_alias: string
 }
 
 class MsgStore {
@@ -308,9 +311,6 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
 }
 
 async function decodeSingle(m: Msg){
-  if(m.id===609){
-    console.log("MESSAGE 609!!!!!!")
-  }
   const msg = m
   if(m.message_content) {
     const dcontent = await e2e.decryptPrivate(m.message_content)

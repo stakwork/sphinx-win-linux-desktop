@@ -12,7 +12,8 @@ import Popup from './popup'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {SwipeRow} from 'react-native-swipe-list-view'
 import {IconButton} from 'react-native-paper'
- 
+import ReplyContent from './replyContent' 
+
 export default function MsgRow(props){
   const [copied, setCopied] = useState(false)
   const [showReply, setShowReply] = useState(false)
@@ -82,6 +83,10 @@ export default function MsgRow(props){
         borderStyle:dashed?'dashed':'solid',
         overflow:'hidden',
       }}>
+        {props.reply_message_content && <ReplyContent 
+          reply_message_content={props.reply_message_content}
+          reply_message_sender_alias={props.reply_message_sender_alias}
+        />}
         <Message {...props} onCopy={onCopy}/>
       </View>
     </SwipeRow>

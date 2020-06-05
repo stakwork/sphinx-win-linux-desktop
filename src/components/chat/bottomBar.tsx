@@ -10,6 +10,7 @@ import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import { constants } from '../../constants'
 import AttachmentDialog from './attachmentDialog'
 import EE from '../utils/ee'
+import ReplyContent from './msg/replyContent'
 
 const conversation = constants.chat_types.conversation
 
@@ -17,7 +18,7 @@ const audioRecorderPlayer = new AudioRecorderPlayer()
 
 export default function BottomBar(props) {
   const {chat,pricePerMessage} = props
-  const {ui,msg} = useStores()
+  const {ui,msg,contacts} = useStores()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
@@ -106,66 +107,84 @@ export default function BottomBar(props) {
   const isConversation = chat.type===conversation
   const isTribe = chat.type===constants.chat_types.tribe
   const hideArrows = (inputFocused||text)?true:false
-  return useObserver(()=> <>
-    <View style={{...styles.spacer,height:textInputHeight+20}} />
-    <View style={{...styles.bar,height:textInputHeight+20,bottom:0}}>
-      {!hideArrows && <IconButton icon="arrow-bottom-left" size={32} color="#666"
-        style={{marginLeft:0,marginRight:0}} 
-        disabled={!isConversation}
-        onPress={()=> ui.setPayMode('invoice', chat)}     
-      />}
-      {!hideArrows && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
-        <Icon name="plus" color="#888" size={27} />
-      </TouchableOpacity>}
-      <TextInput textAlignVertical="top"
-        numberOfLines={4}
-        multiline={true} blurOnSubmit={true}
-        onContentSizeChange={e=>{
-          let h = e.nativeEvent.contentSize.height
-          if(h<44) h=44
-          if(h<108) setTextInputHeight(h)
-        }}
-        placeholder="Message..." ref={inputRef}
-        style={{...styles.input,
-          marginLeft:hideArrows?15:0,
-          height:textInputHeight,
-          maxHeight:98
-        }}
-        onFocus={(e)=> setInputFocused(true)}
-        onBlur={()=> setInputFocused(false)}
-        onChangeText={e=> setText(e)}
-        value={text}>
-        {/* <Text>{text}</Text> */}
-      </TextInput>
-      {/* <IconButton icon="microphone-outline" size={32} color="#666"
-        style={{marginLeft:0,marginRight:-4}}
-        onPress={rec}
-      /> */}
-      {!hideArrows && <IconButton icon="arrow-top-right" size={32} color="#666"
-        style={{marginLeft:0,marginRight:0}}
-        disabled={!isConversation}
-        onPress={()=> ui.setPayMode('payment',chat)}
-      />}
-      {hideArrows && <View style={styles.sendButtonWrap}>
-        <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
-          onPress={()=> sendMessage()}>
-          <Icon name="send" size={17} color="white" />
-        </TouchableOpacity>
-      </View>}
 
-      <AttachmentDialog 
-        open={dialogOpen} onClose={()=>setDialogOpen(false)}
-        onPick={res=> tookPic(res)}
-        onChooseCam={()=> setTakingPhoto(true)}
-        doPaidMessage={()=> doPaidMessage()}
-      />
+  let theID = chat&&chat.id
+  const thisChatMsgs = theID && msg.messages[theID]
+  const replyMessage = props.replyUuid&&thisChatMsgs&&thisChatMsgs.find(m=>m.uuid===props.replyUuid)
+  let replyMessageSenderAlias = replyMessage.sender_alias
+  if(!isTribe && !replyMessageSenderAlias && replyMessage.sender){
+    const sender = contacts.contacts.find(c=> c.id===replyMessage.sender)
+    if(sender) replyMessageSenderAlias = sender.alias
+  }
+  let fullHeight=textInputHeight+20
+  if(replyMessage) fullHeight+=48
+  return useObserver(()=> <>
+    <View style={{...styles.spacer,height:fullHeight}} />
+    <View style={{...styles.bar,height:fullHeight,bottom:0}}>
+      {(replyMessage?true:false) && <ReplyContent showClose={true}
+        reply_message_content={replyMessage.message_content}
+        reply_message_sender_alias={replyMessageSenderAlias}
+        extraStyles={{width:'100%',marginTop:inputFocused?0:8,marginBottom:inputFocused?6:0}} 
+        onClose={()=> props.setReplyUUID('')}
+      />}
+      <View style={styles.barInner}>
+        {!hideArrows && <IconButton icon="arrow-bottom-left" size={32} color="#666"
+          style={{marginLeft:0,marginRight:0}} 
+          disabled={!isConversation}
+          onPress={()=> ui.setPayMode('invoice', chat)}     
+        />}
+        {!hideArrows && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+          <Icon name="plus" color="#888" size={27} />
+        </TouchableOpacity>}
+        <TextInput textAlignVertical="top"
+          numberOfLines={4}
+          multiline={true} blurOnSubmit={true}
+          onContentSizeChange={e=>{
+            let h = e.nativeEvent.contentSize.height
+            if(h<44) h=44
+            if(h<108) setTextInputHeight(h)
+          }}
+          placeholder="Message..." ref={inputRef}
+          style={{...styles.input,
+            marginLeft:hideArrows?15:0,
+            height:textInputHeight,
+            maxHeight:98
+          }}
+          onFocus={(e)=> setInputFocused(true)}
+          onBlur={()=> setInputFocused(false)}
+          onChangeText={e=> setText(e)}
+          value={text}>
+          {/* <Text>{text}</Text> */}
+        </TextInput>
+        {/* <IconButton icon="microphone-outline" size={32} color="#666"
+          style={{marginLeft:0,marginRight:-4}}
+          onPress={rec}
+        /> */}
+        {!hideArrows && <IconButton icon="arrow-top-right" size={32} color="#666"
+          style={{marginLeft:0,marginRight:0}}
+          disabled={!isConversation}
+          onPress={()=> ui.setPayMode('payment',chat)}
+        />}
+        {hideArrows && <View style={styles.sendButtonWrap}>
+          <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
+            onPress={()=> sendMessage()}>
+            <Icon name="send" size={17} color="white" />
+          </TouchableOpacity>
+        </View>}
+
+        <AttachmentDialog 
+          open={dialogOpen} onClose={()=>setDialogOpen(false)}
+          onPick={res=> tookPic(res)}
+          onChooseCam={()=> setTakingPhoto(true)}
+          doPaidMessage={()=> doPaidMessage()}
+        />
+      </View>
 
       {takingPhoto && <Portal>
         <Cam onCancel={()=>setTakingPhoto(false)} 
           onSnap={pic=> tookPic(pic)}
         />
       </Portal>}
-
     </View>
   </>)
 }
@@ -179,8 +198,9 @@ const styles=StyleSheet.create({
     flex:1,
     width:'100%',
     maxWidth:'100%',
-    flexDirection:'row',
+    flexDirection:'column',
     alignItems:'center',
+    justifyContent:'center',
     backgroundColor:'white',
     elevation:5,
     borderWidth: 2,
@@ -190,6 +210,12 @@ const styles=StyleSheet.create({
     borderRightWidth: 0,
     position:'absolute',
     zIndex:999,
+  },
+  barInner:{
+    width:'100%',
+    maxWidth:'100%',
+    flexDirection:'row',
+    alignItems:'center',
   },
   input:{
     flex:1,
@@ -227,5 +253,5 @@ const styles=StyleSheet.create({
     display:'flex',
     alignItems:'center',
     justifyContent:'center'
-  }
+  },
 })

@@ -5,6 +5,7 @@ import { ScrollView, RefreshControl, View, Text, StyleSheet, Keyboard } from 're
 import {Chat} from '../../store/chats'
 import Message from './msg'
 import {Msg} from '../../store/msg'
+import {Contact} from '../../store/contacts'
 import moment from 'moment'
 import { constants,constantCodes } from '../../constants'
 import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
@@ -13,7 +14,7 @@ const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,setReplyUUID,replyUuid}){
-  const {msg,chats,ui} = useStores()
+  const {msg,chats,contacts} = useStores()
   const [max, setMax] = useState(0)
   useEffect(()=>{
     (async () => {
@@ -31,7 +32,7 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
-    const messages = processMsgs(msgs, isTribe)
+    const messages = processMsgs(msgs, isTribe, contacts.contacts)
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
@@ -147,7 +148,7 @@ function wait(timeout) {
 }
 
 const hideTypes=['purchase','purchase_accept','purchase_deny']
-function processMsgs(msgs: Msg[], isTribe:boolean){
+function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
   const ms = []
   if(!msgs) return ms
   for(let i=0; i<msgs.length; i++){
@@ -184,6 +185,18 @@ function processMsgs(msgs: Msg[], isTribe:boolean){
           msg.sold = true
         }
       }
+    }
+
+    // reply logic
+    if(typ==='message' && msg.reply_uuid) {
+      const repmsg = msgs.find(m=>m.uuid===msg.reply_uuid)
+      let senderAlias = repmsg.sender_alias
+      if(!senderAlias&&!isTribe&&repmsg.sender){
+        const contact = contacts.find(c=> c.id===repmsg.sender)
+        senderAlias = contact.alias
+      }
+      msg.reply_message_content = repmsg.message_content
+      msg.reply_message_sender_alias = senderAlias
     }
 
     if(hideTypes.includes(typ)) skip=true
