@@ -1,1 +1,1 @@
-June 4 at 9:30 am PST
+June 5 at 2 pm PST
