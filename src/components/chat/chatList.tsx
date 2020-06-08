@@ -35,11 +35,11 @@ export default function ChatList() {
     })
     chatsToShow.sort((a,b)=>{
       const amsgs = msg.messages[a.id]
-      const alastMsg = amsgs&&amsgs[amsgs.length-1]
+      const alastMsg = amsgs&&amsgs[0]
       const then = moment(new Date()).add(-30, 'days')
       const adate = alastMsg&&alastMsg.date?moment(alastMsg.date):then
       const bmsgs = msg.messages[b.id]
-      const blastMsg = bmsgs&&bmsgs[bmsgs.length-1]
+      const blastMsg = bmsgs&&bmsgs[0]
       const bdate = blastMsg&&blastMsg.date?moment(blastMsg.date):then
       return adate.isBefore(bdate) ? 0 : -1
     })
@@ -82,7 +82,7 @@ function ChatRow(props){
   const hasImg = uri?true:false
   return useObserver(()=>{
     const msgs = msg.messages[id||'_']
-    const lastMsg = msgs&&msgs[msgs.length-1]
+    const lastMsg = msgs&&msgs[0]
     const lastMsgText = lastMessageText(lastMsg)
     const hasLastMsg = lastMsgText?true:false
 

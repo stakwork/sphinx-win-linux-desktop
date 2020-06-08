@@ -31,3 +31,30 @@ React-Native Android client for Sphinx network
 - Persist state with mobx-persist (dont directly use AsyncStorage)
 - Incoming websocket messages managed from one interface (*src/store/websocketHandlers.ts*)
 
+
+
+
+
+### note
+```ts
+//add this @types/react-native/index.d.ts
+
+export class VirtualizedList<ItemT> extends React.Component<
+  VirtualizedListProps<ItemT>
+> {
+  scrollToEnd: (params?: { animated?: boolean }) => void;
+  scrollToIndex: (
+    params: {
+      animated?: boolean;
+      index: number;
+      viewOffset?: number;
+      viewPosition?: number;
+    }
+  ) => void;
+  scrollToItem: (
+    params: { animated?: boolean; item: ItemT; viewPosition?: number }
+  ) => void;
+  scrollToOffset: (params: { animated?: boolean; offset: number }) => void;
+  recordInteraction: () => void;
+}
+```

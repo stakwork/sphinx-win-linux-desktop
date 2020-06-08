@@ -47,6 +47,8 @@ export interface Msg {
 
   reply_message_content: string
   reply_message_sender_alias: string
+
+  temp_uid: string // tempory unique id to mark the sent msg, so once returned it we can fill will all values
 }
 
 class MsgStore {
@@ -98,9 +100,18 @@ class MsgStore {
   @action // only if it contains a "chat"
   async gotNewMessage(m) {
     let newMsg = await decodeSingle(m)
+    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    if(chatID){
+      putIn(this.messages, newMsg, chatID)
+      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
+    }
+  }
+
+  async messagePosted(m) {
+    let newMsg = await decodeSingle(m)
     if(newMsg.chat && newMsg.chat.id){
-      putIn(this.messages, newMsg)
-      chatStore.gotChat(newMsg.chat)
+      const idx = this.messages[newMsg.chat.id].findIndex(m=>m.id===-1)
+      this.messages[newMsg.chat.id][idx] = m
     }
   }
 
@@ -131,9 +142,14 @@ class MsgStore {
         amount:amount||0,
         reply_uuid
       }
+      
       console.log(v)
       const r = await relay.post('messages', v)
       this.gotNewMessage(r)
+      
+      // putIn(this.messages, {...v,id:-1,sender:1,date:moment().toISOString(),type:0,message_content:text}, chat_id)
+      // const r = await relay.post('messages', v)
+      // this.messagePosted(r)
     } catch(e) {
       console.log(e)
     }
@@ -336,7 +352,7 @@ function orgMsgs(messages: Msg[]) {
   const orged: {[k:number]:Msg[]} = {}
   messages.forEach(msg=>{
     if(msg.chat && msg.chat.id){
-      putIn(orged, msg)
+      putIn(orged, msg, msg.chat.id)
     }
   })
   return orged
@@ -346,21 +362,24 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
   const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(allMsgs))
   messages.forEach(msg=>{
     if(msg.chat && msg.chat.id){
-      putIn(allms, msg) // THIS IS TOO HEAVY in a for each
+      putIn(allms, msg, msg.chat.id) // THIS IS TOO HEAVY in a for each
     }
   })
   return allms
 }
 
-function putIn(orged, msg){
-  if(msg.chat&&msg.chat.id){
-    if(orged[msg.chat.id]){
-      const existing = orged[msg.chat.id].find(m=>m.id===msg.id)
-      if(!existing) orged[msg.chat.id].push(msg)
-    } else {
-      orged[msg.chat.id] = [msg]
-    }
+function putIn(orged, msg, chatID){
+  if(!chatID) return
+  if(orged[chatID]){
+    const existing = orged[chatID].find(m=>m.id===msg.id)
+    if(!existing) orged[chatID].unshift(msg)
+  } else {
+    orged[chatID] = [msg]
   }
 }
 
 export const msgStore = new MsgStore()
+
+function rando(){
+  return Math.random().toString(12).substring(0)
+}

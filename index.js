@@ -11,7 +11,7 @@ YellowBox.ignoreWarnings([
 global._fetch = fetch;
 global.fetch = function (uri, options, ...args) {
   return global._fetch(uri, options, ...args).then((response) => {
-    console.log('-> fetch:', { request: { uri, options, ...args }, response });
+    // console.log('-> fetch:', { request: { uri, options, ...args }, response });
     return response;
   });
 };

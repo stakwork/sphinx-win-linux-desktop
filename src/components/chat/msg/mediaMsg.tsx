@@ -7,6 +7,7 @@ import {useCachedEncryptedFile} from './hooks'
 import {ActivityIndicator,Button} from 'react-native-paper'
 import AudioPlayer from './audioPlayer'
 import {parseLDAT} from '../../utils/ldat'
+import Video from 'react-native-video';
 
 export default function MediaMsg(props){  
   const {meme,ui,msg} = useStores()
@@ -125,6 +126,10 @@ function Media({type,data,uri}){
   if(type.startsWith('audio')) {
     return <AudioPlayer source={uri||data} />
   }
+  if(type.startsWith('video') && uri) {
+    return <Video source={{uri}} style={styles.backgroundVideo} />
+  }
+  return <></>
 }
 
 const styles = StyleSheet.create({
@@ -211,5 +216,12 @@ const styles = StyleSheet.create({
     alignItems:'center',
     position:'absolute',
     top:0,left:0,right:0,bottom:0,
+  },
+  backgroundVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   },
 })

@@ -78,6 +78,7 @@
     "react-native-url-preview": "^1.1.6",
     "react-native-uuid": "^1.4.9",
     "react-native-vector-icons": "^6.6.0",
+    "react-native-video": "^4.4.5",
     "react-native-viewport-units": "0.0.5",
     "react-native-web": "~0.11.7",
     "react-native-webrtc": "git+https://github.com/openland/react-native-webrtc.git",

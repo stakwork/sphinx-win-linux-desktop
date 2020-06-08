@@ -1,7 +1,7 @@
 import React, {useRef, useState, useCallback, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-import { ScrollView, RefreshControl, View, Text, StyleSheet, Keyboard } from 'react-native'
+import { VirtualizedList, InteractionManager, View, Text, StyleSheet, Keyboard } from 'react-native'
 import {Chat} from '../../store/chats'
 import Message from './msg'
 import {Msg} from '../../store/msg'
@@ -15,15 +15,6 @@ const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,setReplyUUID,replyUuid}){
   const {msg,chats,contacts} = useStores()
-  const [max, setMax] = useState(0)
-  useEffect(()=>{
-    (async () => {
-      setMax(10) // first render just 10
-      await sleep(150)
-      setMax(Infinity) // then the rest
-    })()
-  },[])
-
   const isTribe = chat.type===tribe
   return useObserver(()=>{
     let theID = chat.id
@@ -32,17 +23,20 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
+    const msgsLength = (msgs&&msgs.length)||0
     const messages = processMsgs(msgs, isTribe, contacts.contacts)
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
-    let final = []
-    if(max) final = filtered.slice(0).slice(max * -1)
-    return <MsgList msgs={final} chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />
+    // let final = []
+    // if(max) final = filtered.slice(0).slice(max * -1)
+    return <MsgList msgs={filtered} msgsLength={msgsLength} 
+      chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid}
+    />
   })
 }
 
-function MsgList({msgs, chat, setReplyUUID, replyUuid}) {
+function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
   const scrollViewRef = useRef(null)
   const [y,setY] = useState(0)
 
@@ -60,43 +54,76 @@ function MsgList({msgs, chat, setReplyUUID, replyUuid}) {
 
   useEffect(()=>{
     setTimeout(()=>{
-      scrollViewRef.current.scrollToEnd({duration: 500})
+      if(scrollViewRef&&scrollViewRef.current&&msgs.length) {
+        scrollViewRef.current.scrollToOffset({offset:0})
+      }
     },500)
     Keyboard.addListener('keyboardDidShow', e=>{
-      if(scrollViewRef.current) {
-        scrollViewRef.current.scrollToEnd({duration: 500})
+      if(scrollViewRef&&scrollViewRef.current&&msgs.length) {
+        scrollViewRef.current.scrollToOffset({offset:0})
       }
     })
-  },[msgs.length])
+  },[msgsLength])
 
   const isGroup = chat.type===group
   const isTribe = chat.type===tribe
+  const initialNumToRender = 9
   return useObserver(()=> 
-    <ScrollView style={styles.scroller}
-      contentContainerStyle={{flexGrow:1}} // add paddingBottom?
+    <VirtualizedList
+      inverted
       ref={scrollViewRef}
-      onScroll={e=> {
+      data={msgs}
+      extraData={msgs.length}
+      initialNumToRender={initialNumToRender}
+      initialScrollIndex={0}
+      renderItem={({item,index}) => {
+        return <ListItem key={index}
+          m={item} i={index} y={y} chat={chat} 
+          isGroup={isGroup} isTribe={isTribe}
+          replyUuid={replyUuid} setReplyUUID={setReplyUUID}
+        />
+      }}
+      keyExtractor={(item:any)=> item.index+''}
+      getItemCount={()=>msgs.length}
+      getItem={(data,index)=>({...data[index],index})}
+      onScrollToIndexFailed={e=>console.log('onScrollToIndexFailed',e)}
+      ListHeaderComponent={<View style={{height:13}} />}
+      onScroll={e=>{
         const y = e.nativeEvent.contentOffset.y
         debounce(()=> setY(y), 50)
       }}
-      horizontal={false}
-      // onContentSizeChange={(w, h) => scrollToBottom(h)}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View style={styles.msgList}>
-        {msgs.map((m,i)=> {
-          if (typeof m==='string') {
-            return <DateLine key={i} dateString={m} />
-          }
-          const msg=m
-          if(!m.chat) msg.chat = chat
-          return <Message key={i} {...m} y={y} isGroup={isGroup} isTribe={isTribe} 
-            setReplyUUID={setReplyUUID} replyUuid={replyUuid}
-          />
-        })}
-        <View style={{height:20,width:'100%'}} />
-      </View>
-    </ScrollView>
+    />
+    // <ScrollView style={styles.scroller}
+    //   contentContainerStyle={{flexGrow:1}} // add paddingBottom?
+    //   ref={scrollViewRef}
+    //   onScroll={e=> {
+    //     const y = e.nativeEvent.contentOffset.y
+    //     debounce(()=> setY(y), 50)
+    //   }}
+    //   horizontal={false}
+    //   // onContentSizeChange={(w, h) => scrollToBottom(h)}
+    //   refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+    //   <View style={styles.msgList}>
+    //     {msgs.map((m,i)=> <ListItem key={i}
+    //       m={m} i={i} y={y} chat={chat} 
+    //       isGroup={isGroup} isTribe={isTribe}
+    //       replyUuid={replyUuid} setReplyUUID={setReplyUUID}
+    //     />)}
+    //     <View style={{height:20,width:'100%'}} />
+    //   </View>
+    // </ScrollView>
   )
+}
+
+function ListItem({m,i,chat,isGroup,isTribe,setReplyUUID,replyUuid,y}){
+  if (m.dateLine) {
+    return <DateLine dateString={m.dateLine} />
+  }
+  const msg=m
+  if(!m.chat) msg.chat = chat
+  return <Message {...m} y={y} isGroup={isGroup} isTribe={isTribe} 
+    setReplyUUID={setReplyUUID} replyUuid={replyUuid}
+  />
 }
 
 function DateLine({dateString}){
@@ -205,11 +232,12 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
   return ms
 }
 
+// LIST IS REVERSED
 // need to filter out purchase, purchase_accept, purchase_deny
 const filterOut = ['purchase','purchase_accept','purchase_deny']
 function getPrevious(msgs: Msg[], i:number){
-  if(i===0) return null
-  const previous = msgs[i-1]
+  if(i===msgs.length-1) return null
+  const previous = msgs[i+1]
   const mtype = constantCodes['message_types'][previous.type]
   if(filterOut.includes(mtype)) {
     return getPrevious(msgs, i-1)
@@ -239,7 +267,7 @@ function injectDates(msgs: Msg[]){
     const msg = msgs[i]
     const dateString = moment(msg.date).format('dddd DD')
     if(dateString !== currentDate){
-      ms.splice(i===0?0:i+1, 0, dateString) // inject date string
+      if(i>0) ms.splice(i+1, 0, {dateLine:currentDate}) // inject date string
       currentDate = dateString
     }
     ms.push(msg)

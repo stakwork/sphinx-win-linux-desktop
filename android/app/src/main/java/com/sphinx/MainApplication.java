@@ -6,6 +6,7 @@ import android.webkit.WebView;
 import com.oney.WebRTCModule.WebRTCModulePackage;
 
 import com.facebook.react.ReactApplication;
+import com.brentvatne.react.ReactVideoPackage;
 import io.sua.RNDeviceTimeFormatPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import org.linusu.RNGetRandomValuesPackage;
@@ -51,6 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new WebRTCModulePackage(),
           new MainReactPackage(),
+            new ReactVideoPackage(),
             new RNDeviceTimeFormatPackage(),
             new ReactNativePushNotificationPackage(),
           new RNGetRandomValuesPackage(),
