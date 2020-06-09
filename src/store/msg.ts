@@ -143,13 +143,15 @@ class MsgStore {
         reply_uuid
       }
       
-      console.log(v)
-      const r = await relay.post('messages', v)
-      this.gotNewMessage(r)
+      // console.log(v)
       
-      // putIn(this.messages, {...v,id:-1,sender:1,date:moment().toISOString(),type:0,message_content:text}, chat_id)
       // const r = await relay.post('messages', v)
-      // this.messagePosted(r)
+      // console.log("GOT IT BABY@")
+      // this.gotNewMessage(r)
+      
+      putIn(this.messages, {...v,id:-1,sender:1,date:moment().toISOString(),type:0,message_content:text}, chat_id)
+      const r = await relay.post('messages', v)
+      this.messagePosted(r)
     } catch(e) {
       console.log(e)
     }

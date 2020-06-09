@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
 import RNFetchBlob from 'rn-fetch-blob'
-import {parseLDAT} from '../../utils/ldat'
 import {useStores} from '../../../store'
 import * as aes from '../../../crypto/aes'
 import {decode as atob} from 'base-64'

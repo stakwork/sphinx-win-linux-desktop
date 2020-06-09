@@ -95,8 +95,7 @@ function ChatRow(props){
     return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
       onPress={()=> {
         msg.seeChat(props.id)
-        user.reconnectWebsocket()
-        msg.getMessages()
+        // msg.getMessages()
         navigation.navigate('Dashboard',{
           screen:'Chat', params: props
         })

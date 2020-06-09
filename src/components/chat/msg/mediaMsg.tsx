@@ -11,7 +11,6 @@ import Video from 'react-native-video';
 
 export default function MediaMsg(props){  
   const {meme,ui,msg} = useStores()
-  const wrapRef = useRef(null)
   const [buying,setBuying] = useState(false)
   const {message_content, media_type, chat, media_token} = props
   const isMe = props.sender===1
@@ -27,12 +26,8 @@ export default function MediaMsg(props){
   const {data,uri,loading,trigger,paidMessageText} = useCachedEncryptedFile(props,ldat)
 
   useEffect(()=>{
-    if(props.y && wrapRef.current){ // dont run if y=0 (beginning)
-      wrapRef.current.measure((fx, fy, width, height, px, py)=>{
-        if(py>0) trigger()
-      })
-    }
-  },[props.y, props.media_token]) // refresh when scroll, or when purchase accepted
+    if(props.viewable) trigger()
+  },[props.viewable, props.media_token]) // refresh when scroll, or when purchase accepted
 
   async function buy(amount){
     setBuying(true)
@@ -78,7 +73,7 @@ export default function MediaMsg(props){
   let wrapHeight = minHeight
   if(showPurchaseButton) wrapHeight+=38
 
-  return <View ref={wrapRef} collapsable={false}>
+  return <View collapsable={false}>
     <TouchableOpacity style={{...styles.wrap, minHeight:wrapHeight}} 
       //onPressIn={tap} onPressOut={untap} 
       // onLongPress={()=>longPress()}

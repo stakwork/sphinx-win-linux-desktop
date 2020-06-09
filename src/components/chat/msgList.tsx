@@ -1,4 +1,4 @@
-import React, {useRef, useState, useCallback, useEffect} from 'react'
+import React, {useRef, useMemo, useState, useCallback, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import { VirtualizedList, InteractionManager, View, Text, StyleSheet, Keyboard } from 'react-native'
@@ -14,8 +14,9 @@ const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,setReplyUUID,replyUuid}){
-  const {msg,chats,contacts} = useStores()
+  const {msg,chats,contacts,user} = useStores()
   const isTribe = chat.type===tribe
+
   return useObserver(()=>{
     let theID = chat.id
     if(!theID) { // for very beginning, where chat doesnt have id
@@ -24,12 +25,14 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
     }
     const msgs = msg.messages[theID]
     const msgsLength = (msgs&&msgs.length)||0
+    // console.log("RENDER NEW MESSAGE",msgsLength)
     const messages = processMsgs(msgs, isTribe, contacts.contacts)
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
     // let final = []
     // if(max) final = filtered.slice(0).slice(max * -1)
+    // console.log("OK DONE PREOCESSING MSGS")
     return <MsgList msgs={filtered} msgsLength={msgsLength} 
       chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid}
     />
@@ -38,19 +41,13 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
 
 function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
   const scrollViewRef = useRef(null)
-  const [y,setY] = useState(0)
+  const [viewableIds,setViewableIds] = useState([])
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(() => {
     setRefreshing(true)
     wait(2000).then(() => setRefreshing(false))
   }, [refreshing])
-
-  function scrollToBottom(contentHeight) {
-    if (contentHeight > 0) {
-      scrollViewRef.current.scrollToEnd({duration: 500})
-    }
-  }
 
   useEffect(()=>{
     setTimeout(()=>{
@@ -68,62 +65,50 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
   const isGroup = chat.type===group
   const isTribe = chat.type===tribe
   const initialNumToRender = 9
-  return useObserver(()=> 
+  return (
     <VirtualizedList
       inverted
       ref={scrollViewRef}
       data={msgs}
-      extraData={msgs.length}
+      // extraData={msgs.length}
       initialNumToRender={initialNumToRender}
       initialScrollIndex={0}
+      viewabilityConfig={{
+        waitForInteraction: false,
+        viewAreaCoveragePercentThreshold: 20
+      }}
+      onViewableItemsChanged={({viewableItems,changed})=>{
+        debounce(()=>{
+          const ids=(viewableItems&&viewableItems.filter(c=> c.item.id).map(c=> c.item.id))||[]
+          setViewableIds(current=>[...current, ...ids])
+        },200)
+      }}
       renderItem={({item,index}) => {
-        return <ListItem key={index}
-          m={item} i={index} y={y} chat={chat} 
+        return <ListItem key={item.id}
+          viewable={viewableIds.includes(item.id)}
+          m={item} chat={chat} 
           isGroup={isGroup} isTribe={isTribe}
           replyUuid={replyUuid} setReplyUUID={setReplyUUID}
-        />
+        /> 
       }}
-      keyExtractor={(item:any)=> item.index+''}
+      keyExtractor={(item:any)=> item.id+''}
       getItemCount={()=>msgs.length}
-      getItem={(data,index)=>({...data[index],index})}
-      onScrollToIndexFailed={e=>console.log('onScrollToIndexFailed',e)}
+      getItem={(data,index)=>(data[index])}
       ListHeaderComponent={<View style={{height:13}} />}
-      onScroll={e=>{
-        const y = e.nativeEvent.contentOffset.y
-        debounce(()=> setY(y), 50)
-      }}
     />
-    // <ScrollView style={styles.scroller}
-    //   contentContainerStyle={{flexGrow:1}} // add paddingBottom?
-    //   ref={scrollViewRef}
-    //   onScroll={e=> {
-    //     const y = e.nativeEvent.contentOffset.y
-    //     debounce(()=> setY(y), 50)
-    //   }}
-    //   horizontal={false}
-    //   // onContentSizeChange={(w, h) => scrollToBottom(h)}
-    //   refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-    //   <View style={styles.msgList}>
-    //     {msgs.map((m,i)=> <ListItem key={i}
-    //       m={m} i={i} y={y} chat={chat} 
-    //       isGroup={isGroup} isTribe={isTribe}
-    //       replyUuid={replyUuid} setReplyUUID={setReplyUUID}
-    //     />)}
-    //     <View style={{height:20,width:'100%'}} />
-    //   </View>
-    // </ScrollView>
   )
 }
 
-function ListItem({m,i,chat,isGroup,isTribe,setReplyUUID,replyUuid,y}){
+function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable}) {
   if (m.dateLine) {
     return <DateLine dateString={m.dateLine} />
   }
   const msg=m
   if(!m.chat) msg.chat = chat
-  return <Message {...m} y={y} isGroup={isGroup} isTribe={isTribe} 
+  return useMemo(()=> <Message {...msg} viewable={viewable} 
+    isGroup={isGroup} isTribe={isTribe} 
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
-  />
+  />, [viewable,m.id,m.media_token])
 }
 
 function DateLine({dateString}){
@@ -240,7 +225,7 @@ function getPrevious(msgs: Msg[], i:number){
   const previous = msgs[i+1]
   const mtype = constantCodes['message_types'][previous.type]
   if(filterOut.includes(mtype)) {
-    return getPrevious(msgs, i-1)
+    return getPrevious(msgs, i+1)
   }
   return previous
 }
@@ -267,7 +252,7 @@ function injectDates(msgs: Msg[]){
     const msg = msgs[i]
     const dateString = moment(msg.date).format('dddd DD')
     if(dateString !== currentDate){
-      if(i>0) ms.splice(i+1, 0, {dateLine:currentDate}) // inject date string
+      if(i>0) ms.splice(i+1, 0, {dateLine:currentDate,id:rando()}) // inject date string
       currentDate = dateString
     }
     ms.push(msg)
@@ -301,4 +286,8 @@ function debounce(func, delay) {
 
 async function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function rando(){
+  return Math.random().toString(12).substring(0)
 }

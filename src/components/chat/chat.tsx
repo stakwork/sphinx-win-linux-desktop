@@ -49,6 +49,8 @@ export default function Chat(){
     handleBack()
 
     fetchTribeParams()
+
+    user.reconnectWebsocket()
   },[])
 
   async function fetchTribeParams(){
