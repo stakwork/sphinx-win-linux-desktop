@@ -7,7 +7,7 @@ import Form from '../form'
 import * as schemas from '../form/schemas'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
-import {createContactPic,usePicSrc} from '../utils/picSrc'
+import {usePicSrc} from '../utils/picSrc'
 
 export default function EditContact({visible}) {
   const { ui, contacts } = useStores()
@@ -23,10 +23,6 @@ export default function EditContact({visible}) {
       await contacts.updateContact(contact.id, {
         alias: values.alias
       })
-    }
-    if(values.photo){
-      await createContactPic(contact.id, values.photo)
-      contacts.updatePhotoURI(contact.id, values.photo)
     }
     setLoading(false)
     close()

@@ -33,7 +33,6 @@ export default function MsgRow(props){
 
   const swipeRowRef = useRef<any>(null)
   useEffect(()=>{
-    console.log("REPLY UUID CHANGED")
     if(!props.replyUuid && showReply) {
       const sr = swipeRowRef.current
       if(sr&&sr.closeRow) sr.closeRow()
@@ -63,10 +62,13 @@ export default function MsgRow(props){
     <SwipeRow 
       ref={swipeRowRef}
       disableRightSwipe={true} friction={100}
+      disableLeftSwipe={!props.message_content}
       rightOpenValue={-60} stopRightSwipe={-60}
       onRowOpen={()=> {
-        if(props.setReplyUUID&&props.message_content) props.setReplyUUID(props.uuid)
-        setShowReply(true)
+        if(props.setReplyUUID&&props.message_content) {
+          props.setReplyUUID(props.uuid)
+          setShowReply(true)
+        }
       }}
       onRowClose={()=> {
         if(props.setReplyUUID) props.setReplyUUID('')

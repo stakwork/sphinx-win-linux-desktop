@@ -33,7 +33,6 @@ export interface Contact {
 
   invite: Invite
 
-  photo_uri: string
 }
 
 export interface Invite {
@@ -55,6 +54,7 @@ class ContactStore {
   async getContacts() {
     try {
       const r = await relay.get('contacts')
+      console.log(r)
       if(r.contacts) {
         this.contacts = r.contacts
         const me = r.contacts.find(c=> c.id===1)
@@ -89,6 +89,7 @@ class ContactStore {
       const existingContact = this.contacts.find(c=> c.id===r.id)
       if(existingContact) {
         if(r.alias) existingContact.alias = r.alias
+        if(r.photo_url) existingContact.photo_url = r.photo_url
         existingContact.from_group = r.fromGroup||false
       } else {
         this.contacts = [...this.contacts, r]
@@ -139,9 +140,7 @@ class ContactStore {
   @action
   async uploadProfilePic(file, params:{[k:string]:any}) {
     try {
-      console.log("UPLOAD DATA:",file, params)
       const data = createFormData(file, params)
-      console.log("FORM DATA",data)
       const r = await relay.upload(`upload`, data)
       console.log(r)
     } catch(e) {

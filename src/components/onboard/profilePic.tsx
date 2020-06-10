@@ -5,9 +5,10 @@ import {useObserver} from 'mobx-react-lite'
 import {Button, IconButton} from 'react-native-paper'
 import Slider from '../utils/slider'
 import ImagePicker from 'react-native-image-picker';
+import RNFetchBlob from 'rn-fetch-blob'
 
 export default function ProfilePic({z,show,onDone,onBack}) {
-  const {contacts, user} = useStores()
+  const {contacts, user, meme} = useStores()
   const [uploading, setUploading] = useState(false)
   const [img, setImg] = useState(null)
 
@@ -22,12 +23,49 @@ export default function ProfilePic({z,show,onDone,onBack}) {
   async function finish(){
     if(img) {
       setUploading(true)
-      await contacts.uploadProfilePic(img, {
-        contact_id:1,
-      })
+      const url = await upload(img.uri)
+      if(url){
+        await contacts.updateContact(1, {
+          photo_url: url,
+        })
+      }
       setUploading(false)
     }
     onDone()
+  }
+
+  async function upload(uri){
+
+    const type = 'image/jpg'
+    const name = 'Image.jpg'
+    const server = meme.getDefaultServer()
+    if(!server) return ''
+
+    RNFetchBlob.fetch('POST', `https://${server.host}/public`, {
+      Authorization: `Bearer ${server.token}`,
+      'Content-Type': 'multipart/form-data'
+    }, [{
+        name:'file',
+        filename:name,
+        type: type,
+        data: RNFetchBlob.wrap(uri)
+      }, {name:'name', data:name}
+    ])
+    .uploadProgress({ interval : 250 },(written, total) => {
+      console.log('uploaded', written / total)
+    })
+    .then(async (resp) => {
+      let json = resp.json()
+      if(json.muid){
+        return `https://${server.host}/public/${json.muid}`
+      }
+      setUploading(false)
+    })
+    .catch((err) => {
+       console.log(err)
+       setUploading(false)
+       return ''
+    })
   }
 
   return useObserver(()=> {

@@ -12,14 +12,14 @@ const contact = [
     required: true,
     validator: Yup.string().required(rq),
   },
-  {
-    name:'photo',
-    type:'photo',
-    label:{
-      en:'Profile Image',
-      es:'Imagen'
-    }
-  },
+  // {
+  //   name:'photo',
+  //   type:'photo',
+  //   label:{
+  //     en:'Profile Image',
+  //     es:'Imagen'
+  //   }
+  // },
   {
     name:'public_key',
     type:'pubkey',

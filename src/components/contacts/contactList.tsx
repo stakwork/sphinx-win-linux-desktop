@@ -21,7 +21,7 @@ export default function ContactList() {
         style={styles.list}
         sections={grouper(contactsNotFromGroups)}
         keyExtractor={(item:{[k:string]:any}, index) => {
-          return item.alias+index
+          return item.alias+index+item.photo_url
         }}
         renderItem={({ item }) => <Item contact={item} 
           onPress={contact=> ui.setEditContactModal(contact)} 
@@ -41,7 +41,6 @@ function Item({ contact, onPress }) {
   
   const uri = usePicSrc(contact)
   const hasImg = uri?true:false
-
   return (
     <SwipeRow disableRightSwipe={true} friction={100}
       rightOpenValue={-80} stopRightSwipe={-80}>

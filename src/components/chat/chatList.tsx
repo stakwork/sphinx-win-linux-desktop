@@ -79,10 +79,10 @@ function ChatRow(props){
   const navigation = useNavigation()
   const {msg,user} = useStores()
 
-  let uri = useChatPicSrc(props)
-
-  const hasImg = uri?true:false
   return useObserver(()=>{
+    let uri = useChatPicSrc(props)
+    const hasImg = uri?true:false
+
     const msgs = msg.messages[id||'_']
     const lastMsg = msgs&&msgs[0]
     const lastMsgText = lastMessageText(lastMsg)

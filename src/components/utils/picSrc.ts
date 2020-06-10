@@ -15,8 +15,7 @@ function rnd(){
 
 export function usePicSrc(contact: Contact){
   const [uri, setURI] = useState('')
-  // console.log("CONTACT PHTOO URI",contact.photo_uri)
-  const s = (contact&&contact.photo_uri)||''
+  const s = (contact&&contact.photo_url)
   useEffect(()=>{
     if(contact&&contact.photo_url) {
       setURI(contact.photo_url)
@@ -42,7 +41,7 @@ export function useChatPicSrc(chat: Chat){
   if(isConversation) {
     const cid = chat.contact_ids.find(id=>id!==1)
     const contact = contacts.contacts.find(c=>c.id===cid)
-    s = (contact&&contact.photo_uri)||''
+    s = (contact&&contact.photo_url)||''
   } else {
     s = (chat&&chat.photo_url)||''
   }

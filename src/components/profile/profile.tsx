@@ -30,11 +30,6 @@ export default function Profile() {
     console.log("TOOK PIC")
     setUploading(true)
     try {
-      await createContactPic(1, img.uri)
-      contacts.updatePhotoURI(1, img.uri)
-      // await contacts.uploadProfilePic(img, {
-      //   contact_id:1,
-      // })
       await upload(img.uri)
     } catch(e){
       console.log(e)
@@ -65,6 +60,7 @@ export default function Profile() {
     .then(async (resp) => {
       let json = resp.json()
       if(json.muid){
+        console.log("SET PHOTO URL HERE")
         setPhotoUrl(`https://${server.host}/public/${json.muid}`)
       }
       setUploading(false)
@@ -75,11 +71,10 @@ export default function Profile() {
     })
   }
 
-  const meContact = contacts.contacts.find(c=> c.id===1)
-  const imgURI = usePicSrc(meContact)
-
-  return useObserver(() =>
-    <View style={styles.wrap}>
+  return useObserver(()=> {
+    const meContact = contacts.contacts.find(c=> c.id===1)
+    const imgURI = usePicSrc(meContact)
+    return <View style={styles.wrap}>
       <Header />
       <View style={styles.userInfoSection}>
         <View >
@@ -135,7 +130,7 @@ export default function Profile() {
         />
       </Portal>}
 
-    </View>
+    </View>}
   )
 }
 
