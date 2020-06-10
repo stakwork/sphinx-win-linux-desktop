@@ -58,8 +58,8 @@ function Item({ contact, onPress }) {
         <TouchableOpacity style={styles.contactTouch} activeOpacity={0.5}
           onPress={()=>onPress(contact)}>
           <View style={styles.avatar}>
-            <Image source={hasImg?{uri}:require('../../../assets/avatar.png')} 
-              style={{width:44,height:44}} resizeMode={'cover'}
+            <FastImage source={hasImg?{uri}:require('../../../assets/avatar.png')} 
+              style={{width:44,height:44}} resizeMode={FastImage.resizeMode.cover}
             />
           </View>
           <View style={styles.contactContent}>

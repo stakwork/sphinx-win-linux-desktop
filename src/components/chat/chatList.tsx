@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {useChatPicSrc} from '../utils/picSrc'
 import moment from 'moment'
+import FastImage from 'react-native-fast-image'
 
 export default function ChatList() {
   const {ui,chats,contacts,msg} = useStores()
@@ -102,8 +103,8 @@ function ChatRow(props){
       }}>
       <View style={styles.avatarWrap}>
         <View style={styles.avatar}>
-          <Image source={hasImg?{uri}:require('../../../assets/avatar.png')}
-            style={{width:52,height:52}} resizeMode={'cover'}
+          <FastImage source={hasImg?{uri}:require('../../../assets/avatar.png')}
+            style={{width:52,height:52}} resizeMode={FastImage.resizeMode.cover}
           />
         </View>
         {hasUnseen && <View style={moreStyles.badgeWrap}>

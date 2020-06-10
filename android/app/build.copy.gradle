@@ -164,6 +164,7 @@ dependencies {
     implementation project(':react-native-image-picker')
     implementation project(':react-native-camera')
 
+    compile project(':react-native-fast-image')
     implementation project(':react-native-audio-recorder-player')
     implementation project(':react-native-webview')
     implementation project(':rn-fetch-blob')
