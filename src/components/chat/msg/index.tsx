@@ -33,6 +33,7 @@ export default function MsgRow(props){
 
   const swipeRowRef = useRef<any>(null)
   useEffect(()=>{
+    console.log("REPLY UUID CHANGED")
     if(!props.replyUuid && showReply) {
       const sr = swipeRowRef.current
       if(sr&&sr.closeRow) sr.closeRow()

@@ -10,12 +10,11 @@ import {randAscii} from '../../crypto/rand'
 
 const conversation = constants.chat_types.conversation
 
-export default function Header({chatID}) {
+export default function Header({chat}:{chat:Chat}) {
   const {contacts,ui,msg,details,chats} = useStores()
   const navigation = useNavigation()
 
   return useObserver(()=> {
-    const chat = chats.chats.find(c=> c.id===chatID)
     let contact
     if(chat && chat.type===conversation){
       contact = contactForConversation(chat, contacts.contacts)

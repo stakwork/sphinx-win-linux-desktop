@@ -18,7 +18,7 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
   const isTribe = chat&&chat.type===tribe
 
   return useObserver(()=>{
-    let theID = chat.id
+    let theID = (chat&&chat.id)
     if(!theID) { // for very beginning, where chat doesnt have id
       const theChat = chats.chats.find(ch=>ch.type===0 && arraysEqual(ch.contact_ids, chat.contact_ids)) // this is the problem
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
@@ -70,7 +70,7 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
       inverted
       ref={scrollViewRef}
       data={msgs}
-      // extraData={msgs.length}
+      extraData={replyUuid}
       initialNumToRender={initialNumToRender}
       initialScrollIndex={0}
       viewabilityConfig={{
@@ -108,7 +108,7 @@ function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable}) {
   return useMemo(()=> <Message {...msg} viewable={viewable} 
     isGroup={isGroup} isTribe={isTribe} 
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
-  />, [viewable,m.id,m.media_token])
+  />, [viewable,m.id,m.media_token,replyUuid])
 }
 
 function DateLine({dateString}){

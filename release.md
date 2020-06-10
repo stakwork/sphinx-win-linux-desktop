@@ -1,1 +1,1 @@
-June 9 at 5 pm PST
+June 10 at noon PST

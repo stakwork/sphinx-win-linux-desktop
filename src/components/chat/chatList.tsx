@@ -22,6 +22,7 @@ export default function ChatList() {
     })
     setRefreshing(true)
     await contacts.getContacts()
+    msg.getMessages()
     setRefreshing(false)
   }, [refreshing])
 

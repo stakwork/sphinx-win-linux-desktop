@@ -34,7 +34,7 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
 }
 
 export function contactForConversation(chat: Chat, contacts: Contact[]){
-  if(chat.type===conversation){
+  if(chat && chat.type===conversation){
     const cid = chat.contact_ids.find(id=>id!==1)
     return contacts.find(c=> c.id===cid)
   }

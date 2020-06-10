@@ -20,7 +20,8 @@ export default function Chat(){
   const {contacts,user,chats} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
-  const chat = chats.chats.find(c=>c.id===chatID)
+  const chat = chats.chats.find(c=>c.id===chatID) || route.params
+  console.log("CHAT",chat)
 
   const navigation = useNavigation()
 
@@ -54,7 +55,7 @@ export default function Chat(){
   },[])
 
   async function fetchTribeParams(){
-    const isTribe = chat.type===constants.chat_types.tribe
+    const isTribe = chat&&chat.type===constants.chat_types.tribe
     const isTribeAdmin = isTribe && chat.owner_pubkey===user.publicKey
     if(isTribe && !isTribeAdmin){
       const params = await chats.getTribeDetails(chat.host,chat.uuid)
@@ -66,7 +67,7 @@ export default function Chat(){
   }
 
   return <View style={styles.main}>
-    <Header chatID={chatID} />
+    <Header chat={chat} />
     {!show && <View style={styles.loadWrap}>
       <ActivityIndicator animating={true} color="grey" />
     </View>}
