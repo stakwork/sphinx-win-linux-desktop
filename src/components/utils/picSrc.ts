@@ -18,12 +18,16 @@ export function usePicSrc(contact: Contact){
   // console.log("CONTACT PHTOO URI",contact.photo_uri)
   const s = (contact&&contact.photo_uri)||''
   useEffect(()=>{
+    if(contact&&contact.photo_url) {
+      setURI(contact.photo_url)
+      return
+    } 
     (async () => {
       if(!contact) {
         setURI('')
       } else {
         const src = await contactPicSrc(contact.id)
-        if(src&&src.uri) setURI(src.uri+rnd())
+        if(src&&src.uri) setURI('file://'+src.uri+rnd())
       }
     })()
   },[s])

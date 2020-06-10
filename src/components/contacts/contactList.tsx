@@ -5,6 +5,7 @@ import { TouchableOpacity, ScrollView, SectionList, View, Text, StyleSheet, Imag
 import {SwipeRow} from 'react-native-swipe-list-view'
 import {IconButton} from 'react-native-paper'
 import {usePicSrc} from '../utils/picSrc'
+import FastImage from 'react-native-fast-image'
 
 export default function ContactList() {
   const {ui, contacts} = useStores()
@@ -39,8 +40,8 @@ function Item({ contact, onPress }) {
   const {ui, contacts} = useStores()
   
   const uri = usePicSrc(contact)
-  
   const hasImg = uri?true:false
+
   return (
     <SwipeRow disableRightSwipe={true} friction={100}
       rightOpenValue={-80} stopRightSwipe={-80}>
@@ -57,7 +58,7 @@ function Item({ contact, onPress }) {
         <TouchableOpacity style={styles.contactTouch} activeOpacity={0.5}
           onPress={()=>onPress(contact)}>
           <View style={styles.avatar}>
-            <Image source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')} 
+            <Image source={hasImg?{uri}:require('../../../assets/avatar.png')} 
               style={{width:44,height:44}} resizeMode={'cover'}
             />
           </View>

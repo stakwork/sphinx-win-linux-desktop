@@ -44,7 +44,7 @@ export default function EditContact({visible}) {
           initialValues={contact?{
             alias: contact.alias,
             public_key: contact.public_key,
-            photo: uri?`file://${uri}`:''
+            photo: uri||''
           }:{}}
           readOnlyFields={'public_key'}
           onSubmit={values=> updateContact(values)}

@@ -25,7 +25,7 @@ export default function TheDrawer(props) {
           <View style={styles.userInfoSection}>
             <View style={styles.userName}>
               <Image resizeMode="cover" 
-                source={hasImg?{uri:'file://'+uri}:require('../../../assets/avatar.png')}
+                source={hasImg?{uri}:require('../../../assets/avatar.png')}
                 style={{width:50,height:50,borderRadius:25}}
               />
               <Title style={styles.title}>{user.alias}</Title>
