@@ -11,15 +11,18 @@ import Form from '../form'
 import Cam from '../utils/cam'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 import {createContactPic, usePicSrc} from '../utils/picSrc'
+import RNFetchBlob from 'rn-fetch-blob'
 
 // no contact_id!
 // http://x.x.x.x/static/uploads/undefined_profile_picture.jpeg
 
 export default function Profile() {
-  const { details, user, contacts } = useStores()
+  const { details, user, contacts, meme } = useStores()
   const [uploading, setUploading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
+  const [saving,setSaving] = useState(false)
+  const [photo_url, setPhotoUrl] = useState('')
 
   async function tookPic(img){
     setDialogOpen(false)
@@ -32,10 +35,44 @@ export default function Profile() {
       // await contacts.uploadProfilePic(img, {
       //   contact_id:1,
       // })
-    }catch(e){
+      await upload(img.uri)
+    } catch(e){
       console.log(e)
+      setUploading(false)
     }
-    setUploading(false)
+  }
+
+  async function upload(uri){
+
+    const type = 'image/jpg'
+    const name = 'Image.jpg'
+    const server = meme.getDefaultServer()
+    if(!server) return
+
+    RNFetchBlob.fetch('POST', `https://${server.host}/public`, {
+      Authorization: `Bearer ${server.token}`,
+      'Content-Type': 'multipart/form-data'
+    }, [{
+        name:'file',
+        filename:name,
+        type: type,
+        data: RNFetchBlob.wrap(uri)
+      }, {name:'name', data:name}
+    ])
+    .uploadProgress({ interval : 250 },(written, total) => {
+      console.log('uploaded', written / total)
+    })
+    .then(async (resp) => {
+      let json = resp.json()
+      if(json.muid){
+        setPhotoUrl(`https://${server.host}/public/${json.muid}`)
+      }
+      setUploading(false)
+    })
+    .catch((err) => {
+       console.log(err)
+       setUploading(false)
+    })
   }
 
   const meContact = contacts.contacts.find(c=> c.id===1)
@@ -64,17 +101,27 @@ export default function Profile() {
           </View>
         </View>
       </View>
-      <Card>
-        <Card.Content style={{height:250}}>
-          <Form schema={me}
-            displayOnly
-            initialValues={{
-              alias: user.alias,
-              public_key: user.publicKey
-            }}
-          />
-        </Card.Content>
-      </Card>
+      <View style={{backgroundColor:'white',flex:1,paddingBottom:30}}>
+        <Form schema={me} loading={saving}
+          buttonText="Save"
+          readOnlyFields={['public_key']}
+          forceEnable={photo_url}
+          initialValues={{
+            alias: user.alias,
+            public_key: user.publicKey,
+            private_photo: meContact.private_photo||false
+          }}
+          onSubmit={async values=> {
+            setSaving(true)
+            await contacts.updateContact(1,{
+              alias: values.alias,
+              private_photo: values.private_photo,
+              ...photo_url && {photo_url},
+            })
+            setSaving(false)
+          }}
+        />
+      </View>
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}

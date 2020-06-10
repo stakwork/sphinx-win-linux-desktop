@@ -50,6 +50,15 @@ const me = [
     },
     required: true,
     validator: Yup.string().required(rq),
+  },
+  {
+    name:'private_photo',
+    type:'radio',
+    inverted:true,
+    label:{
+      en:'Share your Profile Photo with Contacts'
+    },
+    required:false
   }
 ]
 

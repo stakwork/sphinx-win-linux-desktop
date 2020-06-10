@@ -51,7 +51,7 @@ export default function InfoBar(props){
           style={{marginRight:4,marginLeft:4}}
         />}
         {isMe && isReceived && <Icon 
-          name="check" size={14} color="#64C684" 
+          name="flash" size={14} color="#64C684" 
           style={{marginRight:showLock?0:4}}
         />}
       </View>

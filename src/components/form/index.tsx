@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Formik } from 'formik'
 import { Button } from 'react-native-paper'
@@ -10,10 +10,10 @@ export default function Form(props) {
   return (
     <Formik
       initialValues={props.initialValues||{}}
-      onSubmit={values => props.onSubmit(values)}
+      onSubmit={values=> props.onSubmit(values)}
       validationSchema={validator(props.schema)}
       validateOnChange={false}>
-      {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, errors }) => {
+      {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, errors, dirty, isValid }) => {
         return (<View style={styles.wrap}>
           <View style={styles.topper}>
             {props.schema.map(item=>{
@@ -29,7 +29,9 @@ export default function Form(props) {
             })}
           </View>
           {!props.displayOnly && <View style={styles.buttonWrap}>
-            <Button onPress={handleSubmit} mode="contained"
+            <Button mode="contained"
+              onPress={handleSubmit} 
+              disabled={!props.forceEnable && (!dirty || !isValid)}
               dark={true} style={styles.button} loading={props.loading}>
               {props.buttonText||'Submit'}
             </Button>
@@ -71,12 +73,15 @@ const styles=StyleSheet.create({
     justifyContent:'center',
     position:'absolute',
     bottom:10,left:0,right:0,
+    zIndex:1000
   },
   button:{
     borderRadius:30,
     width:'80%',
     height:60,
     display:'flex',
-    justifyContent:'center'
+    justifyContent:'center',
+    zIndex:999,
+    position:'relative',
   }
 })

@@ -19,6 +19,7 @@ export interface Contact {
   node_alias: string
   alias: string
   photo_url: string
+  private_photo: boolean
   is_owner: boolean
   deleted: boolean
   auth_token: string

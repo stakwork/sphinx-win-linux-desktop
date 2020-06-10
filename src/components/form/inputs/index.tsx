@@ -5,6 +5,7 @@ import Photo from './photo'
 import Tags from './tags'
 import Number from './number'
 import PhotoURI from './photoURI'
+import Radio from './radio'
 
 export default function Input(props){
   switch (props.type) {
@@ -20,6 +21,8 @@ export default function Input(props){
       return <Number {...props} />
     case 'photoURI':
       return <PhotoURI {...props} />
+    case 'radio':
+      return <Radio {...props} />
     default:
       return <TextInput {...props} />
   }

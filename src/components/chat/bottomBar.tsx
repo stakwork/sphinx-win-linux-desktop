@@ -41,8 +41,8 @@ export default function BottomBar(props) {
     })
     setText('')
     props.setReplyUUID('')
-    inputRef.current.blur()
-    setInputFocused(false)
+    // inputRef.current.blur()
+    // setInputFocused(false)
   }
 
   async function tookPic(img){

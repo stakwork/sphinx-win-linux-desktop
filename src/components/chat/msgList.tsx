@@ -15,7 +15,7 @@ const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,setReplyUUID,replyUuid}){
   const {msg,chats,contacts,user} = useStores()
-  const isTribe = chat.type===tribe
+  const isTribe = chat&&chat.type===tribe
 
   return useObserver(()=>{
     let theID = chat.id
