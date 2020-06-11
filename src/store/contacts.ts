@@ -5,14 +5,15 @@ import {subStore} from './subs'
 import {persist} from 'mobx-persist'
 import {createFormData} from '../api/formdata'
 import {userStore} from './user'
+import {detailsStore} from './details'
 
 /*
 invites:
 create, returns contact:{status:0,invite:{}}    ... put in store
 SOCKET when payment pending invite:{status=6, price:50, invite_string}
 "pay" returns invite:{}
-
 */
+
 export interface Contact {
   id: number
   public_key: string
@@ -54,7 +55,6 @@ class ContactStore {
   async getContacts() {
     try {
       const r = await relay.get('contacts')
-      console.log(r)
       if(r.contacts) {
         this.contacts = r.contacts
         const me = r.contacts.find(c=> c.id===1)
@@ -178,6 +178,7 @@ class ContactStore {
     if(inviteContact){
       inviteContact.invite = inv
     }
+    detailsStore.getBalance()
   }
 
   @action

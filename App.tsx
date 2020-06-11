@@ -12,6 +12,7 @@ import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
+import * as rsa from './src/crypto/rsa'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -54,7 +55,6 @@ function App() {
   useEffect(()=>{
     // AsyncStorage.clear()
     // msg.clearAllMessages()
-
     const isSignedUp = (user.currentIP && user.authToken)?true:false
     setSignedUp(isSignedUp)
     if(isSignedUp){

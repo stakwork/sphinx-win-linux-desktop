@@ -10,7 +10,7 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
   const groupChats = chats.filter(c=> c.type!==conversation).map(c=> ({...c}))
   const conversations = []
   contacts.forEach(contact=>{
-    if(contact.id!==1) {
+    if(contact.id!==1 && !contact.from_group) {
       const chatForContact = chats.find(c=>{
         return c.type===conversation && c.contact_ids.includes(contact.id)
       })

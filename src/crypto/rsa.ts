@@ -15,6 +15,12 @@ export async function keyGen() {
   return ''
 }
 
+export async function deletePrivateKey() {
+  try {
+    await RSAKeychain.deletePrivateKey(KEY_TAG)
+  } catch(e){}
+}
+
 // ENCRYPT UTF8
 export async function encrypt(data, pubkey) {
   const key = pubcert(pubkey)

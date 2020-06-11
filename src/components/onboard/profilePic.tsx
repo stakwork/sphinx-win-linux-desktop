@@ -23,7 +23,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
   async function finish(){
     if(img) {
       setUploading(true)
-      const url = await upload(img.uri)
+      const url = await uploadSync(img.uri)
       if(url){
         await contacts.updateContact(1, {
           photo_url: url,
@@ -34,37 +34,42 @@ export default function ProfilePic({z,show,onDone,onBack}) {
     onDone()
   }
 
-  async function upload(uri){
-
-    const type = 'image/jpg'
-    const name = 'Image.jpg'
-    const server = meme.getDefaultServer()
-    if(!server) return ''
-
-    RNFetchBlob.fetch('POST', `https://${server.host}/public`, {
-      Authorization: `Bearer ${server.token}`,
-      'Content-Type': 'multipart/form-data'
-    }, [{
-        name:'file',
-        filename:name,
-        type: type,
-        data: RNFetchBlob.wrap(uri)
-      }, {name:'name', data:name}
-    ])
-    .uploadProgress({ interval : 250 },(written, total) => {
-      console.log('uploaded', written / total)
-    })
-    .then(async (resp) => {
-      let json = resp.json()
-      if(json.muid){
-        return `https://${server.host}/public/${json.muid}`
+  async function uploadSync(uri){
+    return new Promise((resolve,reject)=>{
+      const type = 'image/jpg'
+      const name = 'Image.jpg'
+      const server = meme.getDefaultServer()
+      if(!server) {
+        resolve('')
+        return
       }
-      setUploading(false)
-    })
-    .catch((err) => {
-       console.log(err)
-       setUploading(false)
-       return ''
+      RNFetchBlob.fetch('POST', `https://${server.host}/public`, {
+        Authorization: `Bearer ${server.token}`,
+        'Content-Type': 'multipart/form-data'
+      }, [{
+          name:'file',
+          filename:name,
+          type: type,
+          data: RNFetchBlob.wrap(uri)
+        }, {name:'name', data:name}
+      ])
+      .uploadProgress({ interval : 250 },(written, total) => {
+        console.log('uploaded', written / total)
+      })
+      .then(async (resp) => {
+        let json = resp.json()
+        if(json.muid){
+          resolve(`https://${server.host}/public/${json.muid}`)
+        }
+        setUploading(false)
+        return
+      })
+      .catch((err) => {
+        console.log(err)
+        setUploading(false)
+        resolve('')
+        return
+      })
     })
   }
 

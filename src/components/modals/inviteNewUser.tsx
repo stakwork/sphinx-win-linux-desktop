@@ -22,7 +22,7 @@ export default function InviteNewUser({done}){
       const price = await contacts.getLowestPriceForInvite()
       if(price||price===0) setPrice(price)
     })()
-  })
+  },[])
 
   const hasPrice = price||price===0 
   return <View style={styles.former}>

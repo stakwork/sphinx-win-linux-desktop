@@ -5,6 +5,7 @@ import Welcome from './welcome'
 import NameAndKey from './nameAndKey'
 import Ready from './ready'
 import PIN from './choosePIN'
+import ProfilePic from './profilePic'
 
 /*
 1. scan or enter code, create ip (from invite server), create auth_token in Relay
@@ -16,7 +17,7 @@ import PIN from './choosePIN'
 */
 
 // Final: ProfilePic before Ready
-const steps=[Code,Welcome,PIN,NameAndKey,Ready]
+const steps=[Code,Welcome,PIN,NameAndKey,ProfilePic,Ready]
 export default function Invite({onFinish}) {  
   const [step, setStep] = useState(1)
 

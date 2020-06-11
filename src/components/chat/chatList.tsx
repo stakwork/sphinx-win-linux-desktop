@@ -12,7 +12,7 @@ import moment from 'moment'
 import FastImage from 'react-native-fast-image'
 
 export default function ChatList() {
-  const {ui,chats,contacts,msg} = useStores()
+  const {ui,chats,contacts,msg,details} = useStores()
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async() => {
@@ -23,6 +23,7 @@ export default function ChatList() {
     setRefreshing(true)
     await contacts.getContacts()
     msg.getMessages()
+    details.getBalance()
     setRefreshing(false)
   }, [refreshing])
 
@@ -55,7 +56,7 @@ export default function ChatList() {
         const chatID = (c.id||rando())+''
         let showInvite = false
         if(c.invite && c.invite.status!==4) showInvite=true
-        if(showInvite) return <InviteRow key={i} {...c} />
+        if(showInvite) return <InviteRow key={`invite_${i}`} {...c} />
         return <ChatRow key={chatID} {...c} />
       })}
       <View style={moreStyles.buttonsWrap}>

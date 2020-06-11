@@ -1,16 +1,18 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native'
-import {Dialog, Portal, Button} from 'react-native-paper'
+import {Dialog, Portal, Button, Snackbar} from 'react-native-paper'
 import {constantCodes} from '../../constants'
 import {useStores} from '../../store'
 import moment from 'moment'
 
 export default function InviteRow(props){
-  const {contacts,ui} = useStores()
+  const {contacts,ui,details} = useStores()
   const {name, invite} = props
   const [dialogOpen, setDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [notEnuff,setNotEnuff] = useState(false)
+  const [confirmed,setConfirmed] = useState(false)
   const statusString = constantCodes['invite_statuses'][invite.status]
 
   const expiredStatus = props.invite.status===5
@@ -32,17 +34,20 @@ export default function InviteRow(props){
       <Image style={{height:40,width:40}} source={require('../../../assets/invite_qr.png')} />
     </View>
     <View style={styles.chatContent}>
-      <Text style={styles.chatName}>{`Invite: ${name}`}</Text>
+      <View style={styles.chatContentTop}>
+        <Text style={styles.chatName}>{`Invite: ${name}`}</Text>
+        {invite.price && <Text style={styles.invitePrice}>{invite.price}</Text>}
+      </View>
       <View style={styles.chatMsgWrap}>
         {inviteIcon(statusString)}
-        <Text style={styles.chatMsg}>{inviteMsg(statusString, name)}</Text>
+        <Text style={styles.chatMsg}>{inviteMsg(statusString, name, confirmed)}</Text>
       </View>
     </View>
 
     <Portal>
       <Dialog visible={dialogOpen} style={{bottom:10}}
         onDismiss={()=>setDialogOpen(false)}>
-        <Dialog.Title>Pay for Invitation?</Dialog.Title>
+        <Dialog.Title>{`Pay for invitation?`}</Dialog.Title>
         <Dialog.Actions style={{justifyContent:'space-between'}}>
           <Button onPress={()=>setDialogOpen(false)} labelStyle={{color:'grey'}}>
             <Icon name="cancel" size={14} color="grey" />
@@ -50,15 +55,29 @@ export default function InviteRow(props){
             <Text>Cancel</Text>
           </Button>
           <Button icon="credit-card" loading={loading} onPress={async()=>{
-            setLoading(true)
-            await contacts.payInvite(invite.invite_string)
-            setDialogOpen(false)
-            setLoading(false)
+            const balance = details.balance
+            if(balance<invite.price) {
+              setNotEnuff(true)
+              setDialogOpen(false)
+            } else {
+              setLoading(true)
+              await contacts.payInvite(invite.invite_string)
+              setConfirmed(true)
+              setDialogOpen(false)
+              setLoading(false)
+            }
           }}>
             Confirm
           </Button>
         </Dialog.Actions>
       </Dialog>
+
+      <Snackbar
+        visible={notEnuff}
+        duration={3000}
+        onDismiss={()=> setNotEnuff(false)}>
+        Not enough balance
+      </Snackbar>
     </Portal>
     
   </TouchableOpacity>
@@ -82,12 +101,12 @@ function inviteIcon(statusString){
       return <></>
   }
 }
-function inviteMsg(statusString: string, name: string){
+function inviteMsg(statusString: string, name: string, confirmed?:boolean){
   switch (statusString) {
     case 'pending':
       return `${name} is on the waitlist`
     case 'payment_pending':
-      return 'Tap to pay and activate the invite'
+      return confirmed?'Awaiting confirmation...':'Tap to pay and activate the invite'
     case 'ready':
       return 'Ready! Tap to share. Expires in 24 hours'
     case 'delivered':
@@ -144,7 +163,28 @@ export const styles = StyleSheet.create({
   },
   chatContent:{
     display:'flex',
-    flexDirection:'column'
+    flexDirection:'column',
+    flex:1,
+  },
+  chatContentTop:{
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    flex:1,
+    maxHeight:28
+  },
+  invitePrice:{
+    height:22,
+    color:'white',
+    backgroundColor:'#64c684',
+    paddingLeft:10,
+    paddingRight:10,
+    paddingTop:3,
+    paddingBottom:3,
+    borderRadius:3,
+    fontSize:12,
+    marginRight:20,
   },
   chatName:{
     marginRight:12,

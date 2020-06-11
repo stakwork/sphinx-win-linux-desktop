@@ -86,7 +86,7 @@ export default function MsgRow(props){
         borderStyle:dashed?'dashed':'solid',
         overflow:'hidden',
       }}>
-        {props.reply_message_content && <ReplyContent 
+        {(props.reply_message_content?true:false) && <ReplyContent 
           reply_message_content={props.reply_message_content}
           reply_message_sender_alias={props.reply_message_sender_alias}
         />}
