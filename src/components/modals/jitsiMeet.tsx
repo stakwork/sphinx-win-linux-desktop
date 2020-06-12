@@ -11,6 +11,7 @@ console.log("ASDF",JitsiMeet, JitsiMeetView)
 
 export default function Jitsi() {
   const { ui } = useStores()
+  const [showJitsi, setShowJitsi] = useState(true)
 
   function close(){
     console.log('close!')
@@ -20,7 +21,10 @@ export default function Jitsi() {
 
   }
   function jitsiJoined(){
-
+    setShowJitsi(false);
+    setTimeout(()=>{
+      setShowJitsi(true)
+    },100)
   }
   function jitsiWillJoin(){
 
@@ -45,12 +49,12 @@ export default function Jitsi() {
   return useObserver(() =>
     <View style={styles.wrap}>
       <View style={{ backgroundColor: 'black',flex: 1 }}>
-        <JitsiMeetView 
+        {showJitsi && <JitsiMeetView 
           onConferenceTerminated={jitsiDone}
           onConferenceJoined={jitsiJoined} 
           onConferenceWillJoin={jitsiWillJoin} 
           style={{ flex: 1, height: '100%', width: '100%' }} 
-        />
+        />}
       </View>
       <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true}

@@ -2,9 +2,7 @@ package com.sphinx;
 
 import android.app.Application;
 import android.webkit.WebView;
-
 import com.oney.WebRTCModule.WebRTCModulePackage;
-
 import com.facebook.react.ReactApplication;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
@@ -36,7 +34,6 @@ import com.facebook.soloader.SoLoader;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,10 +50,10 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new WebRTCModulePackage(),
           new MainReactPackage(),
-            new FastImageViewPackage(),
-            new ReactVideoPackage(),
-            new RNDeviceTimeFormatPackage(),
-            new ReactNativePushNotificationPackage(),
+          new FastImageViewPackage(),
+          new ReactVideoPackage(),
+          new RNDeviceTimeFormatPackage(),
+          new ReactNativePushNotificationPackage(),
           new RNGetRandomValuesPackage(),
           new RNGestureHandlerPackage(),
           new VectorIconsPackage(),

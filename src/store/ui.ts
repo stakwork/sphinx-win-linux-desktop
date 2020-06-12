@@ -57,7 +57,10 @@ export class UiStore {
 
   @observable editTribeParams: {[k:string]:any} = null
   @action setEditTribeParams(o) {
-    this.editTribeParams = o
+    this.editTribeParams = o ? {
+      ...o,
+      escrow_time: o.escrow_millis?Math.floor(o.escrow_millis/(60*60*1000)):0
+    } : null
   }
 
   @observable groupModal: boolean = false
@@ -153,6 +156,11 @@ export class UiStore {
   @observable rtcParams: {[k:string]:any} = null
   @action setRtcParams(obj:{[k:string]:any}) {
     this.rtcParams = obj
+  }
+
+  @observable jitsiMeet: boolean = false
+  @action setJitsiMeet(b:boolean) {
+    this.jitsiMeet = b
   }
 
   @observable is24HourFormat: boolean

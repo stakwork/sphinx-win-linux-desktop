@@ -122,8 +122,35 @@ const tribe = [
     },
     validator: Yup.number(),
   },
+  {
+    name:'escrow_amount',
+    type:'number',
+    label:{
+      en:'Escrow Amount',
+      es:'Escrow Amount'
+    },
+    validator: Yup.number(),
+    description: 'A spam protection mechanism: every subscriber pays this fee for each message, which is returned to them after after the amount of hours specific in Escrow Time'
+  },
+  {
+    name:'escrow_time',
+    type:'number',
+    label:{
+      en:'Escrow Time',
+      es:'Escrow Time'
+    },
+    validator: Yup.number(),
+    description: 'The number of hours before the Escrow Amount is returned to the subscriber'
+  },
 ]
 
 export {
   contact, subscribe, me, tribe,
+}
+
+function emptyStringToNull(value, originalValue) {
+  if (typeof originalValue === 'string' && originalValue === '') {
+    return null;
+  }
+  return value;
 }

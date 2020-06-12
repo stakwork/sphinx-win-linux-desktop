@@ -69,12 +69,14 @@ export class ChatStore {
   }
 
   @action 
-  async createTribe({name, description, tags, img, price_per_message, price_to_join}){
+  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time}){
     const r = await relay.post('group', {
       name, description, tags:tags||[],
       is_tribe: true, is_listed:true,
       price_per_message: price_per_message||0,
       price_to_join: price_to_join||0,
+      escrow_amount: escrow_amount||0,
+      escrow_millis: escrow_time?escrow_time*60*60*1000:0,
       img: img||'',
     })
     this.gotChat(r)
@@ -82,12 +84,14 @@ export class ChatStore {
   }
 
   @action 
-  async editTribe({id, name, description, tags, img, price_per_message, price_to_join}){
+  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time}){
     const r = await relay.put(`group/${id}`, {
       name, description, tags:tags||[],
       is_listed:true,
       price_per_message: price_per_message||0,
       price_to_join: price_to_join||0,
+      escrow_amount: escrow_amount||0,
+      escrow_millis: escrow_time?escrow_time*60*60*1000:0,
       img: img||'',
     })
     this.gotChat(r)

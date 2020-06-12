@@ -52,7 +52,10 @@ export default function NewTribe({onFinish}){
       <Form schema={tribe} loading={loading} 
         buttonText={(ui.editTribeParams?'Edit':'Create')+' Group'}
         onSubmit={finish}
-        initialValues={ui.editTribeParams}
+        initialValues={ui.editTribeParams?ui.editTribeParams:{
+          escrow_amount:10, escrow_time:12,
+          price_to_join:0, price_per_message:0,
+        }}
       />
     </ScrollView>
   </View>
