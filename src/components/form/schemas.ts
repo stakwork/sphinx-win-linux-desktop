@@ -136,8 +136,8 @@ const tribe = [
     name:'escrow_time',
     type:'number',
     label:{
-      en:'Escrow Time',
-      es:'Escrow Time'
+      en:'Escrow Time (Hours)',
+      es:'Escrow Time (Hours)'
     },
     validator: Yup.number(),
     description: 'The number of hours before the Escrow Amount is returned to the subscriber'
