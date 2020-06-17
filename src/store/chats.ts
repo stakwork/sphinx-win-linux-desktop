@@ -3,6 +3,15 @@ import { persist } from 'mobx-persist'
 import {Invite} from './contacts'
 import {relay} from '../api'
 
+/*
+disconneted - socket?
+03eab50cef61b9360bc24f0fd8a8cb3ebd7cec226d9f6fd39150594e0da8bd58a7
+
+android crash when open tribe
+
+only send confirmation if u are trbie owner/??
+*/
+
 export interface Chat {
   id: number
   uuid: string
@@ -20,6 +29,8 @@ export interface Chat {
   host: string
   price_to_join: number
   price_per_message: number
+  escrow_amount: number
+  escrow_millis: number
   owner_pubkey: string
 
   invite: Invite
