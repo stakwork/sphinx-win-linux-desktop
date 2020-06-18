@@ -1,1 +1,1 @@
-June 17 at noon PST
+June 18 at 9:30 am PST

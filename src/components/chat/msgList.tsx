@@ -208,7 +208,7 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
         const contact = contacts.find(c=> c.id===repmsg.sender)
         senderAlias = contact.alias
       }
-      msg.reply_message_content = repmsg.message_content
+      if(repmsg) msg.reply_message_content = repmsg.message_content
       msg.reply_message_sender_alias = senderAlias
     }
 
