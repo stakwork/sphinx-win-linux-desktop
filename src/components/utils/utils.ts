@@ -6,13 +6,15 @@ export function jsonFromUrl(url): {[k:string]:any} {
   const qIndex = url.indexOf('?')
   var query = url.substr(qIndex+1)
   var result = {}
-  query.split("&").forEach(function (part) {
-    var item = part.split("=")
-    if(base64Fields.includes(item[0])){
-      result[item[0]] = atob(item[1])
+  query.split("&").forEach(function(s) {
+    const idx = s.indexOf('=')
+    const k = s.substr(0,idx)
+    const v = s.substr(idx+1)
+    if(base64Fields.includes(k)){
+      result[k]=atob(v)
     } else {
-      result[item[0]] = item[1]
-    } 
+      result[k]=v
+    }
   })
   return result
 }

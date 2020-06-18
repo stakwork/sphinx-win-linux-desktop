@@ -43,20 +43,20 @@ function reconnectWebsocket(ip:string){
   registerWsHandlers(wsHandlers)
 }
 
-function composeMeme(host:string, authToken?:string) {
-  let meme = null
+function composeAPI(host:string, authToken?:string) {
+  let api = null
   if(authToken) {
-    meme = new API(`https://${host}/`, 'Authorization', `Bearer ${authToken}`)
+    api = new API(`https://${host}/`, 'Authorization', `Bearer ${authToken}`)
   } else {
-    meme = new API(`https://${host}/`)
+    api = new API(`https://${host}/`)
   }
-  return meme
+  return api
 }
 
 export {
   invite,
   relay,
   instantiateRelay,
-  composeMeme,
+  composeAPI,
   reconnectWebsocket,
 }

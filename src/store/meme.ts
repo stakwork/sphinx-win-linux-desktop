@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import {relay, composeMeme} from '../api'
+import {relay, composeAPI} from '../api'
 import { persist } from 'mobx-persist'
 import {userStore} from './user'
 
@@ -33,7 +33,7 @@ class MemeStore {
     const pubkey = userStore.publicKey
     if(!pubkey) return
 
-    const meme = composeMeme(server.host)
+    const meme = composeAPI(server.host)
     const r = await meme.get('ask')
     if(!(r&&r.challenge)) return
 

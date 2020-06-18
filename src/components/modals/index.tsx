@@ -14,6 +14,7 @@ import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
 import JoinTribe from './joinTribe'
+import Oauth from './oauth'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -25,6 +26,7 @@ export default function Modals(){
     const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri||ui.imgViewerParams.msg)?true:false
     const showPeer = ui.rtcParams?true:false
     const showJoinTribe = ui.joinTribeParams?true:false
+    const showOauth = ui.oauthParams?true:false
     return <>
       <AddFriend visible={showAddFriendModal} />
       <Payment visible={ui.showPayModal} />
@@ -38,6 +40,7 @@ export default function Modals(){
       <GroupModal visible={ui.groupModal} />
       <PaymentHistory visible={ui.paymentHistory} />
       <JoinTribe visible={showJoinTribe} />
+      <Oauth visible={showOauth} />
     </>
   })
 }

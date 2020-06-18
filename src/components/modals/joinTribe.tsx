@@ -36,6 +36,7 @@ export default function JoinTribe({visible}) {
     prices = [
       {label:'Price to Join', value:params.price_to_join},
       {label:'Price per Message', value:params.price_per_message},
+      {label:'Amount to Stake', value:params.escrow_amount}
     ]
   }
 

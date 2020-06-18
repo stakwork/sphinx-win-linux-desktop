@@ -233,7 +233,7 @@ function getPrevious(msgs: Msg[], i:number){
 // only show info bar if first in a group from contact
 function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number, isTribe:boolean){
   const previous = getPrevious(msgs, i)
-  if(previous===null) return true
+  if(!previous) return true
   if(isTribe && msg.sender!==1) { // for self msgs, do normal way
     if(previous.sender_alias===msg.sender_alias && previous.type!==constants.message_types.group_join) {
       return false

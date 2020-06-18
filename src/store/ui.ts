@@ -174,6 +174,11 @@ export class UiStore {
     this.replyUUID = s
   }
 
+  @observable oauthParams: {[k:string]:any} = null
+  @action setOauthParams(obj:{[k:string]:any}) {
+    this.oauthParams = obj
+  }
+
 }
 
 export const uiStore = new UiStore()

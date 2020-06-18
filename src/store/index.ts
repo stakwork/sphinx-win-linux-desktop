@@ -7,6 +7,7 @@ import { chatStore } from './chats'
 import { subStore } from './subs'
 import { userStore } from './user'
 import { memeStore } from './meme'
+import { authStore } from './auth'
 import { create } from 'mobx-persist'
 import { AsyncStorage } from 'react-native'
 
@@ -32,6 +33,7 @@ const ctx = React.createContext({
   ui: uiStore,
   user: userStore,
   meme: memeStore,
+  auth: authStore,
 })
 
 export const useStores = () => React.useContext(ctx)
