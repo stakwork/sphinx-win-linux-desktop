@@ -53,7 +53,7 @@ export default function JoinTribe({visible}) {
           {params.name}
         </Text>
 
-        <Text style={{marginTop:10,marginBottom:10}}>
+        <Text style={{marginTop:10,marginBottom:10,paddingLeft:15,paddingRight:15}}>
           {params.description}
         </Text>
 

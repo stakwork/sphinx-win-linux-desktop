@@ -79,17 +79,19 @@ class MsgStore {
 
   @action
   async getMessages() {
+
     let route = 'messages'
     if(this.lastFetched) {
-      const dateq = moment(this.lastFetched).format('YYYY-MM-DD%20HH:mm:ss')
+      const dateq = moment.utc(this.lastFetched-1000000).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else {
-      const start = moment(0).format('YYYY-MM-DD%20HH:mm:ss')
+      const start = moment.utc(0).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }
     try {
       const r = await relay.get(route)
       const msgs = await decodeMessages(r.new_messages)
+      msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
       this.messages = orgMsgsFromExisting(this.messages, msgs)
       this.lastFetched = new Date().getTime()
     } catch(e) {
@@ -111,7 +113,12 @@ class MsgStore {
     let newMsg = await decodeSingle(m)
     if(newMsg.chat && newMsg.chat.id){
       const idx = this.messages[newMsg.chat.id].findIndex(m=>m.id===-1)
-      this.messages[newMsg.chat.id][idx] = m
+      if(idx>-1){
+        this.messages[newMsg.chat.id][idx] = {
+          ...m,
+          status: this.messages[newMsg.chat.id][idx].status
+        }
+      }
     }
   }
 
@@ -142,9 +149,8 @@ class MsgStore {
         amount:amount||0,
         reply_uuid
       }
-      
-      // console.log(v)
-      
+      // const r = await relay.post('messages', v)
+      // this.gotNewMessage(r)
       if(!chat_id) {
         const r = await relay.post('messages', v)
         // console.log("GOT IT BABY@",r)
@@ -152,7 +158,7 @@ class MsgStore {
       } else {
         putIn(this.messages, {...v,id:-1,sender:1,date:moment().toISOString(),type:0,message_content:text}, chat_id)
         const r = await relay.post('messages', v)
-        // console.log("RESULT",r)
+        // console.log("RESULT")
         this.messagePosted(r)
       }
     } catch(e) {
@@ -191,7 +197,7 @@ class MsgStore {
   async setMessageAsReceived(m) {
     if(!(m.chat)) return
     const msgsForChat = this.messages[m.chat.id]
-    const ogMessage = msgsForChat.find(msg=> msg.id===m.id)
+    const ogMessage = msgsForChat.find(msg=> msg.id===m.id || msg.id===-1)
     if(ogMessage) {
       ogMessage.status = constants.statuses.received
     }
@@ -370,6 +376,7 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
       putIn(allms, msg, msg.chat.id) // THIS IS TOO HEAVY in a for each
     }
   })
+  // limit to 50 each?
   return allms
 }
 

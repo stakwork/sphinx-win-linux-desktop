@@ -108,7 +108,7 @@ function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable}) {
   return useMemo(()=> <Message {...msg} viewable={viewable} 
     isGroup={isGroup} isTribe={isTribe} 
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
-  />, [viewable,m.id,m.media_token,replyUuid])
+  />, [viewable,m.id,m.media_token,replyUuid,m.status])
 }
 
 function DateLine({dateString}){

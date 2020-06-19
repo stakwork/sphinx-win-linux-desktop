@@ -25,7 +25,6 @@ export default function Wrap(){
       case 'invoice':
         ui.setRawInvoiceModal(j)
       case 'challenge':
-        console.log("JJJJJJJJJ",j)
         ui.setOauthParams(j)
       default:
         return
