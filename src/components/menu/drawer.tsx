@@ -71,6 +71,12 @@ export default function TheDrawer(props) {
             {`Version: ${VERSION}`}
           </Text>
         </View>
+        <View style={styles.supportWrap}>
+          <Button style={styles.supportButton} icon="email"
+            onPress={()=>ui.setSupportModal(true)}>
+            Support
+          </Button>
+        </View>
       </View>
     </DrawerContentScrollView>
   )
@@ -119,6 +125,13 @@ const styles = StyleSheet.create({
   versionWrap:{
     position:'absolute',
     bottom:10,left:13,
+  },
+  supportWrap:{
+    position:'absolute',
+    bottom:60,left:13,
+  },
+  supportButton:{
+
   }
 })
 

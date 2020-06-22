@@ -15,6 +15,7 @@ import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
 import JoinTribe from './joinTribe'
 import Oauth from './oauth'
+import Support from './support'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -41,6 +42,7 @@ export default function Modals(){
       <PaymentHistory visible={ui.paymentHistory} />
       <JoinTribe visible={showJoinTribe} />
       <Oauth visible={showOauth} />
+      <Support visible={ui.supportModal} />
     </>
   })
 }

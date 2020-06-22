@@ -31,6 +31,22 @@ class DetailsStore {
       console.log(e)
     }
   }
+
+  @observable logs: string = ''
+  @action
+  async getLogs() {
+    try {
+      const r = await relay.get('logs')
+      if(r) this.logs = r
+    } catch(e) {
+      console.log(e)
+    }
+  }
+  @action
+  async clearLogs() {
+    this.logs=''
+  }
+  
 }
 
 export const detailsStore = new DetailsStore()

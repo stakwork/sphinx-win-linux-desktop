@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius:20,
     overflow:'hidden',
     width:'100%',
+    backgroundColor:'black'
   },
   bottom:{
     width:'100%',

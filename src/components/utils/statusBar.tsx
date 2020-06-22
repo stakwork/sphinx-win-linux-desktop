@@ -29,10 +29,15 @@ const styles = StyleSheet.create({
 
 export default GeneralStatusBarColor
 
-export function setTint(s='light'){
+type Tint = 'light' | 'dark' | 'black'
+
+export function setTint(s:Tint='light'){
   if(s==='light') {
     StatusBar.setBarStyle('dark-content')
     StatusBar.setBackgroundColor('white')
+  } else if(s==='black'){
+    StatusBar.setBarStyle('light-content')
+    StatusBar.setBackgroundColor('#102b44')
   } else {
     StatusBar.setBarStyle('light-content')
     StatusBar.setBackgroundColor('#6289FD')

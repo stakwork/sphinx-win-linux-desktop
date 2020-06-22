@@ -179,6 +179,11 @@ export class UiStore {
     this.oauthParams = obj
   }
 
+  @observable supportModal: boolean = false
+  @action setSupportModal(b:boolean) {
+    this.supportModal = b
+  }
+
 }
 
 export const uiStore = new UiStore()

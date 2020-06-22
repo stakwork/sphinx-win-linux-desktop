@@ -13,38 +13,32 @@ import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
 import * as rsa from './src/crypto/rsa'
+import {deeplinkActions} from './src/deeplinkActions'
 
 declare var global: {HermesInternal: null | {}}
 
 export default function Wrap(){
-  const {ui,user} = useStores()
+  const {ui,chats} = useStores()
+  const [wrapReady,setWrapReady] = useState(false)
 
-  function deeplinkActions(j){
-    const action = j['action']
-    switch (action) {
-      case 'invoice':
-        ui.setRawInvoiceModal(j)
-      case 'challenge':
-        ui.setOauthParams(j)
-      default:
-        return
-    }
-  }
-  function gotLink(e){
+  async function gotLink(e){
     if(e && typeof e==='string'){
       const j = utils.jsonFromUrl(e)
-      if(j['action']) deeplinkActions(j)
+      if(j['action']) await deeplinkActions(j,ui,chats)
     }
   }
   useEffect(()=>{
-    Linking.getInitialURL().then(e=> gotLink(e))
-    Linking.addEventListener('url', gotLink)
-    RNWebRTC.registerGlobals()
-    console.log(RNWebRTC)
+    (async () => {
+      const e = await Linking.getInitialURL()
+      if(e) await gotLink(e) // await to keep spinner there...
+      Linking.addEventListener('url', gotLink)
+      RNWebRTC.registerGlobals()
+      setWrapReady(true)
+    })()
   },[])
 
   return useObserver(()=>{
-    if (ui.ready) return <App /> // hydrated!
+    if (ui.ready && wrapReady) return <App /> // hydrated!
     return <Loading /> // full screen loading
   })
 }
