@@ -13,8 +13,8 @@ const conversation = constants.chat_types.conversation
 export default function Header({chat}:{chat:Chat}) {
   const {contacts,ui,msg,details,chats} = useStores()
   const navigation = useNavigation()
-
   return useObserver(()=> {
+    const theChat = chats.chats.find(c=>c.id===chat.id)
     let contact
     if(chat && chat.type===conversation){
       contact = contactForConversation(chat, contacts.contacts)
@@ -33,8 +33,9 @@ export default function Header({chat}:{chat:Chat}) {
       ui.setRtcParams({id})
     }
 
+    const isMuted = theChat.is_muted||false
     async function muteChat(){
-      chats.muteChat(chat.id, chat.is_muted?false:true)
+      chats.muteChat(chat.id, isMuted?false:true)
     }
 
     const name = (chat&&chat.name) || (contact&&contact.alias)
@@ -47,7 +48,7 @@ export default function Header({chat}:{chat:Chat}) {
         }} />
         <Appbar.Content title={name} onPress={clickTitle} />
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
-        <Appbar.Action icon={chat&&chat.is_muted?'bell-off':'bell'} onPress={muteChat} color="grey" />
+        <Appbar.Action icon={isMuted?'bell-off':'bell'} onPress={muteChat} color="grey" />
       </Appbar.Header>
     )
   })

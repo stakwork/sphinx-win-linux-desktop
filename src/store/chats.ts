@@ -52,7 +52,6 @@ export class ChatStore {
     relay.post(`chats/${chatID}/${muted?'mute':'unmute'}`)
     const chats = this.chats.map(c=>{
       if(c.id===chatID) {
-        console.log("CHAT CHAT TO muted",muted)
         return {...c, is_muted:muted}
       }
       return c
