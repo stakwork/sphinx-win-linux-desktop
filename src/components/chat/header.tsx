@@ -33,7 +33,7 @@ export default function Header({chat}:{chat:Chat}) {
       ui.setRtcParams({id})
     }
 
-    const isMuted = theChat.is_muted||false
+    const isMuted = (theChat&&theChat.is_muted)||false
     async function muteChat(){
       chats.muteChat(chat.id, isMuted?false:true)
     }
@@ -48,7 +48,9 @@ export default function Header({chat}:{chat:Chat}) {
         }} />
         <Appbar.Content title={name} onPress={clickTitle} />
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
-        <Appbar.Action icon={isMuted?'bell-off':'bell'} onPress={muteChat} color="grey" />
+        {theChat && <Appbar.Action icon={isMuted?'bell-off':'bell'} 
+          onPress={muteChat} color="grey" 
+        />}
       </Appbar.Header>
     )
   })

@@ -1,1 +1,1 @@
-June 22 at 9pm PST
+June 23 at 1pm PST

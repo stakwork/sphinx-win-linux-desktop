@@ -20,6 +20,7 @@ export default function InviteNewUser({done}){
   useEffect(()=>{
     (async () => {
       const price = await contacts.getLowestPriceForInvite()
+      console.log("PRICE",price)
       if(price||price===0) setPrice(price)
     })()
   },[])
