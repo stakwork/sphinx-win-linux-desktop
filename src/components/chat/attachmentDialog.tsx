@@ -2,7 +2,7 @@ import React from 'react'
 import {Portal, Button, Dialog} from 'react-native-paper'
 import ImagePicker from 'react-native-image-picker'
 
-export default function AttachmentDialog({open, onClose, onPick, onChooseCam, doPaidMessage}){
+export default function AttachmentDialog({open, onClose, onPick, onChooseCam, doPaidMessage, request, send}){
   async function pickImage() {
     ImagePicker.launchImageLibrary({}, result=>{
       if (!result.didCancel) {
@@ -17,7 +17,7 @@ export default function AttachmentDialog({open, onClose, onPick, onChooseCam, do
       onDismiss={()=> onClose()}>
       <Dialog.Title>File Attachment</Dialog.Title>
       <Dialog.Actions style={{
-        height:160,
+        height:240,
         display:'flex',flexDirection:'column',
         justifyContent:'space-between',alignItems:'flex-start'
         }}>
@@ -29,6 +29,12 @@ export default function AttachmentDialog({open, onClose, onPick, onChooseCam, do
         </Button>
         <Button icon="message" onPress={()=>doPaidMessage()} style={{width:'100%',alignItems:'flex-start'}}>
           Paid Message
+        </Button>
+        <Button icon="arrow-bottom-left" onPress={()=>request()} style={{width:'100%',alignItems:'flex-start'}}>
+          Request
+        </Button>
+        <Button icon="arrow-top-right" onPress={()=>send()} style={{width:'100%',alignItems:'flex-start'}}>
+          Send
         </Button>
       </Dialog.Actions>
     </Dialog>

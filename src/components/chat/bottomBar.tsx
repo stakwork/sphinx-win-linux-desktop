@@ -1,16 +1,16 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, View, Text, TextInput, StyleSheet } from 'react-native'
+import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated } from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
-import {Chat} from '../../store/chats'
 import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import { constants } from '../../constants'
 import AttachmentDialog from './attachmentDialog'
-import EE from '../utils/ee'
 import ReplyContent from './msg/replyContent'
+import ReactNativeHapticFeedback from "react-native-haptic-feedback";
+import RecDot from './recDot'
 
 const conversation = constants.chat_types.conversation
 
@@ -23,9 +23,10 @@ export default function BottomBar(props) {
   const [inputFocused, setInputFocused] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [recordSecs, setRecordSecs] = useState('0')
+  const [recordSecs, setRecordSecs] = useState('0:00')
   const [recording, setRecording] = useState(false)
   const [textInputHeight, setTextInputHeight] = useState(40)
+  const [recordingStartTime, setRecordingStartTime] = useState(null)
 
   const inputRef = useRef(null)
 
@@ -74,39 +75,78 @@ export default function BottomBar(props) {
   }
 
   async function startRecord() {
-    setRecordSecs('0')
-    setRecording(true)
-    console.log("BLAH BLAH",audioRecorderPlayer.startRecorder)
-    const result = await audioRecorderPlayer.startRecorder()
-    audioRecorderPlayer.addRecordBackListener((e) => {
-      console.log('back!!!',e.current_position)
-      setRecordSecs(audioRecorderPlayer.mmssss(
-        Math.floor(e.current_position),
-      ))
-      return
-    })
-    console.log(result)
+    setRecordSecs('0:00')
+    try{
+      await audioRecorderPlayer.startRecorder()
+      audioRecorderPlayer.addRecordBackListener((e) => {
+        const str = audioRecorderPlayer.mmssss(
+          Math.floor(e.current_position),
+        )
+        const idx = str.lastIndexOf(':')
+        setRecordSecs(str.substr(1,idx-1))
+      })
+      console.log("SET RECORDING TRUE")
+      setRecording(true)
+      setRecordingStartTime(Date.now().valueOf())
+    } catch(e){console.log(e)}
   }
 
-  async function stopRecord() {
-    const result = await audioRecorderPlayer.stopRecorder()
-    audioRecorderPlayer.removeRecordBackListener()
-    setRecordSecs('0')
-    setRecording(false)
-    console.log(result)
-  }
-
-  function rec(){
-    if(recording){
-      stopRecord()
-    } else {
-      startRecord()
+  async function stopRecord(cb) {
+    const now = Date.now().valueOf()
+    console.log(now,recordingStartTime)
+    if(now-recordingStartTime<1000){
+      await sleep(1000)
     }
+    try{
+      const result = await audioRecorderPlayer.stopRecorder()
+      audioRecorderPlayer.removeRecordBackListener()
+      setRecordSecs('0:00')
+      if(cb) cb(result)
+    } catch(e){console.log(e)}
   }
+
+  const position = useRef(new Animated.ValueXY()).current;
+  const panResponder = React.useMemo(() => PanResponder.create({
+    onStartShouldSetPanResponder: (evt, gestureState)=> true,
+    onMoveShouldSetPanResponderCapture: ()=> true,
+    onPanResponderStart:()=>{
+      console.log("START")
+      startRecord()
+    },
+    onPanResponderEnd:()=>{
+      function callback(path){
+        console.log(path)
+        // HERE ! upload file and send msg
+      }
+      console.log("END")
+      setRecording(current=>{
+        console.log("IS RECORINDG?",current)
+        if(current) stopRecord(callback)
+        return false
+      })
+      setRecordingStartTime(null)
+    },
+    onPanResponderMove: (evt, gestureState) => {
+      if(gestureState.dx<-70) {  
+        setRecording(current=>{
+          if(current) {
+            stopRecord(null) //cancel
+            ReactNativeHapticFeedback.trigger("impactLight", {
+              enableVibrateFallback: true,
+              ignoreAndroidSystemSettings: true
+            })
+          }
+          return false
+        })
+        setRecordingStartTime(null)
+      }
+    },
+    onPanResponderRelease: (evt, gestureState) => {},
+  }), []);
 
   const isConversation = chat.type===conversation
   const isTribe = chat.type===constants.chat_types.tribe
-  const hideArrows = (inputFocused||text)?true:false
+  const hideMic = (inputFocused||text)?true:false
 
   let theID = chat&&chat.id
   const thisChatMsgs = theID && msg.messages[theID]
@@ -128,15 +168,11 @@ export default function BottomBar(props) {
         onClose={()=> props.setReplyUUID('')}
       />}
       <View style={styles.barInner}>
-        {!hideArrows && <IconButton icon="arrow-bottom-left" size={32} color="#666"
-          style={{marginLeft:0,marginRight:0}} 
-          disabled={!isConversation}
-          onPress={()=> ui.setPayMode('invoice', chat)}     
-        />}
-        {!hideArrows && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+
+        {!recording && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
           <Icon name="plus" color="#888" size={27} />
         </TouchableOpacity>}
-        <TextInput textAlignVertical="top"
+        {!recording && <TextInput textAlignVertical="top"
           numberOfLines={4}
           multiline={true} blurOnSubmit={true}
           onContentSizeChange={e=>{
@@ -146,7 +182,7 @@ export default function BottomBar(props) {
           }}
           placeholder="Message..." ref={inputRef}
           style={{...styles.input,
-            marginLeft:hideArrows?15:0,
+            marginLeft:hideMic?15:0,
             height:textInputHeight,
             maxHeight:98
           }}
@@ -155,17 +191,25 @@ export default function BottomBar(props) {
           onChangeText={e=> setText(e)}
           value={text}>
           {/* <Text>{text}</Text> */}
-        </TextInput>
-        {/* <IconButton icon="microphone-outline" size={32} color="#666"
-          style={{marginLeft:0,marginRight:-4}}
-          onPress={rec}
-        /> */}
-        {!hideArrows && <IconButton icon="arrow-top-right" size={32} color="#666"
-          style={{marginLeft:0,marginRight:0}}
-          disabled={!isConversation}
-          onPress={()=> ui.setPayMode('payment',chat)}
-        />}
-        {hideArrows && <View style={styles.sendButtonWrap}>
+        </TextInput>}
+
+        {recording && <View style={styles.recording}>
+          <RecDot />
+          <View style={styles.recordSecs}>
+            <Text style={styles.recordSecsText}>{recordSecs}</Text>
+          </View>
+          <View style={{display:'flex',flexDirection:'row',alignItems:'center'}}>
+            <Icon name="rewind" size={16} color="grey" />
+            <Text style={{marginLeft:5}}>Swipe to cancel</Text>  
+          </View>
+        </View>}
+
+        {!hideMic && <Animated.View style={{marginLeft:0,marginRight:4}}
+          {...panResponder.panHandlers}>
+          <IconButton icon="microphone-outline" size={32} color="#666" />
+        </Animated.View>}
+
+        {hideMic && <View style={styles.sendButtonWrap}>
           <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
             onPress={()=> sendMessage()}>
             <Icon name="send" size={17} color="white" />
@@ -177,6 +221,14 @@ export default function BottomBar(props) {
           onPick={res=> tookPic(res)}
           onChooseCam={()=> setTakingPhoto(true)}
           doPaidMessage={()=> doPaidMessage()}
+          request={()=>{
+            setDialogOpen(false)
+            ui.setPayMode('invoice', chat)
+          }}
+          send={()=>{
+            setDialogOpen(false)
+            ui.setPayMode('payment',chat)
+          }}
         />
       </View>
 
@@ -216,6 +268,7 @@ const styles=StyleSheet.create({
     maxWidth:'100%',
     flexDirection:'row',
     alignItems:'center',
+    justifyContent:'space-between',
   },
   input:{
     flex:1,
@@ -246,6 +299,7 @@ const styles=StyleSheet.create({
   img:{
     width:40,height:40,
     borderRadius:20,
+    marginLeft:8,
     borderColor:'#ccc',
     borderWidth:1,
     backgroundColor:'whitesmoke',
@@ -254,4 +308,23 @@ const styles=StyleSheet.create({
     alignItems:'center',
     justifyContent:'center'
   },
+  recordSecs:{
+    flex:1,
+    paddingLeft:10,
+    minWidth:80,
+  },
+  recordSecsText:{
+    fontSize:24,
+  },
+  recording:{
+    display:'flex',
+    alignItems:'center',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    width:200,
+  }
 })
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}

@@ -69,6 +69,9 @@ export default function MediaMsg(props){
     minHeight = isMe?72:42
     if(!isMe&&!loading&&!paidMessageText) showPayToUnlockMessage=true
   }
+  if(media_type.startsWith('audio')){
+    minHeight=40
+  }
 
   let wrapHeight = minHeight
   if(showPurchaseButton) wrapHeight+=38
@@ -119,7 +122,7 @@ function Media({type,data,uri}){
     return <Image style={styles.img} resizeMode='cover' source={{uri:uri||data}} />
   }
   if(type.startsWith('audio')) {
-    return <AudioPlayer source={uri||data} />
+    return <AudioPlayer source={uri||data} type={type} />
   }
   if(type.startsWith('video') && uri) {
     return <Video source={{uri}} style={styles.backgroundVideo} />

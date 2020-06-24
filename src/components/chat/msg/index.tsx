@@ -20,7 +20,7 @@ export default function MsgRow(props){
   function onCopy(msg){
     ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
-      ignoreAndroidSystemSettings: false
+      ignoreAndroidSystemSettings: true
     })
     Clipboard.setString(msg||'')
     setCopied(true)

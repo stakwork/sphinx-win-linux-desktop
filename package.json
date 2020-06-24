@@ -8,6 +8,7 @@
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",
     "@react-native-community/async-storage": "^1.8.1",
+    "@react-native-community/audio-toolkit": "^2.0.3",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-navigation/drawer": "^5.1.0",
     "@react-navigation/native": "^5.0.8",
@@ -57,6 +58,7 @@
     "react-native-keyboard-aware-scrollview": "^2.1.0",
     "react-native-keychain": "^4.0.5",
     "react-native-level-fs": "^3.0.1",
+    "react-native-media-metadata-retriever": "git+https://github.com/ishwortimilsina/react-native-media-metadata-retriever.git",
     "react-native-modal": "^11.5.6",
     "react-native-os": "^1.2.6",
     "react-native-paper": "^3.8.0",

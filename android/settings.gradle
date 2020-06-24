@@ -1,4 +1,10 @@
 include ':react-native-secure-key-store'
+include ':@react-native-community_audio-toolkit'
+project(':@react-native-community_audio-toolkit').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/audio-toolkit/android')
+include ':react-native-audio-toolkit'
+project(':react-native-audio-toolkit').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-audio-toolkit/android')
+include ':react-native-media-metadata-retriever'
+project(':react-native-media-metadata-retriever').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-media-metadata-retriever/android')
 include ':react-native-fast-image'
 project(':react-native-fast-image').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fast-image/android')
 include ':react-native-video'
