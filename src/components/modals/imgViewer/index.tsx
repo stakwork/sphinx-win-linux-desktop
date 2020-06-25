@@ -11,6 +11,7 @@ import {ActivityIndicator} from 'react-native-paper'
 import SetPrice from './setPrice'
 import EE from '../../utils/ee'
 import { constants } from '../../../constants'
+import {fileUpload} from '../../chat/fileUpload'
 
 export default function ImgViewer(props) {
   const {params} = props
@@ -49,6 +50,26 @@ export default function ImgViewer(props) {
 
     const type = showMsgMessage?'text/plain':'image/jpg'
     const name = showMsgMessage?'Message.txt':'Image.jpg'
+
+    // const server = meme.getDefaultServer()
+    // console.log("ADFASDF")
+    // fileUpload({
+    //   filename:name, filetype:type,
+    //   text, isTextMsg:showMsgMessage,
+    //   server, uri,
+    //   setUploadedPercent,
+    //   finished: async(j)=>{
+    //     j.price=price
+    //     await sendFinalMsg({
+    //       muid:j.muid,
+    //       media_key:j.media_key,
+    //       media_type:j.media_type,
+    //       price
+    //     })
+    //     setUploading(false)
+    //   }
+    // })
+
     const pwd = await randString(32)
     const server = meme.getDefaultServer()
     if(!server) return

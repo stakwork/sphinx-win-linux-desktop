@@ -185,7 +185,7 @@ class MsgStore {
         v.text = encryptedText
         v.remote_text_map = remote_text_map
       }
-
+      // return
       const r = await relay.post('attachment', v)
       this.gotNewMessage(r)
     } catch(e) {

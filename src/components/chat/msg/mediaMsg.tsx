@@ -70,7 +70,7 @@ export default function MediaMsg(props){
     if(!isMe&&!loading&&!paidMessageText) showPayToUnlockMessage=true
   }
   if(media_type.startsWith('audio')){
-    minHeight=40
+    minHeight=50
   }
 
   let wrapHeight = minHeight

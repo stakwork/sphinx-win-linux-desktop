@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
     justifyContent:'center',
     width:'100%',
-    marginBottom:5,
+    marginBottom:10,
   },
   barWrap:{
     flex:1,

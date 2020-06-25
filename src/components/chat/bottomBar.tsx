@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated } from 'react-native'
-import {IconButton, Portal} from 'react-native-paper'
+import {IconButton, Portal, ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
 import Cam from '../utils/cam'
@@ -11,6 +11,9 @@ import AttachmentDialog from './attachmentDialog'
 import ReplyContent from './msg/replyContent'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import RecDot from './recDot'
+import RNFetchBlob from 'rn-fetch-blob'
+import * as e2e from '../../crypto/e2e'
+import {randString} from '../../crypto/rand'
 
 const conversation = constants.chat_types.conversation
 
@@ -18,15 +21,15 @@ const audioRecorderPlayer = new AudioRecorderPlayer()
 
 export default function BottomBar(props) {
   const {chat,pricePerMessage} = props
-  const {ui,msg,contacts} = useStores()
+  const {ui,msg,contacts,meme} = useStores()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [recordSecs, setRecordSecs] = useState('0:00')
-  const [recording, setRecording] = useState(false)
   const [textInputHeight, setTextInputHeight] = useState(40)
   const [recordingStartTime, setRecordingStartTime] = useState(null)
+  const [uploading,setUploading] = useState(false)
 
   const inputRef = useRef(null)
 
@@ -85,50 +88,46 @@ export default function BottomBar(props) {
         const idx = str.lastIndexOf(':')
         setRecordSecs(str.substr(1,idx-1))
       })
-      console.log("SET RECORDING TRUE")
-      setRecording(true)
       setRecordingStartTime(Date.now().valueOf())
     } catch(e){console.log(e)}
   }
 
-  async function stopRecord(cb) {
+  async function stopRecord(cb,time?) {
     const now = Date.now().valueOf()
-    console.log(now,recordingStartTime)
-    if(now-recordingStartTime<1000){
+    let tooShort = false
+    if(now-time<1000){
+      tooShort = true
       await sleep(1000)
     }
     try{
       const result = await audioRecorderPlayer.stopRecorder()
       audioRecorderPlayer.removeRecordBackListener()
       setRecordSecs('0:00')
-      if(cb) cb(result)
+      if(cb && !tooShort) cb(result)
     } catch(e){console.log(e)}
   }
 
-  const position = useRef(new Animated.ValueXY()).current;
+  // const position = useRef(new Animated.ValueXY()).current;
   const panResponder = React.useMemo(() => PanResponder.create({
     onStartShouldSetPanResponder: (evt, gestureState)=> true,
     onMoveShouldSetPanResponderCapture: ()=> true,
     onPanResponderStart:()=>{
-      console.log("START")
       startRecord()
     },
-    onPanResponderEnd:()=>{
+    onPanResponderEnd:async()=>{
+      await sleep(10)
       function callback(path){
-        console.log(path)
-        // HERE ! upload file and send msg
+        setUploading(true)
+        uploadAudioFile(path)
       }
-      console.log("END")
-      setRecording(current=>{
-        console.log("IS RECORINDG?",current)
-        if(current) stopRecord(callback)
-        return false
+      setRecordingStartTime(current=>{
+        if(current) stopRecord(callback,current)
+        return null
       })
-      setRecordingStartTime(null)
     },
     onPanResponderMove: (evt, gestureState) => {
       if(gestureState.dx<-70) {  
-        setRecording(current=>{
+        setRecordingStartTime(current=>{
           if(current) {
             stopRecord(null) //cancel
             ReactNativeHapticFeedback.trigger("impactLight", {
@@ -136,13 +135,61 @@ export default function BottomBar(props) {
               ignoreAndroidSystemSettings: true
             })
           }
-          return false
+          return null
         })
-        setRecordingStartTime(null)
       }
     },
     onPanResponderRelease: (evt, gestureState) => {},
   }), []);
+
+  async function uploadAudioFile(uri){
+    const pwd = await randString(32)
+    const server = meme.getDefaultServer()
+    if(!server) return
+    if(!uri) return
+
+    const type = 'audio/mp4'
+    const filename = 'sound.mp4'
+    let enc = await e2e.encryptFile(uri, pwd)
+    RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
+      Authorization: `Bearer ${server.token}`,
+      'Content-Type': 'multipart/form-data'
+    }, [{
+        name:'file',
+        filename,
+        type: type,
+        data: enc,
+      }, {name:'name', data:filename}
+    ])
+    // listen to upload progress event, emit every 250ms
+    .uploadProgress({ interval : 250 },(written, total) => {
+        console.log('uploaded', written / total)
+        // setUploadedPercent(Math.round((written / total)*100))
+    })
+    .then(async (resp) => {
+      let json = resp.json()
+      console.log('done uploading',json)
+      await sendFinalMsg({
+        muid:json.muid,
+        media_key:pwd,
+        media_type:type,
+      })
+      setUploading(false)
+    })
+    .catch((err) => {
+       console.log(err)
+    })
+  }
+
+  async function sendFinalMsg({muid,media_key,media_type}){
+    await msg.sendAttachment({
+      contact_id:null, chat_id:chat.id,
+      muid, price:0,
+      media_key, media_type,
+      text:'',
+      amount:0
+    })
+  }
 
   const isConversation = chat.type===conversation
   const isTribe = chat.type===constants.chat_types.tribe
@@ -169,10 +216,10 @@ export default function BottomBar(props) {
       />}
       <View style={styles.barInner}>
 
-        {!recording && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+        {!recordingStartTime && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
           <Icon name="plus" color="#888" size={27} />
         </TouchableOpacity>}
-        {!recording && <TextInput textAlignVertical="top"
+        {!recordingStartTime && <TextInput textAlignVertical="top"
           numberOfLines={4}
           multiline={true} blurOnSubmit={true}
           onContentSizeChange={e=>{
@@ -193,7 +240,7 @@ export default function BottomBar(props) {
           {/* <Text>{text}</Text> */}
         </TextInput>}
 
-        {recording && <View style={styles.recording}>
+        {recordingStartTime && <View style={styles.recording}>
           <RecDot />
           <View style={styles.recordSecs}>
             <Text style={styles.recordSecsText}>{recordSecs}</Text>
@@ -204,10 +251,14 @@ export default function BottomBar(props) {
           </View>
         </View>}
 
-        {!hideMic && <Animated.View style={{marginLeft:0,marginRight:4}}
+        {!hideMic && <Animated.View style={{marginLeft:0,marginRight:4,zIndex:9}}
           {...panResponder.panHandlers}>
-          <IconButton icon="microphone-outline" size={32} color="#666" />
+          {uploading ? 
+            <View style={{width:42}}><ActivityIndicator size={20} color="grey" /></View> :
+            <IconButton icon="microphone-outline" size={32} color={recordingStartTime?'white':'#666'} />
+          }
         </Animated.View>}
+        {recordingStartTime && <View style={styles.recordingCircle}></View>}
 
         {hideMic && <View style={styles.sendButtonWrap}>
           <TouchableOpacity activeOpacity={0.5} style={styles.sendButton}
@@ -322,6 +373,15 @@ const styles=StyleSheet.create({
     flexDirection:'row',
     justifyContent:'space-between',
     width:200,
+  },
+  recordingCircle:{
+    height:100,
+    width:100,
+    backgroundColor:'#6289FD',
+    position:'absolute',
+    right:-15,
+    top:-15,
+    borderRadius:50
   }
 })
 
