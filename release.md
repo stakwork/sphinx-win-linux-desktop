@@ -1,1 +1,1 @@
-June 24 at 4:30pm PST
+June 25 at 4:30pm PST
