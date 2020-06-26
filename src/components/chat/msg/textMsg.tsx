@@ -8,7 +8,7 @@ export default function TextMsg(props){
   const isLink = message_content && (message_content.toLowerCase().startsWith('http://') || message_content.toLowerCase().startsWith('https://'))
   return <>
     <TouchableOpacity style={isLink?{width:280,paddingLeft:7,minHeight:72}:shared.innerPad}
-      onLongPress={()=>props.onCopy(message_content)}>
+      onLongPress={()=>props.onLongPress(props)}>
       {isLink ? <RNUrlPreview {...linkStyles} 
         text={message_content}
       /> : 

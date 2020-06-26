@@ -1,35 +1,22 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useLayoutEffect} from 'react'
 import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
-import {View, Clipboard, StyleSheet} from 'react-native'
+import {View, Clipboard, StyleSheet, Text, TouchableOpacity} from 'react-native'
 import {constantCodes, constants} from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
 import GroupNotification from './groupNotification'
-import Popup from './popup'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {SwipeRow} from 'react-native-swipe-list-view'
 import {IconButton} from 'react-native-paper'
 import ReplyContent from './replyContent' 
+import { Popover, PopoverTouchable, PopoverController } from 'react-native-modal-popover';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default function MsgRow(props){
-  const [copied, setCopied] = useState(false)
-  const [showReply, setShowReply] = useState(false)
-  function onCopy(msg){
-    ReactNativeHapticFeedback.trigger("impactLight", {
-      enableVibrateFallback: true,
-      ignoreAndroidSystemSettings: true
-    })
-    Clipboard.setString(msg||'')
-    setCopied(true)
-    setTimeout(()=> setCopied(false), 2000)
-  }
-
-  const isMe = props.sender===1
-  const isInvoice = props.type===constants.message_types.invoice
-  const isPaid = props.status===constants.statuses.confirmed
+  const [showReply, setShowReply] = useState(false)  
 
   const swipeRowRef = useRef<any>(null)
   useEffect(()=>{
@@ -43,16 +30,6 @@ export default function MsgRow(props){
   const isGroupNotification = props.type===constants.message_types.group_join || props.type===constants.message_types.group_leave
   if(isGroupNotification) {
     return <GroupNotification {...props} />
-  }
-
-  let dashed = false
-  let backgroundColor = isMe?'whitesmoke':'white'
-  let borderColor = '#DADFE2'
-  if(isInvoice && !isPaid) {
-    backgroundColor='white'
-    dashed = true
-    borderColor = '#777'
-    if(!isMe) borderColor='#4AC998'
   }
 
   return <View style={{display:'flex',width:'100%',
@@ -80,21 +57,84 @@ export default function MsgRow(props){
           style={{marginLeft:0,marginRight:15}} 
         />}
       </View>
-      <View style={{...sharedStyles.bubble,
-        alignSelf: isMe?'flex-end':'flex-start',
-        backgroundColor, borderColor,
-        borderStyle:dashed?'dashed':'solid',
-        overflow:'hidden',
-      }}>
-        {(props.reply_message_content?true:false) && <ReplyContent 
-          reply_message_content={props.reply_message_content}
-          reply_message_sender_alias={props.reply_message_sender_alias}
-        />}
-        <Message {...props} onCopy={onCopy}/>
-      </View>
+      <MsgBubble {...props} onDelete={props.onDelete} myPubkey={props.myPubkey} />
     </SwipeRow>
-    {copied && <Popup {...props} />}
   </View>
+}
+
+function MsgBubble(props){
+  const isMe = props.sender===1
+  const isInvoice = props.type===constants.message_types.invoice
+  const isPaid = props.status===constants.statuses.confirmed
+
+  const chat = props.chat
+  let isTribe=false
+  let isTribeOwner=false
+  if(chat){
+    isTribe=chat.type===constants.chat_types.tribe
+    isTribeOwner = chat.owner_pubkey===props.myPubkey
+  }
+
+  let dashed = false
+  let backgroundColor = isMe?'whitesmoke':'white'
+  let borderColor = '#DADFE2'
+  if(isInvoice && !isPaid) {
+    backgroundColor='white'
+    dashed = true
+    borderColor = '#777'
+    if(!isMe) borderColor='#4AC998'
+  }
+  const isDeleted = props.status===constants.statuses.deleted
+  return <PopoverController>
+    {({ openPopover, closePopover, popoverVisible, setPopoverAnchor, popoverAnchorRect }) => (
+      <>
+        <View ref={setPopoverAnchor} style={{...sharedStyles.bubble,
+          alignSelf: isMe?'flex-end':'flex-start',
+          backgroundColor, borderColor,
+          borderStyle:dashed?'dashed':'solid',
+          overflow:'hidden',
+        }}>
+          {isDeleted && <DeletedMsg />}
+          {!isDeleted && (props.reply_message_content?true:false) && <ReplyContent 
+            reply_message_content={props.reply_message_content}
+            reply_message_sender_alias={props.reply_message_sender_alias}
+          />}
+          {!isDeleted && <Message {...props} onLongPress={()=>{
+            ReactNativeHapticFeedback.trigger("impactLight", {
+              enableVibrateFallback: true,
+              ignoreAndroidSystemSettings: true
+            })
+            openPopover()
+          }}/>}
+        </View>
+        <Popover 
+          contentStyle={styles.content}
+          arrowStyle={styles.arrow}
+          backgroundStyle={styles.background}
+          visible={popoverVisible}
+          onClose={closePopover}
+          fromRect={popoverAnchorRect}
+          placement="top"
+          supportedOrientations={['portrait', 'landscape']}
+        >
+          <TouchableOpacity onPress={()=>{
+            Clipboard.setString(props.message_content||'')
+            closePopover()
+          }}
+            style={{padding:6}}>
+            <Text style={{textAlign:'center'}}>Copy</Text>
+          </TouchableOpacity>
+          {(isMe || isTribeOwner) && <TouchableOpacity onPress={async()=>{
+            await props.onDelete(props.id)
+            closePopover()
+          }}
+            style={{padding:6,borderTopWidth:1, borderTopColor:'#ddd'}}>
+            <Text style={{textAlign:'center'}}>Delete</Text>
+          </TouchableOpacity>}
+        </Popover>
+      </>
+    )}
+  </PopoverController>
 }
 
 // only show "messages"
@@ -119,6 +159,13 @@ function Message(props){
   }
 }
 
+function DeletedMsg(){
+  return <View style={{padding:10,display:'flex',flexDirection:'row',alignItems:'center'}}>
+    <Icon color="#aaa" size={12} name="cancel" />
+    <Text style={{color:'#aaa',marginLeft:5}}>This message has been deleted</Text>
+  </View>
+}
+
 const styles = StyleSheet.create({
   replyWrap:{
     width:'100%',
@@ -126,5 +173,16 @@ const styles = StyleSheet.create({
     justifyContent:'flex-end',
     flexDirection:'row',
     alignItems:'center',
-  }
+  },
+  content: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    width:100,
+  },
+  arrow: {
+    borderTopColor: 'white',
+  },
+  background: {
+    backgroundColor: 'rgba(0, 0, 0, 0.35)'
+  },
 })

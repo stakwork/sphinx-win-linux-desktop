@@ -17,6 +17,9 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
   const {msg,chats,contacts,user} = useStores()
   const isTribe = chat&&chat.type===tribe
 
+  async function onDelete(id){
+    await msg.deleteMessage(id)
+  }
   return useObserver(()=>{
     let theID = (chat&&chat.id)
     if(!theID) { // for very beginning, where chat doesnt have id
@@ -35,11 +38,12 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
     // console.log("OK DONE PREOCESSING MSGS")
     return <MsgList msgs={filtered} msgsLength={msgsLength} 
       chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid}
+      onDelete={onDelete} myPubkey={user.publicKey}
     />
   })
 }
 
-function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
+function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey}) {
   const scrollViewRef = useRef(null)
   const [viewableIds,setViewableIds] = useState([])
 
@@ -89,6 +93,7 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
           m={item} chat={chat} 
           isGroup={isGroup} isTribe={isTribe}
           replyUuid={replyUuid} setReplyUUID={setReplyUUID}
+          onDelete={onDelete} myPubkey={myPubkey}
         /> 
       }}
       keyExtractor={(item:any)=> item.id+''}
@@ -99,7 +104,7 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid}) {
   )
 }
 
-function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable}) {
+function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable,onDelete,myPubkey}) {
   if (m.dateLine) {
     return <DateLine dateString={m.dateLine} />
   }
@@ -108,6 +113,7 @@ function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable}) {
   return useMemo(()=> <Message {...msg} viewable={viewable} 
     isGroup={isGroup} isTribe={isTribe} 
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
+    onDelete={onDelete} myPubkey={myPubkey}
   />, [viewable,m.id,m.media_token,replyUuid,m.status])
 }
 

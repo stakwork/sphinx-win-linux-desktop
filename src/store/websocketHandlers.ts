@@ -94,6 +94,11 @@ export function group_leave(data) {
   }
 }
 
+export function deleteMessage(data){
+  log('[ws] delete message', data)
+  msgStore.gotNewMessage(data.response)
+}
+
 const oktolog=false
 function log(a,b){
   if(oktolog) {

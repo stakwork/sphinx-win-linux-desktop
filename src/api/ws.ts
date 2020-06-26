@@ -39,7 +39,9 @@ export function connectWebSocket(ip: string) {
 
   rws.onmessage = (e) => {
     let msg: WSMessage = JSON.parse(e.data)
-    let handler = handlers[msg.type]
+    let typ = msg.type
+    if(typ==='delete') typ='deleteMessage'
+    let handler = handlers[typ]
     if (handler) {
       handler(msg)
     }

@@ -279,6 +279,15 @@ class MsgStore {
   }
 
   @action
+  async deleteMessage(id) {
+    if(!id) return console.log("NO ID!")
+    console.log("DEL MSG",id)
+    const r = await relay.del(`message/${id}`)
+    console.log(r)
+    // UPDATE IN STATE
+  }
+
+  @action
   seeChat(id) {
     if(!id) return
     this.lastSeen[id] = new Date().getTime()
@@ -383,8 +392,13 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
 function putIn(orged, msg, chatID){
   if(!chatID) return
   if(orged[chatID]){
-    const existing = orged[chatID].find(m=>m.id===msg.id)
-    if(!existing) orged[chatID].unshift(msg)
+    if(!Array.isArray(orged[chatID])) return
+    const idx = orged[chatID].findIndex(m=>m.id===msg.id)
+    if(idx===-1) {
+      orged[chatID].unshift(msg)
+    } else {
+      orged[chatID][idx] = msg
+    }
   } else {
     orged[chatID] = [msg]
   }
