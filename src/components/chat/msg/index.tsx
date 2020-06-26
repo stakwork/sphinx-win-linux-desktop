@@ -10,7 +10,7 @@ import sharedStyles from './sharedStyles'
 import GroupNotification from './groupNotification'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {SwipeRow} from 'react-native-swipe-list-view'
-import {IconButton} from 'react-native-paper'
+import {IconButton, ActivityIndicator} from 'react-native-paper'
 import ReplyContent from './replyContent' 
 import { Popover, PopoverTouchable, PopoverController } from 'react-native-modal-popover';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -63,6 +63,7 @@ export default function MsgRow(props){
 }
 
 function MsgBubble(props){
+  const [deleting,setDeleting] = useState(false)
   const isMe = props.sender===1
   const isInvoice = props.type===constants.message_types.invoice
   const isPaid = props.status===constants.statuses.confirmed
@@ -125,11 +126,16 @@ function MsgBubble(props){
             <Text style={{textAlign:'center'}}>Copy</Text>
           </TouchableOpacity>
           {(isMe || isTribeOwner) && <TouchableOpacity onPress={async()=>{
-            await props.onDelete(props.id)
-            closePopover()
+            if(!deleting){
+              setDeleting(true)
+              await props.onDelete(props.id)
+              closePopover()
+              setDeleting(false)
+            }
           }}
-            style={{padding:6,borderTopWidth:1, borderTopColor:'#ddd'}}>
-            <Text style={{textAlign:'center'}}>Delete</Text>
+            style={{padding:6,borderTopWidth:1, borderTopColor:'#ddd', display:'flex',alignItems:'center',flexDirection:'row',justifyContent:'center'}}>
+            {deleting && <ActivityIndicator color="#888" size={10} />}
+            <Text style={{textAlign:'center',marginLeft:6}}>Delete</Text>
           </TouchableOpacity>}
         </Popover>
       </>

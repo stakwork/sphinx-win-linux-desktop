@@ -281,10 +281,10 @@ class MsgStore {
   @action
   async deleteMessage(id) {
     if(!id) return console.log("NO ID!")
-    console.log("DEL MSG",id)
     const r = await relay.del(`message/${id}`)
-    console.log(r)
-    // UPDATE IN STATE
+    if(r.chat && r.chat.id) {
+      putIn(this.messages, r, r.chat.id)
+    }
   }
 
   @action
