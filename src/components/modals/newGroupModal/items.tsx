@@ -3,6 +3,36 @@ import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native'
 import {RadioButton} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {usePicSrc} from '../../utils/picSrc'
+import {SwipeRow} from 'react-native-swipe-list-view'
+import {IconButton} from 'react-native-paper'
+
+export function DeletableContact(props){
+  const {contact,onDelete} =props
+  const uri = usePicSrc(contact)
+  const hasImg = uri?true:false
+  return <SwipeRow disableRightSwipe={true} friction={100}
+    rightOpenValue={-80} stopRightSwipe={-80}>
+    <View style={styles.backSwipeRow}>
+      <IconButton
+        icon="trash-can-outline"
+        color="white"
+        size={25}
+        onPress={()=> onDelete(contact.id)}
+        style={{marginRight:20}}
+      />
+    </View>
+    <View style={styles.frontSwipeRow}>
+      <View style={styles.avatar}>
+        <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')}
+          style={{width:44,height:44}} resizeMode={'cover'}
+        />
+      </View>
+      <View style={styles.contactContent}>
+        <Text style={styles.contactName}>{contact.alias}</Text>
+      </View>
+    </View>
+  </SwipeRow>
+}
 
 export function Contact(props){
   const {contact,onPress,selected,unselectable} =props
@@ -105,6 +135,20 @@ const styles = StyleSheet.create({
     display:'flex',
     alignItems:'center',
     justifyContent:'center'
+  },
+  backSwipeRow:{
+    backgroundColor:'#DB5554',
+    flex:1,
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'flex-end',
+  },
+  frontSwipeRow:{
+    backgroundColor:'white',
+    flex:1,
+    flexDirection:'row',
+    alignItems:'center',
+    height:80
   }
 })
 

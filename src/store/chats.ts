@@ -131,6 +131,13 @@ export class ChatStore {
     this.chats = chats.filter(c=> c.id!==chatID)
   }
 
+  @action 
+  async kick(chatID, contactID){
+    const r = await relay.put(`kick/${chatID}/${contactID}`)
+    console.log(r)
+    // return r
+  }
+
   @action
   updateChatPhotoURI(id,photo_uri){
     const cs = [...this.chats]

@@ -4,8 +4,6 @@ import { useStores } from '../../../store'
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native'
 import {Contact, SelectedContact} from './items'
 
-
-
 export default function People(props) {
   const { contacts } = useStores()
   const [selected, setTheSelected] = useState([])

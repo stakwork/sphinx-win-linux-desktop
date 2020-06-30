@@ -9,10 +9,11 @@ import FadeView from '../../utils/fadeView'
 import People from './people'
 import {useChatPicSrc,createChatPic} from '../../utils/picSrc'
 import moment from 'moment'
-import {Contact} from './items'
+import {Contact, DeletableContact} from './items'
 import EE from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
 import { constants } from '../../../constants'
+import {SwipeListView} from 'react-native-swipe-list-view'
 
 export default function GroupInfo({visible}) {
   const { ui, contacts, chats, user } = useStores()
@@ -24,6 +25,10 @@ export default function GroupInfo({visible}) {
   const [loadingTribe, setLoadingTribe] = useState(false)
 
   const group = ui.groupModalParams
+
+  async function onKickContact(cid){
+    await chats.kick(group.id, cid)
+  }
 
   function close(){
     ui.closeGroupModal()
@@ -77,7 +82,8 @@ export default function GroupInfo({visible}) {
   const isTribe = group && group.type===constants.chat_types.tribe
   const isTribeAdmin = isTribe && group.owner_pubkey===user.publicKey
 
-  return useObserver(() => <ModalWrap onClose={close} visible={visible}>
+  return useObserver(() => <ModalWrap onClose={close} visible={visible}
+    propagateSwipe={true}>
     <Portal.Host>
       <Header title={addPeople?'Add Contacts':'New Group'} 
         showNext={addPeople && showSelectedContacts} 
@@ -112,6 +118,11 @@ export default function GroupInfo({visible}) {
           <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
           <ScrollView style={styles.scroller}>
             {contactsToShow.map((c,i)=>{
+              if(isTribeAdmin){
+                return <DeletableContact key={i} contact={c} 
+                  onDelete={onKickContact}
+                />
+              }
               return <Contact key={i} contact={c} 
                 unselectable={true}
               />
@@ -224,6 +235,7 @@ const styles = StyleSheet.create({
   },
   scroller:{
     width:'100%',
+    position:'relative',
   },
   addPeople:{
     height:46,
