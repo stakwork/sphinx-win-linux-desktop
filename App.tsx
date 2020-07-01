@@ -12,7 +12,6 @@ import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
-import * as rsa from './src/crypto/rsa'
 import {deeplinkActions} from './src/deeplinkActions'
 
 declare var global: {HermesInternal: null | {}}
@@ -28,17 +27,18 @@ export default function Wrap(){
     }
   }
   useEffect(()=>{
-    (async () => {
-      const e = await Linking.getInitialURL()
-      if(e) await gotLink(e) // await to keep spinner there...
-      Linking.addEventListener('url', gotLink)
-      RNWebRTC.registerGlobals()
-      setWrapReady(true)
-    })()
+    Linking.getInitialURL()
+      .then(e=>{
+        if(e) gotLink(e).then(()=> setWrapReady(true)) // start with initial url
+        else setWrapReady(true) // cold start
+      })
+      .catch(()=> setWrapReady(true)) // this should not happen?
+    Linking.addEventListener('url', gotLink)
+    RNWebRTC.registerGlobals()
   },[])
 
   return useObserver(()=>{
-    if (ui.ready && wrapReady) return <App /> // hydrated!
+    if (ui.ready && wrapReady) return <App /> // hydrated and checked for deeplinks!
     return <Loading /> // full screen loading
   })
 }
