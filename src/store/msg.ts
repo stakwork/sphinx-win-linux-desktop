@@ -52,7 +52,8 @@ export interface Msg {
 }
 
 class MsgStore {
-  @persist('object') @observable // chat id: message array
+  @persist('object')
+  @observable // chat id: message array
   messages: {[k:number]:Msg[]} = {}
 
   @persist('object') @observable

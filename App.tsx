@@ -27,6 +27,7 @@ export default function Wrap(){
     }
   }
   useEffect(()=>{
+    console.log('=> check for deeplink')
     Linking.getInitialURL()
       .then(e=>{
         if(e) gotLink(e).then(()=> setWrapReady(true)) // start with initial url
