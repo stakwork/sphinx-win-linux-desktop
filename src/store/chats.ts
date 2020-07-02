@@ -134,8 +134,10 @@ export class ChatStore {
   @action 
   async kick(chatID, contactID){
     const r = await relay.put(`kick/${chatID}/${contactID}`)
-    console.log(r)
-    // return r
+    if(r===true){ // succes
+      const chat = this.chats.find(c=>c.id===chatID)
+      if(chat) chat.contact_ids = chat.contact_ids.filter(cid=>cid!==contactID)
+    }
   }
 
   @action

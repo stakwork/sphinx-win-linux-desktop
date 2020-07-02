@@ -13,7 +13,6 @@ import {Contact, DeletableContact} from './items'
 import EE from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
 import { constants } from '../../../constants'
-import {SwipeListView} from 'react-native-swipe-list-view'
 
 export default function GroupInfo({visible}) {
   const { ui, contacts, chats, user } = useStores()
@@ -56,12 +55,6 @@ export default function GroupInfo({visible}) {
     EE.emit('left-group')
   }
 
-  const contactsToShow = contacts.contacts.filter(c=> {
-    return c.id>1 && group && group.contact_ids.includes(c.id)
-  })
-  const selectedContacts = contacts.contacts.filter(c=> selected.includes(c.id))
-  const showSelectedContacts = selectedContacts.length>0
-
   const uri = useChatPicSrc(group)
 
   const hasGroup = group?true:false
@@ -82,108 +75,115 @@ export default function GroupInfo({visible}) {
   const isTribe = group && group.type===constants.chat_types.tribe
   const isTribeAdmin = isTribe && group.owner_pubkey===user.publicKey
 
-  return useObserver(() => <ModalWrap onClose={close} visible={visible}
-    propagateSwipe={true}>
-    <Portal.Host>
-      <Header title={addPeople?'Add Contacts':'New Group'} 
-        showNext={addPeople && showSelectedContacts} 
-        onClose={()=>close()} nextButtonText="Add"
-        next={()=>addGroupMembers()} loading={loading}
-      />
-
-      <FadeView opacity={!addPeople?1:0} style={styles.content}>
-
-        {hasGroup && <View style={styles.groupInfo}>
-          <View style={styles.groupInfoLeft}>
-            <TouchableOpacity onPress={changePic}>
-              <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')} 
-                style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
-              />
-            </TouchableOpacity>
-            <View style={styles.groupInfoText}>
-              <Text style={styles.groupInfoName}>{group.name}</Text>
-              <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>
-            </View>
-          </View>
-          <IconButton icon="dots-vertical" size={32} color="#666"
-            style={{marginLeft:0,marginRight:0}} 
-            onPress={()=>{
-              if(isTribeAdmin) setEditDialog(true)
-              else setLeaveDialog(true)
-            }}
-          />
-        </View>}
-
-        {(!isTribe || isTribeAdmin) && <View style={styles.members}>
-          <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
-          <ScrollView style={styles.scroller}>
-            {contactsToShow.map((c,i)=>{
-              if(isTribeAdmin){
-                return <DeletableContact key={i} contact={c} 
-                  onDelete={onKickContact}
-                />
-              }
-              return <Contact key={i} contact={c} 
-                unselectable={true}
-              />
-            })}
-          </ScrollView>
-          {!isTribeAdmin && <Button mode="contained" dark={true} icon="plus"
-            onPress={()=> setAddPeople(true)}
-            style={styles.addPeople}>
-            Add People
-          </Button>}
-        </View>}
-       
-      </FadeView>
-
-      <FadeView opacity={addPeople?1:0} style={styles.content}>
-        <People setSelected={setSelected} 
-          initialContactIds={(group&&group.contact_ids)||[]}
+  return useObserver(() => {
+    const contactsToShow = contacts.contacts.filter(c=> {
+      return c.id>1 && group && group.contact_ids.includes(c.id)
+    })
+    const selectedContacts = contacts.contacts.filter(c=> selected.includes(c.id))
+    const showSelectedContacts = selectedContacts.length>0
+    return <ModalWrap onClose={close} visible={visible}
+      propagateSwipe={true}>
+      <Portal.Host>
+        <Header title={addPeople?'Add Contacts':'New Group'} 
+          showNext={addPeople && showSelectedContacts} 
+          onClose={()=>close()} nextButtonText="Add"
+          next={()=>addGroupMembers()} loading={loading}
         />
-      </FadeView>
 
-      <Portal>
-        <Dialog visible={leaveDialog} style={{bottom:10,zIndex:99}}
-          onDismiss={()=> setLeaveDialog(false)}>
-          <Dialog.Title>Exit Group?</Dialog.Title>
-          <Dialog.Actions style={{justifyContent:'space-between'}}>
-            <Button icon="cancel" onPress={()=>setLeaveDialog(false)} color="#888">
-              Cancel
-            </Button>
-            <Button icon="exit-to-app" onPress={()=>{
-              if(!loading) exitGroup()
-            }} 
-              loading={loading} color="#DB5554">
-              Exit Group
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+        <FadeView opacity={!addPeople?1:0} style={styles.content}>
 
-      <Portal>
-        <Dialog visible={editDialog} style={{bottom:10,zIndex:99}}
-          onDismiss={()=> setEditDialog(false)}>
-          <Dialog.Title>Edit Group?</Dialog.Title>
-          <Dialog.Actions style={{justifyContent:'space-between'}}>
-            <Button icon="cancel" onPress={()=>setEditDialog(false)} color="#888">
-              Cancel
-            </Button>
-            <Button loading={loadingTribe} icon="pencil" onPress={async()=>{
-              setLoadingTribe(true)
-              const params = await chats.getTribeDetails(group.host,group.uuid)
-              if(params) ui.setEditTribeParams({id:group.id,...params})
-              setEditDialog(false)
-              setLoadingTribe(false)
-            }}>
-              Edit Group
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+          {hasGroup && <View style={styles.groupInfo}>
+            <View style={styles.groupInfoLeft}>
+              <TouchableOpacity onPress={changePic}>
+                <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')} 
+                  style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
+                />
+              </TouchableOpacity>
+              <View style={styles.groupInfoText}>
+                <Text style={styles.groupInfoName}>{group.name}</Text>
+                <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>
+              </View>
+            </View>
+            <IconButton icon="dots-vertical" size={32} color="#666"
+              style={{marginLeft:0,marginRight:0}} 
+              onPress={()=>{
+                if(isTribeAdmin) setEditDialog(true)
+                else setLeaveDialog(true)
+              }}
+            />
+          </View>}
 
-    </Portal.Host>
-  </ModalWrap>)
+          {(!isTribe || isTribeAdmin) && <View style={styles.members}>
+            <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
+            <ScrollView style={styles.scroller}>
+              {contactsToShow.map((c,i)=>{
+                if(isTribeAdmin){
+                  return <DeletableContact key={i} contact={c} 
+                    onDelete={onKickContact}
+                  />
+                }
+                return <Contact key={i} contact={c} 
+                  unselectable={true}
+                />
+              })}
+            </ScrollView>
+            {!isTribeAdmin && <Button mode="contained" dark={true} icon="plus"
+              onPress={()=> setAddPeople(true)}
+              style={styles.addPeople}>
+              Add People
+            </Button>}
+          </View>}
+        
+        </FadeView>
+
+        <FadeView opacity={addPeople?1:0} style={styles.content}>
+          <People setSelected={setSelected} 
+            initialContactIds={(group&&group.contact_ids)||[]}
+          />
+        </FadeView>
+
+        <Portal>
+          <Dialog visible={leaveDialog} style={{bottom:10,zIndex:99}}
+            onDismiss={()=> setLeaveDialog(false)}>
+            <Dialog.Title>Exit Group?</Dialog.Title>
+            <Dialog.Actions style={{justifyContent:'space-between'}}>
+              <Button icon="cancel" onPress={()=>setLeaveDialog(false)} color="#888">
+                Cancel
+              </Button>
+              <Button icon="exit-to-app" onPress={()=>{
+                if(!loading) exitGroup()
+              }} 
+                loading={loading} color="#DB5554">
+                Exit Group
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
+        <Portal>
+          <Dialog visible={editDialog} style={{bottom:10,zIndex:99}}
+            onDismiss={()=> setEditDialog(false)}>
+            <Dialog.Title>Edit Group?</Dialog.Title>
+            <Dialog.Actions style={{justifyContent:'space-between'}}>
+              <Button icon="cancel" onPress={()=>setEditDialog(false)} color="#888">
+                Cancel
+              </Button>
+              <Button loading={loadingTribe} icon="pencil" onPress={async()=>{
+                setLoadingTribe(true)
+                const params = await chats.getTribeDetails(group.host,group.uuid)
+                if(params) ui.setEditTribeParams({id:group.id,...params})
+                setEditDialog(false)
+                setLoadingTribe(false)
+              }}>
+                Edit Group
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
+      </Portal.Host>
+    </ModalWrap>
+  })
 }
 
 const styles = StyleSheet.create({
