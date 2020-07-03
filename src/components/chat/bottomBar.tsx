@@ -267,7 +267,7 @@ export default function BottomBar(props) {
           </TouchableOpacity>
         </View>}
 
-        <AttachmentDialog 
+        <AttachmentDialog isConversation={isConversation}
           open={dialogOpen} onClose={()=>setDialogOpen(false)}
           onPick={res=> tookPic(res)}
           onChooseCam={()=> setTakingPhoto(true)}

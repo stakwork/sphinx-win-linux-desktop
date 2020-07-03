@@ -200,6 +200,49 @@ class ContactStore {
       console.log(e)
     }
   }
+
+  @action async createSubscription(v){
+    if(!v.contact_id || !v.chat_id || !v.amount || !v.interval) {
+      return console.log('missing param')
+    }
+    try{
+      const s = await relay.post('subscriptions', v)
+      console.log(s)
+    } catch(e){
+      console.log(e)
+    }
+  }
+
+  @action async deleteSubscription(id){
+    try{
+      const s = await relay.del(`subscription/${id}`)
+      console.log(s)
+    } catch(e){
+      console.log(e)
+    }
+  }
+
+  @action async getSubscriptionForContact(contactID){
+    try{
+      const s = await relay.get(`subscriptions/contact/${contactID}`)
+      return s
+    } catch(e){
+      console.log(e)
+    }
+  }
+
+  @action async editSubscription(id, v){
+    if(!id || !v.contact_id || !v.chat_id || !v.amount || !v.interval) {
+      return console.log('missing param')
+    }
+    try{
+      const s = await relay.put(`subscription/${id}`, v)
+      return s
+    } catch(e){
+      console.log(e)
+    }
+  }
+  
 }
 
 export const contactStore = new ContactStore()

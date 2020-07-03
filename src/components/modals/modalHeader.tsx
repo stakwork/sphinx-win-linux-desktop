@@ -3,17 +3,27 @@ import {View,Text,StyleSheet} from 'react-native'
 import {IconButton} from 'react-native-paper'
 
 export default function Header(props){
-  const {title,onClose} = props
+  const {title,onClose,leftArrow} = props
   return <View style={{...styles.header, ...props.background&&{backgroundColor:props.background}}}>
-    <View style={styles.headerLefty}></View>
+    <View style={styles.headerLefty}>
+      {leftArrow && <IconButton
+        icon="arrow-left"
+        color="grey"
+        size={22}
+        style={{marginRight:14,marginTop:8}}
+        onPress={() => onClose()}
+      />}
+    </View>
     <Text style={styles.headerTitle}>{title}</Text>
-    <IconButton
-      icon="close"
-      color="#DB5554"
-      size={22}
-      style={{marginRight:14,marginTop:8}}
-      onPress={() => onClose()}
-    />
+    <View style={styles.headerLefty}>
+      {!leftArrow && <IconButton
+        icon="close"
+        color="#DB5554"
+        size={22}
+        style={{marginRight:14,marginTop:8}}
+        onPress={() => onClose()}
+      />}
+    </View>
   </View>
 }
 
@@ -34,6 +44,8 @@ const styles = StyleSheet.create({
   },
   headerLefty:{
     backgroundColor:'white',
-    width:51,height:1,
+    width:51,height:50,
+    borderRadius:18,
+    marginLeft:5
   },
 })

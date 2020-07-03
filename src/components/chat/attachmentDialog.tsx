@@ -2,7 +2,7 @@ import React from 'react'
 import {Portal, Button, Dialog} from 'react-native-paper'
 import ImagePicker from 'react-native-image-picker'
 
-export default function AttachmentDialog({open, onClose, onPick, onChooseCam, doPaidMessage, request, send}){
+export default function AttachmentDialog({open, onClose, onPick, onChooseCam, doPaidMessage, request, send, isConversation}){
   async function pickImage() {
     ImagePicker.launchImageLibrary({}, result=>{
       if (!result.didCancel) {
@@ -15,9 +15,9 @@ export default function AttachmentDialog({open, onClose, onPick, onChooseCam, do
   return <Portal>
     <Dialog visible={open} style={{bottom:10}}
       onDismiss={()=> onClose()}>
-      <Dialog.Title>File Attachment</Dialog.Title>
+      <Dialog.Title>Message Options</Dialog.Title>
       <Dialog.Actions style={{
-        height:240,
+        height:isConversation?260:160,
         display:'flex',flexDirection:'column',
         justifyContent:'space-between',alignItems:'flex-start'
         }}>
@@ -30,12 +30,12 @@ export default function AttachmentDialog({open, onClose, onPick, onChooseCam, do
         <Button icon="message" onPress={()=>doPaidMessage()} style={{width:'100%',alignItems:'flex-start'}}>
           Paid Message
         </Button>
-        <Button icon="arrow-bottom-left" onPress={()=>request()} style={{width:'100%',alignItems:'flex-start'}}>
+        {isConversation && <Button icon="arrow-bottom-left" onPress={()=>request()} style={{width:'100%',alignItems:'flex-start'}}>
           Request
-        </Button>
-        <Button icon="arrow-top-right" onPress={()=>send()} style={{width:'100%',alignItems:'flex-start'}}>
+        </Button>}
+        {isConversation && <Button icon="arrow-top-right" onPress={()=>send()} style={{width:'100%',alignItems:'flex-start'}}>
           Send
-        </Button>
+        </Button>}
       </Dialog.Actions>
     </Dialog>
   </Portal>

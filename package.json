@@ -9,6 +9,7 @@
     "@babel/plugin-proposal-decorators": "^7.8.3",
     "@react-native-community/async-storage": "^1.8.1",
     "@react-native-community/audio-toolkit": "^2.0.3",
+    "@react-native-community/datetimepicker": "^2.5.0",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-navigation/drawer": "^5.1.0",
     "@react-navigation/native": "^5.0.8",

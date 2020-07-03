@@ -6,6 +6,7 @@ import Tags from './tags'
 import Number from './number'
 import PhotoURI from './photoURI'
 import Radio from './radio'
+import MultiBox from './multiBox'
 
 export default function Input(props){
   switch (props.type) {
@@ -23,6 +24,8 @@ export default function Input(props){
       return <PhotoURI {...props} />
     case 'radio':
       return <Radio {...props} />
+    case 'multibox':
+      return <MultiBox {...props} />
     default:
       return <TextInput {...props} />
   }

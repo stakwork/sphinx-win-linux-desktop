@@ -12,10 +12,14 @@ export default function Form(props) {
       initialValues={props.initialValues||{}}
       onSubmit={values=> props.onSubmit(values)}
       validationSchema={validator(props.schema)}
-      validateOnChange={false}>
+      // validateOnChange={false}
+      >
       {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, errors, dirty, isValid }) => {
+        // console.log('============================')
+        // console.log("VALUES",values)
+        // console.log("ERRORS",errors)
         return (<View style={styles.wrap}>
-          <View style={styles.topper}>
+          <View style={{...styles.topper,padding:props.nopad?0:25}}>
             {props.schema.map(item=>{
               const readOnly = props.readOnlyFields && props.readOnlyFields.includes(item.name)
               return <Input key={item.name} {...item} 
@@ -28,6 +32,7 @@ export default function Form(props) {
               />
             })}
           </View>
+          {/* <View style={{height:1,backgroundColor:'#ddd'}}></View> */}
           {!props.displayOnly && <View style={styles.buttonWrap}>
             <Button mode="contained"
               onPress={handleSubmit} 
@@ -63,7 +68,6 @@ const styles=StyleSheet.create({
   topper:{
     width:'100%',
     flex:1,
-    padding:25,
     paddingBottom:75,
   },
   buttonWrap:{
@@ -71,9 +75,9 @@ const styles=StyleSheet.create({
     maxHeight:60,
     flexDirection:'row-reverse',
     justifyContent:'center',
+    zIndex:1000,
     position:'absolute',
     bottom:10,left:0,right:0,
-    zIndex:1000
   },
   button:{
     borderRadius:30,

@@ -1,9 +1,7 @@
 import React, {useState} from 'react'
-import {View, ScrollView, TouchableOpacity, StyleSheet, TextInput} from 'react-native'
-import {Button} from 'react-native-paper'
+import {View, ScrollView, StyleSheet} from 'react-native'
 import ImagePicker from 'react-native-image-picker';
 import { useStores } from '../../../store'
-import {createChatPic} from '../../utils/picSrc'
 import Form from '../../form'
 import {tribe} from '../../form/schemas'
 
@@ -79,36 +77,4 @@ const styles=StyleSheet.create({
     width:'100%',
     paddingBottom:20,
   },
-  buttonWrap:{
-    position:'absolute',
-    bottom:12,
-    width:'100%',
-    height:60,
-    display:'flex',
-    flexDirection:'row-reverse',
-  },
-  button:{
-    width:150,
-    marginRight:'12.5%',
-    borderRadius:30,
-    height:60,
-    display:'flex',
-    justifyContent:'center',
-    backgroundColor:'#6289FD'
-  },
-  input:{
-    width:'75%',
-    borderColor:'#bbb',
-    borderWidth:1,
-    backgroundColor:'white',
-    height:70,
-    borderRadius:35,
-    marginTop:30,
-    fontSize:21,
-    paddingLeft:25,
-    paddingRight:25,
-    marginLeft:'12.5%',
-    marginRight:'12.5%',
-    marginBottom:100,
-  }
 })
