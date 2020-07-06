@@ -35,6 +35,13 @@ export class UiStore {
     this.addFriendModal = b
   }
 
+  @observable subModalParams: {[k:string]:any} = null
+  @action
+  setSubModalParams(o) {
+    console.log('setSubModalParams',o)
+    this.subModalParams = o
+  }
+
   @observable editContactModal: boolean = false
   @observable editContactParams: Contact
   @action

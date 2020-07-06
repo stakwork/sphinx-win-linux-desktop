@@ -2,13 +2,14 @@ import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
 import {View, Text, StyleSheet, ScrollView} from 'react-native'
-import {Button, Portal, IconButton} from 'react-native-paper'
+import {Button, Portal, IconButton, Switch} from 'react-native-paper'
 import Form from '../form'
 import * as schemas from '../form/schemas'
 import ModalWrap from './modalWrap'
 import {usePicSrc} from '../utils/picSrc'
 import FadeView from '../utils/fadeView'
 import { constants } from '../../constants'
+import ConfirmDialog from '../utils/confirmDialog'
 
 const conversation = constants.chat_types.conversation
 
@@ -17,6 +18,7 @@ export default function EditContact({visible}) {
   const [loading, setLoading] = useState(false)
   const [sub,setSub] = useState(false)
   const [existingSub, setExistingSub] = useState(null)
+  const [showConfirm,setShowConfirm] = useState(false)
   function close(){
     ui.closeEditContactModal()
   }
@@ -57,42 +59,61 @@ export default function EditContact({visible}) {
     if(!cfc) return console.log('no chat')
     setLoading(true)
     if(existingSub) {
-      await contacts.editSubscription(existingSub.id, {
+      const s = await contacts.editSubscription(existingSub.id, {
         ...v, chat_id:cfc.id, contact_id:contact.id
       })
+      setExistingSub(s)
     } else {
-      await contacts.createSubscription({
+      const s = await contacts.createSubscription({
         ...v, chat_id:cfc.id, contact_id:contact.id
       })
+      setExistingSub(s)
     }
     setLoading(false)
     setSub(false)
   }
 
-  async function deleteSubscription(sid){
-    setLoading(true)
-    await contacts.deleteSubscription(sid)
-    setLoading(false)
+  async function toggleSubscription(sid,paused:boolean){
+    const ok = await contacts.toggleSubscription(sid,paused)
+    if(ok) setExistingSub(current=>{
+      return {...current,paused}
+    })
   }
 
   const uri = usePicSrc(contact)
 
-  const initialSubValues:{[k:string]:any} = {}
-  if(existingSub){
-    const amountIsCustom = existingSub.amount!==500 && existingSub.amount!==1000 && existingSub.amount!==2000
-    if(amountIsCustom) {
-      initialSubValues.amount = {selected:'custom',custom:existingSub.amount}
-    } else {
-      initialSubValues.amount = {selected:existingSub.amount}
+  function makeSubValues(){
+    const initialSubValues:{[k:string]:any} = {}
+    if(existingSub){
+      const amountIsCustom = existingSub.amount!==500 && existingSub.amount!==1000 && existingSub.amount!==2000
+      if(amountIsCustom) {
+        initialSubValues.amount = {selected:'custom',custom:existingSub.amount}
+      } else {
+        initialSubValues.amount = {selected:existingSub.amount}
+      }
+      initialSubValues.interval = {selected:existingSub.interval}
+      if(existingSub.end_number){
+        initialSubValues.endRule = {selected:'number',custom:existingSub.end_number}
+      } else if(existingSub.end_date){
+        initialSubValues.endRule = {selected:'date',custom:existingSub.end_date}
+      }
     }
-    initialSubValues.interval = {selected:existingSub.interval}
-    if(existingSub.end_number){
-      initialSubValues.endRule = {selected:'number',custom:existingSub.end_number}
-    } else if(existingSub.end_date){
-      initialSubValues.endRule = {selected:'date',custom:existingSub.end_date}
+    return initialSubValues
+  }
+  function parseSubValues(v){
+    const amountIsCustom = v.amount.selected==='custom' && v.amount.custom
+    const endRuleIsNumber = v.endRule.selected==='number' && v.endRule.custom
+    const endRuleIsDate = v.endRule.selected==='date' && v.endRule.custom
+    const body = {
+      amount: amountIsCustom ? v.amount.custom : v.amount.selected,
+      interval: v.interval.selected,
+      ...endRuleIsNumber && {end_number:v.endRule.custom},
+      ...endRuleIsDate && {end_date:v.endDate.custom},
     }
+    return body
   }
 
+  const subPaused = (existingSub&&existingSub.paused)?true:false
   return useObserver(() => <ModalWrap onClose={close} visible={visible} propagateSwipe={true} noSwipe>
     <Portal.Host>
       <View style={styles.header}>
@@ -113,8 +134,21 @@ export default function EditContact({visible}) {
           {!sub && <Button style={styles.subscribe}
             onPress={()=>setSub(true)}
             mode="contained" dark={true}>
-            <Text style={{fontSize:10}}>{'Subscribe'}</Text>
+            <Text style={{fontSize:9}}>{existingSub?'Subscribed':'Subscribe'}</Text>
           </Button>}
+          {(sub && existingSub && existingSub.id) && <View style={styles.row}>
+            <IconButton
+              icon="trash-can-outline"
+              color="grey" size={22} style={{marginRight:12}}
+              onPress={()=>setShowConfirm(true)}
+            />
+            <View style={styles.row}>
+              <Text style={styles.pausedText}>{subPaused?'PAUSED':'ACTIVE'}</Text>
+              <Switch value={!subPaused} 
+                onValueChange={()=> toggleSubscription(existingSub.id, subPaused?false:true)}
+              />
+            </View>
+          </View>}
         </View>
       </View>
 
@@ -135,24 +169,27 @@ export default function EditContact({visible}) {
 
       <FadeView opacity={sub?1:0} style={styles.fader}>
         <ScrollView style={styles.scroller} contentContainerStyle={styles.container}>
-          <Form schema={schemas.subscribe} loading={loading} 
-            buttonText="Subscribe" nopad
-            initialValues={initialSubValues}
+          <Form schema={schemas.subscribe} loading={loading} nopad
+            buttonText="Subscribe"
+            initialValues={makeSubValues()}
             onSubmit={v=> {
-              const amountIsCustom = v.amount.selected==='custom' && v.amount.custom
-              const endRuleIsNumber = v.endRule.selected==='number' && v.endRule.custom
-              const endRuleIsDate = v.endRule.selected==='date' && v.endRule.custom
-              const body = {
-                amount: amountIsCustom ? v.amount.custom : v.amount.selected,
-                interval: v.interval.selected,
-                ...endRuleIsNumber && {endNumber:v.endRule.custom},
-                ...endRuleIsDate && {endDate:v.endDate.custom},
-              }
+              const body = parseSubValues(v)
               createOrEditSubscription(body)
             }}
           />
         </ScrollView>
       </FadeView>
+
+      <ConfirmDialog 
+        open={showConfirm}
+        onClose={()=> setShowConfirm(false)}
+        onConfirm={()=>{
+          setShowConfirm(false)
+          contacts.deleteSubscription(existingSub.id)
+          setSub(false)
+          setExistingSub(null)
+        }}
+      />
 
     </Portal.Host>
   </ModalWrap>)
@@ -183,14 +220,14 @@ const styles = StyleSheet.create({
     marginLeft:5
   },
   subWrap:{
-    width:101,
+    minWidth:111,
     borderRadius:18,
     marginRight:12,
   },
   subscribe:{
     backgroundColor:'#6289FD',
     height:27,
-    width:95,
+    width:111,
     display:'flex',
     flexDirection:'row',
     alignItems:'center',
@@ -216,4 +253,14 @@ const styles = StyleSheet.create({
     width:'100%',
     paddingBottom:20,
   },
+  pausedText:{
+    fontSize:12,
+    color:'grey',
+    minWidth:50
+  },
+  row:{
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center'
+  }
 })

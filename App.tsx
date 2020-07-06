@@ -12,7 +12,7 @@ import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
-import {deeplinkActions} from './src/deeplinkActions'
+import {qrActions} from './src/qrActions'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -23,7 +23,7 @@ export default function Wrap(){
   async function gotLink(e){
     if(e && typeof e==='string'){
       const j = utils.jsonFromUrl(e)
-      if(j['action']) await deeplinkActions(j,ui,chats)
+      if(j['action']) await qrActions(j,ui,chats)
     }
   }
   useEffect(()=>{

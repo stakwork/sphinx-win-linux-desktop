@@ -15,9 +15,9 @@ export default function Wrap(props) {
     // deviceHeight={Dimensions.get('screen').height-142}
     propagateSwipe={props.propagateSwipe?true:false}
     swipeThreshold={20}>
-    <View style={styles.main}>
+    {visible ? <View style={styles.main}>
       {children}
-    </View>
+    </View> : <View />}
   </Modal>
 }
 

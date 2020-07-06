@@ -48,7 +48,9 @@ function Custom({type,onFocus,onChange,value,isFocused}){
   const previousIsFocused = usePrevious(isFocused);
   useEffect(()=>{
     if(!previousIsFocused && isFocused) {
-      if(type==='date') setShowDate(true)
+      if(type==='date') {
+        setShowDate(true)
+      }
       if(type==='number') {
         if(numberInputRef&&numberInputRef.current){
           numberInputRef.current.focus()

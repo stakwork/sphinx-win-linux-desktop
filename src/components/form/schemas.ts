@@ -56,7 +56,9 @@ const subscribe = [
     type:'multibox',
     label:{en:'Amount',es:'Amount'},
     required: true,
-    validator: Yup.object().shape({selected:Yup.string().required(rq)}),
+    validator: Yup.object().shape({
+      selected:Yup.string().required(rq)
+    }),
     options:[
       {label:'500',value:500,suffix:'sat'},
       {label:'1000',value:1000,suffix:'sat'},
@@ -69,7 +71,9 @@ const subscribe = [
     type:'multibox',
     label:{en:'Time Interval',es:'Time Interval'},
     required: true,
-    validator: Yup.object().shape({selected:Yup.string().required(rq)}),
+    validator: Yup.object().shape({
+      selected:Yup.string().required(rq),
+    }),
     options:[
       {label:'Daily',value:'daily'},
       {label:'Weekly',value:'weekly'},
@@ -81,7 +85,10 @@ const subscribe = [
     type:'multibox',
     label:{en:'End Rule',es:'End Rule'},
     required: true,
-    validator: Yup.object().shape({selected:Yup.string().required(rq)}),
+    validator: Yup.object().shape({
+      selected:Yup.string().required(rq),
+      custom:Yup.mixed().required(rq),
+    }),
     options:[
       {label:'Make',value:'number', suffix:'Payments', custom:'number'},
       {label:'Pay Until',value:'date', custom:'date'}

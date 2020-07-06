@@ -16,6 +16,7 @@ import PaymentHistory from './paymentHistory'
 import JoinTribe from './joinTribe'
 import Oauth from './oauth'
 import Support from './support'
+import Subscribe from './subscribe'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -28,6 +29,7 @@ export default function Modals(){
     const showPeer = ui.rtcParams?true:false
     const showJoinTribe = ui.joinTribeParams?true:false
     const showOauth = ui.oauthParams?true:false
+    const showSubModal = ui.subModalParams?true:false
     return <>
       <AddFriend visible={showAddFriendModal} />
       <Payment visible={ui.showPayModal} />
@@ -43,6 +45,7 @@ export default function Modals(){
       <JoinTribe visible={showJoinTribe} />
       <Oauth visible={showOauth} />
       <Support visible={ui.supportModal} />
+      <Subscribe visible={showSubModal} />
     </>
   })
 }

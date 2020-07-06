@@ -94,6 +94,7 @@ class ContactStore {
       } else {
         this.contacts = [...this.contacts, r]
       }
+      return r
     } catch(e) {
       console.log(e)
     }
@@ -208,6 +209,7 @@ class ContactStore {
     try{
       const s = await relay.post('subscriptions', v)
       console.log(s)
+      return s
     } catch(e){
       console.log(e)
     }
@@ -238,6 +240,15 @@ class ContactStore {
     try{
       const s = await relay.put(`subscription/${id}`, v)
       return s
+    } catch(e){
+      console.log(e)
+    }
+  }
+
+  @action async toggleSubscription(sid,paused){
+    try {
+      const s = await relay.put(`subscription/${sid}/${paused?'restart':'pause'}`)
+      if(s) return true
     } catch(e){
       console.log(e)
     }

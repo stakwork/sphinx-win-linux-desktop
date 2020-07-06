@@ -37,7 +37,9 @@ const constants = {
     group_invite: 13,
     group_join: 14,
     group_leave: 15,
-    group_query: 16
+    group_kick: 16,
+    delete: 17,
+    repayment: 18,
   },
   payment_errors: {
     timeout: 'Timed Out',

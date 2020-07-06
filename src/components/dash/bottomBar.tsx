@@ -8,6 +8,7 @@ import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
 import * as ln from '../utils/decode'
 import * as utils from '../utils/utils'
+import {qrActions} from '../../qrActions'
 
 export default function BottomTabs() {
   const {ui,chats} = useStores()
@@ -34,6 +35,7 @@ export default function BottomTabs() {
             showPaster
             onCancel={()=>setScanning(false)}
             onScan={async data=>{
+              console.log(data)
               if(isLN(data)) {
                 let inv:any
                 let theData = data
@@ -49,7 +51,15 @@ export default function BottomTabs() {
                   setScanning(false)
                 },1500)
               } else if(data.startsWith('sphinx.chat://')) {
-                await parseSphinxQR(data, ui, chats)
+                const j = utils.jsonFromUrl(data)
+                await qrActions(j, ui, chats)
+                setTimeout(()=>{
+                  setScanning(false)
+                },150)
+              } else if(data.startsWith('action=donation')) { // this should be already
+                const nd = 'sphinx.chat://?'+data
+                const j = utils.jsonFromUrl(nd)
+                await qrActions(j, ui, chats)
                 setTimeout(()=>{
                   setScanning(false)
                 },150)
@@ -60,18 +70,6 @@ export default function BottomTabs() {
       </Portal>
     </View>
   )
-}
-
-async function parseSphinxQR(data:string, ui:UiStore, chats:ChatStore){
-  const j = utils.jsonFromUrl(data)
-  switch(j.action) {
-    case 'tribe':
-      const tribeParams = await chats.getTribeDetails(j.host,j.uuid)
-      // console.log(tribeParams)
-      if(tribeParams) ui.setJoinTribeParams(tribeParams)
-    default:
-      return
-  }
 }
 
 const lnPrefixes = ['ln','LIGHTNING:ln']
