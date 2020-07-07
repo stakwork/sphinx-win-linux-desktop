@@ -2,7 +2,7 @@
 
 [![StakWork](https://img.shields.io/badge/-StakWork%20Bounty-informational?logo=bitcoin&link=https%3A%2F%2Fsphinx.chat)](https://sphinx.chat)
 
-React-Native Android client for Sphinx network
+React-Native Android and Web client for Sphinx network
 
 ### contributing
 
@@ -15,6 +15,16 @@ React-Native Android client for Sphinx network
   - purpose of changes
   - any libraries added & if they need linking
   - any changes in Android manifest, etc
+
+***development***
+
+- Android dev:
+  - uncomment the `"include": ["src"]` line in `tsconfig.json`
+  - `react-native run-android`
+
+- Web dev:
+  - uncomment the `["src/index.web.tsx","web"]` line in `tsconfig.json`
+  - `npm run web`
 
 **react:**
 

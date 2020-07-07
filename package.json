@@ -3,7 +3,9 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "postinstall": "jetify"
+    "postinstall": "jetify",
+    "web": "react-app-rewired start",
+    "build-web": "react-app-rewired build"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",
@@ -15,6 +17,7 @@
     "@react-navigation/native": "^5.0.8",
     "@react-navigation/stack": "^5.0.8",
     "@tradle/react-native-http": "^2.0.1",
+    "@types/react-dom": "^16.9.8",
     "assert": "^1.5.0",
     "base-64": "^0.1.0",
     "browserify-zlib": "^0.1.4",
@@ -34,7 +37,7 @@
     "mobx-persist": "^0.4.1",
     "mobx-react-lite": "^1.5.2",
     "moment": "^2.24.0",
-    "npm": "^6.14.4",
+    "npm": "^6.14.6",
     "paper": "^0.12.4",
     "path-browserify": "0.0.0",
     "process": "^0.11.10",
@@ -43,7 +46,8 @@
     "qrious": "^4.0.2",
     "querystring-es3": "^0.2.1",
     "react": "~16.9.0",
-    "react-dom": "~16.9.0",
+    "react-app-rewired": "^2.1.6",
+    "react-dom": "^16.9.0",
     "react-native": "^0.62.2",
     "react-native-audio-recorder-player": "^2.5.0",
     "react-native-camera": "^3.21.0",
@@ -89,6 +93,8 @@
     "react-native-webrtc": "git+https://github.com/openland/react-native-webrtc.git",
     "react-native-webview": "^9.0.2",
     "react-navigation": "^4.3.7",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.1",
     "readable-stream": "^1.0.33",
     "reconnecting-websocket": "^4.4.0",
     "rn-fetch-blob": "^0.12.0",
@@ -98,6 +104,7 @@
     "stream-browserify": "^1.0.0",
     "string_decoder": "^0.10.31",
     "timers-browserify": "^1.4.2",
+    "ts-import-plugin": "^1.6.6",
     "tty-browserify": "0.0.0",
     "url": "^0.10.3",
     "util": "^0.10.4",
@@ -111,9 +118,11 @@
     "@types/react": "^16.9.23",
     "@types/react-native": "~0.60.23",
     "babel-jest": "~24.9.0",
+    "customize-cra": "^1.0.0",
     "jest": "~24.9.0",
     "jetifier": "~1.6.4",
     "metro-react-native-babel-preset": "^0.56.4",
+    "react-dev-utils": "^10.2.1",
     "react-test-renderer": "~16.9.0",
     "typescript": "~3.6.3"
   },
@@ -169,5 +178,17 @@
     "tty": "tty-browserify",
     "vm": "vm-browserify",
     "tls": false
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

@@ -5,6 +5,7 @@ import PINCode, {hasUserSetPinCode} from './utils/pin'
 import {useStores} from '../store'
 import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
+import { is24HourFormat } from 'react-native-device-time-format'
 
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
@@ -33,7 +34,8 @@ export default function Main() {
         }
       })
 
-      ui.initIs24HourFormat()
+      const is24Hour = await is24HourFormat()
+      ui.setIs24HourFormat(is24Hour)
 
     })()
   },[])
