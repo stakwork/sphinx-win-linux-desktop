@@ -16,14 +16,14 @@ React-Native Android and Web client for Sphinx network
   - any libraries added & if they need linking
   - any changes in Android manifest, etc
 
-***development***
+**development**
 
 - Android dev:
   - uncomment the `"include": ["src"]` line in `tsconfig.json`
   - `react-native run-android`
 
 - Web dev:
-  - uncomment the `["src/index.web.tsx","web"]` line in `tsconfig.json`
+  - uncomment the `"include": ["src/index.web.tsx","web"]` line in `tsconfig.json`
   - `npm run web`
 
 **react:**
