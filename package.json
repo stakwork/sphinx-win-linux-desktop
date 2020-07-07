@@ -93,6 +93,7 @@
     "reconnecting-websocket": "^4.4.0",
     "rn-fetch-blob": "^0.12.0",
     "rn-rncryptor": "^1.0.12",
+    "rn-rsa-native": "^2.0.2",
     "sdp-transform": "^2.14.0",
     "stream-browserify": "^1.0.0",
     "string_decoder": "^0.10.31",

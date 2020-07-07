@@ -13,6 +13,7 @@ import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
+import * as rsa from './src/crypto/rsa'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -27,6 +28,8 @@ export default function Wrap(){
     }
   }
   useEffect(()=>{
+    // rsa.getPrivateKey()
+
     console.log('=> check for deeplink')
     Linking.getInitialURL()
       .then(e=>{

@@ -1,4 +1,4 @@
-import { RSAKeychain, RSA } from 'react-native-rsa-native'
+import { RSAKeychain, RSA } from 'rn-rsa-native'
 global.Buffer = global.Buffer || require('buffer').Buffer
 
 const KEY_SIZE = 2048
@@ -15,10 +15,24 @@ export async function keyGen() {
   return ''
 }
 
-export async function deletePrivateKey() {
+export async function getPrivateKey() {
+  console.log('=> get private key')
   try {
-    await RSAKeychain.deletePrivateKey(KEY_TAG)
-  } catch(e){}
+    const priv = await RSAKeychain.getPrivateKey(KEY_TAG)
+    console.log('======> priv',priv)
+  } catch(e){
+    console.log(e)
+  }
+}
+
+export async function getPublicKey() {
+  console.log('=> get public key')
+  try {
+    const pub = await RSAKeychain.getPublicKey(KEY_TAG)
+    console.log('======> pub',pub)
+  } catch(e){
+    console.log(e)
+  }
 }
 
 // ENCRYPT UTF8
