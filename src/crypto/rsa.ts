@@ -1,11 +1,55 @@
-import { RSAKeychain, RSA } from 'rn-rsa-native'
+import { RSAKeychain, RSA } from 'react-native-rsa-native'
 global.Buffer = global.Buffer || require('buffer').Buffer
+import SecureStorage from 'react-native-secure-storage'
 
 const KEY_SIZE = 2048
 const KEY_TAG = 'sphinx'
 
 const BLOCK_SIZE=256
 const MAX_CHUNK_SIZE=BLOCK_SIZE-11 // 11 is the PCKS1 padding
+
+export async function generateKeyPair(): Promise<{private:string,public:string}> {
+  try {
+    const keys = await RSA.generateKeys(KEY_SIZE)
+    const priv = privuncert(keys.private)
+    const pub = pubuncert(keys.public)
+    await SecureStorage.setItem('private', priv, {service: 'sphinx_encryption_key'})
+    return {private:priv, public:pub}
+  } catch(e){}
+}
+
+export async function getPrivateKey() {
+  try{
+    const config = {service: 'sphinx_encryption_key'}
+    const got = await SecureStorage.getItem('private', config)
+    return got
+  } catch(e) {
+    console.log(e)
+  }
+}
+
+export async function decryptNew(data) {
+  try{
+    const config = {service: 'sphinx_encryption_key'}
+    const priv = await SecureStorage.getItem('private', config)
+    const key = privcert(priv)
+
+    const buf = Buffer.from(data, 'base64')
+    let dataArray = []
+    let finalDec = ''
+    const n = Math.ceil(buf.length/BLOCK_SIZE)
+    const arr = Array(n).fill(0)
+    arr.forEach((_,i)=>{
+      dataArray.push(buf.subarray(i*BLOCK_SIZE,i*BLOCK_SIZE+BLOCK_SIZE).toString('base64'))
+    })
+    await asyncForEach(dataArray, async d=>{
+      const dec = await RSA.decrypt(d, key)
+      finalDec += dec
+    })
+    return finalDec
+  } catch(e){}
+  return ''
+}
 
 export async function keyGen() {
   try {
@@ -15,21 +59,11 @@ export async function keyGen() {
   return ''
 }
 
-export async function getPrivateKey() {
-  console.log('=> get private key')
-  try {
-    const priv = await RSAKeychain.getPrivateKey(KEY_TAG)
-    console.log('======> priv',priv)
-  } catch(e){
-    console.log(e)
-  }
-}
-
 export async function getPublicKey() {
-  console.log('=> get public key')
+  console.log('=> get publickey')
   try {
     const pub = await RSAKeychain.getPublicKey(KEY_TAG)
-    console.log('======> pub',pub)
+    console.log('======> pub ',pub)
   } catch(e){
     console.log(e)
   }
@@ -105,7 +139,12 @@ function privcert(key){
     key + '\n' +
   '-----END RSA PRIVATE KEY-----'
 }
-
+function privuncert(key){
+  let s = key
+  s = s.replace('-----BEGIN RSA PRIVATE KEY-----','')
+  s = s.replace('-----END RSA PRIVATE KEY-----','')
+  return s.replace(/[\r\n]+/gm, '')
+}
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {

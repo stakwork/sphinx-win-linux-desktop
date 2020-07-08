@@ -6,6 +6,17 @@ import {useStores} from '../store'
 import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
 import { is24HourFormat } from 'react-native-device-time-format'
+import * as rsa from '../crypto/rsa'
+
+async function migratePrivateKey(contacts){
+  const priv = await rsa.getPrivateKey()
+  if(priv) return // all good
+
+  const keyPair = await rsa.generateKeyPair()
+  contacts.updateContact(1, {
+    contact_key: keyPair.public
+  })
+}
 
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
@@ -37,6 +48,7 @@ export default function Main() {
       const is24Hour = await is24HourFormat()
       ui.setIs24HourFormat(is24Hour)
 
+      migratePrivateKey(contacts)
     })()
   },[])
 
