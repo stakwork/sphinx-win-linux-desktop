@@ -13,18 +13,21 @@ import { AsyncStorage } from 'react-native'
 
 const hydrate = create({storage: AsyncStorage})
 
-console.log('=> initialize store')
-Promise.all([
-  hydrate('user', userStore),
-  hydrate('details', detailsStore),
-  hydrate('contacts', contactStore),
-  hydrate('chats', chatStore),
-  hydrate('meme', memeStore),
-  hydrate('msg', msgStore)
-]).then(()=> {
-  console.log('=> store initialized')
-  uiStore.setReady(true)
-})
+function init(){
+  console.log('=> initialize store')
+  Promise.all([
+    hydrate('user', userStore),
+    hydrate('details', detailsStore),
+    hydrate('contacts', contactStore),
+    hydrate('chats', chatStore),
+    hydrate('meme', memeStore),
+  ]).then(()=> {
+    console.log('=> store initialized')
+    uiStore.setReady(true)
+    hydrate('msg', msgStore)
+  })
+}
+init()
 
 const ctx = React.createContext({
   details: detailsStore,

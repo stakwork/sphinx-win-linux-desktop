@@ -86,7 +86,7 @@ class MsgStore {
       const dateq = moment.utc(this.lastFetched-1000000).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else {
-      const start = moment.utc(0).format('YYYY-MM-DD%20HH:mm:ss')
+      const start = moment().subtract(28, 'days').format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }
     try {

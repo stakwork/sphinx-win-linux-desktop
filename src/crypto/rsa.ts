@@ -28,7 +28,7 @@ export async function getPrivateKey() {
   }
 }
 
-export async function decryptNew(data) {
+export async function decrypt(data) {
   try{
     const config = {service: 'sphinx_encryption_key'}
     const priv = await SecureStorage.getItem('private', config)
@@ -91,7 +91,7 @@ export async function encrypt(data, pubkey) {
 }
 
 // DECRYPT BASE64
-export async function decrypt(data) {
+export async function decryptOld(data) {
   try{
     const buf = Buffer.from(data, 'base64')
     let dataArray = []
