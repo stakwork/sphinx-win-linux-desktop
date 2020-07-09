@@ -13,7 +13,6 @@ import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import org.linusu.RNGetRandomValuesPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
-import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
 import com.mkuczera.RNReactNativeHapticFeedbackPackage;
 import com.imagepicker.ImagePickerPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -35,6 +34,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
+import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +61,6 @@ public class MainApplication extends Application implements ReactApplication {
           new RNGetRandomValuesPackage(),
           new RNGestureHandlerPackage(),
           new VectorIconsPackage(),
-          new RNSecureKeyStorePackage(),
           new RNReactNativeHapticFeedbackPackage(),
           new ImagePickerPackage(),
           new RNCameraPackage(),
@@ -78,7 +77,8 @@ public class MainApplication extends Application implements ReactApplication {
           new RNRSAPackage(),
           new SafeAreaContextPackage(),
           new ReanimatedPackage(),
-          new RNScreensPackage()
+          new RNScreensPackage(),
+          new RNSecureStoragePackage()
       );
     }
 

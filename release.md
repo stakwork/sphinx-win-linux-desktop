@@ -1,1 +1,1 @@
-July 6 at 4:30pm PST
+July 9 at noon PST
