@@ -5,9 +5,11 @@ import QR from '../utils/qr'
 import { useStores } from '../../store'
 import RadialGradient from 'react-native-radial-gradient'
 import {decode as atob} from 'base-64'
+import * as e2e from '../../crypto/e2e'
+import * as rsa from '../../crypto/rsa'
 
 export default function Code(props) {
-  const {onDone,z} = props
+  const {onDone,z,onRestore} = props
   const {user,contacts} = useStores()
   
   const [scanning, setScanning] = useState(false)
@@ -32,6 +34,7 @@ export default function Code(props) {
     }, 333)   
   }
 
+  // from relay QR code
   async function signupWithIP(s){
     const a = s.split('::')
     if(a.length===1) return
@@ -45,10 +48,29 @@ export default function Code(props) {
     if(token) onDone()
     setChecking(false)
   }
-
+  
+  // sign up from invitation code (or restore)
   async function checkInvite(theCode){
     if(!theCode || checking) return
     setChecking(true)
+
+    // restore
+    try {
+      const restoreString = atob(theCode)
+      if(restoreString.startsWith('keys::')) {
+        const enc = restoreString.substr(6)
+        const dec = await e2e.decrypt(enc,'111111')
+        if(dec) {
+          const priv = await user.restore(dec)
+          if(priv) {
+            console.log("SET AND DONE!")
+            rsa.setPrivateKey(priv)
+            return onRestore()
+          }
+        }
+      }
+    } catch(e) {}
+
     const {ip,password} = await user.signupWithCode(theCode)
     await sleep(200)
     if (ip) {

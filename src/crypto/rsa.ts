@@ -28,6 +28,16 @@ export async function getPrivateKey() {
   }
 }
 
+export async function setPrivateKey(priv) {
+  try{
+    const config = {service: 'sphinx_encryption_key'}
+    const got = await SecureStorage.setItem('private', priv, config)
+    return got
+  } catch(e) {
+    console.log(e)
+  }
+}
+
 export async function decrypt(data) {
   try{
     const config = {service: 'sphinx_encryption_key'}

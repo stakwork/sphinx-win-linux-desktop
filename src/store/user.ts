@@ -45,6 +45,21 @@ class UserStore {
   }
 
   @action
+  async restore(restoreString): Promise<boolean> {
+    console.log("RESTORE")
+    const arr = restoreString.split('::')
+    if(arr.length!==4) return false
+    const priv = arr[0]
+    // const pub = arr[1]
+    const ip = arr[2]
+    const token = arr[3]
+    this.setCurrentIP(ip)
+    this.setAuthToken(token)
+    api.instantiateRelay(ip, token)
+    return priv
+  }
+
+  @action
   async registerMyDeviceId(device_id) {
     try {
       const r = await api.relay.put(`contacts/1`, {device_id})
