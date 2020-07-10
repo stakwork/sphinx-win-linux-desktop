@@ -91,7 +91,7 @@ class MsgStore {
     }
     try {
       const r = await relay.get(route)
-      const msgs = await decodeMessages(r.new_messages)
+      const msgs = await decodeMessages(r.new_messages) // this takes a longass time
       msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
       this.messages = orgMsgsFromExisting(this.messages, msgs)
       this.lastFetched = new Date().getTime()

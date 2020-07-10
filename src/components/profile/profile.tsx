@@ -15,6 +15,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import * as rsa from '../../crypto/rsa'
 import * as e2e from '../../crypto/e2e'
 import {encode as btoa} from 'base-64'
+import {userPinCode} from '../utils/pin'
 
 // no contact_id!
 // http://x.x.x.x/static/uploads/undefined_profile_picture.jpeg
@@ -36,7 +37,9 @@ export default function Profile() {
     const token = user.authToken
     if(!priv || !pub || !ip || !token) return
     const str = `${priv}::${pub}::${ip}::${token}`
-    const enc = await e2e.encrypt(str,'111111')
+    const pin = await userPinCode()
+    if(!pin) return
+    const enc = await e2e.encrypt(str,pin)
     const final = btoa(`keys::${enc}`)
     Clipboard.setString(final)
     setCopied(true)
