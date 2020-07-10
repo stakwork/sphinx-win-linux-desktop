@@ -5,14 +5,18 @@ import QR from '../utils/qr'
 import { useStores } from '../../store'
 import RadialGradient from 'react-native-radial-gradient'
 import {decode as atob} from 'base-64'
+import * as e2e from '../../crypto/e2e'
+import * as rsa from '../../crypto/rsa'
+import PINCode, {setPinCode} from '../utils/pin'
 
 export default function Code(props) {
-  const {onDone,z} = props
+  const {onDone,z,onRestore} = props
   const {user,contacts} = useStores()
   
   const [scanning, setScanning] = useState(false)
   const [code, setCode] = useState('')
   const [checking, setChecking] = useState(false)
+  const [showPin,setShowPin] = useState(false)
 
   async function scan(data){
     setCode(data)
@@ -21,7 +25,6 @@ export default function Code(props) {
       const ip = atob(data)
       console.log(ip)
       if(ip.startsWith('ip:')){
-        console.log("IPIIPPPPPPP",ip)
         signupWithIP(ip)
         return
       }
@@ -32,23 +35,33 @@ export default function Code(props) {
     }, 333)   
   }
 
+  // from relay QR code
   async function signupWithIP(s){
     const a = s.split('::')
     if(a.length===1) return
     setChecking(true)
     const ip = a[1]
     const pwd = a.length>2?a[2]:''
-    console.log("IP HERE",ip)
     await user.signupWithIP(ip)
     await sleep(200)
     const token = await user.generateToken(pwd)
     if(token) onDone()
     setChecking(false)
   }
-
+  
+  // sign up from invitation code (or restore)
   async function checkInvite(theCode){
     if(!theCode || checking) return
     setChecking(true)
+    // restore
+    try {
+      const restoreString = atob(theCode)
+      if(restoreString.startsWith('keys::')) {
+        setShowPin(true)
+        return
+      }
+    } catch(e) {}
+
     const {ip,password} = await user.signupWithCode(theCode)
     await sleep(200)
     if (ip) {
@@ -58,6 +71,35 @@ export default function Code(props) {
     setChecking(false)
   }
 
+  async function pinEntered(pin){
+    const restoreString = atob(code)
+      if(restoreString.startsWith('keys::')) {
+      const enc = restoreString.substr(6)
+      const dec = await e2e.decrypt(enc,pin)
+      if(dec) {
+        await setPinCode(pin)
+        const priv = await user.restore(dec)
+        if(priv) {
+          rsa.setPrivateKey(priv)
+          return onRestore()
+        }
+      } else {
+        // wrong PIN
+        setShowPin(false)
+        setChecking(false)
+      }
+    }
+  }
+
+  if(showPin) {
+    return <PINCode 
+      forceEnterMode
+      onFinish={async(pin) => {
+        await sleep(240)
+        pinEntered(pin)
+      }}
+    />
+  }
   return <View style={{...styles.wrap,zIndex:z}}>
     <RadialGradient style={styles.gradient}
       colors={['#A68CFF','#6A8FFF']}

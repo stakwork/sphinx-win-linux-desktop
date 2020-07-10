@@ -63,7 +63,7 @@ const styles=StyleSheet.create({
     width:'100%',height:'100%',
     justifyContent:'space-between',
     position:'relative',
-    minHeight:420
+    // minHeight:420
   },
   topper:{
     width:'100%',

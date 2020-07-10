@@ -14,6 +14,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
 // import * as rsa from './src/crypto/rsa'
+import PINCode, {wasEnteredRecently, clearPin} from './src/components/utils/pin'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -52,25 +53,44 @@ function App() {
   const {user,msg} = useStores()
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
+  const [pinned, setPinned] = useState(false)
 
   useEffect(()=>{
-    // AsyncStorage.clear()
-    // msg.clearAllMessages()
-    const isSignedUp = (user.currentIP && user.authToken)?true:false
-    setSignedUp(isSignedUp)
-    if(isSignedUp){
-      instantiateRelay(user.currentIP, user.authToken)
-    }
-    setLoading(false)
+    (async () => {
+      // // AsyncStorage.clear()
+      // // clearPin()
+
+      // msg.clearAllMessages()
+      const isSignedUp = (user.currentIP && user.authToken)?true:false
+      setSignedUp(isSignedUp)
+      if(isSignedUp){
+        instantiateRelay(user.currentIP, user.authToken)
+      }
+      const pinWasEnteredRecently = await wasEnteredRecently()
+      if(pinWasEnteredRecently) setPinned(true)
+
+      setLoading(false)
+    })()
   },[])
 
   if(loading) return <Loading />
+  if(signedUp && !pinned) { // checking if the pin was entered recently
+    return <PINCode
+      onFinish={async() => {
+        await sleep(240)
+        setPinned(true)
+      }}
+    />
+  }
   return (<>
     <NavigationContainer>
       <PaperProvider theme={theme}>
-        <StatusBar />
+        {/* <StatusBar /> */}
         {signedUp && <Main />}
-        {!signedUp && <Onboard onFinish={()=>setSignedUp(true)} />}
+        {!signedUp && <Onboard onFinish={()=>{
+          setSignedUp(true) // signed up w key export
+          setPinned(true)   // also PIN has been set 
+        }} />}
       </PaperProvider>
     </NavigationContainer>
   </>)
@@ -84,4 +104,8 @@ const theme = {
     primary: '#6289FD',
     accent: '#55D1A9',
   },
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }

@@ -1,9 +1,15 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {View, StyleSheet, Text} from 'react-native'
 import NumKey from './numkey'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { ActivityIndicator, Colors } from 'react-native-paper'
-import RNSecureKeyStore, {ACCESSIBLE} from "react-native-secure-key-store";
+import SecureStorage from 'react-native-secure-storage'
+import ReactNativeHapticFeedback from "react-native-haptic-feedback";
+import AsyncStorage from '@react-native-community/async-storage'
+import moment from 'moment'
+
+const ssConfig = {service: 'sphinx_pin'}
+// removeItem
 
 const ns = [1,2,3,4,5,6]
 export default function PIN(props) {
@@ -11,13 +17,34 @@ export default function PIN(props) {
   const [chosenPin, setChosenPin] = useState('')
   const [checking, setChecking] = useState(false)
   const [err, setErr] = useState(false)
+  const [mode,setMode] = useState('choose')
 
-  async function check(){
-    if(props.mode==='choose') {
+  useEffect(()=>{
+    (async () => {
+      if(props.forceEnterMode) {
+        setMode('enter')
+        return
+      }
+      // await SecureStorage.removeItem('pin',ssConfig)
+      const storedPin = await SecureStorage.getItem('pin', ssConfig)
+      if(storedPin) setMode('enter')
+    })()
+  },[])
+
+  async function check(thePin){
+    if(props.forceEnterMode) {
+      setChecking(true)
+      return props.onFinish(thePin)
+    }
+    ReactNativeHapticFeedback.trigger("impactMedium", {
+      enableVibrateFallback: true,
+      ignoreAndroidSystemSettings: true
+    })
+    if(mode==='choose') {
       if(chosenPin){
-        if(pin===chosenPin){ // success!
+        if(thePin===chosenPin){ // success!
           setChecking(true)
-          await RNSecureKeyStore.set('pin', pin, {accessible: ACCESSIBLE.ALWAYS_THIS_DEVICE_ONLY})
+          await setPinCode(thePin)
           props.onFinish()
         } else {
           setErr(true)
@@ -25,16 +52,21 @@ export default function PIN(props) {
           setChosenPin('')
         }
       } else {
-        setChosenPin(pin)
+        setChosenPin(thePin)
         setPin('')
       }
     }
-    if(props.mode==='enter') {
+    if(mode==='enter') {
       setChecking(true)
       try {
-        const storedPin = await RNSecureKeyStore.get('pin')
-        if(storedPin===pin){
+        const storedPin = await SecureStorage.getItem('pin',ssConfig)
+        if(storedPin===thePin){
+          AsyncStorage.setItem('pin_entered', ts())
           props.onFinish()
+        } else {
+          setErr(true)
+          setPin('')
+          setChecking(false)
         }
       } catch(e){}
     } 
@@ -42,12 +74,10 @@ export default function PIN(props) {
   function go(v){
     const newPin = pin+v
     if(err) setErr(false)
+    setPin(newPin)
     if(newPin.length===6){
-      setPin(newPin)
-      check()
-    } else if(newPin.length<6) {
-      setPin(newPin)
-    } 
+      check(newPin)
+    }
   }
   function backspace(){
     const newPin = pin.substr(0, pin.length-1)
@@ -55,11 +85,11 @@ export default function PIN(props) {
   }
 
   let txt = 'ENTER PIN'
-  if(props.mode==='choose') {
+  if(mode==='choose') {
     txt='CHOOSE PIN'
     if(chosenPin) txt='CONFIRM PIN'
-    if(err) txt='TRY AGAIN!'
   }
+  if(err) txt='TRY AGAIN!'
 
   return <View style={styles.wrap}>
     <View style={styles.top}>
@@ -85,14 +115,43 @@ export default function PIN(props) {
   </View>
 }
 
-export async function hasUserSetPinCode(): Promise<boolean> {
+export async function userPinCode(): Promise<string> {
   try{
-    const pin = await RNSecureKeyStore.get('pin')
-    if(pin) return true
-    else return false
+    const pin = await SecureStorage.getItem('pin', ssConfig)
+    if(pin) return pin
+    else return ''
   } catch(e) {
+    return ''
+  }
+}
+
+export async function setPinCode(pin): Promise<any> {
+  AsyncStorage.setItem('pin_entered', ts())
+  return await SecureStorage.setItem('pin', pin, ssConfig)
+}
+
+const MINUTES = 720 // 12 hours
+export async function wasEnteredRecently(): Promise<boolean> {
+  const now = moment().unix()
+  const enteredAtStr = await AsyncStorage.getItem('pin_entered')
+  const enteredAt = parseInt(enteredAtStr)
+  if(!enteredAt){
     return false
   }
+  if(now < enteredAt+(60*MINUTES)) { // five minutes
+    return true
+  }
+  return false
+}
+
+export async function clearPin(): Promise<boolean> {
+  await SecureStorage.removeItem('pin',ssConfig)
+  await AsyncStorage.removeItem('pin_entered')
+  return true
+}
+
+function ts(){
+  return moment().unix()+''
 }
 
 const styles = StyleSheet.create({

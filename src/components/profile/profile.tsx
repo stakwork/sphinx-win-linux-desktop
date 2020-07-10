@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity, Image} from 'react-native'
+import {View, Text, StyleSheet, Clipboard, TouchableOpacity, Image} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
-import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
+import { Appbar, Dialog, Button, Portal, ActivityIndicator, Snackbar } from 'react-native-paper'
 import { Card, Title } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
@@ -12,6 +12,10 @@ import Cam from '../utils/cam'
 import ImgSrcDialog from '../utils/imgSrcDialog'
 import {createContactPic, usePicSrc} from '../utils/picSrc'
 import RNFetchBlob from 'rn-fetch-blob'
+import * as rsa from '../../crypto/rsa'
+import * as e2e from '../../crypto/e2e'
+import {encode as btoa} from 'base-64'
+import {userPinCode} from '../utils/pin'
 
 // no contact_id!
 // http://x.x.x.x/static/uploads/undefined_profile_picture.jpeg
@@ -23,6 +27,23 @@ export default function Profile() {
   const [takingPhoto, setTakingPhoto] = useState(false)
   const [saving,setSaving] = useState(false)
   const [photo_url, setPhotoUrl] = useState('')
+  const [copied,setCopied] = useState(false)
+
+  async function exportKeys(){
+    const priv = await rsa.getPrivateKey()
+    const me = contacts.contacts.find(c=>c.id===1)
+    const pub = me && me.contact_key
+    const ip = user.currentIP
+    const token = user.authToken
+    if(!priv || !pub || !ip || !token) return
+    const str = `${priv}::${pub}::${ip}::${token}`
+    const pin = await userPinCode()
+    if(!pin) return
+    const enc = await e2e.encrypt(str,pin)
+    const final = btoa(`keys::${enc}`)
+    Clipboard.setString(final)
+    setCopied(true)
+  }
 
   async function tookPic(img){
     setDialogOpen(false)
@@ -96,7 +117,7 @@ export default function Profile() {
           </View>
         </View>
       </View>
-      <View style={{backgroundColor:'white',flex:1,paddingBottom:30}}>
+      <View style={styles.formWrap}>
         <Form schema={me} loading={saving}
           buttonText="Save"
           readOnlyFields={['public_key']}
@@ -117,6 +138,18 @@ export default function Profile() {
           }}
         />
       </View>
+
+      <TouchableOpacity style={styles.export} onPress={exportKeys}>
+        <Text style={styles.exportText}>
+          Want to switch devices? Export keys
+        </Text>
+      </TouchableOpacity>
+      <Snackbar
+        visible={copied}
+        duration={3000}
+        onDismiss={()=> setCopied(false)}>
+        Export keys copied to clipboard
+      </Snackbar>
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}
@@ -199,5 +232,33 @@ const styles = StyleSheet.create({
     position:'absolute',
     left:19,
     top:19
+  },
+  formWrap:{
+    backgroundColor:'white',
+    flex:1,
+    paddingBottom:30,
+    maxHeight:365,
+    position:'relative',
+    borderBottomWidth:1,
+    borderBottomColor:'#ddd',
+    borderTopWidth:1,
+    borderTopColor:'#ddd',
+  },
+  export:{
+    width:'100%',
+    backgroundColor:'white',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    height:50,
+    marginTop:10,
+    borderBottomWidth:1,
+    borderBottomColor:'#ddd',
+    borderTopWidth:1,
+    borderTopColor:'#ddd',
+  },
+  exportText:{
+    color:'#6289FD',
+    fontSize:12,
   }
 })

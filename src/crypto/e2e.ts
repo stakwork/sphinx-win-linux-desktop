@@ -23,6 +23,11 @@ export async function encrypt(text:string, pwd:string) {
     return await aes.encrypt(text, pwd)
 }
 
+// decrypt with a symmetric password (using RN-Cryptor)
+export async function decrypt(text:string, pwd:string) {
+    return await aes.decrypt(text, pwd)
+}
+
 // encrypt file with symmetric password
 export async function encryptFile(filepath:string, pwd:string) {
     return await aes.encryptFile(filepath, pwd)

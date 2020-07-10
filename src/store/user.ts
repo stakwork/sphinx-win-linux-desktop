@@ -45,6 +45,20 @@ class UserStore {
   }
 
   @action
+  async restore(restoreString): Promise<boolean> {
+    const arr = restoreString.split('::')
+    if(arr.length!==4) return false
+    const priv = arr[0]
+    // const pub = arr[1]
+    const ip = arr[2]
+    const token = arr[3]
+    this.setCurrentIP(ip)
+    this.setAuthToken(token)
+    api.instantiateRelay(ip, token)
+    return priv
+  }
+
+  @action
   async registerMyDeviceId(device_id) {
     try {
       const r = await api.relay.put(`contacts/1`, {device_id})
@@ -87,7 +101,7 @@ class UserStore {
       this.currentIP = ip
       this.invite={
         inviterNickname: 'Sphinx Support',
-        inviterPubkey: '0292052c3ab594f7b5e997099f66e8ed51b4342126dcb5c3caa76b38adb725dcdb',
+        inviterPubkey: '023d70f2f76d283c6c4e58109ee3a2816eb9d8feb40b23d62469060a2b2867b77f',
         welcomeMessage: 'Welcome to Sphinx!'
       }
       api.instantiateRelay(ip) // no token

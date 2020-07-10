@@ -35,6 +35,7 @@ export default function Invite({onFinish}) {
     {steps.map((C,i)=> <C key={i} z={i} 
       show={step>i} 
       onDone={stepForward} onBack={stepBack} 
+      onRestore={onFinish}
     />)}
   </View>
 }
