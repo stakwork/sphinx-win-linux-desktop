@@ -28,6 +28,17 @@ export default function Profile() {
   const [saving,setSaving] = useState(false)
   const [photo_url, setPhotoUrl] = useState('')
   const [copied,setCopied] = useState(false)
+  const [_,setTapCount] = useState(0)
+  const [sharing,setSharing] = useState(false)
+
+  async function shareContactKey(){
+    const me = contacts.contacts.find(c=> c.id===1)
+    const contact_key = me.contact_key
+    if(!contact_key) return
+    setSharing(true)
+    await contacts.updateContact(1, {contact_key})
+    setSharing(false)
+  }
 
   async function exportKeys(){
     const priv = await rsa.getPrivateKey()
@@ -113,7 +124,22 @@ export default function Profile() {
           <View style={styles.userBalance}>
             <Text>{details.balance}</Text>
             <Text style={{marginLeft:10,marginRight:10,color:'#c0c0c0'}}>sat</Text>
-            <Icon name="wallet" color="#d0d0d0" size={20} />
+            <TouchableOpacity onPress={()=>{
+              setTapCount(cu=>{
+                if(cu>=6) { // seventh tap
+                  shareContactKey()
+                  return 0
+                }
+                return cu+1
+              })
+            }}>
+              {sharing ? 
+                <View style={{height:20,paddingTop:4}}>
+                  <ActivityIndicator animating={true} color="#d0d0d0" size={12} style={{marginLeft:4}} />
+                </View> :
+                <Icon name="wallet" color="#d0d0d0" size={20} />
+              }
+            </TouchableOpacity>
           </View>
         </View>
       </View>

@@ -210,7 +210,7 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
       let senderAlias = ''
       const repmsg = msgs.find(m=>m.uuid===msg.reply_uuid)
       if(repmsg) senderAlias = repmsg.sender_alias
-      if(!senderAlias&&!isTribe&&repmsg.sender){
+      if(!senderAlias&&!isTribe&&repmsg&&repmsg.sender){
         const contact = contacts.find(c=> c.id===repmsg.sender)
         senderAlias = contact.alias
       }

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useState} from 'react'
 import {StyleSheet, View, Text, Image, Dimensions} from 'react-native'
 import {DrawerContentScrollView,DrawerItem} from '@react-navigation/drawer'
 import {Title,Drawer,Button} from 'react-native-paper'
@@ -13,7 +13,6 @@ const itemStyle = {height:60,paddingLeft:15}
 
 export default function TheDrawer(props) {
   const {ui, details, user, contacts} = useStores()
-
   const me = contacts.contacts.find(c=> c.id===1)
   const uri = usePicSrc(me)
   const height = Math.round(Dimensions.get('window').height)

@@ -15,10 +15,10 @@ export default function NameAndKey(props) {
 
   async function ok(){
     setUpdating(true)
-    const pkey = await rsa.keyGen()
+    const keyPair = await rsa.generateKeyPair()
     await contacts.updateContact(1, {
       alias: text,
-      contact_key: pkey
+      contact_key: keyPair.public
     })
     user.setAlias(text)
     inputRef.current.blur()

@@ -1,1 +1,1 @@
-July 10 at 2:30pm PST
+July 11 at 8pm PST

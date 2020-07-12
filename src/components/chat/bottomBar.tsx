@@ -199,7 +199,7 @@ export default function BottomBar(props) {
   const thisChatMsgs = theID && msg.messages[theID]
   const replyMessage = props.replyUuid&&thisChatMsgs&&thisChatMsgs.find(m=>m.uuid===props.replyUuid)
   let replyMessageSenderAlias = replyMessage&&replyMessage.sender_alias
-  if(!isTribe && !replyMessageSenderAlias && replyMessage.sender){
+  if(!isTribe && !replyMessageSenderAlias && replyMessage && replyMessage.sender){
     const sender = contacts.contacts.find(c=> c.id===replyMessage.sender)
     if(sender) replyMessageSenderAlias = sender.alias
   }
