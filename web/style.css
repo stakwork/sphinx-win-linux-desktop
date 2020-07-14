@@ -1,0 +1,13 @@
+*{
+    box-sizing: border-box;
+}
+html, body, #root, .main{
+    display: flex;
+    flex: 1;
+    height:100%;
+    overflow: hidden;
+}
+body{
+    color:white;
+    font-family: 'Roboto', sans-serif;
+}

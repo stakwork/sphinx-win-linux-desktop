@@ -9,9 +9,11 @@ import { userStore } from './user'
 import { memeStore } from './meme'
 import { authStore } from './auth'
 import { create } from 'mobx-persist'
-import { AsyncStorage } from 'react-native'
+import { AsyncStorage, Platform } from 'react-native'
 
-const hydrate = create({storage: AsyncStorage})
+const hydrate = create({
+  storage: Platform.OS==='android' ? AsyncStorage : localStorage
+})
 
 function init(){
   console.log('=> initialize store')
