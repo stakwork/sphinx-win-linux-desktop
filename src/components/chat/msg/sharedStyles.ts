@@ -4,8 +4,8 @@ const styles = {
     borderWidth:1,
     borderRadius:5,
     borderColor:'#DADFE2',
-    marginLeft:15,
-    marginRight:15,
+    marginLeft:8,
+    marginRight:8,
     marginTop:5,
   },
   innerPad:{

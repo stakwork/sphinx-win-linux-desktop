@@ -14,7 +14,7 @@ const encryptedTypes = [
 ]
 
 export default function InfoBar(props){
-  const {contacts,ui} = useStores()
+  const {ui} = useStores()
 
   const isMe = props.sender===1
   const isReceived = props.status===received
@@ -25,13 +25,7 @@ export default function InfoBar(props){
   const isPaid = props.status===constants.statuses.confirmed
   const hasExpiry = (!isPaid&&expiry)?true:false
 
-  let senderAlias = ''
-  if(props.isTribe) {
-    senderAlias = props.sender_alias
-  } else {
-    const sender = contacts.contacts.find(c=>c.id===props.sender)
-    senderAlias = sender && sender.alias
-  }
+  let senderAlias = props.senderAlias
 
   const timeFormat = ui.is24HourFormat?'HH:mm A':'hh:mm A'
   return <View style={styles.wrap}>
@@ -69,8 +63,8 @@ const styles = StyleSheet.create({
     display:'flex',
   },
   content:{
-    marginRight:15,
-    marginLeft:15,
+    marginRight:8,
+    marginLeft:8,
     maxWidth:234,
     minWidth:234,
     display:'flex',

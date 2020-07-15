@@ -137,7 +137,7 @@ export const styles = StyleSheet.create({
     justifyContent:'center',
     width:52,height:52,
     marginRight:18,
-    marginLeft:18,
+    marginLeft:10,
   },
   avatar:{
     width:52,height:52,

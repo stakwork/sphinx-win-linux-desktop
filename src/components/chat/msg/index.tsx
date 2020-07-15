@@ -14,6 +14,7 @@ import {IconButton, ActivityIndicator} from 'react-native-paper'
 import ReplyContent from './replyContent' 
 import { Popover, PopoverTouchable, PopoverController } from 'react-native-modal-popover';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Avatar from './avatar'
 
 export default function MsgRow(props){
   const [showReply, setShowReply] = useState(false)  
@@ -32,33 +33,41 @@ export default function MsgRow(props){
     return <GroupNotification {...props} />
   }
 
-  return <View style={{display:'flex',width:'100%',
+  const isMe = props.sender===1
+  const w = props.windowWidth
+  return <View style={{display:'flex',width:'100%',flexDirection:'row',
       marginTop:props.showInfoBar?20:0
     }}>
-    {props.showInfoBar && <InfoBar {...props} />}
-    <SwipeRow 
-      ref={swipeRowRef}
-      disableRightSwipe={true} friction={100}
-      disableLeftSwipe={!props.message_content}
-      rightOpenValue={-60} stopRightSwipe={-60}
-      onRowOpen={()=> {
-        if(props.setReplyUUID&&props.message_content) {
-          props.setReplyUUID(props.uuid)
-          setShowReply(true)
-        }
-      }}
-      onRowClose={()=> {
-        if(props.setReplyUUID) props.setReplyUUID('')
-        setShowReply(false)
-      }}
-      >
-      <View style={styles.replyWrap}>
-        {showReply && <IconButton icon="reply" size={32} color="#aaa"
-          style={{marginLeft:0,marginRight:15}} 
-        />}
-      </View>
-      <MsgBubble {...props} onDelete={props.onDelete} myPubkey={props.myPubkey} />
-    </SwipeRow>
+    <Avatar alias={props.senderAlias}
+      photo={props.senderPhoto}
+      hide={!props.showInfoBar||isMe} 
+    />
+    <View style={{display:'flex',width: w-40}}>
+      {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
+      <SwipeRow 
+        ref={swipeRowRef}
+        disableRightSwipe={true} friction={100}
+        disableLeftSwipe={!props.message_content}
+        rightOpenValue={-60} stopRightSwipe={-60}
+        onRowOpen={()=> {
+          if(props.setReplyUUID&&props.message_content) {
+            props.setReplyUUID(props.uuid)
+            setShowReply(true)
+          }
+        }}
+        onRowClose={()=> {
+          if(props.setReplyUUID) props.setReplyUUID('')
+          setShowReply(false)
+        }}
+        >
+        <View style={styles.replyWrap}>
+          {showReply && <IconButton icon="reply" size={32} color="#aaa"
+            style={{marginLeft:0,marginRight:15}} 
+          />}
+        </View>
+        <MsgBubble {...props} onDelete={props.onDelete} myPubkey={props.myPubkey} />
+      </SwipeRow>
+    </View>
   </View>
 }
 

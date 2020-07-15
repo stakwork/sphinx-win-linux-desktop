@@ -1,7 +1,7 @@
 import React, {useRef, useMemo, useState, useCallback, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-import { VirtualizedList, InteractionManager, View, Text, StyleSheet, Keyboard } from 'react-native'
+import { VirtualizedList, InteractionManager, View, Text, StyleSheet, Keyboard, Dimensions } from 'react-native'
 import {Chat} from '../../store/chats'
 import Message from './msg'
 import {Msg} from '../../store/msg'
@@ -46,6 +46,7 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
 function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey}) {
   const scrollViewRef = useRef(null)
   const [viewableIds,setViewableIds] = useState([])
+  const {contacts} = useStores()
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(() => {
@@ -65,6 +66,8 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myP
       }
     })
   },[msgsLength])
+
+  const windowWidth = Math.round(Dimensions.get('window').width)
 
   const isGroup = chat.type===group
   const isTribe = chat.type===tribe
@@ -88,13 +91,23 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myP
         },200)
       }}
       renderItem={({item,index}) => {
+        let senderAlias = ''
+        const sender = contacts.contacts.find(c=>c.id===item.sender)
+        const senderPhoto = !isTribe && (sender&&sender.photo_url) || ''
+        if(isTribe) {
+          senderAlias = item.sender_alias
+        } else {    
+          senderAlias = sender && sender.alias
+        }
         return <ListItem key={item.id}
+          windowWidth={windowWidth}
           viewable={viewableIds.includes(item.id)}
           m={item} chat={chat} 
+          senderAlias={senderAlias} senderPhoto={senderPhoto}
           isGroup={isGroup} isTribe={isTribe}
           replyUuid={replyUuid} setReplyUUID={setReplyUUID}
           onDelete={onDelete} myPubkey={myPubkey}
-        /> 
+        />
       }}
       keyExtractor={(item:any)=> item.id+''}
       getItemCount={()=>msgs.length}
@@ -104,7 +117,7 @@ function MsgList({msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myP
   )
 }
 
-function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable,onDelete,myPubkey}) {
+function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable,onDelete,myPubkey,senderAlias,senderPhoto,windowWidth}) {
   if (m.dateLine) {
     return <DateLine dateString={m.dateLine} />
   }
@@ -112,8 +125,9 @@ function ListItem({m,chat,isGroup,isTribe,setReplyUUID,replyUuid,viewable,onDele
   if(!m.chat) msg.chat = chat
   return useMemo(()=> <Message {...msg} viewable={viewable} 
     isGroup={isGroup} isTribe={isTribe} 
+    senderAlias={senderAlias} senderPhoto={senderPhoto}
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
-    onDelete={onDelete} myPubkey={myPubkey}
+    onDelete={onDelete} myPubkey={myPubkey} windowWidth={windowWidth}
   />, [viewable,m.id,m.media_token,replyUuid,m.status])
 }
 
