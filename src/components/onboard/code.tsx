@@ -21,15 +21,6 @@ export default function Code(props) {
   async function scan(data){
     setCode(data)
     setScanning(false)
-    try {
-      const ip = atob(data)
-      console.log(ip)
-      if(ip.startsWith('ip:')){
-        signupWithIP(ip)
-        return
-      }
-    } catch(e){}
-    // else
     setTimeout(()=>{
       checkInvite(data)
     }, 333)   
@@ -55,9 +46,13 @@ export default function Code(props) {
     setChecking(true)
     // restore
     try {
-      const restoreString = atob(theCode)
-      if(restoreString.startsWith('keys::')) {
+      const codeString = atob(theCode)
+      if(codeString.startsWith('keys::')) {
         setShowPin(true)
+        return
+      }
+      if(codeString.startsWith('ip::')){
+        signupWithIP(codeString)
         return
       }
     } catch(e) {}
