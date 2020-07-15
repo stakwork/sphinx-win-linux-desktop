@@ -57,7 +57,7 @@ function App() {
 
   useEffect(()=>{
     (async () => {
-      AsyncStorage.clear()
+      // // AsyncStorage.clear()
       // // clearPin()
 
       // msg.clearAllMessages()
