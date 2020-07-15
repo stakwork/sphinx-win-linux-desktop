@@ -34,8 +34,10 @@ export default function Subscribe({visible}) {
     })
     if(chatForContact) chatId = chatForContact.id
 
+    const contactId = contact&&contact.id
+
     await contacts.createSubscription({
-      contact_id: contact&&contact.id,
+      ...contactId && {contact_id:contactId},
       ...chatId && {chat_id:chatId},
       amount: params.amount,
       interval: params.interval||'daily',

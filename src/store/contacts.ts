@@ -203,8 +203,8 @@ class ContactStore {
   }
 
   @action async createSubscription(v){
-    if(!v.contact_id || !v.chat_id || !v.amount || !v.interval) {
-      return console.log('missing param')
+    if(!v.amount || !v.interval || !(v.contact_id || v.chat_id)) {
+      return console.log('createSubscription: missing param')
     }
     try{
       const s = await relay.post('subscriptions', v)
@@ -234,8 +234,8 @@ class ContactStore {
   }
 
   @action async editSubscription(id, v){
-    if(!id || !v.contact_id || !v.chat_id || !v.amount || !v.interval) {
-      return console.log('missing param')
+    if(!id || !v.amount || !v.interval || !(v.contact_id || v.chat_id)) {
+      return console.log('editSubscription: missing param')
     }
     try{
       const s = await relay.put(`subscription/${id}`, v)

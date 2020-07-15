@@ -1,4 +1,5 @@
-import ReconnectingWebSocket from 'reconnecting-websocket';
+// import ReconnectingWebSocket from 'reconnecting-websocket';
+import socketio from 'socket.io-client';
 
 type WSMessage = {[k: string]: any}
 
@@ -10,10 +11,10 @@ export function registerWsHandlers(hs: {[k: string]: DataHandler}) {
   handlers = hs
 }
 
-let ws: any = null
+let io: any = null
 
 export function connectWebSocket(ip: string) {
-  if(ws) return // dont reconnect if already exists
+  if(io) return // dont reconnect if already exists
 
   let theIP = ip
   if(ip.startsWith('https://')) {
@@ -23,27 +24,29 @@ export function connectWebSocket(ip: string) {
     theIP=ip.replace('http://','')
   }
 
-  const uri = 'ws://' + theIP + '/socket' 
+  const uri = 'ws://' + theIP
+  // const rws = new ReconnectingWebSocket(uri);
+  io = socketio.connect(uri, {
+    reconnection:true,
+  })
 
-  const rws = new ReconnectingWebSocket(uri);
+  io.on('connect', socket => {
+    console.log("=> socketio connected!")
+  })
 
-  rws.onopen = function(){
-    ws = rws
-  }
-  rws.onclose = function(){
-    ws = null
-  }
-  rws.onerror = function(){
-    ws = null
-  }
+  io.on('message', (data) => {
+    try {
+      let msg: WSMessage = JSON.parse(data)
+      let typ = msg.type
+      if(typ==='delete') typ='deleteMessage'
+      let handler = handlers[typ]
+      if (handler) {
+        handler(msg)
+      }
+    } catch(e) {}
+  });
 
-  rws.onmessage = (e) => {
-    let msg: WSMessage = JSON.parse(e.data)
-    let typ = msg.type
-    if(typ==='delete') typ='deleteMessage'
-    let handler = handlers[typ]
-    if (handler) {
-      handler(msg)
-    }
-  }
+  io.on('error',function(e){
+    console.log('socketio error',e)
+  })
 }
