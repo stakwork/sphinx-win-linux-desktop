@@ -13,21 +13,18 @@ export function registerWsHandlers(hs: {[k: string]: DataHandler}) {
 
 let io: any = null
 
-export function connectWebSocket(ip: string) {
+export function connectWebSocket(ip: string, authToken:string) {
   if(io) return // dont reconnect if already exists
 
-  let theIP = ip
-  if(ip.startsWith('https://')) {
-    theIP=ip.replace('https://','')
-  }
-  if(ip.startsWith('http://')) {
-    theIP=ip.replace('http://','')
-  }
-
-  const uri = 'ws://' + theIP
-  // const rws = new ReconnectingWebSocket(uri);
-  io = socketio.connect(uri, {
+  io = socketio.connect(ip, {
     reconnection:true,
+    transportOptions: {
+      polling: {
+        extraHeaders: {
+          'x-user-token': authToken
+        }
+      }
+    }
   })
 
   io.on('connect', socket => {

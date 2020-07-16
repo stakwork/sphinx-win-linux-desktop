@@ -30,17 +30,12 @@ function instantiateRelay(ip:string, authToken?:string){
   console.log('=> instantiated relay!', `${protocol}${ip}/`)
   
   if(authToken) { // only connect here (to avoid double) if auth token means for real
-    connectWebSocket(ip)
+    connectWebSocket(`${protocol}${ip}`, authToken)
     registerWsHandlers(wsHandlers)
   }
 
   // registerHandler each msg type here?
   // or just one?
-}
-
-function reconnectWebsocket(ip:string){
-  connectWebSocket(ip)
-  registerWsHandlers(wsHandlers)
 }
 
 function composeAPI(host:string, authToken?:string) {
@@ -58,5 +53,4 @@ export {
   relay,
   instantiateRelay,
   composeAPI,
-  reconnectWebsocket,
 }

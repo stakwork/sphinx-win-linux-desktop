@@ -138,10 +138,6 @@ class UserStore {
     }
   }
 
-  @action
-  async reconnectWebsocket(){
-    api.reconnectWebsocket(this.currentIP)
-  }
 }
 
 export const userStore = new UserStore()

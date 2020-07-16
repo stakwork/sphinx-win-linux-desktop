@@ -50,7 +50,6 @@ export default function Chat(){
 
     fetchTribeParams()
 
-    user.reconnectWebsocket()
   },[])
 
   async function fetchTribeParams(){
