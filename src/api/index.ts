@@ -7,7 +7,7 @@ const invite = new API('http://hub.sphinx.chat/api/v1/','','')
 
 let relay = null
 
-function instantiateRelay(ip:string, authToken?:string){
+export function instantiateRelay(ip:string, authToken?:string){
   if(!ip) return console.log("cant instantiate Relay, no IP")
 
   let protocol = 'http://'
@@ -38,7 +38,7 @@ function instantiateRelay(ip:string, authToken?:string){
   // or just one?
 }
 
-function composeAPI(host:string, authToken?:string) {
+export function composeAPI(host:string, authToken?:string) {
   let api = null
   if(authToken) {
     api = new API(`https://${host}/`, 'Authorization', `Bearer ${authToken}`)
@@ -51,6 +51,4 @@ function composeAPI(host:string, authToken?:string) {
 export {
   invite,
   relay,
-  instantiateRelay,
-  composeAPI,
 }

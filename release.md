@@ -1,1 +1,1 @@
-July 15 at 9am PST
+July 17 at 1pm PST

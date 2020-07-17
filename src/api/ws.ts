@@ -15,7 +15,7 @@ let io: any = null
 
 export function connectWebSocket(ip: string, authToken:string) {
   if(io) return // dont reconnect if already exists
-
+  console.log("START SOCKET IO", authToken)
   io = socketio.connect(ip, {
     reconnection:true,
     transportOptions: {

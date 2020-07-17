@@ -30,3 +30,10 @@ body{
     flex-direction: column;
     background:linear-gradient(145deg, #A68CFF 0%, #6A8FFF 55%) 0% 0% / cover; 
 }
+
+.MuiTouchRipple-root .MuiTouchRipple-child {
+    background-color: white;
+}
+.MuiIconButton-root:hover {
+    background-color: rgba(255, 255, 255, 0.065) !important;
+}
