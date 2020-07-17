@@ -1,6 +1,7 @@
 import {Chat} from '../../store/chats'
 import {Contact} from '../../store/contacts'
 import { constants } from '../../constants'
+import moment from 'moment'
 
 const conversation = constants.chat_types.conversation
 const group = constants.chat_types.conversation
@@ -40,3 +41,29 @@ export function contactForConversation(chat: Chat, contacts: Contact[]){
   }
   return null
 }
+
+export function sortChats(chatsToShow, messages){
+  chatsToShow.sort((a,b)=>{
+    const amsgs = messages[a.id]
+    const alastMsg = amsgs&&amsgs[0]
+    const then = moment(new Date()).add(-30, 'days')
+    const adate = alastMsg&&alastMsg.date?moment(alastMsg.date):then
+    const bmsgs = messages[b.id]
+    const blastMsg = bmsgs&&bmsgs[0]
+    const bdate = blastMsg&&blastMsg.date?moment(blastMsg.date):then
+    return adate.isBefore(bdate) ? 0 : -1
+  })
+  chatsToShow.sort(a=>{
+    if(a.invite && a.invite.status!==4) return -1
+    return 0
+  })
+}
+
+export function filterChats(theChats, searchTerm){
+  return theChats.filter(c=> {
+    if (!searchTerm) return true
+    return (c.invite?true:false) || 
+      c.name.toLowerCase().includes(searchTerm.toLowerCase())
+  })
+}
+

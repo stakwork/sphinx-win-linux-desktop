@@ -2,14 +2,13 @@ import React, {useState,useCallback} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image, Dimensions } from 'react-native'
-import {allChats} from './utils'
+import {allChats, sortChats, filterChats} from './utils'
 import {Button} from 'react-native-paper'
 import InviteRow, {styles} from './inviteRow'
 import { useNavigation } from '@react-navigation/native'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {useChatPicSrc} from '../utils/picSrc'
 import moment from 'moment'
-import FastImage from 'react-native-fast-image'
 import Avatar from './msg/avatar'
 
 export default function ChatList() {
@@ -29,28 +28,9 @@ export default function ChatList() {
   }, [refreshing])
 
   return useObserver(()=>{
-    const _chats = chats.chats
-    const _contacts = contacts.contacts
-    const theChats = allChats(_chats, _contacts)
-    const chatsToShow = theChats.filter(c=> {
-      if (!ui.searchTerm) return true
-      return (c.invite?true:false) || 
-        c.name.toLowerCase().includes(ui.searchTerm.toLowerCase())
-    })
-    chatsToShow.sort((a,b)=>{
-      const amsgs = msg.messages[a.id]
-      const alastMsg = amsgs&&amsgs[0]
-      const then = moment(new Date()).add(-30, 'days')
-      const adate = alastMsg&&alastMsg.date?moment(alastMsg.date):then
-      const bmsgs = msg.messages[b.id]
-      const blastMsg = bmsgs&&bmsgs[0]
-      const bdate = blastMsg&&blastMsg.date?moment(blastMsg.date):then
-      return adate.isBefore(bdate) ? 0 : -1
-    })
-    chatsToShow.sort(a=>{
-      if(a.invite && a.invite.status!==4) return -1
-      return 0
-    })
+    const theChats = allChats(chats.chats, contacts.contacts)
+    const chatsToShow = filterChats(theChats, ui.searchTerm)
+    sortChats(chatsToShow, msg.messages)
     return <ScrollView style={{width:'100%',flex:1}}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {chatsToShow.map((c,i)=> {

@@ -24,7 +24,6 @@ export default function Main() {
       contacts.getContacts()
       msg.getMessages()
       details.getBalance()
-      // HERE auth with meme server
 
       meme.authenticateAll()
 

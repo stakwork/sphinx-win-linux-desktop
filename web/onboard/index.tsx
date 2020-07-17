@@ -4,9 +4,10 @@ import { useStores } from '../../src/store'
 import SendIcon from '@material-ui/icons/Send';
 import * as aes from '../crypto/aes'
 import PIN, {setPinCode} from '../modals/pin'
+import * as rsa from '../crypto/rsa'
 
-function Onboard(){
-  const {user} = useStores()
+function Onboard(props){
+  const {user,details} = useStores()
   const [text,setText] = useState('')
   const [showPin, setShowPin] = useState(false)
   const [checking, setChecking] = useState(false)
@@ -42,12 +43,11 @@ function Onboard(){
         const enc = restoreString.substr(6)
         const dec = await aes.decryptSync(enc,pin)
         if(dec) {
-          console.log("DEC ASDFASDF!!!!!!!!!")
           await setPinCode(pin)
           const priv = await user.restore(dec)
           if(priv) {
-            // rsa.setPrivateKey(priv)
-            // return onRestore()
+            rsa.setPrivateKey(priv)
+            return props.onRestore()
           }
         }
       }

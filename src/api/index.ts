@@ -27,7 +27,7 @@ export function instantiateRelay(ip:string, authToken?:string){
   } else {
     relay = new API(`${protocol}${ip}/`)
   }
-  console.log('=> instantiated relay!', `${protocol}${ip}/`)
+  console.log('=> instantiated relay!', `${protocol}${ip}/`, 'authToken?', authToken?true:false)
   
   if(authToken) { // only connect here (to avoid double) if auth token means for real
     connectWebSocket(`${protocol}${ip}`, authToken)

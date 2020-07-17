@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 function Chat(){
   return <Section>
-    chat
+    {' '}
   </Section>
 }
 

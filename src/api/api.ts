@@ -20,6 +20,7 @@ export default class API {
 function addMethod(m: string, rootUrl: string): Function {
   return async function (url: string, data: any, encoding?: string) {
     if(!data) data={}
+    
     try {
       const skip = isPublic(rootUrl + url)
       if (this.tokenKey && !this.tokenValue && !skip) {

@@ -9,6 +9,8 @@ const url = require('url');
 
 let mainWindow;
 
+app.setName('Sphinx Chat');
+
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800, height: 600,
@@ -18,7 +20,7 @@ function createWindow() {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://localhost:8080');
 
     mainWindow.webContents.openDevTools();
 

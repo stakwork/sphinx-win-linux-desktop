@@ -1,17 +1,17 @@
 import React, {useState,useEffect} from 'react'
 import {useStores} from '../src/store'
 import './style.css'
-import ChatList from './chat/chatList'
-import Chat from './chat/chat'
 import theme from './theme'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {useObserver} from 'mobx-react-lite'
 import styled from 'styled-components'
 import PIN, {wasEnteredRecently} from './modals/pin'
 import Onboard from './onboard'
+import Main from './main'
+import {instantiateRelay} from '../src/api'
 
 function Wrap(){
-  const {ui,chats} = useStores()
+  const {ui} = useStores()
   return useObserver(()=>{
     if(ui.ready) return <App />
     return <Loading>
@@ -21,22 +21,32 @@ function Wrap(){
 }
 
 function App(){
+  const {user} = useStores()
   const [pinned,setPinned] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
   useEffect(()=>{
     (async () => {
+      const isSignedUp = (user.currentIP && user.authToken)?true:false
+      setSignedUp(isSignedUp)
+      if(isSignedUp){
+        instantiateRelay(user.currentIP, user.authToken)
+      }
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
     })()
   },[])
   if(!signedUp) {
-    return <Onboard />
+    return <Onboard onRestore={()=>{
+      setSignedUp(true)
+      setPinned(true)
+    }}/>
   }
-  return <main className="main" style={{background:theme.bg}}>
-    {!pinned && <PIN onFinish={()=>setPinned(true)} />}
-    <ChatList />
-    <Chat />
-  </main>
+  if(!pinned) {
+    return <main className="main" style={{background:theme.bg}}>
+      {!pinned && <PIN onFinish={()=>setPinned(true)} />}
+    </main>
+  }
+  return <Main />
 }
 
 const Loading=styled.div`
