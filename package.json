@@ -1,11 +1,14 @@
 {
+  "main": "electron.js",
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "postinstall": "jetify",
     "web": "react-app-rewired start",
-    "build-web": "react-app-rewired build"
+    "build-web": "react-app-rewired build",
+    "electron": "electron .",
+    "rebuild": "electron-rebuild -f -w jscryptor"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",
@@ -35,6 +38,7 @@
     "https-browserify": "0.0.1",
     "install": "^0.13.0",
     "ion-sdk-js": "^0.3.4",
+    "jscryptor": "0.0.12",
     "mobx": "^5.15.4",
     "mobx-persist": "^0.4.1",
     "mobx-react-lite": "^1.5.2",
@@ -123,6 +127,8 @@
     "@types/react-native": "~0.60.23",
     "babel-jest": "~24.9.0",
     "customize-cra": "^1.0.0",
+    "electron": "^9.1.0",
+    "electron-rebuild": "^1.11.0",
     "jest": "~24.9.0",
     "jetifier": "~1.6.4",
     "metro-react-native-babel-preset": "^0.56.4",
