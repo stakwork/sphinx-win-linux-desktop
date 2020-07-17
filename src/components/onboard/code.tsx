@@ -68,7 +68,7 @@ export default function Code(props) {
 
   async function pinEntered(pin){
     const restoreString = atob(code)
-      if(restoreString.startsWith('keys::')) {
+    if(restoreString.startsWith('keys::')) {
       const enc = restoreString.substr(6)
       const dec = await e2e.decrypt(enc,pin)
       if(dec) {

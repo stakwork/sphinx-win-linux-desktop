@@ -3,14 +3,33 @@ import styled from 'styled-components'
 import SendIcon from '@material-ui/icons/Send';
 import * as aes from '../crypto/aes'
 
-aes.decrypt()
-
 function Onboard(){
   const [text,setText] = useState('')
 
-  function checkCode(){
+  async function checkCode(){
     if(!text) return
     console.log(text)
+    try{
+      const restoreString = atob(text)
+      if(restoreString.startsWith('keys::')) {
+        const enc = restoreString.substr(6)
+        const dec = await aes.decryptSync(enc,'111111')
+        console.log(dec)
+        // if(dec) {
+        //   await setPinCode(pin) // in the PIN
+        //   const priv = await user.restore(dec)
+        //   if(priv) {
+        //     rsa.setPrivateKey(priv)
+        //     return onRestore()
+        //   }
+        // }
+      }
+    } catch(e) {
+      console.log(e)
+    }
+    // wrong PIN
+    // setShowPin(false)
+    // setChecking(false)
   }
 
   return <main className="onboard">
@@ -59,7 +78,7 @@ const Input=styled.input`
   border-radius:32px;
   font-size:16px;
   padding-left:32px;
-  
+  padding-right:52px;
 `
 
 export default Onboard
