@@ -46,7 +46,10 @@ const Chats = styled.div`
   flex:1;
   overflow:auto;
   flex-direction:column;
-  width:100%;
+  width:99.4%;
+  position:relative;
+  z-index:9;
+  margin-top:4px;
 `
 
 export default ChatList
