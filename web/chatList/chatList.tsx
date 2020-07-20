@@ -1,29 +1,34 @@
 import React, {useState} from 'react'
 import styled from 'styled-components'
 import Dragger from './dragger'
-import {useStores} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
-import {allChats, sortChats, filterChats} from '../../src/components/chat/utils'
 import Head from './head'
 import ChatRow from './chatRow'
+import {useStores,hooks} from '../../src/store'
+const {useChats} = hooks
 
 function ChatList(){
-  const {ui,chats,contacts,msg,details} = useStores()
-  const [width,setWidth] = useState(400)
+  const {msg,ui} = useStores()
+  const maxWidth = 350
+  const [width,setWidth] = useState(maxWidth)
   return useObserver(()=>{
-    const theChats = allChats(chats.chats, contacts.contacts)
-    const chatsToShow = filterChats(theChats, ui.searchTerm)
-    sortChats(chatsToShow, msg.messages)
+    const theChats = useChats()
+    const scid = ui.selectedChat&&ui.selectedChat.id
     return <Section style={{width,maxWidth:width,minWidth:width}}>
       <Inner>
         <Head />
         <Chats>
-          {chatsToShow.map((c,i)=>{
-            return <ChatRow key={i} {...c} />
-          })}
+          {theChats.map((c,i)=> (<ChatRow 
+            key={i} {...c} 
+            selected={c.id===scid} 
+            onClick={()=> {
+              msg.seeChat(c.id)
+              ui.setSelectedChat(c)
+            }} />)
+          )}
         </Chats>
       </Inner>
-      <Dragger setWidth={setWidth}/>
+      <Dragger setWidth={setWidth} maxWidth={maxWidth} />
     </Section>
   })
 }

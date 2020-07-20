@@ -6,7 +6,6 @@ import {useStores} from './src/store'
 import {instantiateRelay} from './src/api'
 import {useObserver} from 'mobx-react-lite'
 import Loading from './src/components/loading'
-import AsyncStorage from '@react-native-community/async-storage'
 import StatusBar from './src/components/utils/statusBar'
 import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
@@ -14,7 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
 // import * as rsa from './src/crypto/rsa'
-import PINCode, {wasEnteredRecently, clearPin} from './src/components/utils/pin'
+import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -57,10 +56,6 @@ function App() {
 
   useEffect(()=>{
     (async () => {
-      // // AsyncStorage.clear()
-      // // clearPin()
-
-      // msg.clearAllMessages()
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){

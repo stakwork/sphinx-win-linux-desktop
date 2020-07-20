@@ -20,7 +20,7 @@ export default function Head(){
       <SearchIcon style={{color:'grey',fontSize:18,position:'absolute',top:12,left:19}} />
       <Search placeholder="Search" value={ui.searchTerm}
         onChange={e=>ui.setSearchTerm(e.target.value)}
-        style={{background:theme.dark}}
+        style={{background:theme.deep}}
       />
     </Searcher>
   </Wrap>)
@@ -28,18 +28,20 @@ export default function Head(){
 
 const Wrap = styled.div`
   width:100%;
-  height:114px;
+  height:115px;
   max-height:114px;
   display:flex;
   flex-direction:column;
-  box-shadow: 0px 0px 17px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.65);
+  position:relative;
+  z-index:11;
 `
 const Top=styled.div`
   display:flex;
   justify-content:space-between;
   align-items:center;
   width:100%;
-  height:60px;
+  height:65px;
 `
 const Balance=styled.div`
   width:100px;

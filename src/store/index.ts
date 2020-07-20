@@ -10,9 +10,18 @@ import { memeStore } from './meme'
 import { authStore } from './auth'
 import { create } from 'mobx-persist'
 import { AsyncStorage, Platform } from 'react-native'
+import * as hookz from './hooks'
+import {webStorage} from './storage'
+
+const strg = {
+  ios: AsyncStorage,
+  android: AsyncStorage,
+  web: webStorage
+}
 
 const hydrate = create({
-  storage: Platform.OS==='android' ? AsyncStorage : localStorage
+  storage: strg[Platform.OS] || localStorage,
+  debounce: 180,
 })
 
 function init(){
@@ -44,3 +53,5 @@ const ctx = React.createContext({
 })
 
 export const useStores = () => React.useContext(ctx)
+
+export const hooks = hookz

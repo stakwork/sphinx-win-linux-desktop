@@ -13,7 +13,7 @@ app.setName('Sphinx Chat');
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 800, height: 600,
+        width: 999, height: 700,
         webPreferences: {
             nodeIntegration: true
         }

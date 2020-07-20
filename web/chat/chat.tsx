@@ -1,9 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
+import Head from './head'
+import theme from '../theme'
 
 function Chat(){
-  return <Section>
-    {' '}
+  return <Section style={{background:theme.deep}}>
+    <Head />
   </Section>
 }
 

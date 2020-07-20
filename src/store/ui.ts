@@ -10,6 +10,12 @@ export class UiStore {
     this.ready = ready
   }
 
+  @observable selectedChat: Chat
+  @action
+  setSelectedChat(c){
+    this.selectedChat = c
+  }
+
   @observable searchTerm: string = ''
   @action
   setSearchTerm(term) {

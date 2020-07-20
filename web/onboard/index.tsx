@@ -64,16 +64,18 @@ function Onboard(props){
   }
   return <main className="onboard">
     <Logo src="static/sphinx-white-logo.png" />
-    <Title>Welcome</Title>
-    <Msg>Paste the invitation text or scan the QR code</Msg>
-    <InputWrap>
-      <Input value={text} onChange={e=> setText(e.target.value)} 
-        placeholder="Enter Code..."
-      />
-      <SendIcon onClick={checkCode}
-        style={{color:'#6A8FFF',fontSize:24,position:'absolute',right:16,top:20,cursor:'pointer'}} 
-      />
-    </InputWrap>
+    {props.welcome && <>
+      <Title>Welcome</Title>
+      <Msg>Paste the invitation text or scan the QR code</Msg>
+      <InputWrap>
+        <Input value={text} onChange={e=> setText(e.target.value)} 
+          placeholder="Enter Code..."
+        />
+        <SendIcon onClick={checkCode}
+          style={{color:'#6A8FFF',fontSize:24,position:'absolute',right:16,top:20,cursor:'pointer'}} 
+        />
+      </InputWrap>
+    </>}
   </main>
 }
 

@@ -7,8 +7,9 @@ import {useObserver} from 'mobx-react-lite'
 import styled from 'styled-components'
 import PIN, {wasEnteredRecently} from './modals/pin'
 import Onboard from './onboard'
-import Main from './main'
 import {instantiateRelay} from '../src/api'
+import ChatList from './chatList/chatList'
+import Chat from './chat/chat'
 
 function Wrap(){
   const {ui} = useStores()
@@ -24,6 +25,7 @@ function App(){
   const {user} = useStores()
   const [pinned,setPinned] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
+  const [welcome, setWelcome] = useState(false)
   useEffect(()=>{
     (async () => {
       const isSignedUp = (user.currentIP && user.authToken)?true:false
@@ -33,10 +35,11 @@ function App(){
       }
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
+      setWelcome(true)
     })()
   },[])
   if(!signedUp) {
-    return <Onboard onRestore={()=>{
+    return <Onboard welcome={welcome} onRestore={()=>{
       setSignedUp(true)
       setPinned(true)
     }}/>
@@ -47,6 +50,21 @@ function App(){
     </main>
   }
   return <Main />
+}
+
+function Main(){
+  const {contacts,msg,details,meme} = useStores()
+  useEffect(()=>{
+    contacts.getContacts()
+    msg.getMessages()
+    details.getBalance()
+    meme.authenticateAll()
+    msg.initLastSeen()
+  },[])
+  return <main className="main" style={{background:theme.bg}}>
+    <ChatList />
+    <Chat />
+  </main>
 }
 
 const Loading=styled.div`

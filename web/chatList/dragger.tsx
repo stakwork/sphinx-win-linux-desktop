@@ -2,10 +2,10 @@ import React, {useState} from 'react'
 import {DraggableCore} from 'react-draggable'
 import styled from 'styled-components'
 
-function Dragger({setWidth}){
+function Dragger({setWidth,maxWidth}){
   return <DraggableCore
     onDrag={(e:any)=>{
-      if(e.x>=250 && e.x<=400) setWidth(e.x)
+      if(e.x>=250 && e.x<=maxWidth) setWidth(e.x)
     }}>
     <Handle>
       <Circle />
@@ -26,6 +26,8 @@ const Handle=styled.div`
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  position:relative;
+  z-index:12;
 `
 const Circle=styled.div`
   width:5px;
