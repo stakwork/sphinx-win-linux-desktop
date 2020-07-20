@@ -1,15 +1,12 @@
-const electron = require('electron');
-const {ipcMain} = require('electron')
+const {app, ipcMain, BrowserWindow} = require('electron')
 const RNCryptor = require('jscryptor')
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
 
 let mainWindow;
 
-app.setName('Sphinx Chat');
+// app.setName('Sphinx Chat');
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -20,7 +17,7 @@ function createWindow() {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL('http://localhost:8080');
+    mainWindow.loadURL('http://localhost:3000');
 
     mainWindow.webContents.openDevTools();
 
