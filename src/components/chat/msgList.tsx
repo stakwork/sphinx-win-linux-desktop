@@ -1,6 +1,6 @@
 import React, {useRef, useMemo, useState, useCallback, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import {useStores} from '../../store'
+import {useStores, hooks} from '../../store'
 import { VirtualizedList, InteractionManager, View, Text, StyleSheet, Keyboard, Dimensions } from 'react-native'
 import {Chat} from '../../store/chats'
 import Message from './msg'
@@ -9,34 +9,19 @@ import {Contact} from '../../store/contacts'
 import moment from 'moment'
 import { constants,constantCodes } from '../../constants'
 import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
+const {useMsgs} = hooks
 
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,setReplyUUID,replyUuid}){
-  const {msg,chats,contacts,user} = useStores()
-  const isTribe = chat&&chat.type===tribe
-
+  const {msg,ui,user} = useStores()
   async function onDelete(id){
     await msg.deleteMessage(id)
   }
   return useObserver(()=>{
-    let theID = (chat&&chat.id)
-    if(!theID) { // for very beginning, where chat doesnt have id
-      const theChat = chats.chats.find(ch=>ch.type===0 && arraysEqual(ch.contact_ids, chat.contact_ids)) // this is the problem
-      if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
-    }
-    const msgs = msg.messages[theID]
-    const msgsLength = (msgs&&msgs.length)||0
-    // console.log("RENDER NEW MESSAGE",msgsLength)
-    const messages = processMsgs(msgs, isTribe, contacts.contacts)
-    const msgsWithDates = msgs && injectDates(messages)
-    const ms = msgsWithDates || []
-    const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
-    // let final = []
-    // if(max) final = filtered.slice(0).slice(max * -1)
-    // console.log("OK DONE PREOCESSING MSGS")
-    return <MsgList msgs={filtered} msgsLength={msgsLength} 
+    const msgs = useMsgs(chat) || []
+    return <MsgList msgs={msgs} msgsLength={msgs.length} 
       chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid}
       onDelete={onDelete} myPubkey={user.publicKey}
     />

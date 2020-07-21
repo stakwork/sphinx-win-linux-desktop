@@ -1,15 +1,14 @@
 import React, {useState,useCallback} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import {useStores} from '../../store'
+import {useStores, hooks} from '../../store'
 import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image, Dimensions } from 'react-native'
-import {allChats, sortChats, filterChats} from './utils'
 import {Button} from 'react-native-paper'
 import InviteRow, {styles} from './inviteRow'
 import { useNavigation } from '@react-navigation/native'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import {useChatPicSrc} from '../utils/picSrc'
-import moment from 'moment'
 import Avatar from './msg/avatar'
+const {useChats, useChatRow} = hooks
 
 export default function ChatList() {
   const {ui,chats,contacts,msg,details} = useStores()
@@ -28,9 +27,7 @@ export default function ChatList() {
   }, [refreshing])
 
   return useObserver(()=>{
-    const theChats = allChats(chats.chats, contacts.contacts)
-    const chatsToShow = filterChats(theChats, ui.searchTerm)
-    sortChats(chatsToShow, msg.messages)
+    const chatsToShow = useChats()
     return <ScrollView style={{width:'100%',flex:1}}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       {chatsToShow.map((c,i)=> {
@@ -65,15 +62,7 @@ function ChatRow(props){
     let uri = useChatPicSrc(props)
     const hasImg = uri?true:false
 
-    const msgs = msg.messages[id||'_']
-    const lastMsg = msgs&&msgs[0]
-    const lastMsgText = lastMessageText(lastMsg)
-    const hasLastMsg = lastMsgText?true:false
-
-    const now = new Date().getTime()
-    const lastSeen = msg.lastSeen[id||'_'] || now
-    const unseenCount = countUnseen(msgs, lastSeen)
-    const hasUnseen = unseenCount>0?true:false
+    const {lastMsgText,hasLastMsg,unseenCount,hasUnseen} = useChatRow(props.id)
 
     const w = Math.round(Dimensions.get('window').width)
     return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
@@ -103,40 +92,6 @@ function ChatRow(props){
         </Text>}
       </View>
     </TouchableOpacity>
-  })
-}
-
-function lastMessageText(msg){
-  if(!msg) return ''
-
-  if(msg.amount) {
-    if(msg.sender===1) return `Payment Sent: ${msg.amount} sat`
-    return `Payment Received: ${msg.amount} sat`
-  }
-  if(msg.message_content) return msg.message_content
-  if(msg.media_token) {
-    if(msg.sender===1) return 'Picture Sent'
-    return 'Picture Received'
-  }
-  
-  return ''
-}
-
-function countUnseen(msgs, lastSeen:number):number{
-  if(!msgs) return 0
-  let unseenCount = 0
-  msgs.forEach(m=>{
-    if(m.sender!==1){
-      const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
-      if(unseen) unseenCount+=1
-    }
-  })
-  return Math.min(unseenCount,99)
-}
-
-function wait(timeout) {
-  return new Promise(resolve => {
-    setTimeout(resolve, timeout)
   })
 }
 
