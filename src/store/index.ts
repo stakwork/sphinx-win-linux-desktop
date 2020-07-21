@@ -21,7 +21,7 @@ const strg = {
 
 const hydrate = create({
   storage: strg[Platform.OS] || localStorage,
-  debounce: 180,
+  debounce: 280,
 })
 
 function init(){

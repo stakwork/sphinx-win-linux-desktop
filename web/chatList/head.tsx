@@ -32,7 +32,7 @@ const Wrap = styled.div`
   max-height:114px;
   display:flex;
   flex-direction:column;
-  box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.65);
+  box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.55);
   position:relative;
   z-index:11;
 `

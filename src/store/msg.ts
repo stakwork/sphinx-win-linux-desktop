@@ -80,10 +80,10 @@ class MsgStore {
 
   @action
   async getMessages() {
-
     let route = 'messages'
     if(this.lastFetched) {
-      const dateq = moment.utc(this.lastFetched-1000000).format('YYYY-MM-DD%20HH:mm:ss')
+      const mult = 1
+      const dateq = moment.utc(this.lastFetched-1000000*mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else {
       const start = moment().subtract(28, 'days').format('YYYY-MM-DD%20HH:mm:ss')

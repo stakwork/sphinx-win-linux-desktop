@@ -1,5 +1,5 @@
 {
-  "main": "electron.js",
+  "main": "electron/main.js",
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",

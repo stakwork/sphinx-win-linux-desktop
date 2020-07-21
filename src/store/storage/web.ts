@@ -31,7 +31,6 @@ export function removeItem(key: string) {
   })
 }
 
-
 export function setItem(key: string, value: string) {
   return new Promise((resolve, reject) => {
       try {

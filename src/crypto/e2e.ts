@@ -1,5 +1,22 @@
-import * as rsa from './rsa'
-import * as aes from './aes'
+import * as rsaMobile from './rsa'
+import * as aesMobile from './aes'
+import * as rsaWeb from '../../web/crypto/rsa'
+import * as aesWeb from '../../web/crypto/aes'
+import { Platform } from 'react-native'
+
+const rsaConfig = {
+    ios: rsaMobile,
+    android: rsaMobile,
+    web: rsaWeb
+}
+const aesConfig = {
+    ios: aesMobile,
+    android: aesMobile,
+    web: aesWeb
+}
+
+const rsa = rsaConfig[Platform.OS]
+const aes = aesConfig[Platform.OS]
 
 /*
 File attachments are encrypted with a password,

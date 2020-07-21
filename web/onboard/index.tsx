@@ -41,7 +41,7 @@ function Onboard(props){
       const restoreString = atob(text)
       if(restoreString.startsWith('keys::')) {
         const enc = restoreString.substr(6)
-        const dec = await aes.decryptSync(enc,pin)
+        const dec = await aes.decrypt(enc,pin)
         if(dec) {
           await setPinCode(pin)
           const priv = await user.restore(dec)

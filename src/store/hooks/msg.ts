@@ -10,9 +10,10 @@ const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
 export function useMsgs(chat){
-    const isTribe = chat&&chat.type===tribe
     const {chats,msg,contacts} = useStores()
-    let theID = (chat&&chat.id)
+    if(!chat) return
+    let theID = chat.id
+    const isTribe = chat.type===tribe
     if(!theID) { // for very beginning, where chat doesnt have id
       const theChat = chats.chats.find(ch=>ch.type===0 && arraysEqual(ch.contact_ids, chat.contact_ids)) // this is the problem
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!

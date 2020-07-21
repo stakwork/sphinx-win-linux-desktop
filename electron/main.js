@@ -1,5 +1,5 @@
-const {app, ipcMain, BrowserWindow} = require('electron')
-const RNCryptor = require('jscryptor')
+const {app, BrowserWindow} = require('electron')
+require('./ipc')
 
 const path = require('path');
 const url = require('url');
@@ -48,18 +48,3 @@ app.on('activate', function () {
     }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-ipcMain.on('decryptSync', (event, arg) => {
-    try {
-        const args = JSON.parse(arg)
-        // args.data is base64 encoded
-        // args.password is string
-        const dec = RNCryptor.Decrypt(args.data, args.password)
-        event.returnValue = dec.toString('ascii')
-    } catch(e) {
-        console.log(e)
-        event.returnValue = ''
-    }
-})

@@ -25,6 +25,7 @@ React-Native Android and Web client for Sphinx network
 - Web dev:
   - uncomment the `"include": ["src/index.web.tsx","web"]` line in `tsconfig.json`
   - `npm run web`
+  - in another terminal `electron .`
 
 **react:**
 

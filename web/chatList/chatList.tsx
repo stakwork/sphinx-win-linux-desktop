@@ -14,13 +14,14 @@ function ChatList(){
   return useObserver(()=>{
     const theChats = useChats()
     const scid = ui.selectedChat&&ui.selectedChat.id
+    const scname = ui.selectedChat&&ui.selectedChat.name
     return <Section style={{width,maxWidth:width,minWidth:width}}>
       <Inner>
         <Head />
         <Chats>
           {theChats.map((c,i)=> (<ChatRow 
             key={i} {...c} 
-            selected={c.id===scid} 
+            selected={c.id===scid&&c.name===scname} 
             onClick={()=> {
               msg.seeChat(c.id)
               ui.setSelectedChat(c)

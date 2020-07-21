@@ -1,17 +1,6 @@
 *{
     box-sizing: border-box;
 }
-::-webkit-scrollbar{
-    width: 8px;
-    background-color: transparent;
-}
-::-webkit-scrollbar-thumb{
-    background-color: #141d27;
-    border-radius: 5px;
-}
-::-webkit-scrollbar-track{
-    display: none;
-}
 html, body, #root, .main{
     display: flex;
     flex: 1;
@@ -22,6 +11,20 @@ html, body, #root, .main{
 body{
     color:white;
     font-family: 'Roboto', sans-serif;
+}
+::-webkit-scrollbar{
+    width: 8px;
+    background-color: transparent;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #121a23;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-track{
+    display: none;
+}
+.msg-list::-webkit-scrollbar-thumb{
+    background-color: #0d1219;
 }
 .main{
     align-items: center;
@@ -46,5 +49,6 @@ body{
     background-color: white;
 }
 .MuiIconButton-root:hover {
-    background-color: rgba(255, 255, 255, 0.065) !important;
+    /* background-color: rgba(255, 255, 255, 0.065) !important; */
+    opacity: 0.8;
 }
