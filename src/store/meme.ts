@@ -2,6 +2,7 @@ import { observable, action } from 'mobx'
 import {relay, composeAPI} from '../api'
 import { persist } from 'mobx-persist'
 import {userStore} from './user'
+import moment from 'moment'
 
 export interface Server {
   host: string
@@ -45,6 +46,18 @@ class MemeStore {
     }, 'application/x-www-form-urlencoded')
     if(!(r3&&r3.token)) return
     server.token = r3.token
+  }
+
+  @observable cacheEnabled: boolean = false
+  @action checkCacheEnabled() {
+    this.cacheEnabled = window&&window.indexedDB?true:false
+  }
+
+  @persist('object') @observable cache: {[k:string]:string} = {}
+  @persist('object') @observable cacheTS: {[k:string]:number} = {}
+  @action addToCache(muid:string,data:string){
+    this.cache[muid] = data
+    this.cacheTS[muid] = moment().unix()
   }
 
 }

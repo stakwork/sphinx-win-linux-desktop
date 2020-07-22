@@ -11,12 +11,12 @@ import { authStore } from './auth'
 import { create } from 'mobx-persist'
 import { AsyncStorage, Platform } from 'react-native'
 import * as hookz from './hooks'
-import {webStorage} from './storage'
+import * as localForage from 'localforage'
 
 const strg = {
   ios: AsyncStorage,
   android: AsyncStorage,
-  web: webStorage
+  web: localForage,
 }
 
 const hydrate = create({

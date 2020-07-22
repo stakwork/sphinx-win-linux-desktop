@@ -60,7 +60,7 @@ export function useCachedEncryptedFile(props, ldat){
         path: dirs.CacheDir + `/attachments/msg_${id}`
       })
       .fetch('GET', url, {
-        Authorization : `Bearer ${server.token}`,
+        Authorization: `Bearer ${server.token}`,
       })
       console.log('The file saved to ', res.path())
 

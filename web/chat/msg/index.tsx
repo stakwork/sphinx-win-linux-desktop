@@ -58,7 +58,7 @@ const MsgRow = styled.div`
   flex-shrink:0;
   display:flex;
   padding-left:8px;
-  margin:6px 0 8px 0;
+  margin:4px 0 6px 0;
 `
 const InnerBox = styled.div`
   display:flex;
@@ -75,5 +75,5 @@ const BubbleWrap = styled.div`
 `
 const Bubble = styled.div`
   border-radius:6px;
-  padding:14px 18px;
+  overflow:hidden;
 `

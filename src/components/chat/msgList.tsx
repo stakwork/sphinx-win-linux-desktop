@@ -21,7 +21,7 @@ export default function MsgListWrap({chat,setReplyUUID,replyUuid}:{chat:Chat,set
   }
   return useObserver(()=>{
     const msgs = useMsgs(chat) || []
-    return <MsgList msgs={msgs} msgsLength={msgs.length} 
+    return <MsgList msgs={msgs} msgsLength={(msgs&&msgs.length)||0} 
       chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid}
       onDelete={onDelete} myPubkey={user.publicKey}
     />

@@ -32,6 +32,7 @@ export default function Main() {
       initPicSrc()
 
       push.configure((t)=>{
+        console.log(t&&t.token)
         if(!user.deviceId || user.deviceId!==t.token) {
           user.registerMyDeviceId(t.token)
         }

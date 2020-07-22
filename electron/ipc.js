@@ -14,6 +14,18 @@ ipcMain.on('decrypt', (event, args) => {
     }
 })
 
+ipcMain.on('decrypt-64', (event, args) => {
+    try {
+        if(!args.rid) return
+        // args.data is base64 encoded
+        // args.password is string
+        const dec = RNCryptor.Decrypt(args.data, args.password)
+        event.reply(args.rid, dec.toString('base64'))
+    } catch(e) {
+        console.log('ERROR! decrypt-64')
+    }
+})
+
 ipcMain.on('decrypt-rsa', (event, args) => {
     try {
         if(!args.rid) return

@@ -39,6 +39,7 @@
     "install": "^0.13.0",
     "ion-sdk-js": "^0.3.4",
     "jscryptor": "0.0.12",
+    "localforage": "^1.8.1",
     "mobx": "^5.15.4",
     "mobx-persist": "^0.4.1",
     "mobx-react-lite": "^1.5.2",

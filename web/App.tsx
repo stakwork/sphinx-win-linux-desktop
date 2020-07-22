@@ -10,6 +10,8 @@ import Onboard from './onboard'
 import {instantiateRelay} from '../src/api'
 import ChatList from './chatList/chatList'
 import Chat from './chat/chat'
+import * as localForage from 'localforage'
+import Modals from './modals'
 
 function Wrap(){
   const {ui} = useStores()
@@ -27,6 +29,7 @@ function App(){
   const [signedUp, setSignedUp] = useState(false)
   const [welcome, setWelcome] = useState(false)
   useEffect(()=>{
+    // localForage.clear();
     (async () => {
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
@@ -59,11 +62,13 @@ function Main(){
     msg.getMessages()
     details.getBalance()
     meme.authenticateAll()
+    meme.checkCacheEnabled()
     msg.initLastSeen()
   },[])
   return <main className="main" style={{background:theme.bg}}>
     <ChatList />
     <Chat />
+    <Modals />
   </main>
 }
 

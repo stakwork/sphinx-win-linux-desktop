@@ -1,6 +1,12 @@
 import React from 'react'
+import styled from 'styled-components'
 
 export default function TextMsg(props){
   const {message_content} = props
-  return <div>{message_content}</div>
+  return <Wrap>{message_content}</Wrap>
 }
+
+const Wrap = styled.div`
+  padding:16px;
+  max-width:240px;
+`

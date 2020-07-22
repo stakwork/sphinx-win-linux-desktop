@@ -4,7 +4,7 @@ import { constants,constantCodes } from '../../constants'
 import {Msg} from '../msg'
 import {Contact} from '../contacts'
 import moment from 'moment'
-// import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
+import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
 
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
@@ -19,15 +19,14 @@ export function useMsgs(chat){
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
-    const msgsLength = (msgs&&msgs.length)||0
-    // console.log("RENDER NEW MESSAGE",msgsLength)
     const messages = processMsgs(msgs, isTribe, contacts.contacts)
+
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
+    
     const filtered = ms.filter(m=> m.type!==constants.message_types.payment)
     return filtered
 }
-
 
 const hideTypes=['purchase','purchase_accept','purchase_deny']
 function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
@@ -41,13 +40,11 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
 
     // attachment logic
     if(typ==='attachment' && msg.sender!==1){ // not from me
-      // const ldat = parseLDAT(msg.media_token)
-      // const ldat = parseLDAT(msg.media_token)
-      const ldat:{[k:string]:any} = {}
+      const ldat = parseLDAT(msg.media_token)
       if(ldat.muid&&ldat.meta&&ldat.meta.amt) {
         const accepted = msgs.find(m=>{
           const mtype = constantCodes['message_types'][m.type]
-          const start = '.'//urlBase64FromAscii(ldat.host)+"."+ldat.muid
+          const start = urlBase64FromAscii(ldat.host)+"."+ldat.muid
           return (mtype==='purchase_accept'&&m.media_token.startsWith(start)) ||
             (isTribe&&mtype==='purchase_accept'&&m.original_muid===ldat.muid)
         })
@@ -58,8 +55,7 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
       }
     }
     if(typ==='attachment' && msg.sender===1) { // from me
-      // const ldat = parseLDAT(msg.media_token)
-      const ldat:{[k:string]:any} = {}
+      const ldat = parseLDAT(msg.media_token)
       if(ldat&&ldat.muid&&ldat.meta&&ldat.meta.amt) {
         const purchase = msgs.find(m=>{
           const mtype = constantCodes['message_types'][m.type]

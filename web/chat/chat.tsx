@@ -32,9 +32,9 @@ function Chat(){
               senderAlias = sender && sender.alias
             }
             if (m.dateLine) {
-              return <DateLine key={i} dateString={m.dateLine} />
+              return <DateLine key={'date'+i} dateString={m.dateLine} />
             }
-            return <Msg key={i} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} />
+            return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} />
           })}
         </MsgList>
       </MsgListWrap>

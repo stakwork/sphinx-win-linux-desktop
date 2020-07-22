@@ -52,3 +52,10 @@ body{
     /* background-color: rgba(255, 255, 255, 0.065) !important; */
     opacity: 0.8;
 }
+
+.view-img-modal-wrap{
+    display:flex;
+    flex:1;
+    align-items: center;
+    justify-content: center;
+}
