@@ -4,6 +4,7 @@ import Head from './head'
 import Foot from './foot'
 import theme from '../theme'
 import Msg from './msg'
+import {constants} from '../../src/constants'
 import {useStores,hooks} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
 const {useMsgs} = hooks
@@ -11,19 +12,29 @@ const {useMsgs} = hooks
 const headHeight = 65
 const footHeight = 65
 function Chat(){
-  const {msg,ui} = useStores()
+  const {contacts,ui} = useStores()
   return useObserver(()=>{
-    const msgs = useMsgs(ui.selectedChat) || []
+    const chat = ui.selectedChat
+    const msgs = useMsgs(chat) || []
+    const isTribe = chat&&chat.type===constants.chat_types.tribe
     const h = `calc(100% - ${headHeight+footHeight}px)`
     return <Section style={{background:theme.deep}}>
       <Head height={headHeight} />
       <MsgListWrap style={{maxHeight:h,minHeight:h}}>
         <MsgList className="msg-list">
           {msgs.map((m,i)=>{
+            let senderAlias = ''
+            const sender = contacts.contacts.find(c=>c.id===m.sender)
+            const senderPhoto = !isTribe && (sender&&sender.photo_url) || ''
+            if(isTribe) {
+              senderAlias = m.sender_alias
+            } else {
+              senderAlias = sender && sender.alias
+            }
             if (m.dateLine) {
               return <DateLine key={i} dateString={m.dateLine} />
             }
-            return <Msg key={i} {...m} />
+            return <Msg key={i} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} />
           })}
         </MsgList>
       </MsgListWrap>

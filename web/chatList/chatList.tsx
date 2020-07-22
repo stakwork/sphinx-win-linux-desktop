@@ -4,11 +4,14 @@ import Dragger from './dragger'
 import {useObserver} from 'mobx-react-lite'
 import Head from './head'
 import ChatRow from './chatRow'
+import {Chat} from '../../src/store/chats'
+import {Contact} from '../../src/store/contacts'
+import {constants} from '../../src/constants'
 import {useStores,hooks} from '../../src/store'
 const {useChats} = hooks
 
 function ChatList(){
-  const {msg,ui} = useStores()
+  const {msg,ui,contacts} = useStores()
   const maxWidth = 350
   const [width,setWidth] = useState(maxWidth)
   return useObserver(()=>{
@@ -19,19 +22,30 @@ function ChatList(){
       <Inner>
         <Head />
         <Chats>
-          {theChats.map((c,i)=> (<ChatRow 
-            key={i} {...c} 
-            selected={c.id===scid&&c.name===scname} 
-            onClick={()=> {
-              msg.seeChat(c.id)
-              ui.setSelectedChat(c)
-            }} />)
-          )}
+          {theChats.map((c,i)=> {
+            const contact = contactForConversation(c, contacts.contacts)
+            return <ChatRow 
+              key={i} {...c} contact_photo={contact&&contact.photo_url}
+              selected={c.id===scid&&c.name===scname} 
+              onClick={()=> {
+                msg.seeChat(c.id)
+                ui.setSelectedChat(c)
+              }} 
+            />
+          })}
         </Chats>
       </Inner>
       <Dragger setWidth={setWidth} maxWidth={maxWidth} />
     </Section>
   })
+}
+
+export function contactForConversation(chat: Chat, contacts: Contact[]){
+  if(chat && chat.type===constants.chat_types.conversation){
+    const cid = chat.contact_ids.find(id=>id!==1)
+    return contacts.find(c=> c.id===cid)
+  }
+  return null
 }
 
 const Section=styled.section`

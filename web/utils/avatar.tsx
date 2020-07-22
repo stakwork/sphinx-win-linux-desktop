@@ -32,7 +32,7 @@ export default function Avatar(props){
   </Wrap>
 }
 
-function getColor(s){
+export function getColor(s){
   const hc = hashCode(s.repeat(Math.round(32/s.length)))
   const int = Math.round(Math.abs(
     hc/2147483647*colorz.length

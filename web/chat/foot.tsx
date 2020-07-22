@@ -49,7 +49,8 @@ const Wrap=styled.div`
   box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.45);
 `
 const Input = styled.input`
-  width:90%;
+  max-width:calc(100% - 64px);
+  width:100%;
   height:42px;
   border:none;
   outline:none;
