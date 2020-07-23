@@ -1,14 +1,43 @@
 {
-  "main": "electron/main.js",
+  "name": "sphinx",
+  "description": "Bitcoin Lightning Powered Chat",
+  "author": "Evan Feenstra",
+  "version": "0.1.0",
+  "main": "public/electron/main.js",
+  "homepage": "./",
+  "build": {
+    "appId": "com.stakwork.sphinx",
+    "productName": "Sphinx Chat",
+    "copyright": "copyright © year Stakwork",
+    "win": {
+      "target": "nsis",
+      "icon": "build/static/icon.ico"
+    },
+    "mac": {
+      "identity": null,
+      "category": "com.stakwork.sphinx.chat",
+      "icon": "build/static/icon.ico"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "build"
+    }
+  },
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "postinstall": "jetify",
     "web": "react-app-rewired start",
-    "build-web": "react-app-rewired build",
+    "build": "react-app-rewired build",
     "electron": "ELECTRON_DEV_URL=http://localhost:3000 electron .",
-    "rebuild": "electron-rebuild -f -w jscryptor"
+    "rebuild": "electron-rebuild -f -w jscryptor",
+    "install-app-deps": "electron-builder install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",
@@ -31,6 +60,7 @@
     "constants-browserify": "^1.0.0",
     "dns.js": "^1.0.1",
     "domain-browser": "^1.2.0",
+    "electron-unhandled": "^3.0.2",
     "eventemitter3": "^4.0.0",
     "events": "^1.1.1",
     "firebase": "^7.14.2",

@@ -32,7 +32,7 @@ export default function ShareInvite({visible}) {
       <TouchableWithoutFeedback style={styles.wrap} onPress={copy}>
         <View style={styles.wrap}>
           <View style={styles.tapWrap}>
-            <Image style={{height:29,width:17}} source={require('../../../assets/tap_to_copy.png')} />
+            <Image style={{height:29,width:17}} source={require('../../../android_assets/tap_to_copy.png')} />
             <Text style={styles.tapToCopy}>TAP TO COPY</Text>
           </View>
           <View style={styles.qrWrap}>

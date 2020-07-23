@@ -29,7 +29,7 @@ export default function Welcome(props) {
         A message from your friend...
       </Text>
       <View style={styles.center}>
-        <Image source={require('../../../assets/avatar.png')} 
+        <Image source={require('../../../android_assets/avatar.png')} 
           style={{width:120,height:120}} resizeMode={'cover'}
         />
         <Text style={styles.name}>

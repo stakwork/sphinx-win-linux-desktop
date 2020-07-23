@@ -113,7 +113,7 @@ export default function Profile() {
           <TouchableOpacity onPress={()=>setDialogOpen(true)}
             style={styles.userPic}>
             <Image resizeMode="cover" 
-              source={imgURI?{uri:imgURI}:require('../../../assets/avatar.png')}
+              source={imgURI?{uri:imgURI}:require('../../../android_assets/avatar.png')}
               style={{width:60,height:60,borderRadius:30}}
             />
             {uploading && <ActivityIndicator animating={true} color="#55D1A9" style={styles.spinner} />}

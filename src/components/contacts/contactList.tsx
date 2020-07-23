@@ -57,7 +57,7 @@ function Item({ contact, onPress }) {
         <TouchableOpacity style={styles.contactTouch} activeOpacity={0.5}
           onPress={()=>onPress(contact)}>
           <View style={styles.avatar}>
-            <FastImage source={hasImg?{uri}:require('../../../assets/avatar.png')} 
+            <FastImage source={hasImg?{uri}:require('../../../android_assets/avatar.png')} 
               style={{width:44,height:44}} resizeMode={FastImage.resizeMode.cover}
             />
           </View>

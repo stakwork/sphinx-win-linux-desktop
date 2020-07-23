@@ -95,7 +95,7 @@ export default function GroupInfo({visible}) {
           {hasGroup && <View style={styles.groupInfo}>
             <View style={styles.groupInfoLeft}>
               <TouchableOpacity onPress={changePic}>
-                <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')} 
+                <Image source={hasImg?{uri}:require('../../../../android_assets/avatar.png')} 
                   style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
                 />
               </TouchableOpacity>

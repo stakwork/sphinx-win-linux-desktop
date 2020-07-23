@@ -88,7 +88,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
         {img && <Image source={{uri: img.uri}} 
           style={{width:180,height:180,borderRadius:90}} resizeMode={'cover'}
         />}
-        {!img && <Image source={require('../../../assets/avatar3x.png')} 
+        {!img && <Image source={require('../../../android_assets/avatar3x.png')} 
           style={{width:180,height:180}} resizeMode={'cover'}
         />}
         <Button mode="contained" icon="refresh"

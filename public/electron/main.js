@@ -1,5 +1,8 @@
 const {app, BrowserWindow} = require('electron')
+const unhandled = require('electron-unhandled');
 require('./ipc')
+
+unhandled();
 
 const path = require('path');
 const url = require('url');

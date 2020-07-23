@@ -23,7 +23,7 @@ export function DeletableContact(props){
     </View>
     <View style={styles.frontSwipeRow}>
       <View style={styles.avatar}>
-        <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')}
+        <Image source={hasImg?{uri}:require('../../../../android_assets/avatar.png')}
           style={{width:44,height:44}} resizeMode={'cover'}
         />
       </View>
@@ -41,7 +41,7 @@ export function Contact(props){
   return <TouchableOpacity style={styles.contactTouch} activeOpacity={1}
     onPress={onPress}>
     <View style={styles.avatar}>
-      <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')}
+      <Image source={hasImg?{uri}:require('../../../../android_assets/avatar.png')}
         style={{width:44,height:44}} resizeMode={'cover'}
       />
     </View>
@@ -62,7 +62,7 @@ export function SelectedContact({contact, onPress, removable}){
   const hasImg = uri?true:false
   return <View style={styles.selectedContact}>
     <View style={styles.selAvatar}>
-      <Image source={hasImg?{uri}:require('../../../../assets/avatar.png')} 
+      <Image source={hasImg?{uri}:require('../../../../android_assets/avatar.png')} 
         style={{width:54,height:54,borderRadius:27}} resizeMode={'cover'}
       />
       {removable && <TouchableOpacity style={styles.tinyButton} onPress={onPress}>

@@ -40,7 +40,7 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
 
     {contact && <View style={styles.contactWrap}>
       <Avatar.Image
-        source={hasImg?{uri}:require('../../../../assets/avatar.png')}
+        source={hasImg?{uri}:require('../../../../android_assets/avatar.png')}
         size={32}
       />
       <View style={styles.contactAliasWrap}>

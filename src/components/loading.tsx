@@ -10,7 +10,7 @@ export default function Loading(){
       stops={[0.1,1]}
       center={[80,40]}
       radius={400}>
-      <Image source={require('../../assets/sphinx-white-logo.png')} 
+      <Image source={require('../../android_assets/sphinx-white-logo.png')} 
         style={{width:120,height:120}} resizeMode={'cover'}
       />
       <View style={styles.spinWrap}>

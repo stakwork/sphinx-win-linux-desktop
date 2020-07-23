@@ -31,7 +31,7 @@ export default function InviteRow(props){
   return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
     onPress={()=> doAction()}>
     <View style={styles.inviteQR}>
-      <Image style={{height:40,width:40}} source={require('../../../assets/invite_qr.png')} />
+      <Image style={{height:40,width:40}} source={require('../../../android_assets/invite_qr.png')} />
     </View>
     <View style={styles.chatContent}>
       <View style={styles.chatContentTop}>
