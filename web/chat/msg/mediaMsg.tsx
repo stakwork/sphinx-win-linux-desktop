@@ -39,6 +39,7 @@ export default function MediaMsg(props){
   },[props.media_token])
 
   async function buy(amount){
+    if(purchased) return
     setBuying(true)
     let contact_id=props.sender
     if(!contact_id) {
@@ -59,12 +60,13 @@ export default function MediaMsg(props){
   const sold = props.sold
 
   return <Wrap>
+    {/* {loading &&
+      <CircularProgress size={17} style={{color:'white'}} />
+    } */}
+    
     {needsPurchase ? 
       <NeedsPurchase>
-        {loading ? 
-          <CircularProgress size={17} style={{color:'white'}} /> :
-          <CamIcon style={{color:'grey',fontSize:30}} />
-        }
+        <CamIcon style={{color:'grey',fontSize:30}} />
       </NeedsPurchase> :
       <Media type={media_type} data={data} onClick={()=> ui.setImgViewerParams({data})}/>
     }
@@ -85,7 +87,7 @@ export default function MediaMsg(props){
     </>}
 
     {showPurchaseButton && <BuyButton style={{background:theme.primary}}
-      onClick={()=> buy(amt)}>
+      onClick={()=> buy(amt)} purchased={purchased}>
       <BuyIcon purchased={purchased} loading={buying} />
       <BuyText>{purchased?'Purchased':`Pay ${amt} sat`}</BuyText>
     </BuyButton>}
@@ -138,12 +140,17 @@ const LoadingWrap = styled.div`
 `
 const BuyButton = styled.div`
   color:white;
-  height:45px;
+  height:40px;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:12px;
-  cursor: pointer;
+  ${p=>!p.purchased&&
+    `cursor: pointer;
+    &:hover{
+      background:#5b83f4 !important;
+    }`
+  }
 `
 const BuyText = styled.div`
   margin-left:10px;

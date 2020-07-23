@@ -16,7 +16,7 @@ export function useCachedEncryptedFile(props, ldat){
     if(!(ldat&&ldat.host)) {
       return
     }
-    if(!ldat.sig){
+    if(!ldat.sig || !media_key){
       return
     }
 
@@ -59,6 +59,7 @@ export function useCachedEncryptedFile(props, ldat){
             meme.addToCache(ldat.muid, String(dec))
           }
         } else {
+          console.log("DECRYPT NOW!!!!",b64.length,media_key)
           const dec = await aes.decrypt64(b64, media_key)
           if(dec) {
             setData(`data:image/jpg;base64,${dec}`)

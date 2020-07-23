@@ -31,6 +31,9 @@ export default function Foot({height}){
       <Input value={text} onChange={e=> setText(e.target.value)} 
         placeholder="Message" style={{background:theme.extraDeep}}
         disabled={!chat}
+        onKeyPress={e=>{
+          if(e.key==='Enter') sendMessage()
+        }}
       />
       <IconButton style={{background:chat?theme.primary:theme.extraDeep,width:39,height:39,marginRight:10}}
         disabled={!chat||!text} onClick={sendMessage}>

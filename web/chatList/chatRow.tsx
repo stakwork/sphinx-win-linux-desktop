@@ -20,6 +20,7 @@ export default function ChatRow(props){
       {hasLastMsg && <LastMsg numberOfLines={1} 
         style={{
           fontWeight:hasUnseen?'bold':'normal',
+          color:hasUnseen?'white':'grey',
           // maxWidth:w-105
         }}>
         {lastMsgText}
@@ -48,7 +49,7 @@ const AvatarWrap = styled.div`
   margin-left:10px;
 `
 const Name = styled.div`
-  font-size:16px;
+  font-size:18px;
 `
 const Right = styled.div`
   display:flex;

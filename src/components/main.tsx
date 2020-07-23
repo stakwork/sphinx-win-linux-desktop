@@ -7,7 +7,7 @@ import * as push from './push'
 import { is24HourFormat } from 'react-native-device-time-format'
 import * as rsa from '../crypto/rsa'
 
-async function migratePrivateKey(contacts){
+async function createPrivateKey(contacts){
   const priv = await rsa.getPrivateKey()
   if(priv) return // all good
 
@@ -21,12 +21,11 @@ export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
   useEffect(()=>{
     (async () => {
-      contacts.getContacts()
-      msg.getMessages()
+      contacts.getContacts().then(()=>{
+        meme.authenticateAll()
+      })
       details.getBalance()
-
-      meme.authenticateAll()
-
+      msg.getMessages()
       msg.initLastSeen()
 
       initPicSrc()
@@ -41,7 +40,7 @@ export default function Main() {
       const is24Hour = await is24HourFormat()
       ui.setIs24HourFormat(is24Hour)
 
-      migratePrivateKey(contacts)
+      createPrivateKey(contacts)
     })()
   },[])
 

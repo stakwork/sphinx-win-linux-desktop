@@ -1,12 +1,11 @@
 import * as ipc from './ipc'
 
-export function setPrivateKey(priv) {
-  localStorage.setItem('private', priv)
+export async function setPrivateKey(priv) {
+  await ipc.send('set-private-key', {key:priv})
 }
 
 export async function decrypt(data:string){
-  const priv = localStorage.getItem('private')
-  const obj={data,private:priv}
+  const obj={data}
   const ret = await ipc.send('decrypt-rsa', obj)
   return ret
 }

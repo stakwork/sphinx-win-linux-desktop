@@ -8,5 +8,5 @@ export default function TextMsg(props){
 
 const Wrap = styled.div`
   padding:16px;
-  max-width:240px;
+  max-width:440px;
 `

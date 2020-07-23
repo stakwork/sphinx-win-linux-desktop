@@ -7,7 +7,7 @@
     "postinstall": "jetify",
     "web": "react-app-rewired start",
     "build-web": "react-app-rewired build",
-    "electron": "electron .",
+    "electron": "ELECTRON_DEV_URL=http://localhost:3000 electron .",
     "rebuild": "electron-rebuild -f -w jscryptor"
   },
   "dependencies": {
@@ -39,6 +39,7 @@
     "install": "^0.13.0",
     "ion-sdk-js": "^0.3.4",
     "jscryptor": "0.0.12",
+    "keytar": "^6.0.1",
     "localforage": "^1.8.1",
     "mobx": "^5.15.4",
     "mobx-persist": "^0.4.1",

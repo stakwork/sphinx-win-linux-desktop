@@ -29,7 +29,6 @@ function App(){
   const [signedUp, setSignedUp] = useState(false)
   const [welcome, setWelcome] = useState(false)
   useEffect(()=>{
-    // localForage.clear();
     (async () => {
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
@@ -39,10 +38,16 @@ function App(){
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
       setWelcome(true)
+
+      // setTimeout(()=>{
+      //   localForage.clear()
+      //   console.log('localForage.clear()')
+      // },1000)
     })()
   },[])
   if(!signedUp) {
-    return <Onboard welcome={welcome} onRestore={()=>{
+    return <Onboard welcome={welcome} onRestore={async()=>{
+      await sleep(240)
       setSignedUp(true)
       setPinned(true)
     }}/>
@@ -58,11 +63,12 @@ function App(){
 function Main(){
   const {contacts,msg,details,meme} = useStores()
   useEffect(()=>{
-    contacts.getContacts()
-    msg.getMessages()
+    contacts.getContacts().then(()=>{
+      meme.authenticateAll()
+      meme.checkCacheEnabled()
+    })
     details.getBalance()
-    meme.authenticateAll()
-    meme.checkCacheEnabled()
+    msg.getMessages()
     msg.initLastSeen()
   },[])
   return <main className="main" style={{background:theme.bg}}>
@@ -81,3 +87,7 @@ const Loading=styled.div`
 `
 
 export default Wrap
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}

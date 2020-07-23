@@ -1,6 +1,7 @@
 const {ipcMain} = require('electron')
 const RNCryptor = require('jscryptor')
 const rsa = require('./rsa')
+const keytar = require('./keytar')
 
 ipcMain.on('decrypt', (event, args) => {
     try {
@@ -26,13 +27,24 @@ ipcMain.on('decrypt-64', (event, args) => {
     }
 })
 
-ipcMain.on('decrypt-rsa', (event, args) => {
+ipcMain.on('decrypt-rsa', async (event, args) => {
     try {
         if(!args.rid) return
-        // args.private is string
         // args.data is base64 encoded
-        const dec = rsa.decrypt(args.private, args.data)
+        const private = await keytar.getPrivateKey()
+        const dec = rsa.decrypt(private, args.data)
         event.reply(args.rid, dec)
+    } catch(e) {
+        console.log(e)
+    }
+})
+
+ipcMain.on('set-private-key', (event, args) => {
+    try {
+        if(!args.rid) return
+        // args.key
+        keytar.setPrivateKey(args.key)
+        event.reply(args.rid, true)
     } catch(e) {
         console.log(e)
     }
