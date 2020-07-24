@@ -20,8 +20,9 @@ function createWindow() {
     });
 
     // and load the index.html of the app.
+    // console.log(path.join(__dirname, '/../../build/index.html'))
     const startUrl = process.env.ELECTRON_DEV_URL || url.format({
-        pathname: path.join(__dirname, '/../build/index.html'),
+        pathname: path.join(__dirname, '/../../build/index.html'),
         protocol: 'file:',
         slashes: true
     });
@@ -57,4 +58,6 @@ app.on('activate', function () {
         createWindow()
     }
 });
+
+
 

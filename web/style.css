@@ -11,6 +11,7 @@ html, body, #root, .main{
 body{
     color:white;
     font-family: 'Roboto', sans-serif;
+    margin:0;
 }
 ::-webkit-scrollbar{
     width: 8px;

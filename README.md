@@ -21,12 +21,21 @@ React-Native Android and Web client for Sphinx network
 - Android dev:
   - uncomment the `"include": ["src"]` line in `tsconfig.json`
   - `react-native run-android`
+  - package.json scripts: `"postinstall":"jetify"`
 
 - Web dev:
   - uncomment the `"include": ["src/index.web.tsx","web"]` line in `tsconfig.json`
   - `npm run web`
   - in another terminal `npm run electron`
   - if you are developing on windows, change the `electron` script in `package.json` to start with the word `set` (`set ELECTRON_DEV_URL=...`)
+
+- Build desktop:
+  - package.json scripts: `"postinstall":"electron-builder install-app-deps"`
+  - use docker images from here https://www.electron.build/multi-platform-build
+  - linux: `electronuserland/builder`
+    - yarn && yarn dist:linux
+  - windows: `electronuserland/builder:wine`
+    - yarn && yarn dist:win
 
 **react:**
 
