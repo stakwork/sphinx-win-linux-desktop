@@ -56,7 +56,7 @@
     "pack": "electron-builder --dir",
     "dist:linux": "./node_modules/.bin/electron-builder --linux",
     "dist:win": "./node_modules/.bin/electron-builder --win",
-    "postinstall": "electron-builder install-app-deps --platform=win32"
+    "postinstall": "electron-builder install-app-deps --platform=linux"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",

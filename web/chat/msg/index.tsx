@@ -8,6 +8,7 @@ import InfoBar from './infoBar'
 import {constants} from '../../../src/constants'
 import GroupNotification from './groupNotification'
 import MediaMsg from './mediaMsg'
+import PaymentMessage from './paymentMsg'
 
 export default function Msg(props){
   const isMe = props.sender===1
@@ -42,12 +43,10 @@ function Message(props){
       return <MediaMsg {...props} />
     // case 'invoice':
     //   return <Invoice {...props} />
-    // case 'payment':
-    //   return <PaymentMessage {...props} />
-    // case 'direct_payment':
-    //   return <PaymentMessage {...props} />
-    // case 'attachment':
-    //   return <TextMsg {...props} />
+    case 'payment':
+      return <PaymentMessage {...props} />
+    case 'direct_payment':
+      return <PaymentMessage {...props} />
     default:
       return <></>
   }

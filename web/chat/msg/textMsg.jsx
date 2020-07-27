@@ -9,4 +9,5 @@ export default function TextMsg(props){
 const Wrap = styled.div`
   padding:16px;
   max-width:440px;
+  word-break: break-word;
 `
