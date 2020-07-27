@@ -59,11 +59,13 @@ export function useCachedEncryptedFile(props, ldat){
             meme.addToCache(ldat.muid, String(dec))
           }
         } else {
-          console.log("DECRYPT NOW!!!!",b64.length,media_key)
+          console.log("DECRYPT NOW!!!!",media_type)
           const dec = await aes.decrypt64(b64, media_key)
           if(dec) {
-            setData(`data:image/jpg;base64,${dec}`)
-            meme.addToCache(ldat.muid, `data:image/jpg;base64,${dec}`)
+            let mime = media_type
+            if(mime==='audio/m4a') mime='audio/wav'
+            setData(`data:${mime};base64,${dec}`)
+            meme.addToCache(ldat.muid, `data:${mime};base64,${dec}`)
           }         
         }
         setLoading(false)

@@ -60,7 +60,7 @@ const IconWrap = styled.div`
   padding:3px;
 `
 const Amount = styled.div`
-  color:#ccc;
+  color:#eee;
   font-size:18px;
   margin-right:8px;
 `

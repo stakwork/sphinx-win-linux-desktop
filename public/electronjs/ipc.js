@@ -2,6 +2,20 @@ const {ipcMain} = require('electron')
 const RNCryptor = require('jscryptor')
 const rsa = require('./rsa')
 const keytar = require('./keytar')
+const fetch = require('node-fetch')
+
+ipcMain.on('etch', async (event, args) => {
+    try {
+        if(!args.rid) return
+        const url = args.url.replace('https://cors-anywhere.herokuapp.com/','')
+        const response = await fetch(url, args.config)
+        const mimeType = response.headers.get('content-type')
+        const data = await response.text()
+        event.reply(args.rid, {data,mimeType})
+    } catch(e) {
+        console.log(e)
+    }
+})
 
 ipcMain.on('decrypt', (event, args) => {
     try {

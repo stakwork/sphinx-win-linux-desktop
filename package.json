@@ -105,6 +105,7 @@
     "querystring-es3": "^0.2.1",
     "react": "~16.9.0",
     "react-app-rewired": "^2.1.6",
+    "react-audio-player": "^0.13.0",
     "react-dom": "^16.9.0",
     "react-draggable": "^4.4.3",
     "react-native": "^0.62.2",
@@ -154,6 +155,7 @@
     "react-native-webview": "^9.0.2",
     "react-navigation": "^4.3.7",
     "react-scripts": "^3.4.1",
+    "react-tiny-link-electron": "^3.6.1",
     "readable-stream": "^1.0.33",
     "reconnecting-websocket": "^4.4.0",
     "rn-fetch-blob": "^0.12.0",
@@ -169,6 +171,7 @@
     "url": "^0.10.3",
     "util": "^0.10.4",
     "uuid": "^7.0.3",
+    "video-react": "^0.14.1",
     "vm-browserify": "0.0.4",
     "yup": "^0.28.1"
   },

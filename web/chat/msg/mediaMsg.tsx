@@ -8,6 +8,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import CallMadeIcon from '@material-ui/icons/CallMade';
 import CheckIcon from '@material-ui/icons/Check'
 import CamIcon from '@material-ui/icons/CameraAltOutlined'
+import ReactAudioPlayer from 'react-audio-player'
+import { Player } from 'video-react';
 
 export default function MediaMsg(props){
   const {msg, ui} = useStores()
@@ -101,17 +103,17 @@ function BuyIcon({purchased,loading}){
 }
 
 function Media({type,data,onClick}){
-  // console.log(type,uri)
+  // console.log(type,data)
   if(type==='text/plain') return <></>
   if(type.startsWith('image')) {
     return <Image src={data} onClick={onClick} />
   }
   if(type.startsWith('audio')) {
-    // return <AudioPlayer source={uri||data} type={type} />
+    return <ReactAudioPlayer src={data} controls />
   }
-  if(type.startsWith('video')) {
-    // return <Video source={{uri}} style={styles.backgroundVideo} />
-  }
+  // if(type.startsWith('video')) {
+  //   <Player><source src={data} /></Player>
+  // }
   return <></>
 }
 

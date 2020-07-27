@@ -1,6 +1,7 @@
 import React, {useState,useEffect} from 'react'
 import {useStores} from '../src/store'
 import './style.css'
+import 'video-react/dist/video-react.css';
 import theme from './theme'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {useObserver} from 'mobx-react-lite'

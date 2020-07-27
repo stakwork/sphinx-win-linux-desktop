@@ -29,7 +29,8 @@ function ChatList(){
               selected={c.id===scid&&c.name===scname} 
               onClick={()=> {
                 msg.seeChat(c.id)
-                ui.setSelectedChat(c)
+                ui.setSelectedChat(null)
+                setTimeout(()=> ui.setSelectedChat(c), 5)
               }} 
             />
           })}
