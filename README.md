@@ -34,7 +34,8 @@ React-Native Android and Web client for Sphinx network
 - Windows
   - must build on Windows machine
   - package.json postinstall script: `electron-builder install-app-deps --platform=win32`
-  - yarn && yarn dist:win
+  - yarn && yarn dist:win (or npm i && npm run dist:win)
+
 - Linux:
   - use docker images from here https://www.electron.build/multi-platform-build
   - image: `electronuserland/builder`
