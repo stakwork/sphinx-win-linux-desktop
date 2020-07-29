@@ -16,10 +16,10 @@ class UserStore {
   publicKey: string = ''
 
   @persist @observable
-  currentIP: string = ''//'3.93.12.68'
+  currentIP: string = ''
 
   @persist @observable
-  authToken: string = ''//'Th/PW7RMUsxBbHozqsLMctf2ak4='
+  authToken: string = ''
 
   @persist @observable
   deviceId: string = ''
@@ -99,11 +99,7 @@ class UserStore {
   async signupWithIP(ip:string) {
     try {
       this.currentIP = ip
-      this.invite={
-        inviterNickname: 'Sphinx Support',
-        inviterPubkey: '023d70f2f76d283c6c4e58109ee3a2816eb9d8feb40b23d62469060a2b2867b77f',
-        welcomeMessage: 'Welcome to Sphinx!'
-      }
+      this.invite=supportContact
       api.instantiateRelay(ip) // no token
       return ip
     } catch(e) {
@@ -115,7 +111,7 @@ class UserStore {
   async generateToken(pwd:string) {
     try {
       const token = await randString(20)
-      console.log("OK NOW!",this.currentIP,pwd)
+      console.log("OK GEN TOKEN!",this.currentIP,pwd)
       await api.relay.post(`contacts/tokens?pwd=${pwd}`,{
         token
       })
@@ -144,4 +140,10 @@ export const userStore = new UserStore()
 
 async function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+const supportContact={
+  inviterNickname: 'Sphinx Support',
+  inviterPubkey: '023d70f2f76d283c6c4e58109ee3a2816eb9d8feb40b23d62469060a2b2867b77f',
+  welcomeMessage: 'Welcome to Sphinx!'
 }

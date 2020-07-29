@@ -1,16 +1,21 @@
-import React, {useState} from 'react'
+import React, {useState,useEffect} from 'react'
 import styled from 'styled-components'
 import { useStores } from '../../src/store'
 import SendIcon from '@material-ui/icons/Send';
 import * as aes from '../crypto/aes'
 import PIN, {setPinCode} from '../modals/pin'
 import * as rsa from '../crypto/rsa'
+import {constants} from '../../src/constants'
+import CircularProgress from '@material-ui/core/CircularProgress';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 
 function Onboard(props){
-  const {user,details} = useStores()
+  const {user,contacts} = useStores()
   const [text,setText] = useState('')
   const [showPin, setShowPin] = useState(false)
   const [checking, setChecking] = useState(false)
+  const [alias,setAlias] = useState('')
+  const [showAliasInput, setShowAliasInput] = useState(false)
 
   async function checkCode(){
     if(!text || checking) return
@@ -22,22 +27,46 @@ function Onboard(props){
         return
       }
       if(codeString.startsWith('ip::')){
-        // signupWithIP(codeString)
+        signupWithIP(codeString)
         return
       }
     } catch(e) {}
+  }
 
-    // const {ip,password} = await user.signupWithCode(theCode)
-    // await sleep(200)
-    // if (ip) {
-    //   const token = await user.generateToken(password||'')
-    //   if(token) onDone()
-    // }
-    // setChecking(false)
+  // from relay QR code
+  async function signupWithIP(s){
+    const a = s.split('::')
+    if(a.length===1) return
+    setChecking(true)
+    const ip = a[1]
+    const pwd = a.length>2?a[2]:''
+    await user.signupWithIP(ip)
+    await sleep(200)
+    const token = await user.generateToken(pwd)
+    if(token) {
+      setShowAliasInput(true)
+    }
+    setChecking(false)
+  }
+
+  async function aliasEntered(alias){
+    if(checking || !alias) return
+    setChecking(true)
+    const publicKey = await rsa.genKeys()
+    await contacts.updateContact(1, {
+      alias, contact_key: publicKey // set my pubkey in relay
+    })
+    await contacts.addContact({
+      alias: user.invite.inviterNickname,
+      public_key: user.invite.inviterPubkey,
+      status: constants.contact_statuses.confirmed,
+    })
+    setChecking(false)
+    props.onRestore()
   }
 
   async function pinEntered(pin){
-    try{
+    try {
       const restoreString = atob(text)
       if(restoreString.startsWith('keys::')) {
         const enc = restoreString.substr(6)
@@ -62,6 +91,24 @@ function Onboard(props){
       <PIN forceEnterMode onFinish={pinEntered}/>
     </main>
   }
+  if(showAliasInput && user.invite) {
+    const inv = user.invite
+    return <main className="onboard">
+      <Logo src="static/sphinx-white-logo.png" />
+      <Title>{inv.welcomeMessage}</Title>
+      <InputWrap>
+        <Input value={alias} onChange={e=> setAlias(e.target.value)} 
+          placeholder="Choose a username" style={{maxWidth:300}}
+        />
+        <CheckCircleIcon onClick={()=> aliasEntered(alias)}
+          style={{color:alias?'#6A8FFF':'#A5A5A5',fontSize:32,position:'absolute',right:14,top:16,cursor:'pointer'}} 
+        />
+      </InputWrap>
+      <div style={{height:80}}>
+        {checking && <CircularProgress style={{color:'white'}} />}
+      </div>
+    </main>
+  }
   return <main className="onboard">
     <Logo src="static/sphinx-white-logo.png" />
     {props.welcome && <>
@@ -72,9 +119,12 @@ function Onboard(props){
           placeholder="Enter Code..."
         />
         <SendIcon onClick={checkCode}
-          style={{color:'#6A8FFF',fontSize:24,position:'absolute',right:16,top:20,cursor:'pointer'}} 
+          style={{color:text?'#6A8FFF':'#A5A5A5',fontSize:24,position:'absolute',right:16,top:20,cursor:'pointer'}} 
         />
       </InputWrap>
+      <div style={{height:80}}>
+        {checking && <CircularProgress style={{color:'white'}} />}
+      </div>
     </>}
   </main>
 }
@@ -86,6 +136,7 @@ const Logo = styled.div`
   background-size:cover;
   width:120px;
   height:120px;
+  margin-top:64px;
 `
 const Title=styled.h1`
   font-weight:bold;
@@ -99,7 +150,7 @@ const Msg=styled.div`
 `
 const InputWrap=styled.div`
   margin-top:64px;
-  margin-bottom:100px;
+  margin-bottom:64px;
   position:relative;
 `
 const Input=styled.input`
@@ -114,3 +165,7 @@ const Input=styled.input`
 `
 
 export default Onboard
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}

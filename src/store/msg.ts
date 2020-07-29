@@ -200,6 +200,8 @@ class MsgStore {
     const ogMessage = msgsForChat.find(msg=> msg.id===m.id || msg.id===-1)
     if(ogMessage) {
       ogMessage.status = constants.statuses.received
+    } else { // add anyway (for on another app)
+      this.gotNewMessage(m)
     }
   }
 
@@ -335,7 +337,7 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
       contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
     }
   } else {
-    console.log(contactStore.contacts, contact_id)
+    // console.log(contactStore.contacts, contact_id)
     const contact = contactStore.contacts.find(c=> c.id===contact_id)
     if(contact) idToKeyMap[contact_id] = contact.contact_key
   }

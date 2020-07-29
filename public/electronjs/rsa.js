@@ -23,7 +23,6 @@ function encrypt(key, txt){
   }
 }
 
-// store private key in electron somehow?
 function decrypt(privateKey, enc){
   try{
     const buf = Buffer.from(enc, 'base64')
@@ -42,6 +41,27 @@ function decrypt(privateKey, enc){
   } catch(e) {
     return ''
   }
+}
+
+function genKeys() {
+  return new Promise((resolve, reject)=>{
+    crypto.generateKeyPair('rsa', {
+      modulusLength: 2048
+    }, (err, publicKey, privKey)=>{
+      const pubPEM = publicKey.export({
+        type:'pkcs1',format:'pem'
+      })
+      const pubBase64 = cert.unpub(pubPEM)
+      const privPEM = privKey.export({
+        type:'pkcs1',format:'pem'
+      })
+      const privBase64 = cert.unpriv(privPEM)
+      resolve({
+        public: pubBase64,
+        private: privBase64,
+      })
+    })
+  })
 }
 
 const cert = {
@@ -69,4 +89,4 @@ const cert = {
   }
 }
 
-module.exports = {encrypt,decrypt}
+module.exports = {encrypt,decrypt,genKeys}

@@ -3,6 +3,7 @@ const RNCryptor = require('jscryptor')
 const rsa = require('./rsa')
 const keytar = require('./keytar')
 const fetch = require('node-fetch')
+const Crypto = require('crypto')
 
 ipcMain.on('etch', async (event, args) => {
     try {
@@ -64,6 +65,17 @@ ipcMain.on('set-private-key', (event, args) => {
     }
 })
 
+ipcMain.on('gen-keys', async (event, args) => {
+    try {
+        if(!args.rid) return // no other args
+        const {public,private} = await rsa.genKeys()
+        keytar.setPrivateKey(private)
+        event.reply(args.rid, public)
+    } catch(e) {
+        console.log(e)
+    }
+})
+
 ipcMain.on('encrypt-rsa', (event, args) => {
     try {
         if(!args.rid) return
@@ -88,3 +100,17 @@ ipcMain.on('decryptSync', (event, arg) => {
         event.returnValue = ''
     }
 })
+
+ipcMain.on('rand', (event, args) => {
+    try {
+        if(!args.rid) return
+        // args.length
+        const size = args.length
+        const r = Crypto.randomBytes(size).toString('base64').slice(0, size)
+        event.reply(args.rid, r)
+    } catch(e) {
+        console.log(e)
+        event.returnValue = ''
+    }
+})
+

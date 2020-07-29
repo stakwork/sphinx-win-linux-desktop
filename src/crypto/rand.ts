@@ -1,16 +1,24 @@
-import { NativeModules } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
 const { RNRandomBytes } = NativeModules
+import {randString as ipcRandString} from '../../web/crypto/rand'
 // RNRandomBytes.randomBytes(32, (err, bytes) => {
 //   // bytes is a base64string
 // })
 
 function randString(l): Promise<string> {
-  return new Promise((resolve,reject)=>{
-    RNRandomBytes.randomBytes(l, (err, bytes) => {
-      if(err) reject(err)
-      else resolve(bytes)
+  if (Platform.OS==='web') {
+    return new Promise(async (resolve,reject)=>{
+      const r = await ipcRandString(l||20)
+      resolve(r ? String(r) : insecureRand()) // should not ever run "insecureRand"
     })
-  })
+  } else {
+    return new Promise((resolve,reject)=>{
+      RNRandomBytes.randomBytes(l, (err, bytes) => {
+        if(err) reject(err)
+        else resolve(bytes)
+      })
+    })
+  }
 }
 
 async function randAscii(){
@@ -44,3 +52,7 @@ function replaceAll(str0, str1, str2) {
 } 
 
 export {randString,randAscii}
+
+function insecureRand(){
+  return Math.random().toString(36).substring(7);
+}

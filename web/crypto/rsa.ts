@@ -4,6 +4,11 @@ export async function setPrivateKey(priv) {
   await ipc.send('set-private-key', {key:priv})
 }
 
+export async function genKeys() {
+  const publicKey = await ipc.send('gen-keys', {})
+  return publicKey
+}
+
 export async function decrypt(data:string){
   const obj={data}
   const ret = await ipc.send('decrypt-rsa', obj)
