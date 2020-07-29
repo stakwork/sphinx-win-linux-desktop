@@ -197,7 +197,7 @@ class MsgStore {
   async setMessageAsReceived(m) {
     if(!(m.chat)) return
     const msgsForChat = this.messages[m.chat.id]
-    const ogMessage = msgsForChat.find(msg=> msg.id===m.id || msg.id===-1)
+    const ogMessage = msgsForChat && msgsForChat.find(msg=> msg.id===m.id || msg.id===-1)
     if(ogMessage) {
       ogMessage.status = constants.statuses.received
     } else { // add anyway (for on another app)

@@ -12,7 +12,7 @@ import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
-// import * as rsa from './src/crypto/rsa'
+// import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 
 declare var global: {HermesInternal: null | {}}
