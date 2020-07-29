@@ -32,6 +32,7 @@ export interface Chat {
   escrow_amount: number
   escrow_millis: number
   owner_pubkey: string
+  unlisted: boolean
 
   invite: Invite
 
@@ -79,7 +80,7 @@ export class ChatStore {
   }
 
   @action 
-  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time}){
+  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted}){
     const r = await relay.post('group', {
       name, description, tags:tags||[],
       is_tribe: true, is_listed:true,
@@ -88,13 +89,14 @@ export class ChatStore {
       escrow_amount: escrow_amount||0,
       escrow_millis: escrow_time?escrow_time*60*60*1000:0,
       img: img||'',
+      unlisted: unlisted||false,
     })
     this.gotChat(r)
     return r
   }
 
   @action 
-  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time}){
+  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted}){
     const r = await relay.put(`group/${id}`, {
       name, description, tags:tags||[],
       is_listed:true,
@@ -103,6 +105,7 @@ export class ChatStore {
       escrow_amount: escrow_amount||0,
       escrow_millis: escrow_time?escrow_time*60*60*1000:0,
       img: img||'',
+      unlisted: unlisted||false,
     })
     this.gotChat(r)
     return r

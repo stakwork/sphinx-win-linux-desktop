@@ -148,6 +148,13 @@ const tribe = [
     validator: Yup.number(),
     description: 'The number of hours before the Escrow Amount is returned to the subscriber'
   },
+  {
+    name:'unlisted',
+    type:'radio',
+    // inverted:true,
+    label:{en:'Unlisted (do not show on tribes registry)'},
+    required:false
+  }
 ]
 
 export {

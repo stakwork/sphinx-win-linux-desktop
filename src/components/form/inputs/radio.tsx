@@ -5,7 +5,7 @@ import {View,Text} from 'react-native'
 
 export default function Radio({inverted,name,label,required,error,setValue,handleBlur,value}){
   const val = inverted ? (value?false:true) : (value||false)
-  return <View style={{display:'flex',flexDirection:'row',alignItems:'center',marginTop:10,paddingLeft:10}}>
+  return <View style={{display:'flex',flexDirection:'row',alignItems:'center',marginTop:5,paddingLeft:5,marginBottom:18}}>
     <RadioButton
       value={value}
       status={val ? 'checked' : 'unchecked'}
