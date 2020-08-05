@@ -37,6 +37,7 @@ export default function NewTribe({onFinish}){
   }
   const showDone = true
 
+  const theEditTribeParams = ui.editTribeParams?{...ui.editTribeParams,is_private:ui.editTribeParams.private}:null
   return <View style={styles.wrap}>
     <ScrollView style={styles.scroller} contentContainerStyle={styles.container}>
       {/* <TouchableOpacity onPress={pickImage}>
@@ -50,7 +51,7 @@ export default function NewTribe({onFinish}){
       <Form schema={tribe} loading={loading} 
         buttonText={(ui.editTribeParams?'Edit':'Create')+' Group'}
         onSubmit={finish}
-        initialValues={ui.editTribeParams?ui.editTribeParams:{
+        initialValues={ui.editTribeParams?theEditTribeParams:{
           escrow_amount:10, escrow_time:12,
           price_to_join:0, price_per_message:0,
         }}

@@ -163,11 +163,8 @@ export default function GroupInfo({visible}) {
         <Portal>
           <Dialog visible={editDialog} style={{bottom:10,zIndex:99}}
             onDismiss={()=> setEditDialog(false)}>
-            <Dialog.Title>Edit Group?</Dialog.Title>
-            <Dialog.Actions style={{justifyContent:'space-between'}}>
-              <Button icon="cancel" onPress={()=>setEditDialog(false)} color="#888">
-                Cancel
-              </Button>
+            <Dialog.Title>Group Settings</Dialog.Title>
+            <Dialog.Actions style={{justifyContent:'space-between',flexDirection:'column',alignItems:'flex-start',height:150}}>
               <Button loading={loadingTribe} icon="pencil" onPress={async()=>{
                 setLoadingTribe(true)
                 const params = await chats.getTribeDetails(group.host,group.uuid)
@@ -176,6 +173,15 @@ export default function GroupInfo({visible}) {
                 setLoadingTribe(false)
               }}>
                 Edit Group
+              </Button>
+              <Button icon="share" onPress={async()=>{
+                ui.setShareTribeUUID(group.uuid)
+                setEditDialog(false)
+              }}>
+                Share Group
+              </Button>
+              <Button icon="cancel" onPress={()=>setEditDialog(false)} color="#888">
+                Cancel
               </Button>
             </Dialog.Actions>
           </Dialog>

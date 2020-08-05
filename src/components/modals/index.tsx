@@ -17,6 +17,7 @@ import JoinTribe from './joinTribe'
 import Oauth from './oauth'
 import Support from './support'
 import Subscribe from './subscribe'
+import ShareTribe from './shareTribe'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -46,6 +47,7 @@ export default function Modals(){
       <Oauth visible={showOauth} />
       <Support visible={ui.supportModal} />
       <Subscribe visible={showSubModal} />
+      <ShareTribe visible={ui.shareTribeUUID?true:false} />
     </>
   })
 }

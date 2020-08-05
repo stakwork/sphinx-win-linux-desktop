@@ -154,6 +154,12 @@ const tribe = [
     // inverted:true,
     label:{en:'Unlisted (do not show on tribes registry)'},
     required:false
+  },
+  {
+    name:'is_private',
+    type:'radio',
+    label:{en:'Private (requires permission to join)'},
+    required:false,
   }
 ]
 

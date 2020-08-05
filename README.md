@@ -19,10 +19,10 @@ React-Native Android and Web client for Sphinx network
 **development**
 
 - Android dev:
-  - switching from desktop->android dev? run `npm rebuild`
   - uncomment the `"include": ["src"]` line in `tsconfig.json`
   - `react-native run-android`
   - package.json script: `"postinstall":"jetify"`
+  - switching from desktop->android dev? run `npm rebuild` and also `npm i` so that "jetify" runs
 
 - Desktop dev:
   - swithing from android->desktop dev? run `npm run install-app-deps`

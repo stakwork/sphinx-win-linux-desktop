@@ -75,6 +75,11 @@ export class UiStore {
     } : null
   }
 
+  @observable shareTribeUUID: string = null
+  @action setShareTribeUUID(s) {
+    this.shareTribeUUID = s
+  }
+
   @observable groupModal: boolean = false
   @observable groupModalParams: Chat
   @action setGroupModal(g: Chat) {

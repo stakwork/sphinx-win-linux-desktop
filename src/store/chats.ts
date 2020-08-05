@@ -12,6 +12,8 @@ android crash when open tribe
 only send confirmation if u are trbie owner/??
 */
 
+const DEFAULT_TRIBE_SERVER = 'tribes.sphinx.chat'
+
 export interface Chat {
   id: number
   uuid: string
@@ -33,10 +35,15 @@ export interface Chat {
   escrow_millis: number
   owner_pubkey: string
   unlisted: boolean
+  private: boolean
 
   invite: Invite
 
   photo_uri: string
+}
+
+export interface TribeServer {
+  host: string
 }
 
 export class ChatStore {
@@ -46,6 +53,16 @@ export class ChatStore {
   @action
   setChats(chats: Chat[]) {
     this.chats = chats
+  }
+
+  @persist('list') @observable
+  servers: TribeServer[] = [
+    {host:DEFAULT_TRIBE_SERVER}
+  ]
+
+  @action getDefaultTribeServer(): TribeServer {
+    const server = this.servers.find(s=> s.host===DEFAULT_TRIBE_SERVER)
+    return server
   }
 
   @action
@@ -80,7 +97,7 @@ export class ChatStore {
   }
 
   @action 
-  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted}){
+  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private}){
     const r = await relay.post('group', {
       name, description, tags:tags||[],
       is_tribe: true, is_listed:true,
@@ -90,13 +107,14 @@ export class ChatStore {
       escrow_millis: escrow_time?escrow_time*60*60*1000:0,
       img: img||'',
       unlisted: unlisted||false,
+      private: is_private||false,
     })
     this.gotChat(r)
     return r
   }
 
   @action 
-  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted}){
+  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private}){
     const r = await relay.put(`group/${id}`, {
       name, description, tags:tags||[],
       is_listed:true,
@@ -106,15 +124,16 @@ export class ChatStore {
       escrow_millis: escrow_time?escrow_time*60*60*1000:0,
       img: img||'',
       unlisted: unlisted||false,
+      private: is_private||false,
     })
     this.gotChat(r)
     return r
   }
 
   @action 
-  async joinTribe({name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey}){
+  async joinTribe({name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private}){
     const r = await relay.post('tribe', {
-      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private:is_private,
     })
     this.gotChat(r)
     return r

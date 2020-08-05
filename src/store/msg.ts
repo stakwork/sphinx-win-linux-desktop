@@ -85,8 +85,8 @@ class MsgStore {
       const mult = 1
       const dateq = moment.utc(this.lastFetched-1000000*mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
-    } else {
-      const start = moment().subtract(28, 'days').format('YYYY-MM-DD%20HH:mm:ss')
+    } else { // else just get last week
+      const start = moment().subtract(7, 'days').format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }
     try {
