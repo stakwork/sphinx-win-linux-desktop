@@ -304,6 +304,18 @@ class MsgStore {
     this.lastSeen = obj
   }
 
+  @action 
+  async approveOrRejectMember(contactID, status, msgId){
+    const r = await relay.put(`member/${contactID}/${status}/${msgId}`)
+    if(r&&r.chat&&r.chat.id) {
+      const msgs = this.messages[r.chat.id]
+      const msg = msgs.find(m=>m.id===msgId)
+      if(msg) msg.type = r.message.type
+      // update chat
+      chatStore.gotChat(r.chat)
+    }
+  }
+
 }
 
 async function encryptText({contact_id, text}) {

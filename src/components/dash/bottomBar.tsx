@@ -1,8 +1,6 @@
 import React, {useState} from 'react'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
-import {UiStore} from '../../store/ui'
-import {ChatStore} from '../../store/chats'
 import {View,StyleSheet} from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
@@ -110,6 +108,6 @@ const styles=StyleSheet.create({
   },
   qrWrap:{
     flex:1,
-    marginTop:24,
+    marginTop:2,
   }
 })

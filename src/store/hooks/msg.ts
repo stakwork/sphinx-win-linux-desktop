@@ -99,8 +99,11 @@ function getPrevious(msgs: Msg[], i:number){
   }
   return previous
 }
+
+const msgTypesNoInfoBar=[constants.message_types.member_request, constants.message_types.member_approve, constants.message_types.member_reject]
 // only show info bar if first in a group from contact
 function calcShowInfoBar(msgs: Msg[], msg: Msg, i: number, isTribe:boolean){
+  if(msgTypesNoInfoBar.includes(msg.type)) return false
   const previous = getPrevious(msgs, i)
   if(!previous) return true
   if(isTribe && msg.sender!==1) { // for self msgs, do normal way

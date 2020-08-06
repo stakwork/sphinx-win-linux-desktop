@@ -20,6 +20,11 @@ const constants = {
     failed: 4,
     deleted: 5,
   },
+  chat_statuses: {
+    approved: 0,
+    pending: 1,
+    rejected: 2
+  },
   message_types: {
     message: 0,
     confirmation: 1,
@@ -40,6 +45,9 @@ const constants = {
     group_kick: 16,
     delete: 17,
     repayment: 18,
+    member_request: 19,
+    member_approve: 20,
+    member_reject: 21,
   },
   payment_errors: {
     timeout: 'Timed Out',

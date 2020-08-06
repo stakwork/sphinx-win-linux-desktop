@@ -99,7 +99,25 @@ export function deleteMessage(data){
   msgStore.gotNewMessage(data.response)
 }
 
-const oktolog=false
+export function member_request(data){
+  log('[ws] member_request message', data)
+  if(!data.response.message) return
+  msgStore.gotNewMessage(data.response.message)
+}
+
+export function member_approve(data){
+  log('[ws] member_approve message', data)
+  if(!data.response.message) return
+  msgStore.gotNewMessage(data.response.message)
+}
+
+export function member_reject(data){
+  log('[ws] member_reject message', data)
+  if(!data.response.message) return
+  msgStore.gotNewMessage(data.response.message)
+}
+
+const oktolog=true
 function log(a,b){
   if(oktolog) {
     console.log(a,b)

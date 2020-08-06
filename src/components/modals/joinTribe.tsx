@@ -46,9 +46,9 @@ export default function JoinTribe({visible}) {
       <Header title="Join Group" onClose={()=>close()} />
 
       {params && <View style={styles.content}>
-        <Image source={{uri:params.img}} 
+        {params.img.length>0 ? <Image source={{uri:params.img}} 
           style={{width:150,height:150,borderRadius:75,marginTop:15}} resizeMode={'cover'}
-        />
+        /> : <View style={{height:150}} />}
 
         <Text style={{marginTop:15,fontWeight:'bold',fontSize:22}}>
           {params.name}

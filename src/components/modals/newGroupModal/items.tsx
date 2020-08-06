@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native'
 import {RadioButton} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {usePicSrc} from '../../utils/picSrc'
 import {SwipeRow} from 'react-native-swipe-list-view'
 import {IconButton} from 'react-native-paper'
+import {ApproveButton, RejectButton} from '../../chat/msg/memberRequest'
 
 export function DeletableContact(props){
   const {contact,onDelete} =props
@@ -35,7 +36,7 @@ export function DeletableContact(props){
 }
 
 export function Contact(props){
-  const {contact,onPress,selected,unselectable} =props
+  const {contact,onPress,selected,unselectable} = props
   const uri = usePicSrc(contact)
   const hasImg = uri?true:false
   return <TouchableOpacity style={styles.contactTouch} activeOpacity={1}
@@ -53,6 +54,38 @@ export function Contact(props){
         value="contact" color="#6289FD"
         onPress={onPress}
       />}
+    </View>
+  </TouchableOpacity>
+}
+
+export function PendingContact(props){
+  const [loadingStatus,setLoadingStatus] = useState('')
+  const {contact,onPress,selected,unselectable} =props
+  const uri = usePicSrc(contact)
+  const hasImg = uri?true:false
+  async function press(status:string){
+    if(loadingStatus) return
+    setLoadingStatus(status)
+    await props.onApproveOrDenyMember(contact.id,status)
+    setLoadingStatus('')
+  }
+  return <TouchableOpacity style={styles.contactTouch} activeOpacity={1}
+    onPress={onPress}>
+    <View style={styles.avatar}>
+      <Image source={hasImg?{uri}:require('../../../../android_assets/avatar.png')}
+        style={{width:44,height:44}} resizeMode={'cover'}
+      />
+    </View>
+    <View style={styles.contactContent}>
+      <Text style={styles.contactName}>{contact.alias}</Text>
+    </View>
+    <View style={styles.buttonz}>
+      <ApproveButton disabled={loadingStatus} 
+        onPress={()=>press('approved')} loading={loadingStatus==='approved'}
+      />
+      <RejectButton disabled={loadingStatus} 
+        onPress={()=>press('rejected')} loading={loadingStatus==='rejected'}
+      />
     </View>
   </TouchableOpacity>
 }
@@ -149,6 +182,16 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     height:80
+  },
+  buttonz:{
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center',
+    maxWidth:100,
+    width:100,
+    minWidth:100,
+    marginRight:12,
   }
 })
 

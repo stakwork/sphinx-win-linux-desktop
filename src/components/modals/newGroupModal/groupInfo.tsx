@@ -9,13 +9,13 @@ import FadeView from '../../utils/fadeView'
 import People from './people'
 import {useChatPicSrc,createChatPic} from '../../utils/picSrc'
 import moment from 'moment'
-import {Contact, DeletableContact} from './items'
+import {Contact, DeletableContact, PendingContact} from './items'
 import EE from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
 import { constants } from '../../../constants'
 
 export default function GroupInfo({visible}) {
-  const { ui, contacts, chats, user } = useStores()
+  const { ui, contacts, chats, user, msg } = useStores()
   const [selected, setSelected] = useState([])
   const [addPeople, setAddPeople] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -55,6 +55,15 @@ export default function GroupInfo({visible}) {
     EE.emit('left-group')
   }
 
+  async function onApproveOrDenyMember(contactId,status){
+    // find msgId
+    const msgs = msg.messages[group.id]
+    if(!msgs) return
+    const theMsg = msgs.find(m=>m.sender===contactId&&m.type===constants.message_types.member_request)
+    if(!theMsg) return
+    await msg.approveOrRejectMember(contactId,status,theMsg.id)
+  }
+
   const uri = useChatPicSrc(group)
 
   const hasGroup = group?true:false
@@ -79,6 +88,9 @@ export default function GroupInfo({visible}) {
     const contactsToShow = contacts.contacts.filter(c=> {
       return c.id>1 && group && group.contact_ids.includes(c.id)
     })
+    const pendingContactsToShow = (contacts.contacts.filter(c=> {
+      return c.id>1 && group && group.pending_contact_ids.includes(c.id)
+    })) || []
     const selectedContacts = contacts.contacts.filter(c=> selected.includes(c.id))
     const showSelectedContacts = selectedContacts.length>0
     return <ModalWrap onClose={close} visible={visible}
@@ -114,19 +126,31 @@ export default function GroupInfo({visible}) {
           </View>}
 
           {(!isTribe || isTribeAdmin) && <View style={styles.members}>
-            <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
-            <ScrollView style={styles.scroller}>
-              {contactsToShow.map((c,i)=>{
-                if(isTribeAdmin){
-                  return <DeletableContact key={i} contact={c} 
-                    onDelete={onKickContact}
+            {contactsToShow&&contactsToShow.length>0&&<>
+              <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
+              <ScrollView style={styles.scroller}>
+                {contactsToShow.map((c,i)=>{
+                  if(isTribeAdmin){
+                    return <DeletableContact key={i} contact={c} 
+                      onDelete={onKickContact}
+                    />
+                  }
+                  return <Contact key={i} contact={c} 
+                    unselectable={true}
                   />
-                }
-                return <Contact key={i} contact={c} 
-                  unselectable={true}
-                />
-              })}
-            </ScrollView>
+                })}
+              </ScrollView>
+            </>}
+            {isTribeAdmin && pendingContactsToShow.length>0 && <>
+              <Text style={styles.membersTitle}>PENDING GROUP MEMBERS</Text>
+              <ScrollView style={styles.scroller}>
+                {pendingContactsToShow.map((c,i)=>{
+                  return <PendingContact key={i} contact={c} 
+                    onApproveOrDenyMember={onApproveOrDenyMember}
+                  />
+                })}
+              </ScrollView>
+            </>}
             {!isTribeAdmin && <Button mode="contained" dark={true} icon="plus"
               onPress={()=> setAddPeople(true)}
               style={styles.addPeople}>

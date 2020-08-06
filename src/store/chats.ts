@@ -37,6 +37,8 @@ export interface Chat {
   unlisted: boolean
   private: boolean
 
+  pending_contact_ids: number[]
+
   invite: Invite
 
   photo_uri: string

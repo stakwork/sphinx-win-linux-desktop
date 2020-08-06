@@ -15,6 +15,7 @@ import ReplyContent from './replyContent'
 import { Popover, PopoverTouchable, PopoverController } from 'react-native-modal-popover';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Avatar from './avatar'
+import MemberRequest from './memberRequest'
 
 export default function MsgRow(props){
   const [showReply, setShowReply] = useState(false)  
@@ -31,6 +32,22 @@ export default function MsgRow(props){
   const isGroupNotification = props.type===constants.message_types.group_join || props.type===constants.message_types.group_leave
   if(isGroupNotification) {
     return <GroupNotification {...props} />
+  }
+
+  const chat = props.chat
+  let isTribe=false
+  let isTribeOwner=false
+  if(chat){
+    isTribe=chat.type===constants.chat_types.tribe
+    isTribeOwner = chat.owner_pubkey===props.myPubkey
+  }
+
+  const memberReqTypes=[constants.message_types.member_request, constants.message_types.member_approve, constants.message_types.member_reject]
+  const isMemberRequest = memberReqTypes.includes(props.type)
+  if(isMemberRequest) {
+    return <MemberRequest {...props} isTribeOwner={isTribeOwner} 
+      onDeleteChat={props.onDeleteChat}
+    />
   }
 
   const isMe = props.sender===1
@@ -65,7 +82,7 @@ export default function MsgRow(props){
             style={{marginLeft:0,marginRight:15}} 
           />}
         </View>
-        <MsgBubble {...props} onDelete={props.onDelete} myPubkey={props.myPubkey} />
+        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} />
       </SwipeRow>
     </View>
   </View>
@@ -76,14 +93,6 @@ function MsgBubble(props){
   const isMe = props.sender===1
   const isInvoice = props.type===constants.message_types.invoice
   const isPaid = props.status===constants.statuses.confirmed
-
-  const chat = props.chat
-  let isTribe=false
-  let isTribeOwner=false
-  if(chat){
-    isTribe=chat.type===constants.chat_types.tribe
-    isTribeOwner = chat.owner_pubkey===props.myPubkey
-  }
 
   let dashed = false
   let backgroundColor = isMe?'whitesmoke':'white'
@@ -134,7 +143,7 @@ function MsgBubble(props){
             style={{padding:6}}>
             <Text style={{textAlign:'center'}}>Copy</Text>
           </TouchableOpacity>
-          {(isMe || isTribeOwner) && <TouchableOpacity onPress={async()=>{
+          {(isMe || props.isTribeOwner) && <TouchableOpacity onPress={async()=>{
             if(!deleting){
               setDeleting(true)
               await props.onDelete(props.id)
