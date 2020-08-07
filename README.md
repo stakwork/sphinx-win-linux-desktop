@@ -4,6 +4,12 @@
 
 React-Native Android and Web client for Sphinx network
 
+### verify APK signature
+
+1. import our [pubkey](https://raw.githubusercontent.com/stakwork/sphinx-relay/master/PGP_public_key.asc)
+
+2. `gpg --verify app-release.apk.sig app-release.apk`
+
 ### contributing
 
 1. clone the repo
