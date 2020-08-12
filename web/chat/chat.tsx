@@ -7,6 +7,7 @@ import Msg from './msg'
 import {constants} from '../../src/constants'
 import {useStores,hooks} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
+import Frame from './frame'
 const {useMsgs} = hooks
 
 const headHeight = 65
@@ -15,12 +16,13 @@ function Chat(){
   const {contacts,ui} = useStores()
   return useObserver(()=>{
     const chat = ui.selectedChat
+    const appURL = ui.applicationURL
     const msgs = useMsgs(chat) || []
     const isTribe = chat&&chat.type===constants.chat_types.tribe
     const h = `calc(100% - ${headHeight+footHeight}px)`
     return <Section style={{background:theme.deep}}>
       <Head height={headHeight} />
-      <MsgListWrap style={{maxHeight:h,minHeight:h}}>
+      {!appURL && <MsgListWrap style={{maxHeight:h,minHeight:h}}>
         <MsgList className="msg-list">
           {msgs.map((m,i)=>{
             let senderAlias = ''
@@ -37,7 +39,8 @@ function Chat(){
             return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} />
           })}
         </MsgList>
-      </MsgListWrap>
+      </MsgListWrap>}
+      {appURL && <Frame url={appURL} />}
       <Foot height={footHeight} />
     </Section>
   })
