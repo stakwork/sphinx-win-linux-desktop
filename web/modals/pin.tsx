@@ -140,11 +140,11 @@ function ts(){
 }
 
 const Center = styled.div`
-  border:1px solid #444;
-  border-radius:6px;
   width:385px;
   height:550px;
   box-shadow: 0px 0px 17px 0px rgba(0,0,0,0.75);
+  border:1px solid #444;
+  border-radius:6px;
   background:#6681fe;
   display:flex;
   flex-direction:column;

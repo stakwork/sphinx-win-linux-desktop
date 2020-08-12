@@ -216,7 +216,7 @@ class MsgStore {
       }
       const r = await relay.post('payment', v)
       if(contact_id||chat_id) this.gotNewMessage(r)
-      if(r.amount) detailsStore.addToBalance(r.amount)
+      if(r.amount) detailsStore.addToBalance(r.amount*-1)
     } catch(e) {
       console.log(e)
     }

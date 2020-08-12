@@ -4,6 +4,8 @@ require('./ipc')
 
 unhandled();
 
+app.dirname = __dirname
+
 const path = require('path');
 const url = require('url');
 
@@ -13,10 +15,11 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 999, height: 700,
+        width: 1300, height: 750,
         webPreferences: {
-            nodeIntegration: true
-        }
+            nodeIntegration: true,
+            webviewTag: true,
+        },
     });
 
     // We set an intercept on incoming requests to disable x-frame-options headers.
@@ -70,6 +73,4 @@ app.on('activate', function () {
         createWindow()
     }
 });
-
-
 
