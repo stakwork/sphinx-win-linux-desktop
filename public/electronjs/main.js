@@ -4,6 +4,8 @@ require('./ipc')
 
 unhandled();
 
+app.dirname = __dirname
+
 const path = require('path');
 const url = require('url');
 
@@ -13,11 +15,24 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 999, height: 700,
+        width: 1300, height: 750,
         webPreferences: {
-            nodeIntegration: true
-        }
+            nodeIntegration: true,
+            webviewTag: true,
+        },
     });
+
+    // We set an intercept on incoming requests to disable x-frame-options headers.
+    mainWindow.webContents.session.webRequest.onHeadersReceived({ urls: [ "*://*/*" ] },
+        (d, c)=>{
+            if(d.responseHeaders['X-Frame-Options']){
+                delete d.responseHeaders['X-Frame-Options'];
+            } else if(d.responseHeaders['x-frame-options']) {
+                delete d.responseHeaders['x-frame-options'];
+            }
+            c({cancel: false, responseHeaders: d.responseHeaders});
+        }
+    );
 
     // and load the index.html of the app.
     // console.log(path.join(__dirname, '/../../build/index.html'))
@@ -58,6 +73,4 @@ app.on('activate', function () {
         createWindow()
     }
 });
-
-
 

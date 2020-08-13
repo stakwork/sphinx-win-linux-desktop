@@ -16,6 +16,12 @@ export class UiStore {
     this.selectedChat = c
   }
 
+  @observable applicationURL: string
+  @action
+  setApplicationURL(s){
+    this.applicationURL = s
+  }
+
   @observable searchTerm: string = ''
   @action
   setSearchTerm(term) {

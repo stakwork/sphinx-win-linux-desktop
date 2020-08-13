@@ -168,6 +168,7 @@ const Input = styled.input`
   color:white;
   margin-left:8px;
 `
+<<<<<<< HEAD
 function useInterval(callback, delay) {
   const savedCallback: any = useRef();
 
@@ -187,3 +188,6 @@ function useInterval(callback, delay) {
     }
   }, [delay]);
 }
+=======
+
+>>>>>>> 68612f4fe8ee5c8cac6864da4ed843dcb2d948c6

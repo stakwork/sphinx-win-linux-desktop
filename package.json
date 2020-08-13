@@ -82,7 +82,7 @@
     "domain-browser": "^1.2.0",
     "electron-log": "^4.2.2",
     "electron-unhandled": "^3.0.2",
-    "eventemitter3": "^4.0.0",
+    "eventemitter3": "^4.0.4",
     "events": "^1.1.1",
     "firebase": "^7.14.2",
     "formik": "^2.1.4",
