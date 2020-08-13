@@ -25,7 +25,7 @@ function Wrap(){
 }
 
 function App(){
-  const {user} = useStores()
+  const {user,ui,chats} = useStores()
   const [pinned,setPinned] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
   const [welcome, setWelcome] = useState(false)
@@ -34,8 +34,13 @@ function App(){
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){
-        instantiateRelay(user.currentIP, user.authToken)
+        instantiateRelay(user.currentIP, user.authToken, function(){
+          ui.setConnected(true)
+        }, function(){
+          ui.setConnected(false)
+        })
       }
+
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
       setWelcome(true)
@@ -92,3 +97,4 @@ export default Wrap
 async function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))
 }
+
