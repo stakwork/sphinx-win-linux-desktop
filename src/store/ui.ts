@@ -206,6 +206,11 @@ export class UiStore {
     this.supportModal = b
   }
 
+  @observable connected: boolean = false
+  @action setConnected(b:boolean) {
+    this.connected = b
+  }
+
 }
 
 export const uiStore = new UiStore()

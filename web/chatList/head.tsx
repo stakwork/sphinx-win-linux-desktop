@@ -4,6 +4,9 @@ import {useStores} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
 import SearchIcon from '@material-ui/icons/Search';
 import theme from '../theme'
+import FlashOnIcon from '@material-ui/icons/FlashOn';
+import Tooltip from '@material-ui/core/Tooltip';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 export default function Head(){
   const {details,ui} = useStores()
