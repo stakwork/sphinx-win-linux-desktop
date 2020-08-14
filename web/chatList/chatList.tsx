@@ -11,7 +11,7 @@ import {useStores,hooks} from '../../src/store'
 const {useChats} = hooks
 
 function ChatList(){
-  const {msg,ui,contacts} = useStores()
+  const {msg,ui,contacts,chats} = useStores()
   const maxWidth = 350
   const [width,setWidth] = useState(maxWidth)
   return useObserver(()=>{
@@ -27,11 +27,15 @@ function ChatList(){
             return <ChatRow 
               key={i} {...c} contact_photo={contact&&contact.photo_url}
               selected={c.id===scid&&c.name===scname} 
-              onClick={()=> {
+              onClick={async ()=> {
                 msg.seeChat(c.id)
                 ui.setSelectedChat(null)
                 setTimeout(()=> ui.setSelectedChat(c), 5)
-              }} 
+                const params = await chats.getTribeDetails(c.host,c.uuid)
+                if(params.app_url) {
+                  ui.setApplicationURL(params.app_url)
+                }
+              }}
             />
           })}
         </Chats>

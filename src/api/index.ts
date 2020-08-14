@@ -7,7 +7,7 @@ const invite = new API('http://hub.sphinx.chat/api/v1/','','')
 
 let relay = null
 
-export function instantiateRelay(ip:string, authToken?:string){
+export function instantiateRelay(ip:string, authToken?:string, connectedCallback?:Function, disconnectCallback?:Function){
   if(!ip) return console.log("cant instantiate Relay, no IP")
 
   let protocol = 'http://'
@@ -30,7 +30,7 @@ export function instantiateRelay(ip:string, authToken?:string){
   console.log('=> instantiated relay!', `${protocol}${ip}/`, 'authToken?', authToken?true:false)
   
   if(authToken) { // only connect here (to avoid double) if auth token means for real
-    connectWebSocket(`${protocol}${ip}`, authToken)
+    connectWebSocket(`${protocol}${ip}`, authToken, connectedCallback, disconnectCallback)
     registerWsHandlers(wsHandlers)
   }
 
