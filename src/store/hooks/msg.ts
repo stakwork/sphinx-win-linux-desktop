@@ -151,3 +151,17 @@ function arraysEqual(_arr1, _arr2) {
 function rando(){
   return Math.random().toString(12).substring(0)
 }
+
+export function useParsedGiphyMsg(message_content:string){
+  const arr = message_content.split('::')
+  if(!(arr&&arr[1])) return {}
+  const dec = atob(arr[1])
+  try {
+    const r = JSON.parse(dec)
+    const aspectRatio = parseFloat(r.aspect_ratio)
+    const thumb = r.url.replace(/giphy.gif/g, '200w.gif')
+    return {...r,aspectRatio,thumb}
+  } catch(e) {
+    return {}
+  }
+}

@@ -8,20 +8,33 @@ import {constants} from '../../src/constants'
 import {useStores,hooks} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
 import Frame from './frame'
+import { CircularProgress } from '@material-ui/core'
 const {useMsgs} = hooks
 
 const headHeight = 65
 const footHeight = 65
 function Chat(){
+  return <Section style={{background:theme.deep}}>
+    <Head height={headHeight} />
+    <ChatContent />
+    <Foot height={footHeight} />
+  </Section>
+}
+
+function ChatContent(){
   const {contacts,ui} = useStores()
-  return useObserver(()=>{
+  return useObserver(()=> {
     const chat = ui.selectedChat
     const appURL = ui.applicationURL
     const msgs = useMsgs(chat) || []
     const isTribe = chat&&chat.type===constants.chat_types.tribe
     const h = `calc(100% - ${headHeight+footHeight}px)`
-    return <Section style={{background:theme.deep}}>
-      <Head height={headHeight} />
+    if(ui.loadingChat) {
+      return <LoadingWrap style={{maxHeight:h,minHeight:h}}>
+        <CircularProgress size={32} style={{color:'white'}} />
+      </LoadingWrap>
+    }
+    return (<>
       {!appURL && <MsgListWrap style={{maxHeight:h,minHeight:h}}>
         <MsgList className="msg-list">
           {msgs.map((m,i)=>{
@@ -41,8 +54,7 @@ function Chat(){
         </MsgList>
       </MsgListWrap>}
       {appURL && <Frame url={appURL} />}
-      <Foot height={footHeight} />
-    </Section>
+    </>)
   })
 }
 
@@ -94,6 +106,12 @@ const BackLine = styled.div`
   position:absolute;
   top:8px;
   left:2%;
+`
+const LoadingWrap = styled.div`
+  flex:1;
+  display: flex;
+  align-items:center;
+  justify-content:center;
 `
 
 export default Chat
