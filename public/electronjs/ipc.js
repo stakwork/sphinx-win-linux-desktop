@@ -4,6 +4,7 @@ const rsa = require('./rsa')
 const keytar = require('./keytar')
 const fetch = require('node-fetch')
 const Crypto = require('crypto')
+const meme = require('./meme')
 
 ipcMain.on('etch', async (event, args) => {
     try {
@@ -83,6 +84,20 @@ ipcMain.on('encrypt-rsa', (event, args) => {
         // args.data is base64 encoded
         const dec = rsa.encrypt(args.pubkey, args.data)
         event.reply(args.rid, dec)
+    } catch(e) {
+        console.log(e)
+    }
+})
+
+ipcMain.on('upload-file', async (event, args) => {
+    try {
+        if(!args.rid) return
+        // args.file is a File
+        // args.type is string
+        // args.host is string
+        // args.token is string (the auth token for meme server)
+        const res = await meme.uploadMeme(file,type,host,token)
+        event.reply(args.rid, res)
     } catch(e) {
         console.log(e)
     }

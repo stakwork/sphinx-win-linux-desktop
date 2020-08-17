@@ -5,6 +5,7 @@ import {Msg} from '../msg'
 import {Contact} from '../contacts'
 import moment from 'moment'
 import {parseLDAT,urlBase64FromAscii} from '../utils/ldat'
+import * as base64 from 'base-64'
 
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
@@ -155,7 +156,7 @@ function rando(){
 export function useParsedGiphyMsg(message_content:string){
   const arr = message_content.split('::')
   if(!(arr&&arr[1])) return {}
-  const dec = atob(arr[1])
+  const dec = base64.decode(arr[1])
   try {
     const r = JSON.parse(dec)
     const aspectRatio = parseFloat(r.aspect_ratio)
