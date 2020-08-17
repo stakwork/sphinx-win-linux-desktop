@@ -8,12 +8,15 @@ import FlashOnButton from '@material-ui/icons/FlashOn';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CachedButton from '@material-ui/icons/Cached';
+import ArrowBackIosButton from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosButton from '@material-ui/icons/ArrowForwardIos';
 
-export default function Head() {
+export default function Head({ setWidth }) {
   const { contacts, details, msg, ui } = useStores()
   const [refreshing, setRefreshing] = useState(false)
-  
-  async function refresh(){
+  const [snap, setSnap] = useState(false)
+
+  async function refresh() {
     setRefreshing(true)
     await Promise.all([
       contacts.getContacts(),
@@ -24,7 +27,7 @@ export default function Head() {
   }
 
   return useObserver(() => <Wrap>
-    <Top>
+    <Top style={{ overflow: 'hidden' }}>
       <Tooltip title="Refresh" placement="right">
         <CachedButton style={{ cursor: 'pointer', marginLeft: 20, marginRight: 20 }} onClick={() => refresh()} >
         </CachedButton>
@@ -35,10 +38,11 @@ export default function Head() {
         <span>sat</span>
       </Balance>
       <div></div>
-      <Tooltip title={ui.connected?'Connected':'Not Connected'} placement="left">
-        {refreshing ? 
-          <CircularProgress size='24px' style={{ marginRight: 20, marginLeft: -20, color: '#49ca97' }} /> : 
-          <FlashOnButton style={{ marginRight: 20, marginLeft: -20, height: 20, 
+      <Tooltip title={ui.connected ? 'Connected' : 'Not Connected'} placement="left">
+        {refreshing ?
+          <CircularProgress size='24px' style={{ marginRight: 20, marginLeft: -20, color: '#49ca97' }} /> :
+          <FlashOnButton style={{
+            marginRight: 20, marginLeft: -20, height: 20,
             color: ui.connected ? '#49ca97' : '#febd59'
           }} />
         }
@@ -48,9 +52,14 @@ export default function Head() {
       <SearchIcon style={{ color: 'grey', fontSize: 18, position: 'absolute', top: 12, left: 19 }} />
       <Search placeholder="Search" value={ui.searchTerm}
         onChange={e => ui.setSearchTerm(e.target.value)}
-        style={{ background: theme.deep }}
+        style={{ background: theme.deep, marginRight: 5 }}
       />
+      <ArrowBackIosButton onClick={() => {setWidth(11), setSnap(true)}} style={{ color: '#618af8', fontSize: 'medium', cursor: 'pointer', position: 'absolute', float: 'right', marginTop: 13 }}>
+      </ArrowBackIosButton>
     </Searcher>
+    {snap?
+    <ArrowForwardIosButton onClick={() => {setWidth(350), setSnap(false)}} style={{ cursor: 'pointer', borderTopRightRadius: '5px', borderBottomRightRadius: '5px', backgroundColor: '#618af8', position: 'absolute', right: '-35px', top: '73px', paddingTop: 5, paddingBottom: 5 }} />
+    : <div></div>}
   </Wrap>)
 }
 

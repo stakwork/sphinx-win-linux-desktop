@@ -19,10 +19,6 @@
     "module": "esnext",
     "isolatedModules": true
   },
-<<<<<<< HEAD
-  //"include": ["src"]
-=======
   // "include": ["src"]
->>>>>>> 68612f4fe8ee5c8cac6864da4ed843dcb2d948c6
   "include": ["src/index.web.tsx","web"]
 }
