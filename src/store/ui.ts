@@ -5,63 +5,58 @@ import {Contact} from './contacts'
 
 export class UiStore {
   @observable ready: boolean = false
-  @action
-  setReady(ready){
+  @action setReady(ready){
     this.ready = ready
   }
 
   @observable selectedChat: Chat
-  @action
-  setSelectedChat(c){
+  @action setSelectedChat(c){
     this.selectedChat = c
   }
 
+  @observable loadingChat: boolean
+  @action setLoadingChat(b:boolean){
+    this.loadingChat = b
+  }
+
   @observable applicationURL: string
-  @action
-  setApplicationURL(s){
+  @action setApplicationURL(s){
     this.applicationURL = s
   }
 
   @observable searchTerm: string = ''
-  @action
-  setSearchTerm(term) {
+  @action setSearchTerm(term) {
     this.searchTerm = term
   }
 
   @observable contactsSearchTerm: string = ''
-  @action
-  setContactsSearchTerm(term) {
+  @action setContactsSearchTerm(term) {
     this.contactsSearchTerm = term
   }
 
   @observable qrModal: boolean = false
-  @action
-  setQrModal(b) {
+  @action setQrModal(b) {
     this.qrModal = b
   }
 
   @observable addFriendModal: boolean = false
-  @action
-  setAddFriendModal(b) {
+  @action setAddFriendModal(b) {
     this.addFriendModal = b
   }
 
   @observable subModalParams: {[k:string]:any} = null
-  @action
-  setSubModalParams(o) {
+  @action setSubModalParams(o) {
     console.log('setSubModalParams',o)
     this.subModalParams = o
   }
 
   @observable editContactModal: boolean = false
   @observable editContactParams: Contact
-  @action
-  setEditContactModal(p: Contact) {
+  @action setEditContactModal(p: Contact) {
     this.editContactModal = true
     this.editContactParams = p
   }
-  @action
-  closeEditContactModal() {
+  @action closeEditContactModal() {
     this.editContactModal = false
     setTimeout(()=>{
       this.editContactParams = null

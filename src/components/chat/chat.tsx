@@ -60,6 +60,8 @@ export default function Chat(){
       if(params){
         setPricePerMessage(params.price_per_message+params.escrow_amount)
         setShowPricePerMessage(true)
+
+        chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
       }
     }
   }

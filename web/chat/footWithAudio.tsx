@@ -11,54 +11,75 @@ import { useStores } from '../../src/store'
 import { useObserver } from 'mobx-react-lite'
 import moment from 'moment'
 import { ReactMic } from '@cleandersonlobo/react-mic';
+import InsertEmoticonButton from '@material-ui/icons/InsertEmoticon';
+import Popover from '@material-ui/core/Popover';
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
+import {uploadFile} from '../utils/meme'
 
 export default function Foot({ height }) {
-  const { ui, msg } = useStores()
+  const { ui, msg, meme } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
-  const chat = ui.selectedChat
   const [record, setRecord] = useState(false)
-  useEffect(() => {
-    if (recording) {
-      setRecord(true)
-    }
-  }, [recording])
-
-
-  function sendMessage() {
-    if (!text) return
-    let contact_id = chat.contact_ids.find(cid => cid !== 1)
-    msg.sendMessage({
-      contact_id,
-      text,
-      chat_id: chat.id || null,
-      amount: 0,
-      reply_uuid: ''
-    })
-    setText('')
-  }
-
-  let [count, setCount] = useState(0);
-
-  useInterval(() => {
-    // Your custom logic here
-    setCount(count + 1);
-  }, recording ? 1000 : null);
-
-  function duration(seconds) {
-    var start = moment(0)
-    var end = moment(seconds * 1000)
-    let diff = end.diff(start);
-    return moment.utc(diff).format("m:ss");
-  }
-
-  function onStop(blob) {
-    console.log('Blob is:', blob)
-    setRecording(false)
-    setCount(0)
-  }
 
   return useObserver(() => {
+    const chat = ui.selectedChat
+    
+    useEffect(() => {
+      if (recording) {
+        setRecord(true)
+      }
+    }, [recording])
+
+    function sendMessage() {
+      if (!text) return
+      let contact_id = chat.contact_ids.find(cid => cid !== 1)
+      msg.sendMessage({
+        contact_id,
+        text,
+        chat_id: chat.id || null,
+        amount: 0,
+        reply_uuid: ''
+      })
+      setText('')
+    }
+
+    let [count, setCount] = useState(0);
+
+    useInterval(() => {
+      // Your custom logic here
+      setCount(count + 1);
+    }, recording ? 1000 : null);
+
+    function duration(seconds) {
+      var start = moment(0)
+      var end = moment(seconds * 1000)
+      let diff = end.diff(start);
+      return moment.utc(diff).format("m:ss");
+    }
+
+    async function onStop(blob) {
+      console.log('Blob is:', blob)
+      const file = new File([blob.blob], "Audio.wav");
+      const server = meme.getDefaultServer()
+      const r = await uploadFile(file,blob.type,server.host,server.token)
+      console.log(r)
+      setRecording(false)
+      setCount(0)
+    }
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+    const open = Boolean(anchorEl);
+    const id = open ? 'simple-popover' : undefined;
 
     if (recording) {
 
@@ -72,7 +93,7 @@ export default function Foot({ height }) {
             record={record}
             backgroundColor={theme.bg}
             onStop={onStop}
-            //onStart={onStart}
+            // onStart={onStart}
             strokeColor="#ffffff"
           />
         </WaveWrap>
@@ -90,8 +111,26 @@ export default function Foot({ height }) {
       </MicWrap>
     }
 
-
     return <Wrap style={{ background: theme.bg, height }}>
+      <div>
+      <InsertEmoticonButton style={{ cursor: 'pointer', marginLeft: 10, color: '#8f9ca9', fontSize: 30 }} aria-describedby={id} onClick={handleClick} />
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
+        </Popover>
+      </div>
       <Input value={text} onChange={e => setText(e.target.value)}
         placeholder="Message" style={{ background: theme.extraDeep }}
         disabled={!chat}
@@ -111,11 +150,9 @@ export default function Foot({ height }) {
       }} disabled={!chat} onClick={() => setRecording(true)}>
         <MicIcon style={{ color: '#8f9ca9', fontSize: 30 }} />
       </IconButton>
-    </Wrap >
+    </Wrap>
   })
 }
-
-
 
 const Blinker = styled.div`
   animation:blink 1.2s infinite;

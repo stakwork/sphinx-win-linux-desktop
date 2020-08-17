@@ -14,17 +14,17 @@ export function useChats(){
 
 export function useChatRow(id){
   const {chats,msg,contacts,ui} = useStores()
-    const msgs = msg.messages[id||'_']
-    const lastMsg = msgs&&msgs[0]
-    const lastMsgText = lastMessageText(lastMsg)
-    const hasLastMsg = lastMsgText?true:false
+  const msgs = msg.messages[id||'_']
+  const lastMsg = msgs&&msgs[0]
+  const lastMsgText = lastMessageText(lastMsg)
+  const hasLastMsg = lastMsgText?true:false
 
-    const now = new Date().getTime()
-    const lastSeen = msg.lastSeen[id||'_'] || now
-    const unseenCount = countUnseen(msgs, lastSeen)
-    const hasUnseen = unseenCount>0?true:false
+  const now = new Date().getTime()
+  const lastSeen = msg.lastSeen[id||'_'] || now
+  const unseenCount = countUnseen(msgs, lastSeen)
+  const hasUnseen = unseenCount>0?true:false
 
-    return {lastMsgText,hasLastMsg,unseenCount,hasUnseen} 
+  return {lastMsgText,hasLastMsg,unseenCount,hasUnseen} 
 }
 
 function lastMessageText(msg){
@@ -33,7 +33,10 @@ function lastMessageText(msg){
     if(msg.sender===1) return `Payment Sent: ${msg.amount} sat`
     return `Payment Received: ${msg.amount} sat`
   }
-  if(msg.message_content) return msg.message_content
+  if(msg.message_content) {
+    if(msg.message_content.startsWith('giphy::')) return 'GIF received'
+    return msg.message_content
+  }
   if(msg.media_token) {
     if(msg.sender===1) return 'Picture Sent'
     return 'Picture Received'

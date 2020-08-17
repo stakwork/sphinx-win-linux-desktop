@@ -158,9 +158,23 @@ export class ChatStore {
   @action 
   async kick(chatID, contactID){
     const r = await relay.put(`kick/${chatID}/${contactID}`)
-    if(r===true){ // succes
+    if(r===true){ // success
       const chat = this.chats.find(c=>c.id===chatID)
       if(chat) chat.contact_ids = chat.contact_ids.filter(cid=>cid!==contactID)
+    }
+  }
+
+  @action
+  async updateTribeAsNonAdmin(tribeID:number, name:string, img:string) {
+    const r = await relay.put(`group/${tribeID}`, {name,img})
+    if(r) {
+      const cs = [...this.chats]
+      this.chats = cs.map(c=>{
+        if(c.id===tribeID){
+          return {...c, name, photo_url:img}
+        }
+        return c
+      })
     }
   }
 
