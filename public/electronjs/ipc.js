@@ -92,11 +92,12 @@ ipcMain.on('encrypt-rsa', (event, args) => {
 ipcMain.on('upload-file', async (event, args) => {
     try {
         if(!args.rid) return
-        // args.file is a File
+        // args.file is a string (base64)
         // args.type is string
         // args.host is string
         // args.token is string (the auth token for meme server)
-        const res = await meme.uploadMeme(file,type,host,token)
+        // args.filename is string
+        const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename)
         event.reply(args.rid, res)
     } catch(e) {
         console.log(e)

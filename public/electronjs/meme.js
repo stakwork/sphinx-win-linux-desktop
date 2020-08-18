@@ -1,9 +1,14 @@
 const RNCryptor = require('jscryptor')
+const base64 = require('base-64')
+const crypto = require('crypto')
+const FormData = require('form-data')
+const fetch = require('node-fetch')
 
-async function uploadMeme(file, typ, host, token) {
+async function uploadMeme(fileBase64, typ, host, token, filename) {
   try {
 
-    let imgBuf = await readFileAsync(file);
+    let imgBuf = dataURLtoBuf(fileBase64);
+    console.log(typeof imgBuf)
 
     const newKey = crypto.randomBytes(20).toString('hex')
 
@@ -54,4 +59,31 @@ function readFileAsync(file) {
 
     reader.readAsArrayBuffer(file);
   })
+}
+
+function dataURLtoBuf(dataurl) {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = base64.decode(arr[1]),
+    n = bstr.length, 
+    u8arr = new Uint8Array(n);
+  while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+  }
+  return u8arr
+}
+
+function dataURLtoFile(dataurl, filename) {
+ 
+  var arr = dataurl.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = base64.decode(arr[1]),
+      n = bstr.length, 
+      u8arr = new Uint8Array(n);
+      
+  while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+  }
+  
+  return new File([u8arr], filename, {type:mime});
 }

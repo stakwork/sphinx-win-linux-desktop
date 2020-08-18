@@ -59,11 +59,11 @@ export default function Foot({ height }) {
       return moment.utc(diff).format("m:ss");
     }
 
-    async function onStop(blob) {
-      console.log('Blob is:', blob)
-      const file = new File([blob.blob], "Audio.wav");
+    async function onStop(res) {
+      const blob = res.blob
+      const file = new File([blob], 'Audio.wav', {type:blob.type});
       const server = meme.getDefaultServer()
-      const r = await uploadFile(file,blob.type,server.host,server.token)
+      const r = await uploadFile(file,blob.type,server.host,server.token,'Audio.wav')
       console.log(r)
       setRecording(false)
       setCount(0)
