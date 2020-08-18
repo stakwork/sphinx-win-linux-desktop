@@ -26,6 +26,7 @@ export default function Msg(props){
     <InnerBox>
       {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
       <BubbleWrap style={{flexDirection: isMe?'row-reverse':'row'}}>
+        
         <Bubble style={{background:isMe?theme.highlight:theme.extraDeep}}>
           <Message {...props} />
         </Bubble>
