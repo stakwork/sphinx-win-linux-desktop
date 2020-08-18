@@ -7,21 +7,39 @@ import {Button} from 'react-native-paper'
 import {useStores} from '../../store'
 
 export default function Webview({url}) {
-  const {user} = useStores()
+  const {user,msg} = useStores()
   const [bridge,setBridge] = useState(null)
   const ref = useRef(null)
 
-  function onMessage(msg){
-    console.log("WEBVIEW MESSAGE",msg)
-    const data = msg.nativeEvent.data
+  async function onMessage(m){
+    const data = m.nativeEvent.data
     try {
       const d = JSON.parse(data)
-      console.log(d,d.type)
+      console.log("=> WEBVIEW:",d.type,d)
       if(d.type==='AUTHORIZE') {
         setBridge({...d,url})
       }
       if(d.type==='KEYSEND') {
-
+        const amt = d.amt
+        const dest = d.dest
+        if(!amt||!dest) return console.log("missing dest or amt")
+        await msg.sendPayment({
+          contact_id:null,chat_id:null,
+          destination_key:dest,
+          amt:amt,
+        })
+        postMessage({
+          type: 'KEYSEND',
+          application: 'Sphinx',
+          success: true,
+        })
+      }
+      if(d.type==='UPDATED') {
+        postMessage({
+          type: 'UPDATED',
+          application: 'Sphinx',
+          success: true,
+        })
       }
     } catch(e) {
       console.log(e)
@@ -30,7 +48,6 @@ export default function Webview({url}) {
 
   function postMessage(obj) {
     if(ref&&ref.current) {
-      console.log(ref.current.postMessage)
       ref.current.postMessage(JSON.stringify(obj))
     }
   }
@@ -42,6 +59,7 @@ export default function Webview({url}) {
       budget: parseInt(amt)||0,
       pubkey: user.publicKey
     })
+    setBridge(null)
   }
 
   return <View style={styles.webview}>
@@ -49,6 +67,7 @@ export default function Webview({url}) {
       authorize={authorize}
     />}
     <WebView ref={ref}
+      incognito={true}
       nativeConfig={{props: {webContentsDebuggingEnabled: true}}} 
       onMessage={onMessage}
       startInLoadingState={true}
