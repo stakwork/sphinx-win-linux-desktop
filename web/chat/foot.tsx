@@ -7,6 +7,7 @@ import BlinkingButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import Check from '@material-ui/icons/Check'
 import Close from '@material-ui/icons/Close'
+import AddCircleButton from '@material-ui/icons/AddCircle';
 import { useStores } from '../../src/store'
 import { useObserver } from 'mobx-react-lite'
 import moment from 'moment'
@@ -92,6 +93,7 @@ export default function Foot({ height }) {
 
 
     return <Wrap style={{ background: theme.bg, height }}>
+      <AddCircleButton />
       <Input value={text} onChange={e => setText(e.target.value)}
         placeholder="Message" style={{ background: theme.extraDeep }}
         disabled={!chat}

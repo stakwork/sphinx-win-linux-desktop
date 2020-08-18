@@ -7,6 +7,7 @@ import BlinkingButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import Check from '@material-ui/icons/Check'
 import Close from '@material-ui/icons/Close'
+import AddIcon from '@material-ui/icons/Add';
 import { useStores } from '../../src/store'
 import { useObserver } from 'mobx-react-lite'
 import moment from 'moment'
@@ -112,8 +113,13 @@ export default function Foot({ height }) {
     }
 
     return <Wrap style={{ background: theme.bg, height }}>
-      <div>
-      <InsertEmoticonButton style={{ cursor: 'pointer', marginLeft: 10, color: '#8f9ca9', fontSize: 30 }} aria-describedby={id} onClick={handleClick} />
+      <IconButton style={{
+        cursor: 'pointer', background: chat ? theme.primary : theme.extraDeep, width: 30, height: 30, marginRight: 1, marginLeft: 10,
+        backgroundColor: '#618af8'
+      }} disabled={!chat} onClick={sendMessage}>
+        <AddIcon style={{ color: 'white', fontSize: 22 }} />
+      </IconButton>      <div>
+      <InsertEmoticonButton style={{ cursor: 'pointer', marginLeft: 10, marginTop: 5, color: '#8f9ca9', fontSize: 30 }} aria-describedby={id} onClick={handleClick} />
         <Popover
           id={id}
           open={open}
