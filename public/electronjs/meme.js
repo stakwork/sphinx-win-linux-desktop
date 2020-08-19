@@ -8,7 +8,6 @@ async function uploadMeme(fileBase64, typ, host, token, filename) {
   try {
 
     let imgBuf = dataURLtoBuf(fileBase64);
-    console.log(typeof imgBuf)
 
     const newKey = crypto.randomBytes(20).toString('hex')
 

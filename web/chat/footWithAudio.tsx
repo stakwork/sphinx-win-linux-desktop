@@ -16,12 +16,14 @@ import Popover from '@material-ui/core/Popover';
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import {uploadFile} from '../utils/meme'
+import TouchRipple from '@material-ui/core/ButtonBase/TouchRipple';
 
 export default function Foot({ height }) {
   const { ui, msg, meme } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
+  const [uploading,setUploading] = useState(false)
 
   return useObserver(() => {
     const chat = ui.selectedChat
@@ -63,8 +65,18 @@ export default function Foot({ height }) {
       const blob = res.blob
       const file = new File([blob], 'Audio.wav', {type:blob.type});
       const server = meme.getDefaultServer()
+      setUploading(true)
       const r = await uploadFile(file,blob.type,server.host,server.token,'Audio.wav')
-      console.log(r)
+      await msg.sendAttachment({
+        contact_id:null, chat_id:chat.id,
+        muid:r.muid,
+        media_key:r.media_key, 
+        media_type:blob.type,
+        text:'',
+        price:0,
+        amount:0
+      })
+      setUploading(false)
       setRecording(false)
       setCount(0)
     }
@@ -100,12 +112,13 @@ export default function Foot({ height }) {
         <div style={{ color: 'white', height: 25, marginTop: 8, marginRight: 10 }}>
           {duration(count)}
         </div>
-        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#ea7574' }}
-          onClick={() => { setRecord(false), setRecording(false), setCount(0) }}>
+        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#ea7574', opacity:uploading?0.8:1 }}
+          onClick={() => { setRecord(false), setRecording(false), setCount(0) }}
+          disabled={uploading}>
           <Close style={{ color: 'white', fontSize: 30, borderRadius: "50%" }} />
         </IconButton>
-        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#47ca97' }}
-          onClick={() => setRecord(false)}>
+        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#47ca97', opacity:uploading?0.8:1 }}
+          onClick={() => setRecord(false)} disabled={uploading}>
           <Check style={{ color: 'white', fontSize: 30, borderRadius: "50%" }} />
         </IconButton>
       </MicWrap>
