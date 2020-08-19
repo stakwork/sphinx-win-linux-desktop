@@ -59,7 +59,6 @@ export default function Profile() {
   async function tookPic(img){
     setDialogOpen(false)
     setTakingPhoto(false)
-    console.log("TOOK PIC")
     setUploading(true)
     try {
       await upload(img.uri)
@@ -87,12 +86,11 @@ export default function Profile() {
       }, {name:'name', data:name}
     ])
     .uploadProgress({ interval : 250 },(written, total) => {
-      console.log('uploaded', written / total)
+      // console.log('uploaded', written / total)
     })
     .then(async (resp) => {
       let json = resp.json()
       if(json.muid){
-        console.log("SET PHOTO URL HERE")
         setPhotoUrl(`https://${server.host}/public/${json.muid}`)
       }
       setUploading(false)
@@ -105,7 +103,8 @@ export default function Profile() {
 
   return useObserver(()=> {
     const meContact = contacts.contacts.find(c=> c.id===1)
-    const imgURI = usePicSrc(meContact)
+    let imgURI = usePicSrc(meContact)
+    if(photo_url) imgURI = photo_url
     return <View style={styles.wrap}>
       <Header />
       <View style={styles.userInfoSection}>
