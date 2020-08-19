@@ -20,6 +20,7 @@ export default function Chat(){
   const [replyUuid, setReplyUUID] = useState('')
   const [loadingChat, setLoadingChat] = useState(false)
   const [appURL, setAppURL] = useState('')
+  const [appMode, setAppMode] = useState(false)
   const {contacts,user,chats} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -60,6 +61,7 @@ export default function Chat(){
     const isTribeAdmin = isTribe && chat.owner_pubkey===user.publicKey
     let isAppURL = false
     if(isTribe && !isTribeAdmin){
+      setAppMode(true)
       setLoadingChat(true)
       const params = await chats.getTribeDetails(chat.host,chat.uuid)
       if(params){
@@ -72,33 +74,33 @@ export default function Chat(){
         }
       }
       setLoadingChat(false)
+    } else {
+      setAppMode(false)
     }
     if(!isAppURL) setAppURL('') // remove the app_url
   }
 
-  if(appURL) {
-    return <View style={styles.main}>
-      <Header chat={chat} />
-      <Frame url={appURL} />
-    </View>
-  }
-
   const theShow = show && !loadingChat
   return <View style={styles.main}>
-    <Header chat={chat} />
-    {!theShow && <View style={styles.loadWrap}>
-      <ActivityIndicator animating={true} color="grey" />
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} />
+    {(appURL?true:false) && <View style={{...styles.layer,zIndex:appMode?100:99}}>
+      <Frame url={appURL} />
     </View>}
-    {theShow && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
-    {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage} 
-      replyUuid={replyUuid} setReplyUUID={setReplyUUID}
-    />}
-    <Snackbar
-      visible={showPricePerMessage}
-      duration={1000}
-      onDismiss={()=> setShowPricePerMessage(false)}>
-      {`Price per Message: ${pricePerMessage} sat`}
-    </Snackbar>
+    <View style={{...styles.layer,zIndex:appMode?99:100}}>
+      {!theShow && <View style={styles.loadWrap}>
+        <ActivityIndicator animating={true} color="grey" />
+      </View>}
+      {theShow && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
+      {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage} 
+        replyUuid={replyUuid} setReplyUUID={setReplyUUID}
+      />}
+      <Snackbar
+        visible={showPricePerMessage}
+        duration={1000}
+        onDismiss={()=> setShowPricePerMessage(false)}>
+        {`Price per Message: ${pricePerMessage} sat`}
+      </Snackbar>
+    </View>
   </View>
 }
 
@@ -108,6 +110,13 @@ const styles = StyleSheet.create({
     width:'100%',height:'100%',
     backgroundColor:'white',
     position:'relative',
+  },
+  layer:{
+    display:'flex',
+    width:'100%',height:'100%',
+    backgroundColor:'white',
+    position:'absolute',
+    paddingTop:50
   },
   loadWrap:{
     flex:1,
