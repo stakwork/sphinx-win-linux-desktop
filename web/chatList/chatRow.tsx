@@ -55,7 +55,7 @@ const Right = styled.div`
   display:flex;
   flex-direction:column;
   justify-content:center;
-  width:calc(100% - 81px);
+  width:calc(100% - 88px);
   padding-right:14px;
 `
 const LastMsg = styled.div`

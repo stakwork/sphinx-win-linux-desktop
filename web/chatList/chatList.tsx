@@ -30,21 +30,7 @@ function ChatList(){
               onClick={async ()=> {
                 if(ui.selectedChat&&ui.selectedChat.uuid===c.uuid) return
                 msg.seeChat(c.id)
-                ui.setSelectedChat(null)
-                let isAppURL = false
-                if(c.type===constants.chat_types.tribe) {
-                  ui.setLoadingChat(true)
-                  const params = await chats.getTribeDetails(c.host,c.uuid)
-                  if(params && params.app_url) {
-                    isAppURL = true
-                    ui.setApplicationURL(params.app_url)
-                  }
-                  ui.setLoadingChat(false)
-                }
-                if(!isAppURL) {
-                  ui.setApplicationURL('')
-                }
-                setTimeout(()=> ui.setSelectedChat(c), 5)
+                ui.setSelectedChat(c)
               }}
             />
           })}
@@ -67,6 +53,8 @@ const Section=styled.section`
   height:100%;
   display:flex;
   flex:1;
+  position:relative;
+  z-index:100;
 `
 const Inner=styled.div`
   display:flex;
