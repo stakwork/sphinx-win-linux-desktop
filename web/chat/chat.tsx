@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import Head from './head'
-import Foot from './footWithAudio'
+import Foot from './foot'
 import theme from '../theme'
 import Msg from './msg'
 import {constants} from '../../src/constants'

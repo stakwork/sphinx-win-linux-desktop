@@ -11,12 +11,15 @@ import EE from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
 import {ActivityIndicator,Snackbar} from 'react-native-paper'
 import { constants } from '../../constants'
+import Frame from './frame'
 
 export default function Chat(){
   const [show,setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [showPricePerMessage, setShowPricePerMessage] = useState(false)
   const [replyUuid, setReplyUUID] = useState('')
+  const [loadingChat, setLoadingChat] = useState(false)
+  const [appURL, setAppURL] = useState('')
   const {contacts,user,chats} = useStores()
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -55,24 +58,39 @@ export default function Chat(){
   async function fetchTribeParams(){
     const isTribe = chat&&chat.type===constants.chat_types.tribe
     const isTribeAdmin = isTribe && chat.owner_pubkey===user.publicKey
+    let isAppURL = false
     if(isTribe && !isTribeAdmin){
+      setLoadingChat(true)
       const params = await chats.getTribeDetails(chat.host,chat.uuid)
       if(params){
         setPricePerMessage(params.price_per_message+params.escrow_amount)
         setShowPricePerMessage(true)
-
         chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
+        if(params.app_url) {
+          isAppURL = true
+          setAppURL(params.app_url)
+        }
       }
+      setLoadingChat(false)
     }
+    if(!isAppURL) setAppURL('') // remove the app_url
   }
 
+  if(appURL) {
+    return <View style={styles.main}>
+      <Header chat={chat} />
+      <Frame url={appURL} />
+    </View>
+  }
+
+  const theShow = show && !loadingChat
   return <View style={styles.main}>
     <Header chat={chat} />
-    {!show && <View style={styles.loadWrap}>
+    {!theShow && <View style={styles.loadWrap}>
       <ActivityIndicator animating={true} color="grey" />
     </View>}
-    {show && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
-    {show && <BottomBar chat={chat} pricePerMessage={pricePerMessage} 
+    {theShow && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
+    {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage} 
       replyUuid={replyUuid} setReplyUUID={setReplyUUID}
     />}
     <Snackbar

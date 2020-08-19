@@ -31,18 +31,19 @@ function ChatList(){
                 if(ui.selectedChat&&ui.selectedChat.uuid===c.uuid) return
                 msg.seeChat(c.id)
                 ui.setSelectedChat(null)
-                console.log(c.type===constants.chat_types.tribe)
                 let isAppURL = false
                 if(c.type===constants.chat_types.tribe) {
                   ui.setLoadingChat(true)
                   const params = await chats.getTribeDetails(c.host,c.uuid)
-                  if(params.app_url) {
+                  if(params && params.app_url) {
                     isAppURL = true
                     ui.setApplicationURL(params.app_url)
                   }
                   ui.setLoadingChat(false)
                 }
-                if(!isAppURL) ui.setApplicationURL('')
+                if(!isAppURL) {
+                  ui.setApplicationURL('')
+                }
                 setTimeout(()=> ui.setSelectedChat(c), 5)
               }}
             />
