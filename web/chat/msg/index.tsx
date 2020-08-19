@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { constantCodes } from '../../../src/constants'
 import TextMsg from './textMsg'
@@ -50,6 +50,7 @@ export default function Msg(props) {
         <Menu
           id="simple-menu"
           anchorEl={anchorEl}
+          getContentAnchorEl={null}
           keepMounted
           open={Boolean(anchorEl)}
           onClose={handleClose}
@@ -66,22 +67,22 @@ export default function Msg(props) {
               backgroundColor: isMe ? theme.highlight : theme.extraDeep
             },
           }}>
-          <MenuItem onClick={() => {navigator.clipboard.writeText(props.message_content), handleClose()}} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
+          <MenuItem onClick={() => {navigator.clipboard.writeText(props.message_content), handleClose(), props.onCopy('Text')}} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" style={{ fill: 'white', marginRight: 8 }}>
               <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
             </svg>Copy Text
             </MenuItem>
           {isLink ? 
-          <MenuItem onClick={() => {navigator.clipboard.writeText(props.message_content), handleClose()}} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
+          <MenuItem onClick={() => {navigator.clipboard.writeText(props.message_content), handleClose(), props.onCopy('Link')}} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
             <LinkIcon style={{ fontSize: 'medium', marginRight: 8 }} />Copy Link
             </MenuItem> : <div></div>}
-          <MenuItem onClick={handleClose} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
+          {/* <MenuItem onClick={handleClose} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
             <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
             </MenuItem>
           {isMe ?
             <MenuItem onClick={handleClose} style={{ fontSize: 14, color: 'red', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
               <DeleteForeverIcon style={{ color: 'red', fontSize: 'medium', marginRight: 8 }} />Delete Message
-            </MenuItem> : <div></div>}
+            </MenuItem> : <div></div>} */}
         </Menu>
       </BubbleWrap>
     </InnerBox>

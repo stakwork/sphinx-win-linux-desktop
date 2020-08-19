@@ -102,7 +102,7 @@ export default function Foot({ height }) {
         }}
       />
       <IconButton style={{
-        background: chat ? theme.primary : theme.extraDeep, width: 39, height: 39, marginRight: 10, marginLeft: 10,
+        width: 39, height: 39, marginRight: 10, marginLeft: 10,
         backgroundColor: '#618af8'
       }} disabled={!chat || !text} onClick={sendMessage}>
         <SendIcon style={{ color: 'white', fontSize: 22 }} />

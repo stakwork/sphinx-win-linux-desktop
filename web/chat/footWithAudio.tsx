@@ -114,7 +114,7 @@ export default function Foot({ height }) {
 
     return <Wrap style={{ background: theme.bg, height }}>
       <IconButton style={{
-        cursor: 'pointer', background: chat ? theme.primary : theme.extraDeep, width: 30, height: 30, marginRight: 1, marginLeft: 10,
+        cursor: 'pointer', width: 30, height: 30, marginRight: 1, marginLeft: 10,
         backgroundColor: '#618af8'
       }} disabled={!chat} onClick={sendMessage}>
         <AddIcon style={{ color: 'white', fontSize: 22 }} />
@@ -145,7 +145,7 @@ export default function Foot({ height }) {
         }}
       />
       <IconButton style={{
-        background: chat ? theme.primary : theme.extraDeep, width: 39, height: 39, marginRight: 10, marginLeft: 10,
+        width: 39, height: 39, marginRight: 10, marginLeft: 10,
         backgroundColor: '#618af8'
       }} disabled={!chat || !text} onClick={sendMessage}>
         <SendIcon style={{ color: 'white', fontSize: 22 }} />

@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import {openLink} from '../../utils/openLink'
 import { ReactTinyLink } from 'react-tiny-link-electron'
 import {useParsedGiphyMsg} from '../../../src/store/hooks/msg'
+import { message } from '../../../src/store/websocketHandlers'
 
 export default function TextMsg(props){
   const {message_content} = props
   const isLink = message_content && (message_content.toLowerCase().startsWith('http://') || message_content.toLowerCase().startsWith('https://'))
+  
   if (isLink) {
     return <LinkWrap>
       <Link href={message_content} target="_blank" onClick={(e:any)=>{
