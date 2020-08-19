@@ -20,7 +20,7 @@ function ChatList(){
     const scname = ui.selectedChat&&ui.selectedChat.name
     return <Section style={{width,maxWidth:width,minWidth:width}}>
       <Inner>
-        <Head />
+        <Head setWidth={setWidth} width={width}/>
         <Chats>
           {theChats.map((c,i)=> {
             const contact = contactForConversation(c, contacts.contacts)

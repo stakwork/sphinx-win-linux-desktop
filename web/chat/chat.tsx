@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import Head from './head'
 import Foot from './foot'
@@ -9,6 +9,7 @@ import {useStores,hooks} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
 import Frame from './frame'
 import { CircularProgress } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert';
 const {useMsgs} = hooks
 
 const headHeight = 65
@@ -23,6 +24,13 @@ function Chat(){
 
 function ChatContent(){
   const {contacts,ui} = useStores()
+  const [alert, setAlert] = useState(``)
+  function onCopy(word){
+    setAlert(`${word} copied to clipboard`)
+    setTimeout(() => {
+      setAlert(``)
+    }, 2000);
+  }
   return useObserver(()=> {
     const chat = ui.selectedChat
     const appURL = ui.applicationURL
@@ -49,9 +57,10 @@ function ChatContent(){
             if (m.dateLine) {
               return <DateLine key={'date'+i} dateString={m.dateLine} />
             }
-            return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} />
+            return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} onCopy={onCopy}/>
           })}
         </MsgList>
+        {alert && <Alert style={{position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
       </MsgListWrap>}
       {appURL && <Frame url={appURL} />}
     </>)
@@ -82,6 +91,7 @@ const MsgListWrap = styled.div`
   flex:1;
   display: flex;
   padding-right:3px;
+  position: relative;
 `
 const DateWrap = styled.div`
   display:flex;
