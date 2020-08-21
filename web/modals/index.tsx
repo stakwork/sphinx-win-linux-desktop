@@ -3,14 +3,16 @@ import styled from 'styled-components'
 import ViewImg from './viewImg'
 import {useStores} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
+import ConfirmInvoice from './confirmInvoice'
 
 export default function Modals(){
   const {ui} = useStores()
   return useObserver(()=>{
     let display = 'none'
-    if(ui.imgViewerParams) display='flex'
+    if(ui.imgViewerParams || ui.confirmInvoiceMsg) display='flex'
     return <Wrap style={{display}}>
       {ui.imgViewerParams && <ViewImg params={ui.imgViewerParams} />}
+      {ui.confirmInvoiceMsg && <ConfirmInvoice params={ui.confirmInvoiceMsg} />}
     </Wrap>
   })
 }

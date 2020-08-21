@@ -7,6 +7,7 @@ import BlinkingButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import Check from '@material-ui/icons/Check'
 import Close from '@material-ui/icons/Close'
+import AddIcon from '@material-ui/icons/Add';
 import { useStores } from '../../src/store'
 import { useObserver } from 'mobx-react-lite'
 import moment from 'moment'
@@ -15,7 +16,7 @@ import InsertEmoticonButton from '@material-ui/icons/InsertEmoticon';
 import Popover from '@material-ui/core/Popover';
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
-import {uploadFile} from '../utils/meme'
+import { uploadFile } from '../utils/meme'
 import TouchRipple from '@material-ui/core/ButtonBase/TouchRipple';
 
 export default function Foot({ height }) {
@@ -23,11 +24,11 @@ export default function Foot({ height }) {
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
-  const [uploading,setUploading] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   return useObserver(() => {
     const chat = ui.selectedChat
-    
+
     useEffect(() => {
       if (recording) {
         setRecord(true)
@@ -63,18 +64,18 @@ export default function Foot({ height }) {
 
     async function onStop(res) {
       const blob = res.blob
-      const file = new File([blob], 'Audio.wav', {type:blob.type});
+      const file = new File([blob], 'Audio.wav', { type: blob.type });
       const server = meme.getDefaultServer()
       setUploading(true)
-      const r = await uploadFile(file,blob.type,server.host,server.token,'Audio.wav')
+      const r = await uploadFile(file, blob.type, server.host, server.token, 'Audio.wav')
       await msg.sendAttachment({
-        contact_id:null, chat_id:chat.id,
-        muid:r.muid,
-        media_key:r.media_key, 
-        media_type:blob.type,
-        text:'',
-        price:0,
-        amount:0
+        contact_id: null, chat_id: chat.id,
+        muid: r.muid,
+        media_key: r.media_key,
+        media_type: blob.type,
+        text: '',
+        price: 0,
+        amount: 0
       })
       setUploading(false)
       setRecording(false)
@@ -112,12 +113,12 @@ export default function Foot({ height }) {
         <div style={{ color: 'white', height: 25, marginTop: 8, marginRight: 10 }}>
           {duration(count)}
         </div>
-        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#ea7574', opacity:uploading?0.8:1 }}
+        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#ea7574', opacity: uploading ? 0.8 : 1 }}
           onClick={() => { setRecord(false), setRecording(false), setCount(0) }}
           disabled={uploading}>
           <Close style={{ color: 'white', fontSize: 30, borderRadius: "50%" }} />
         </IconButton>
-        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#47ca97', opacity:uploading?0.8:1 }}
+        <IconButton style={{ width: 39, height: 39, marginRight: 17, backgroundColor: '#47ca97', opacity: uploading ? 0.8 : 1 }}
           onClick={() => setRecord(false)} disabled={uploading}>
           <Check style={{ color: 'white', fontSize: 30, borderRadius: "50%" }} />
         </IconButton>
@@ -125,8 +126,15 @@ export default function Foot({ height }) {
     }
 
     return <Wrap style={{ background: theme.bg, height }}>
+      {/* <IconButton style={{
+        cursor: 'pointer', width: 30, height: 30, marginRight: 1, marginLeft: 10,
+        backgroundColor: '#618af8'
+      }} disabled={!chat} onClick={sendMessage}>
+        <AddIcon style={{ color: 'white', fontSize: 22 }} />
+      </IconButton> */}
       <div>
-      <InsertEmoticonButton style={{ cursor: 'pointer', marginLeft: 10, color: '#8f9ca9', fontSize: 30 }} aria-describedby={id} onClick={handleClick} />
+        <InsertEmoticonButton style={{ pointerEvents: chat ? 'auto' : 'none', cursor: 'pointer', marginLeft: 10, marginTop: 7, color: '#8f9ca9', fontSize: 30 }}
+          aria-describedby={id} onClick={handleClick} />
         <Popover
           id={id}
           open={open}
@@ -152,8 +160,7 @@ export default function Foot({ height }) {
         }}
       />
       <IconButton style={{
-        background: chat ? theme.primary : theme.extraDeep, width: 39, height: 39, marginRight: 10, marginLeft: 10,
-        backgroundColor: '#618af8'
+         width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
       }} disabled={!chat || !text} onClick={sendMessage}>
         <SendIcon style={{ color: 'white', fontSize: 22 }} />
       </IconButton>
