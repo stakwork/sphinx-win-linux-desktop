@@ -9,6 +9,7 @@ import { constants } from '../../../src/constants'
 import GroupNotification from './groupNotification'
 import MediaMsg from './mediaMsg'
 import PaymentMessage from './paymentMsg'
+import InvoiceMsg from './invoiceMsg'
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertButton from '@material-ui/icons/MoreVert';
@@ -96,8 +97,8 @@ function Message(props) {
       return <TextMsg {...props} />
     case 'attachment':
       return <MediaMsg {...props} />
-    // case 'invoice':
-    //   return <Invoice {...props} />
+    case 'invoice':
+      return <InvoiceMsg {...props} />
     case 'payment':
       return <PaymentMessage {...props} />
     case 'direct_payment':
