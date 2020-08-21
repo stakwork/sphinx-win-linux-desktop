@@ -117,7 +117,7 @@ export function member_reject(data){
   msgStore.gotNewMessage(data.response.message)
 }
 
-const oktolog=true
+const oktolog=false
 function log(a,b){
   if(oktolog) {
     console.log(a,b)
