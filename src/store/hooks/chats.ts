@@ -13,7 +13,7 @@ export function useChats(){
 }
 
 export function useChatRow(id){
-  const {chats,msg,contacts,ui} = useStores()
+  const {msg} = useStores()
   const msgs = msg.messages[id||'_']
   const lastMsg = msgs&&msgs[0]
   const lastMsgText = lastMessageText(lastMsg)
@@ -30,8 +30,9 @@ export function useChatRow(id){
 function lastMessageText(msg){
   if(!msg) return ''
   if(msg.amount) {
-    if(msg.sender===1) return `Payment Sent: ${msg.amount} sat`
-    return `Payment Received: ${msg.amount} sat`
+    const kind = msg.type===constants.message_types.invoice?'Invoice':'Payment'
+    if(msg.sender===1) return `${kind} Sent: ${msg.amount} sat`
+    return `${kind} Received: ${msg.amount} sat`
   }
   if(msg.message_content) {
     if(msg.message_content.startsWith('giphy::')) return 'GIF received'

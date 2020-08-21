@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react'
+import { useState } from 'react'
 import RNFetchBlob from 'rn-fetch-blob'
-import {useStores} from '../../../store'
+import { useStores } from '../../../store'
 import * as aes from '../../../crypto/aes'
-import {decode as atob} from 'base-64'
+import { decode as atob } from 'base-64'
 
 const sess = 'all'
 
@@ -10,73 +10,73 @@ let dirs = RNFetchBlob.fs.dirs
 
 // RNFetchBlob.fs.unlink(folder) to kill all there
 
-export function useCachedEncryptedFile(props, ldat){
-  const {meme} = useStores()
-  const {id, media_key, media_type, media_token} = props
+export function useCachedEncryptedFile(props, ldat) {
+  const { meme } = useStores()
+  const { id, media_key, media_type, media_token } = props
 
   const [data, setData] = useState('')
   const [uri, setURI] = useState('')
   const [loading, setLoading] = useState(false)
   const [paidMessageText, setPaidMessageText] = useState(null)
-  const isPaidMessage = media_type==='text/plain'
+  const isPaidMessage = media_type === 'text/plain'
 
-  function dispose(){
-    RNFetchBlob.session(sess).dispose().then(() => { 
-      console.log(`${sess} disposed`)  
+  function dispose() {
+    RNFetchBlob.session(sess).dispose().then(() => {
+      console.log(`${sess} disposed`)
     })
   }
 
   async function trigger() {
-    if(loading||data||uri||paidMessageText) return // already done
-    if(!(ldat&&ldat.host)) {
+    if (loading || data || uri || paidMessageText) return // already done
+    if (!(ldat && ldat.host)) {
       return
     }
-    if(!ldat.sig){
+    if (!ldat.sig) {
       return
     }
 
     const url = `https://${ldat.host}/file/${media_token}`
-    const server = meme.servers.find(s=> s.host===ldat.host)
+    const server = meme.servers.find(s => s.host === ldat.host)
 
     setLoading(true)
     // if img already exists return it
     const existingPath = dirs.CacheDir + `/attachments/msg_${id}_decrypted`
     const exists = await RNFetchBlob.fs.exists(existingPath)
-    if(exists) {
-      if(isPaidMessage){
+    if (exists) {
+      if (isPaidMessage) {
         const txt = await parsePaidMsg(id)
         setPaidMessageText(txt)
       } else {
-        setURI('file://'+existingPath)
+        setURI('file://' + existingPath)
       }
       setLoading(false)
       return
     }
 
-    if(!server) return 
+    if (!server) return
     try {
       const res = await RNFetchBlob
-      .config({
-        path: dirs.CacheDir + `/attachments/msg_${id}`
-      })
-      .fetch('GET', url, {
-        Authorization: `Bearer ${server.token}`,
-      })
+        .config({
+          path: dirs.CacheDir + `/attachments/msg_${id}`
+        })
+        .fetch('GET', url, {
+          Authorization: `Bearer ${server.token}`,
+        })
       console.log('The file saved to ', res.path())
 
       const path = res.path()
       const status = res.info().status
-      if(status == 200 && path){
+      if (status == 200 && path) {
         let extension = ''
-        if(media_type.startsWith('audio')){
+        if (media_type.startsWith('audio')) {
           // extension = 'm4a'
         }
-        if(isPaidMessage) {
+        if (isPaidMessage) {
           const txt = await aes.decryptFileAndSaveReturningContent(path, media_key, extension)
           setPaidMessageText(txt)
         } else {
           const newpath = await aes.decryptFileAndSave(path, media_key, extension)
-          setURI('file://'+newpath)
+          setURI('file://' + newpath)
         }
         setLoading(false)
       }
@@ -99,20 +99,20 @@ export function useCachedEncryptedFile(props, ldat){
       //   setImgData(dataURI)
       //   setLoading(false)
       // }
-    } catch(e) {
+    } catch (e) {
       console.log(e)
     }
   }
 
-  return {data,uri,loading,trigger,dispose,paidMessageText}
+  return { data, uri, loading, trigger, dispose, paidMessageText }
 }
 
-async function parsePaidMsg(id){
+async function parsePaidMsg(id) {
   try {
     const path = dirs.CacheDir + `/attachments/msg_${id}_decrypted`
     const data = await RNFetchBlob.fs.readFile(path, 'base64')
     return atob(data)
-  } catch(e) {
+  } catch (e) {
     console.log(e)
   }
 }
