@@ -57,7 +57,7 @@ export default function Head({ setWidth, width }) {
           onChange={e => ui.setSearchTerm(e.target.value)}
           style={{ background: theme.deep, marginRight: 5 }}
         />
-        <ArrowBackIosButton onClick={() => { setWidth(1) }}
+        <ArrowBackIosButton onClick={() => { setWidth(11) }}
           style={{
             fontWeight: 'bold', color: '#618af8', fontSize: 'medium', cursor: 'pointer',
             position: 'absolute', float: 'right', marginTop: 13
@@ -68,7 +68,7 @@ export default function Head({ setWidth, width }) {
       <ArrowForwardIosButton onClick={() => { setWidth(350)}}
         style={{
           cursor: 'pointer', borderTopRightRadius: '5px', borderBottomRightRadius: '5px', backgroundColor: '#618af8',
-          position: 'absolute', right: '-20px', top: '73px', paddingTop: 5, paddingBottom: 5, width: 15
+          position: 'absolute', right: '-26px', top: '73px', paddingTop: 5, paddingBottom: 5, width: 16
         }} />
       : <div></div>}
   </Wrap>)

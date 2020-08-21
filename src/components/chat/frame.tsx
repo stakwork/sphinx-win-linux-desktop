@@ -7,7 +7,7 @@ import {Button} from 'react-native-paper'
 import {useStores} from '../../store'
 
 export default function Webview({url}) {
-  const {user,msg} = useStores()
+  const {user,msg,auth} = useStores()
   const [bridge,setBridge] = useState(null)
   const ref = useRef(null)
 
@@ -52,12 +52,17 @@ export default function Webview({url}) {
     }
   }
 
-  function authorize(amt){
+  async function authorize(amt,challenge:string){
+    let sig = ''
+    if(challenge) {
+      sig = await auth.sign(challenge)
+    }
     postMessage({
       type: 'AUTHORIZE',
       application: 'Sphinx',
       budget: parseInt(amt)||0,
-      pubkey: user.publicKey
+      pubkey: user.publicKey,
+      signature: sig,
     })
     setBridge(null)
   }
@@ -79,6 +84,11 @@ export default function Webview({url}) {
       javaScriptEnabled={true}
       scrollEnabled={false}
       originWhitelist={['*']}
+      onError={()=>{
+        if(ref&&ref.current) {
+          ref.current.reload()
+        }
+      }}
     />
   </View>
 }
@@ -96,6 +106,7 @@ function LoadingView() {
 
 function BridgeModal({params,authorize,onClose}){
   const [amt,setAmt] = useState('1000')
+  const [authorizing,setAuthorizing] = useState(false)
   return <View style={styles.bridgeModal}>
     <Icon name="shield-check" size={54} color="#6289FD" 
       style={{marginRight:4,marginLeft:4}}
@@ -118,7 +129,12 @@ function BridgeModal({params,authorize,onClose}){
         No
       </Button>
       <Button mode="contained" dark={true} style={{...styles.button}}
-        onPress={()=>authorize(amt)}>
+        onPress={async ()=>{
+          if(authorizing) return
+          setAuthorizing(true)
+          await authorize(amt,params.challenge)
+          setAuthorizing(false)
+        }} loading={authorizing}>
         Yes
       </Button>
     </View>

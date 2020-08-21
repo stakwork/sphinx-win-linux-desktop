@@ -8,16 +8,18 @@ import PublicIcon from '@material-ui/icons/Public';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import IconButton from '@material-ui/core/IconButton';
-import {contactForConversation} from '../chatList/chatList'
 import {constants} from '../../src/constants'
+import ChatIcon from '@material-ui/icons/Chat';
+import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 
-export default function Head({height}){
+export default function Head({height,appMode,setAppMode}){
   const [showURL,setShowURL] = useState(false)
   const [URL,setURL] = useState('')
   const {contacts,ui} = useStores()
 
   return useObserver(()=>  {
     const chat = ui.selectedChat
+    const appURL = ui.applicationURL
 
     function goToURL(){
       ui.setApplicationURL(URL)
@@ -71,14 +73,19 @@ export default function Head({height}){
         </IconButton>
       </Left>}
       <Right>
-        {showURL ? 
+        {appURL && <> {appMode ? <ChatIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
+          onClick={()=> setAppMode(false)}
+        /> : <OpenInBrowserIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
+          onClick={()=> setAppMode(true)}
+        />} </>}
+        {!appURL && <> {showURL ? 
           <HighlightOffIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
             onClick={()=> {setShowURL(false); clearURL()}}
           /> :
           <PublicIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
             onClick={()=> {setShowURL(true); ui.setSelectedChat(null)}}
-          />
-        }
+          />}
+        </>}
       </Right>
     </Wrap>
   })

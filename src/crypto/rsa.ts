@@ -85,17 +85,19 @@ export async function encrypt(data, pubkey) {
   try{
     const buf = Buffer.from(data)
     let dataArray = []
-    let finalEnc = ''
+    let finalBuf = Buffer.from([])
     const n = Math.ceil(buf.length/MAX_CHUNK_SIZE)
     const arr = Array(n).fill(0)
     arr.forEach((_,i)=>{
-      dataArray.push(buf.subarray(i*MAX_CHUNK_SIZE,i*MAX_CHUNK_SIZE+MAX_CHUNK_SIZE).toString('utf8'))
+      const sub = buf.subarray(i*MAX_CHUNK_SIZE,i*MAX_CHUNK_SIZE+MAX_CHUNK_SIZE).toString('utf8')
+      dataArray.push(sub)
     })
     await asyncForEach(dataArray, async d=>{
       const enc = await RSA.encrypt(d, key)
-      finalEnc += enc
+      const encBuf = Buffer.from(enc.replace(/[\r\n]+/gm, ''), 'base64')
+      finalBuf = Buffer.concat([finalBuf,encBuf])
     })
-    return finalEnc.replace(/[\r\n]+/gm, '')
+    return finalBuf.toString('base64')
   } catch(e){}
   return ''
 }
