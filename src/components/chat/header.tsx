@@ -52,7 +52,7 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
         {theChat && <Appbar.Action icon={isMuted ? 'bell-off' : 'bell'}
           onPress={muteChat} color="grey"
         />}
-        {theChat && theChat.type === tribe && <Appbar.Action color="grey"
+        {theChat && theChat.type === tribe && (ui.applicationURL?true:false) && <Appbar.Action color="grey"
           icon={appMode ? 'android-messages' : 'open-in-app'}
           onPress={() => setAppMode(!appMode)}
         />}

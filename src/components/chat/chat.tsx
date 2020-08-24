@@ -14,14 +14,15 @@ import { constants } from '../../constants'
 import Frame from './frame'
 
 export default function Chat() {
+  const { contacts, user, chats, ui } = useStores()
+
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [showPricePerMessage, setShowPricePerMessage] = useState(false)
   const [replyUuid, setReplyUUID] = useState('')
   const [loadingChat, setLoadingChat] = useState(false)
-  const [appURL, setAppURL] = useState('')
   const [appMode, setAppMode] = useState(false)
-  const { contacts, user, chats } = useStores()
+  
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
   const chat = chats.chats.find(c => c.id === chatID) || route.params
@@ -70,16 +71,17 @@ export default function Chat() {
         chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
         if (params.app_url) {
           isAppURL = true
-          setAppURL(params.app_url)
+          ui.setApplicationURL(params.app_url)
         }
       }
       setLoadingChat(false)
     } else {
       setAppMode(false)
     }
-    if (!isAppURL) setAppURL('') // remove the app_url
+    if (!isAppURL) ui.setApplicationURL('') // remove the app_url
   }
 
+  const appURL = ui.applicationURL
   const theShow = show && !loadingChat
   return <View style={styles.main}>
     <Header chat={chat} appMode={appMode} setAppMode={setAppMode} />

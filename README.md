@@ -65,9 +65,6 @@ React-Native Android and Web client for Sphinx network
 - Incoming websocket messages managed from one interface (*src/store/websocketHandlers.ts*)
 
 
-
-
-
 ### note
 ```ts
 //add this @types/react-native/index.d.ts
