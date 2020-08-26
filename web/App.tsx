@@ -13,11 +13,21 @@ import ChatList from './chatList/chatList'
 import Chat from './chat/chat'
 import * as localForage from 'localforage'
 import Modals from './modals'
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+
+const palette = {
+  primary: {
+    main: theme.primary
+  },
+  secondary: {
+    main: theme.secondary
+  }
+}
 
 function Wrap(){
   const {ui} = useStores()
   return useObserver(()=>{
-    if(ui.ready) return <App />
+    if(ui.ready) return <ThemeProvider theme={ createMuiTheme({palette}) }><App /></ThemeProvider>
     return <Loading>
       <CircularProgress style={{color:'white'}} />
     </Loading>

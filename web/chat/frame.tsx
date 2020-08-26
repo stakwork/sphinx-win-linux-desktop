@@ -28,6 +28,7 @@ export default function Frame({url}){
           contact_id:null,chat_id:null,
           destination_key:dest,
           amt:amt,
+          memo: ``
         })
         webview.send('sphinx-bridge',{
           type: 'KEYSEND',

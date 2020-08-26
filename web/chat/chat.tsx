@@ -10,6 +10,11 @@ import {useObserver} from 'mobx-react-lite'
 import Frame from './frame'
 import { CircularProgress } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import ReplyIcon from '@material-ui/icons/Reply';
+import LinkIcon from '@material-ui/icons/Link';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 const {useMsgs} = hooks
 
 const headHeight = 65
@@ -26,6 +31,18 @@ function Chat(){
 function ChatContent({appMode,setAppMode}){
   const {contacts,ui,chats} = useStores()
   const [alert, setAlert] = useState(``)
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [menuMessage, setMenuMessage] = useState(null)
+
+  const handleMenuClick = (event, m) => {
+    setAnchorEl(event.currentTarget);
+    setMenuMessage(m);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setMenuMessage(null);
+  };
 
   function onCopy(word){
     setAlert(`${word} copied to clipboard`)
@@ -81,10 +98,48 @@ function ChatContent({appMode,setAppMode}){
             if (m.dateLine) {
               return <DateLine key={'date'+i} dateString={m.dateLine} />
             }
-            return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} onCopy={onCopy}/>
+
+            return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose}/>
           })}
         </MsgList>
         {alert && <Alert style={{position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          getContentAnchorEl={null}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: isMe(menuMessage) ? 'left' : 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: isMe(menuMessage) ? 'right' : 'left',
+          }}
+          PaperProps={{
+            style: {
+              backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep
+            },
+          }}>
+          <MenuItem onClick={() => {navigator.clipboard.writeText(menuMessage.message_content), handleMenuClose(), onCopy('Text')}} style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" style={{ fill: 'white', marginRight: 8 }}>
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+            </svg>Copy Text
+            </MenuItem>
+          {isLink(menuMessage) ? 
+          <MenuItem onClick={() => {navigator.clipboard.writeText(menuMessage.message_content), handleMenuClose(), onCopy('Link')}} style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+            <LinkIcon style={{ fontSize: 'medium', marginRight: 8 }} />Copy Link
+            </MenuItem> : <div></div>}
+          {/* <MenuItem onClick={props.handleClose} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
+            <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
+            </MenuItem>
+          {isMe ?
+            <MenuItem onClick={props.handleClose} style={{ fontSize: 14, color: 'red', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
+              <DeleteForeverIcon style={{ color: 'red', fontSize: 'medium', marginRight: 8 }} />Delete Message
+            </MenuItem> : <div></div>} */}
+        </Menu>
       </Layer>
       {appURL && <Layer show={appMode} style={{background:theme.deep, height:'calc(100% + 63px)'}}>
         <Frame url={appURL} />
@@ -165,3 +220,11 @@ const LoadingWrap = styled.div`
 `
 
 export default Chat
+
+function isLink (props) {
+  return props && props.message_content && (props.message_content.toLowerCase().startsWith('http://') || props.message_content.toLowerCase().startsWith('https://'))
+}
+
+function isMe (menuMessage) {
+  return menuMessage && menuMessage.sender === 1
+}

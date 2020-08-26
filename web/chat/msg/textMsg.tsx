@@ -33,6 +33,12 @@ export default function TextMsg(props){
     const {url,aspectRatio} = useParsedGiphyMsg(message_content)
     return <GIF src={url} aspectRatio={aspectRatio} />
   }
+
+  const emo_regex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])$/;
+  if(emo_regex.test(message_content)) {
+    return <Wrap style={{fontSize: 40}}>{message_content}</Wrap>
+  }
+
   return <Wrap>{message_content}</Wrap>
 }
 

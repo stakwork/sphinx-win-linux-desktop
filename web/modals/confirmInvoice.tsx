@@ -36,10 +36,10 @@ export default function ConfirmInvoice({ params }) {
                     <CancelIcon style={{ color: theme.bg, marginLeft: 10 }} />
                 </Button>
                 <Button disabled={loading} onClick={() => pay()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', backgroundColor: '#4AC998', width: 125 }}>
-                        <div>Confirm</div>
-                        <div style={{ display: 'flex', height: 20, marginTop: 2 }}>
-                            {!loading ? <CallMadeIcon style={{ backgroundColor: 'white', color: '#4AC998', borderRadius: 5, fontSize: 'medium', height: 20, width: 20, marginLeft: 10 }} />
-                                : <CircularProgress style={{ height: 20, width: 20, marginLeft: 10 }} />}
+                    <div>Confirm</div>
+                    <div style={{ display: 'flex', height: 20, marginTop: 2 }}>
+                        {!loading ? <CallMadeIcon style={{ backgroundColor: 'white', color: '#4AC998', borderRadius: 5, fontSize: 'medium', height: 20, width: 20, marginLeft: 10 }} />
+                            : <CircularProgress style={{ height: 20, width: 20, marginLeft: 10 }} />}
                     </div>
                 </Button>
             </Buttons>

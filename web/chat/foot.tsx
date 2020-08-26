@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import theme from '../theme'
+import {constants} from '../../src/constants'
 import SendIcon from '@material-ui/icons/Send';
 import IconButton from '@material-ui/core/IconButton';
 import BlinkingButton from '@material-ui/core/IconButton';
@@ -125,50 +126,46 @@ export default function Foot({ height }) {
       </MicWrap>
     }
 
-    return <Wrap style={{ background: theme.bg, height }}>
-      {/* <IconButton style={{
-        cursor: 'pointer', width: 30, height: 30, marginRight: 1, marginLeft: 10,
-        backgroundColor: '#618af8'
-      }} disabled={!chat} onClick={sendMessage}>
-        <AddIcon style={{ color: 'white', fontSize: 22 }} />
-      </IconButton> */}
-      <div>
-        <InsertEmoticonButton style={{ pointerEvents: chat ? 'auto' : 'none', cursor: 'pointer', marginLeft: 10, marginTop: 7, color: '#8f9ca9', fontSize: 30 }}
-          aria-describedby={id} onClick={handleClick} />
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-        >
-          <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
-        </Popover>
-      </div>
+    return <Wrap style={{ background: theme.bg, height, display: 'flex', alignItems: 'center' }}>
+      <IconButton style={{ pointerEvents: chat && chat.type===constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
+        onClick={() => ui.setSendRequestModal(chat)}>
+        <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
+      </IconButton>
+      <InsertEmoticonButton style={{ pointerEvents: chat ? "auto" : "none", cursor: 'pointer', marginLeft: 15, color: chat ? "#8f9ca9" : "#2a3540", fontSize: 30 }}
+        aria-describedby={id} onClick={handleClick} />
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
+      </Popover>
       <Input value={text} onChange={e => setText(e.target.value)}
-        placeholder="Message" style={{ background: theme.extraDeep }}
+        placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
         disabled={!chat}
         onKeyPress={e => {
           if (e.key === 'Enter') sendMessage()
         }}
       />
       <IconButton style={{
-         width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
+        width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
       }} disabled={!chat || !text} onClick={sendMessage}>
-        <SendIcon style={{ color: 'white', fontSize: 22 }} />
+        <SendIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
       </IconButton>
       <IconButton style={{
         width: 39, height: 39, marginRight: 10,
         backgroundColor: 'transparent'
       }} disabled={!chat} onClick={() => setRecording(true)}>
-        <MicIcon style={{ color: '#8f9ca9', fontSize: 30 }} />
+        <MicIcon style={{ color: chat ? '#8f9ca9' : '#2a3540', fontSize: 30 }} />
       </IconButton>
     </Wrap>
   })
