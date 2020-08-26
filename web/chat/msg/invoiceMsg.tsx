@@ -20,6 +20,7 @@ export default function InvoiceMsg(props) {
     let opacity = 1
     if (isPaid) {
         color = isMe ? '#555' : '#74ABFF'
+        label = `INVOICE PAID`
     } else { // if unpaid, check expiry
         if (isExpired) opacity = 0.35
     }
@@ -44,12 +45,12 @@ export default function InvoiceMsg(props) {
             <Sat>sat</Sat>
         </Top>
         {hasContent && <Message>{props.message_content}</Message>}
-        {showPayButton ? <Button disabled={isExpired} onClick={() => openConfirmModal()}
+        {showPayButton && <Button disabled={isExpired} onClick={() => openConfirmModal()}
             style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', color: 'white', backgroundColor: isExpired ? '#7f7f7f' : '#4AC998', width: '100%', borderRadius: 5, cursor: 'pointer', marginTop: 10 }}
         >
             <div></div><div style={{ marginLeft: 15 }}>{isExpired ? 'Expired' : 'Pay'}</div>
             <CallMadeIcon style={{ backgroundColor: 'white', color: isExpired ? '#7f7f7f' : '#4AC998', borderRadius: 5, fontSize: 'medium', height: 20, width: 20 }} />
-        </Button> : <Invoice>Invoice Paid</Invoice>}
+        </Button>}
     </Wrap>
 }
 
@@ -61,7 +62,6 @@ const Wrap = styled.div`
     display: flex;
     flex-direction: column;
     border: ${p => p.isPaid ? `` : `2px dashed #4AC998`};
-    border-radius: 8px;
 `
 const Top = styled.div`
     display: flex;

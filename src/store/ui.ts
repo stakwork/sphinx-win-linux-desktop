@@ -135,6 +135,11 @@ export class UiStore {
     this.confirmInvoiceMsg = s
   }
 
+  @observable sendRequestModal: Chat
+  @action setSendRequestModal(c: Chat) {
+    this.sendRequestModal = c
+  }
+
   @observable paymentHistory: boolean
   @action setPaymentHistory(b: boolean){
     this.paymentHistory = b

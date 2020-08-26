@@ -206,13 +206,17 @@ class MsgStore {
   }
 
   @action
-  async sendPayment({contact_id, amt, chat_id, destination_key}) {
+  async sendPayment({contact_id, amt, chat_id, destination_key, memo}) {
     try {
+      const myenc = await encryptText({contact_id:1, text:memo})
+      const encMemo = await encryptText({contact_id, text:memo})
       const v = {
         contact_id: contact_id||null,
         chat_id: chat_id||null,
         amount: amt,
-        destination_key
+        destination_key,
+        text: myenc,
+        remote_text: encMemo
       }
       const r = await relay.post('payment', v)
       if(contact_id||chat_id) this.gotNewMessage(r)
