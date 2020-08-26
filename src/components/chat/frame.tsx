@@ -27,6 +27,7 @@ export default function Webview({ url }) {
           contact_id: null, chat_id: null,
           destination_key: dest,
           amt: amt,
+          memo: '',
         })
         postMessage({
           type: 'KEYSEND',

@@ -30,14 +30,15 @@ export default function SendPayment({visible}) {
 
   const contact = contact_id && contacts.contacts.find(c=> c.id===contact_id)
 
-  async function sendPayment(amt){
+  async function sendPayment(amt,text){
     if(!amt) return
     setLoading(true)
     await msg.sendPayment({
       contact_id:contact_id||null,
       amt,
       chat_id: (chat&&chat.id)||null,
-      destination_key:''
+      destination_key:'',
+      memo: text,
     })
     setLoading(false)
     ui.clearPayModal()
@@ -73,7 +74,8 @@ export default function SendPayment({visible}) {
     setLoading(true)
     await msg.sendPayment({
       contact_id:null, chat_id:null,
-      destination_key:addy, amt:amtToPay
+      destination_key:addy, amt:amtToPay,
+      memo: '',
     })
     setLoading(false)
     close()
@@ -92,7 +94,7 @@ export default function SendPayment({visible}) {
       setTimeout(()=> setTint('dark'), 150)
       return
     }
-    if(ui.payMode==='payment') await sendPayment(amt)
+    if(ui.payMode==='payment') await sendPayment(amt, text)
     if(ui.payMode==='invoice') await sendInvoice(amt, text)
     setTimeout(()=> setTint('light'), 150)
     clearOut()
