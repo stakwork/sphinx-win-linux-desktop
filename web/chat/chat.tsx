@@ -14,7 +14,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ReplyIcon from '@material-ui/icons/Reply';
 import LinkIcon from '@material-ui/icons/Link';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Bots from './bots'
 const {useMsgs} = hooks
 
 const headHeight = 65
@@ -82,6 +82,9 @@ function ChatContent({appMode,setAppMode}){
       return <LoadingWrap style={{maxHeight:h,minHeight:h}}>
         <CircularProgress size={32} style={{color:'white'}} />
       </LoadingWrap>
+    }
+    if(chat && ui.botsChatId) {
+      return <Bots chat={chat} />
     }
     return (<Wrap h={h}>
       <Layer show={!appMode} style={{background:theme.deep}}>

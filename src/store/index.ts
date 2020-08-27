@@ -8,6 +8,7 @@ import { subStore } from './subs'
 import { userStore } from './user'
 import { memeStore } from './meme'
 import { authStore } from './auth'
+import { botStore } from './bots'
 import { create } from 'mobx-persist'
 import { AsyncStorage, Platform } from 'react-native'
 import * as hookz from './hooks'
@@ -50,6 +51,7 @@ const ctx = React.createContext({
   user: userStore,
   meme: memeStore,
   auth: authStore,
+  bots: botStore,
 })
 
 export const useStores = () => React.useContext(ctx)

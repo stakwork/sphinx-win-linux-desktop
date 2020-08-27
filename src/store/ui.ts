@@ -211,6 +211,12 @@ export class UiStore {
     this.connected = b
   }
 
+  @observable botsChatId: number = 0
+  @action toggleBotsChatId(n:number) {
+    if(this.botsChatId===n) this.botsChatId=0
+    else this.botsChatId = n
+  }
+
 }
 
 export const uiStore = new UiStore()

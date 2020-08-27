@@ -31,6 +31,7 @@ function ChatList(){
                 if(ui.selectedChat&&ui.selectedChat.uuid===c.uuid) return
                 msg.seeChat(c.id)
                 ui.setSelectedChat(c)
+                ui.toggleBotsChatId(0)
               }}
             />
           })}

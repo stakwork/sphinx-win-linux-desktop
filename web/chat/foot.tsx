@@ -95,6 +95,9 @@ export default function Foot({ height }) {
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
+    if(ui.botsChatId) {
+      return <></>
+    }
     if (recording) {
 
       return <MicWrap style={{ background: theme.bg, height }}>

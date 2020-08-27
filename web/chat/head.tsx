@@ -11,14 +11,18 @@ import IconButton from '@material-ui/core/IconButton';
 import {constants} from '../../src/constants'
 import ChatIcon from '@material-ui/icons/Chat';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
+import { SvgIcon } from '@material-ui/core';
 
 export default function Head({height,appMode,setAppMode}){
   const [showURL,setShowURL] = useState(false)
   const [URL,setURL] = useState('')
-  const {contacts,ui} = useStores()
+  const {contacts,ui,details} = useStores()
 
   return useObserver(()=>  {
     const chat = ui.selectedChat
+    const ownerPubkey = (chat&&chat.owner_pubkey)||''
+    const owner = contacts.contacts.find(c=>c.id===1)
+    const isTribeOwner = owner.public_key===ownerPubkey
     const appURL = ui.applicationURL
 
     function goToURL(){
@@ -73,6 +77,7 @@ export default function Head({height,appMode,setAppMode}){
         </IconButton>
       </Left>}
       <Right>
+        {isTribeOwner && <Btn onClick={()=> ui.toggleBotsChatId(chat.id)}><BotIcon /></Btn>}
         {appURL && <> {appMode ? <ChatIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
           onClick={()=> setAppMode(false)}
         /> : <OpenInBrowserIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
@@ -89,6 +94,12 @@ export default function Head({height,appMode,setAppMode}){
       </Right>
     </Wrap>
   })
+}
+
+function BotIcon(){
+  return <SvgIcon viewBox="64 64 896 896" height="21">
+    <path d="M300 328a60 60 0 10120 0 60 60 0 10-120 0zM852 64H172c-17.7 0-32 14.3-32 32v660c0 17.7 14.3 32 32 32h680c17.7 0 32-14.3 32-32V96c0-17.7-14.3-32-32-32zm-32 660H204V128h616v596zM604 328a60 60 0 10120 0 60 60 0 10-120 0zm250.2 556H169.8c-16.5 0-29.8 14.3-29.8 32v36c0 4.4 3.3 8 7.4 8h729.1c4.1 0 7.4-3.6 7.4-8v-36c.1-17.7-13.2-32-29.7-32zM664 508H360c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h304c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z" />
+  </SvgIcon>
 }
 
 const Wrap = styled.div`
@@ -159,4 +170,11 @@ const Input = styled.input`
   margin-right:8px;
   position:relative;
   z-index:100;
+`
+const Btn = styled.div`
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor: pointer;
+  margin-right:14px;
 `
