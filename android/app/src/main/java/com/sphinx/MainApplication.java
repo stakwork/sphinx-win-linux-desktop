@@ -4,6 +4,7 @@ import android.app.Application;
 import android.webkit.WebView;
 import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;

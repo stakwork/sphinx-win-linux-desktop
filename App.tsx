@@ -49,17 +49,21 @@ export default function Wrap(){
 }
 
 function App() {
-  const {user,msg} = useStores()
+  const {user,msg, ui} = useStores()
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
   const [pinned, setPinned] = useState(false)
+
+  const connectedHandler = () => {
+    ui.setConnected(true);
+  }
 
   useEffect(()=>{
     (async () => {
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){
-        instantiateRelay(user.currentIP, user.authToken)
+        instantiateRelay(user.currentIP, user.authToken, connectedHandler)
       }
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
