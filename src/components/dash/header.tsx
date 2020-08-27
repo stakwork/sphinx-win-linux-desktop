@@ -11,7 +11,7 @@ export default function Header() {
   const {details, ui} = useStores()
 
   const checkConnectionHandler = () => {
-    const connected = ui.connected ? 'Connected node' : 'Disconnected noe';
+    const connected = ui.connected ? 'Connected node' : 'Disconnected node';
     ToastAndroid.showWithGravity(
       `${connected}`,
       ToastAndroid.SHORT,
