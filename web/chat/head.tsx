@@ -22,7 +22,7 @@ export default function Head({height,appMode,setAppMode}){
     const chat = ui.selectedChat
     const ownerPubkey = (chat&&chat.owner_pubkey)||''
     const owner = contacts.contacts.find(c=>c.id===1)
-    const isTribeOwner = owner.public_key===ownerPubkey
+    const isTribeOwner = owner&&owner.public_key===ownerPubkey
     const appURL = ui.applicationURL
 
     function goToURL(){
