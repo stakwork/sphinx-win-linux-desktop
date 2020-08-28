@@ -53,7 +53,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new WebRTCModulePackage(),
           new MainReactPackage(),
-            new ClipboardPackage(),
+          new ClipboardPackage(),
           new RNDateTimePickerPackage(),
           new AudioPackage(),
           new FastImageViewPackage(),

@@ -10,10 +10,14 @@ export function configure(callback){
 
     // (required) Called when a remote or local notification is opened or received
     onNotification: function (notification) {
-      // console.log("NOTIFICATION:", notification);
+      console.log("NOTIFICATION:", notification);
       // process the notification
-      // notification.message && notify(notification.message)
-      notification.finish()
+      notification.data&&notification.data.message && notify(notification.data.message)
+      // notification.finish()
+      if(notification.userInteraction && notification.finish) {
+        notification.finish()
+        PushNotification.setApplicationIconBadgeNumber(0)
+      }
     },
 
     // ANDROID ONLY: FCM Sender ID (product_number) (optional - not required for local notifications, but is need to receive remote push notifications)
@@ -32,11 +36,11 @@ export function configure(callback){
   })
 }
 
-// function notify(txt){
-//   PushNotification.localNotification({
-//     ignoreInForeground: true,
-//     message: txt, // (required)
-//     playSound: false, // (optional) default: true
-//     soundName: "default",
-//   })
-// }
+function notify(txt){
+  PushNotification.localNotification({
+    ignoreInForeground: true,
+    message: txt, // (required)
+    playSound: false, // (optional) default: true
+    soundName: "default",
+  })
+}
