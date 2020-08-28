@@ -1,8 +1,9 @@
 import React, {useState} from 'react'
-import {View,Text,StyleSheet,Clipboard,Dimensions} from 'react-native'
+import {View,Text,StyleSheet,Dimensions} from 'react-native'
 import {Button,Snackbar} from 'react-native-paper'
 import QRCode from '../../utils/qrcode'
 import Share from 'react-native-share'
+import Clipboard from "@react-native-community/clipboard";
 
 export default function ShowRawInvoice({amount,payreq,paid}){
   const [copied, setCopied] = useState(false)

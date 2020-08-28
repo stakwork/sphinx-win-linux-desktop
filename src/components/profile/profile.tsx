@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, Clipboard, TouchableOpacity, Image} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
 import { Appbar, Dialog, Button, Portal, ActivityIndicator, Snackbar } from 'react-native-paper'
 import { Card, Title } from 'react-native-paper'
@@ -10,15 +10,13 @@ import {me} from '../form/schemas'
 import Form from '../form'
 import Cam from '../utils/cam'
 import ImgSrcDialog from '../utils/imgSrcDialog'
-import {createContactPic, usePicSrc} from '../utils/picSrc'
+import {usePicSrc} from '../utils/picSrc'
 import RNFetchBlob from 'rn-fetch-blob'
 import * as rsa from '../../crypto/rsa'
 import * as e2e from '../../crypto/e2e'
 import {encode as btoa} from 'base-64'
-import {userPinCode} from '../utils/pin'
-
-// no contact_id!
-// http://x.x.x.x/static/uploads/undefined_profile_picture.jpeg
+import PIN, {userPinCode} from '../utils/pin'
+import Clipboard from "@react-native-community/clipboard";
 
 export default function Profile() {
   const { details, user, contacts, meme } = useStores()
@@ -30,6 +28,8 @@ export default function Profile() {
   const [copied,setCopied] = useState(false)
   const [_,setTapCount] = useState(0)
   const [sharing,setSharing] = useState(false)
+  const [showPIN,setShowPIN] = useState(false)
+  const [exporting,setExporting] = useState(false)
 
   async function shareContactKey(){
     const me = contacts.contacts.find(c=> c.id===1)
@@ -40,7 +40,12 @@ export default function Profile() {
     setSharing(false)
   }
 
-  async function exportKeys(){
+  async function exportKeys(pin){
+    setShowPIN(false)
+    if(!pin) return
+    const thePIN = await userPinCode()
+    if(pin!==thePIN) return
+    setExporting(true)
     const priv = await rsa.getPrivateKey()
     const me = contacts.contacts.find(c=>c.id===1)
     const pub = me && me.contact_key
@@ -48,12 +53,11 @@ export default function Profile() {
     const token = user.authToken
     if(!priv || !pub || !ip || !token) return
     const str = `${priv}::${pub}::${ip}::${token}`
-    const pin = await userPinCode()
-    if(!pin) return
     const enc = await e2e.encrypt(str,pin)
     const final = btoa(`keys::${enc}`)
     Clipboard.setString(final)
     setCopied(true)
+    setExporting(false)
   }
 
   async function tookPic(img){
@@ -105,6 +109,13 @@ export default function Profile() {
     const meContact = contacts.contacts.find(c=> c.id===1)
     let imgURI = usePicSrc(meContact)
     if(photo_url) imgURI = photo_url
+
+    if(showPIN) {
+      return <PIN forceEnterMode={true}
+        onFinish={pin=> exportKeys(pin)}
+      />
+    }
+
     return <View style={styles.wrap}>
       <Header />
       <View style={styles.userInfoSection}>
@@ -164,9 +175,11 @@ export default function Profile() {
         />
       </View>
 
-      <TouchableOpacity style={styles.export} onPress={exportKeys}>
+      <TouchableOpacity style={styles.export} onPress={()=>setShowPIN(true)}>
         <Text style={styles.exportText}>
-          Want to switch devices? Export keys
+          {!exporting ? 'Want to switch devices? Export keys' :
+            'Encrypting keys with your PIN........'
+          }
         </Text>
       </TouchableOpacity>
       <Snackbar
@@ -175,6 +188,7 @@ export default function Profile() {
         onDismiss={()=> setCopied(false)}>
         Export keys copied to clipboard
       </Snackbar>
+      
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}

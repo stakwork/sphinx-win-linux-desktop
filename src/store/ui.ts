@@ -211,6 +211,11 @@ export class UiStore {
     this.connected = b
   }
 
+  @observable loadingHistory: boolean = false
+  @action setLoadingHistory(b:boolean) {
+    this.loadingHistory = b
+  }
+
   @observable botsChatId: number = 0
   @action toggleBotsChatId(n:number) {
     if(this.botsChatId===n) this.botsChatId=0
