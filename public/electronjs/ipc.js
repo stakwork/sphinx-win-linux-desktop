@@ -5,6 +5,7 @@ const keytar = require('./keytar')
 const fetch = require('node-fetch')
 const Crypto = require('crypto')
 const meme = require('./meme')
+const open = require('open');
 
 ipcMain.on('etch', async (event, args) => {
     try {
@@ -14,6 +15,16 @@ ipcMain.on('etch', async (event, args) => {
         const mimeType = response.headers.get('content-type')
         const data = await response.text()
         event.reply(args.rid, {data,mimeType})
+    } catch(e) {
+        console.log(e)
+    }
+})
+
+ipcMain.on('link', async (event, args) => {
+    try {
+        if(!args.rid) return
+        await open(args.link||'');
+        event.reply(args.rid, {success:true})
     } catch(e) {
         console.log(e)
     }

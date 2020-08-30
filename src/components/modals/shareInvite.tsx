@@ -1,12 +1,13 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, Image, Clipboard, TouchableWithoutFeedback} from 'react-native'
+import {View, Text, StyleSheet, Image, TouchableWithoutFeedback} from 'react-native'
 import {Button, Portal, Snackbar} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
 import QRCode from '../utils/qrcode'
 import Share from 'react-native-share'
+import Clipboard from "@react-native-community/clipboard";
 
 export default function ShareInvite({visible}) {
   const { ui, contacts } = useStores()

@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-// import {StyleSheet} from 'react-native'
+import React, {useRef, useEffect} from 'react'
+import {AppState} from 'react-native'
 import MainNav from './mainnav'
 import {useStores} from '../store'
 import {initPicSrc} from './utils/picSrc'
@@ -7,7 +7,7 @@ import * as push from './push'
 import { is24HourFormat } from 'react-native-device-time-format'
 import * as rsa from '../crypto/rsa'
 
-async function createPrivateKey(contacts){
+async function createPrivateKeyIfNotExists(contacts){
   const priv = await rsa.getPrivateKey()
   if(priv) return // all good
 
@@ -19,14 +19,36 @@ async function createPrivateKey(contacts){
 
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
+  const appState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
+    return () => {
+      AppState.removeEventListener("change", handleAppStateChange);
+    }
+  }, [])
+
+  function handleAppStateChange(nextAppState) {
+    if (appState.current.match(/inactive|background/) && nextAppState === "active") {
+      loadHistory()
+    }
+    appState.current = nextAppState;
+  }
+
+  async function loadHistory(){
+    ui.setLoadingHistory(true)
+    await contacts.getContacts().then(()=>{
+      meme.authenticateAll()
+    })
+    await details.getBalance()
+    await msg.getMessages()
+    ui.setLoadingHistory(false)
+    msg.initLastSeen()
+  }
+
   useEffect(()=>{
     (async () => {
-      contacts.getContacts().then(()=>{
-        meme.authenticateAll()
-      })
-      details.getBalance()
-      msg.getMessages()
-      msg.initLastSeen()
+      loadHistory()
 
       initPicSrc()
 
@@ -40,7 +62,7 @@ export default function Main() {
       const is24Hour = await is24HourFormat()
       ui.setIs24HourFormat(is24Hour)
 
-      createPrivateKey(contacts)
+      createPrivateKeyIfNotExists(contacts)
     })()
   },[])
 

@@ -3,7 +3,7 @@ import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
-import { View, Clipboard, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { constantCodes, constants } from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
@@ -16,6 +16,7 @@ import { Popover, PopoverTouchable, PopoverController } from 'react-native-modal
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Avatar from './avatar'
 import MemberRequest from './memberRequest'
+import Clipboard from "@react-native-community/clipboard";
 
 export default function MsgRow(props) {
   const [showReply, setShowReply] = useState(false)
