@@ -138,7 +138,7 @@
     "react-native-os": "^1.2.6",
     "react-native-paper": "^3.8.0",
     "react-native-peerjs": "^1.0.4",
-    "react-native-push-notification": "^3.2.1",
+    "react-native-push-notification": "^5.0.1",
     "react-native-qrcode": "^0.2.7",
     "react-native-radial-gradient": "^1.0.6",
     "react-native-randombytes": "^3.5.3",
