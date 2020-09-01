@@ -14,6 +14,8 @@ import RecDot from './recDot'
 import RNFetchBlob from 'rn-fetch-blob'
 import * as e2e from '../../crypto/e2e'
 import {randString} from '../../crypto/rand'
+import { fetchGifs } from './helpers'
+import { Giphy } from './components';
 
 const conversation = constants.chat_types.conversation
 
@@ -30,6 +32,9 @@ export default function BottomBar(props) {
   const [textInputHeight, setTextInputHeight] = useState(40)
   const [recordingStartTime, setRecordingStartTime] = useState(null)
   const [uploading,setUploading] = useState(false)
+  const [gifs, setGifs] = useState([])
+  const [searchGif, setSearchGif] = useState('Dogs')
+  const [showGiphyModal, setShowGiphyModal] = useState(false)
 
   const inputRef = useRef(null)
 
@@ -177,7 +182,7 @@ export default function BottomBar(props) {
       setUploading(false)
     })
     .catch((err) => {
-       console.log(err)
+      console.log(err)
     })
   }
 
@@ -190,6 +195,44 @@ export default function BottomBar(props) {
       amount:0
     })
   }
+
+  async function onGiphyHandler() {
+    const gifs = await fetchGifs(searchGif);
+    if (gifs.meta.status === 200) setGifs(gifs.data);
+    setDialogOpen(false);
+    setShowGiphyModal(true);
+  }
+
+  async function getGifsBySearch() {
+    const gifs = await fetchGifs(searchGif);
+    if (gifs.meta.status === 200) setGifs(gifs.data);
+  };
+
+  async function onSendGifHandler(gif: any) {
+    setShowGiphyModal(false);
+    const { config, fs } = RNFetchBlob;
+    const DownloadDir = fs.dirs.DownloadDir;
+    // configuration to download gif
+    const options = {
+      fileCache: true,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        path: `${DownloadDir}/gif-${Math.floor(new Date().getTime() + new Date().getSeconds() / 2)}.gif`,
+        description: 'Gif',
+      },
+    };
+
+    // download to local storage selected gif
+    config(options)
+      .fetch('GET', gif.images.original.url)
+      .then(res => {
+        const localDir = `file://${res.data}`;
+        const url = gif.images.original.url;
+
+        tookPic({ uri: localDir })
+      });
+  };
 
   const isConversation = chat.type===conversation
   const isTribe = chat.type===constants.chat_types.tribe
@@ -267,7 +310,8 @@ export default function BottomBar(props) {
           </TouchableOpacity>
         </View>}
 
-        <AttachmentDialog isConversation={isConversation}
+        <AttachmentDialog
+          isConversation={isConversation}
           open={dialogOpen} onClose={()=>setDialogOpen(false)}
           onPick={res=> tookPic(res)}
           onChooseCam={()=> setTakingPhoto(true)}
@@ -280,11 +324,21 @@ export default function BottomBar(props) {
             setDialogOpen(false)
             ui.setPayMode('payment',chat)
           }}
+          onGiphyHandler={onGiphyHandler}
+        />
+        <Giphy
+          open={showGiphyModal}
+          onClose={setShowGiphyModal}
+          gifs={gifs}
+          searchGif={searchGif}
+          setSearchGif={setSearchGif}
+          onSendGifHandler={onSendGifHandler}
+          getGifsBySearch={getGifsBySearch}
         />
       </View>
 
       {takingPhoto && <Portal>
-        <Cam onCancel={()=>setTakingPhoto(false)} 
+        <Cam onCancel={()=>setTakingPhoto(false)}
           onSnap={pic=> tookPic(pic)}
         />
       </Portal>}

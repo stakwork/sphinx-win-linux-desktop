@@ -43,13 +43,21 @@ export default function ImgViewer(props) {
   }
 
   async function sendAttachment(){
+    let type = '';
+    let name = '';
     if(uploading) return
+
+    const isGif = uri.split(/[#?]/)[0].split('.').pop().trim() === 'gif';
 
     setUploading(true)
     inputRef.current.blur()
+    type = showMsgMessage?'text/plain':'image/jpg';
+    name = showMsgMessage?'Message.txt':'Image.jpg';
 
-    const type = showMsgMessage?'text/plain':'image/jpg'
-    const name = showMsgMessage?'Message.txt':'Image.jpg'
+    if (isGif) {
+      type = 'image/gif';
+      name = 'Image.gif';
+    }
 
     // const server = meme.getDefaultServer()
     // console.log("ADFASDF")
@@ -75,12 +83,13 @@ export default function ImgViewer(props) {
     if(!server) return
     if(!(uri || (showMsgMessage&&text))) return
 
-    let enc
+    let enc = null;
     if (showMsgMessage) {
       enc = await e2e.encrypt(text, pwd)
     } else {
       enc = await e2e.encryptFile(uri, pwd)
     }
+
     RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
       Authorization: `Bearer ${server.token}`,
       'Content-Type': 'multipart/form-data'
@@ -108,7 +117,7 @@ export default function ImgViewer(props) {
       setUploading(false)
     })
     .catch((err) => {
-       console.log(err)
+      console.log(err)
     })
   }
 
@@ -171,9 +180,8 @@ export default function ImgViewer(props) {
             onPress={()=> sendAttachment()} disabled={disabled}>
             <Icon name="send" size={17} color="white" />
           </TouchableOpacity>
-        </View> 
+        </View>
       </View>}
-      
     </View>
   )
 }
