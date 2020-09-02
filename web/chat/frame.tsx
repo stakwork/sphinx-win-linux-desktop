@@ -1,16 +1,38 @@
 import React,{useEffect,useState} from 'react'
 import {useStores} from '../../src/store'
 import BridgeModal from '../modals/bridgeModal'
+import {randString} from '../crypto/rand'
 
 const dirname = getDirname()
+
+interface BridgeState {
+  budget?:number
+  pubkey?:string
+}
 
 export default function Frame({url}){
   const [render,setRender] = useState(false)
   const [bridge,setBridge] = useState(null)
+  const [password,setPassword] = useState('')
+  const [savedPubkey,setSavedPubkey] = useState('')
+  const [savedBudget,setSavedBudget] = useState(0)
   const {user,msg,details} = useStores()
   useEffect(()=>{
     setTimeout(()=> setRender(true), 5)
   },[])
+
+  async function webviewSend(args){
+    const webview:any = document.getElementById('frame')
+    const pass:string = await randString(16)
+    if(args.budget || args.budget===0) setSavedBudget(args.budget)
+    if(args.pubkey) setSavedPubkey(args.pubkey)
+    setPassword(pass)
+    webview.send('sphinx-bridge',{
+      application: 'Sphinx',
+      ...args,
+      password:pass
+    })
+  }
 
   useEffect(()=>{
     const webview:any = document.getElementById('frame')
@@ -30,37 +52,53 @@ export default function Frame({url}){
           amt:amt,
           memo: ``
         })
-        webview.send('sphinx-bridge',{
+        webviewSend({
           type: 'KEYSEND',
-          application: 'Sphinx',
           success: true,
         })
       }
       if(data.type==='UPDATED') {
-        webview.send('sphinx-bridge',{
+        webviewSend({
           type: 'UPDATED',
-          application: 'Sphinx',
           success: true,
         })
         details.getBalance()
       }
+      if(data.type==='RELOAD') {
+        const pass = data.password
+        let success = false
+        let budget = 0
+        let pubkey = ''
+        if(pass && pass===password) {
+          success = true
+          budget = savedBudget || 0
+          pubkey = savedPubkey || ''
+        }
+        webviewSend({
+          type: 'RELOAD',
+          success, budget, pubkey
+        })
+      }
+    }
+    function consoleHandle(e){
+      console.log('WEBVIEW:', e.message)
     }
     if(render){
-      webview.addEventListener('console-message', (e) => {
-        console.log('WEBVIEW:', e.message)
-      })
+      webview.addEventListener('console-message',consoleHandle)
       webview.addEventListener('ipc-message', handle)
-      return ()=> webview.removeEventListener('ipc-message', handle)
+      return ()=> {
+        webview.removeEventListener('ipc-message', handle)
+        webview.removeEventListener('console-message',consoleHandle)
+      }
     }  
-  },[render])
+  },[render,password,savedBudget,savedPubkey])
 
   function authorize(amt){
     setBridge(null)
     const webview:any = document.getElementById('frame')
     if(!amt||!user.publicKey) return console.log("missing params")
-    webview.send('sphinx-bridge',{
+    webviewSend({
       type: 'AUTHORIZE',
-      application: 'Sphinx',
       budget: amt,
       pubkey: user.publicKey
     })
