@@ -117,6 +117,8 @@
     "react-audio-player": "^0.13.0",
     "react-dom": "^16.9.0",
     "react-draggable": "^4.4.3",
+    "react-dropzone": "^11.0.3",
+    "react-linkify": "^1.0.0-alpha",
     "react-moment": "^0.9.7",
     "react-native": "^0.62.2",
     "react-native-audio-recorder-player": "^2.5.0",
