@@ -14,6 +14,13 @@ export default function ViewImg({params}){
   </Modal>
 }
 
-const Img = styled.img`
-  height:640px;
+const Img = styled.div`
+  background: url(${p=>p.src});
+  background-attachment: center;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 80%;
+  width: 80%;
+  background-color: black;
 `
