@@ -33,7 +33,7 @@ export default function BottomBar(props) {
   const [recordingStartTime, setRecordingStartTime] = useState(null)
   const [uploading,setUploading] = useState(false)
   const [gifs, setGifs] = useState([])
-  const [searchGif, setSearchGif] = useState('Dogs')
+  const [searchGif, setSearchGif] = useState('Bitcoin')
   const [showGiphyModal, setShowGiphyModal] = useState(false)
 
   const inputRef = useRef(null)
@@ -222,14 +222,12 @@ export default function BottomBar(props) {
         description: 'Gif',
       },
     };
-
     // download to local storage selected gif
     config(options)
       .fetch('GET', gif.images.original.url)
       .then(res => {
         const localDir = `file://${res.data}`;
         const url = gif.images.original.url;
-
         tookPic({ uri: localDir })
       });
   };
