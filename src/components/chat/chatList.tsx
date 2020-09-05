@@ -17,7 +17,7 @@ export default function ChatList() {
   const onRefresh = useCallback(async () => {
     ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
-      ignoreAndroidSystemSettings: true
+      ignoreAndroidSystemSettings: false
     })
     setRefreshing(true)
     await contacts.getContacts()

@@ -11,7 +11,10 @@ import MediaMsg from './mediaMsg'
 import PaymentMessage from './paymentMsg'
 import InvoiceMsg from './invoiceMsg'
 import MoreVertButton from '@material-ui/icons/MoreVert';
+import BotResMsg from './botRes'
+import moment from 'moment'
 
+const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
 
 export default function Msg(props) {
   const isMe = props.sender === 1
@@ -19,6 +22,11 @@ export default function Msg(props) {
   const isGroupNotification = props.type === constants.message_types.group_join || props.type === constants.message_types.group_leave
   if (isGroupNotification) {
     return <GroupNotification {...props} senderAlias={props.senderAlias} />
+  }
+
+  const isDeleted = props.status === constants.statuses.deleted
+  if (isDeleted) {
+    return <DeletedMessage {...props} />
   }
 
   return <MsgRow>
@@ -52,10 +60,41 @@ function Message(props) {
       return <PaymentMessage {...props} />
     case 'direct_payment':
       return <PaymentMessage {...props} />
+    case 'bot_res':
+      return <BotResMsg {...props} />
     default:
       return <></>
   }
 }
+
+function DeletedMessage(props) {
+  const isMe = props.sender === 1
+  return <DeletedMsgRow style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
+    <DeletedInnerBox style={{ justifyContent: isMe ? 'end' : 'start' }}>
+      <Time style={{ alignSelf: isMe ? 'flex-end' : 'flex-start' }}>{moment(props.date).format(timeFormat)}</Time>
+      <span style={{ color: '#7f7f7f', fontSize: 11, fontStyle: "italic" }}>This message has been deleted</span>
+    </DeletedInnerBox>
+  </DeletedMsgRow>
+}
+
+const Time = styled.div`
+  display: flex;
+  font-size:10px;
+  color:grey;
+  margin-bottom: 5px;
+`
+const DeletedInnerBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+  margin-left: 10px;
+`
+
+const DeletedMsgRow = styled.div`
+  display:flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+`
 
 const MsgRow = styled.div`
   min-height:50px;

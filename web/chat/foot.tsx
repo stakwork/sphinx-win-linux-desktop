@@ -156,9 +156,9 @@ export default function Foot({ height }) {
         placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
         disabled={!chat}
         onKeyPress={e => {
-          if (e.key === 'Enter') sendMessage()
+          if (e.key === 'Enter') {e.preventDefault(), sendMessage()}
         }}
-      />
+      ></Input>
       <IconButton style={{
         width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
       }} disabled={!chat || !text} onClick={sendMessage}>
@@ -214,7 +214,8 @@ const Wrap = styled.div`
   position:relative;
   z-index:100;
 `
-const Input = styled.input`
+const Input = styled.textarea`
+  font-family: 'Roboto', sans-serif;
   max-width:calc(100% - 64px);
   width:100%;
   height:42px;
@@ -226,6 +227,10 @@ const Input = styled.input`
   padding-right:24px;
   color:white;
   margin-left:8px;
+  resize: none;
+  white-space: normal;
+  text-align: justify;
+  padding: 10px;
 `
 function useInterval(callback, delay) {
   const savedCallback: any = useRef();

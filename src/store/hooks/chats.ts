@@ -29,6 +29,9 @@ export function useChatRow(id){
 
 function lastMessageText(msg){
   if(!msg) return ''
+  if(msg.type===constants.message_types.bot_res) {
+    return msg.sender_alias ? `${msg.sender_alias} says...` : 'Bot Response'
+  }
   if(msg.amount) {
     const kind = msg.type===constants.message_types.invoice?'Invoice':'Payment'
     if(msg.sender===1) return `${kind} Sent: ${msg.amount} sat`

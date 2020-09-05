@@ -137,7 +137,7 @@ export default function BottomBar(props) {
             stopRecord(null) //cancel
             ReactNativeHapticFeedback.trigger("impactLight", {
               enableVibrateFallback: true,
-              ignoreAndroidSystemSettings: true
+              ignoreAndroidSystemSettings: false
             })
           }
           return null

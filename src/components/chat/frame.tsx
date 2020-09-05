@@ -5,10 +5,14 @@ import { View, ActivityIndicator, StyleSheet, Text, TextInput } from 'react-nati
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Button } from 'react-native-paper'
 import { useStores } from '../../store'
+import {randString} from '../../crypto/rand'
 
 export default function Webview({ url }) {
   const { user, msg, auth } = useStores()
   const [bridge, setBridge] = useState(null)
+  const [password,setPassword] = useState('')
+  const [savedPubkey,setSavedPubkey] = useState('')
+  const [savedBudget,setSavedBudget] = useState(0)
   const ref = useRef(null)
 
   async function onMessage(m) {
@@ -31,15 +35,28 @@ export default function Webview({ url }) {
         })
         postMessage({
           type: 'KEYSEND',
-          application: 'Sphinx',
           success: true,
         })
       }
       if (d.type === 'UPDATED') {
         postMessage({
           type: 'UPDATED',
-          application: 'Sphinx',
           success: true,
+        })
+      }
+      if(data.type==='RELOAD') {
+        const pass = data.password
+        let success = false
+        let budget = 0
+        let pubkey = ''
+        if(pass && pass===password) {
+          success = true
+          budget = savedBudget || 0
+          pubkey = savedPubkey || ''
+        }
+        postMessage({
+          type: 'RELOAD',
+          success, budget, pubkey
         })
       }
     } catch (e) {
@@ -47,9 +64,17 @@ export default function Webview({ url }) {
     }
   }
 
-  function postMessage(obj) {
+  async function postMessage(args) {
     if (ref && ref.current) {
-      ref.current.postMessage(JSON.stringify(obj))
+      const pass:string = await randString(16)
+      setPassword(pass)
+      if(args.budget || args.budget===0) setSavedBudget(args.budget)
+      if(args.pubkey) setSavedPubkey(args.pubkey)
+      ref.current.postMessage(JSON.stringify({
+        ...args,
+        application:'Sphinx',
+        password:pass
+      }))
     }
   }
 
@@ -60,7 +85,6 @@ export default function Webview({ url }) {
     }
     postMessage({
       type: 'AUTHORIZE',
-      application: 'Sphinx',
       budget: parseInt(amt) || 0,
       pubkey: user.publicKey,
       signature: sig,
