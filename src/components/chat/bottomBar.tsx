@@ -33,7 +33,7 @@ export default function BottomBar(props) {
   const [recordingStartTime, setRecordingStartTime] = useState(null)
   const [uploading,setUploading] = useState(false)
   const [gifs, setGifs] = useState([])
-  const [searchGif, setSearchGif] = useState('Bitcoin')
+  const [searchGif, setSearchGif] = useState('Dogs')
   const [showGiphyModal, setShowGiphyModal] = useState(false)
 
   const inputRef = useRef(null)
@@ -210,26 +210,7 @@ export default function BottomBar(props) {
 
   async function onSendGifHandler(gif: any) {
     setShowGiphyModal(false);
-    const { config, fs } = RNFetchBlob;
-    const DownloadDir = fs.dirs.DownloadDir;
-    // configuration to download gif
-    const options = {
-      fileCache: true,
-      addAndroidDownloads: {
-        useDownloadManager: true,
-        notification: true,
-        path: `${DownloadDir}/gif-${Math.floor(new Date().getTime() + new Date().getSeconds() / 2)}.gif`,
-        description: 'Gif',
-      },
-    };
-    // download to local storage selected gif
-    config(options)
-      .fetch('GET', gif.images.original.url)
-      .then(res => {
-        const localDir = `file://${res.data}`;
-        const url = gif.images.original.url;
-        tookPic({ uri: localDir })
-      });
+    tookPic({ uri: gif.images.original.url })
   };
 
   const isConversation = chat.type===conversation

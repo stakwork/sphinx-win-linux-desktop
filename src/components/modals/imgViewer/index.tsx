@@ -87,7 +87,17 @@ export default function ImgViewer(props) {
     if (showMsgMessage) {
       enc = await e2e.encrypt(text, pwd)
     } else {
-      enc = await e2e.encryptFile(uri, pwd)
+      if (!isGif) {
+        enc = await e2e.encryptFile(uri, pwd)
+      }
+      if (isGif) {
+        const { config, fs } = RNFetchBlob;
+        const resp = await config({
+          fileCache: true
+        }).fetch('GET', uri)
+        const base64 = await resp.readFile('base64')
+        enc = await e2e.encryptFileFromBase64(base64, pwd)
+      }
     }
 
     RNFetchBlob.fetch('POST', `https://${server.host}/file`, {

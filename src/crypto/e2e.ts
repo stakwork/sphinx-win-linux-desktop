@@ -50,3 +50,8 @@ export async function encryptFile(filepath:string, pwd:string) {
     return await aes.encryptFile(filepath, pwd)
 }
 
+// encrypt file with symmetric password from base64
+export async function encryptFileFromBase64(b64:string, pwd:string) {
+    return await aes.encryptFromBase64(b64, pwd)
+}
+
