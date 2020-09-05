@@ -36,9 +36,9 @@ export default function PIN(props) {
       setChecking(true)
       return props.onFinish(thePin)
     }
-    ReactNativeHapticFeedback.trigger("impactMedium", {
+    ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
-      ignoreAndroidSystemSettings: true
+      ignoreAndroidSystemSettings: false
     })
     if(mode==='choose') {
       if(chosenPin){

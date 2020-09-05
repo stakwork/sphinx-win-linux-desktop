@@ -125,7 +125,7 @@ function MsgBubble(props) {
           {!isDeleted && <Message {...props} onLongPress={() => {
             ReactNativeHapticFeedback.trigger("impactLight", {
               enableVibrateFallback: true,
-              ignoreAndroidSystemSettings: true
+              ignoreAndroidSystemSettings: false
             })
             openPopover()
           }} />}
