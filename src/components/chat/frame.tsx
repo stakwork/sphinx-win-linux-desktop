@@ -97,6 +97,7 @@ export default function Webview({ url }) {
       authorize={authorize}
     />}
     <WebView ref={ref}
+      userAgent="Sphinx"
       incognito={true}
       nativeConfig={{ props: { webContentsDebuggingEnabled: true } }}
       onMessage={onMessage}
@@ -132,22 +133,25 @@ function LoadingView() {
 function BridgeModal({ params, authorize, onClose }) {
   const [amt, setAmt] = useState('1000')
   const [authorizing, setAuthorizing] = useState(false)
+  const showBudget = params.noBudget?false:true
   return <View style={styles.bridgeModal}>
     <Icon name="shield-check" size={54} color="#6289FD"
       style={{ marginRight: 4, marginLeft: 4 }}
     />
     <Text style={styles.modalText}>Do you want to authorize</Text>
     <Text style={styles.modalURL}>{params.url}</Text>
-    <Text style={styles.modalText}>To withdraw up to</Text>
-    <View style={styles.inputWrap}>
-      <View style={styles.inputInnerWrap}>
-        <TextInput value={amt}
-          onChangeText={t => setAmt(t)}
-          placeholder="Application Budget"
-        />
-        <Text style={styles.modalSats}>sats</Text>
+    {showBudget && <>
+      <Text style={styles.modalText}>To withdraw up to</Text>
+      <View style={styles.inputWrap}>
+        <View style={styles.inputInnerWrap}>
+          <TextInput value={amt}
+            onChangeText={t => setAmt(t)}
+            placeholder="Application Budget"
+          />
+          <Text style={styles.modalSats}>sats</Text>
+        </View>
       </View>
-    </View>
+    </>}
     <View style={styles.modalButtonWrap}>
       <Button labelStyle={{ color: 'grey' }} mode="contained" dark={true} style={{ ...styles.button, backgroundColor: '#ccc' }}
         onPress={onClose}>
@@ -157,7 +161,7 @@ function BridgeModal({ params, authorize, onClose }) {
         onPress={async () => {
           if (authorizing) return
           setAuthorizing(true)
-          await authorize(amt, params.challenge)
+          await authorize(showBudget?amt:0, params.challenge)
           setAuthorizing(false)
         }} loading={authorizing}>
         Yes
