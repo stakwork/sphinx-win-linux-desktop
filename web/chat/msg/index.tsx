@@ -37,6 +37,10 @@ export default function Msg(props) {
       {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
       <BubbleWrap style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
         <Bubble style={{ background: isMe ? theme.highlight : theme.extraDeep }}>
+          {(props.reply_message_content ? true : false) && <ReplyContent
+            reply_message_content={props.reply_message_content}
+            reply_message_sender_alias={props.reply_message_sender_alias}
+          />}
           <Message {...props} />
         </Bubble>
         <MoreVertButton aria-controls="simple-menu" aria-haspopup="true" onClick={e => props.handleClick(e)}
@@ -72,6 +76,13 @@ function DeletedMessage(props) {
       <span style={{ color: '#7f7f7f', fontSize: 11, fontStyle: "italic" }}>This message has been deleted</span>
     </DeletedInnerBox>
   </DeletedMsgRow>
+}
+
+function ReplyContent({ reply_message_content, reply_message_sender_alias }) {
+  return<>
+     <div>{reply_message_sender_alias}</div>
+    <div>{reply_message_content}</div>
+  </>
 }
 
 const Time = styled.div`

@@ -34,6 +34,8 @@ export default function TextMsg(props) {
     </Wrap >
   }
 
+  
+
   const isGiphy = message_content && message_content.startsWith('giphy::')
   if (isGiphy) {
     const { url, aspectRatio } = useParsedGiphyMsg(message_content)
