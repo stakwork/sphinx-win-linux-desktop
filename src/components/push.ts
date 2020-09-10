@@ -5,19 +5,21 @@ export function configure(callback){
     // (optional) Called when Token is generated (iOS and Android)
     onRegister: function (token) {
       // console.log("TOKEN",token)
+      // PushNotification.getChannels(function (channel_ids) {
+      //   console.log("CHAN IDS",channel_ids); // ['channel_id_1']
+      // });
       if(callback) callback(token)
     },
 
     // (required) Called when a remote or local notification is opened or received
     onNotification: function (notification) {
       console.log("NOTIFICATION:", notification);
-      // process the notification
-      notification.data&&notification.data.message && notify(notification.data.message)
-      // notification.finish()
-      if(notification.userInteraction && notification.finish) {
-        notification.finish()
-        PushNotification.setApplicationIconBadgeNumber(0)
-      }
+      notification.finish()
+      // notification.data&&notification.data.message && notify(notification.data.message)
+      // if(notification.userInteraction && notification.finish) {
+      //   notification.finish()
+      //   PushNotification.setApplicationIconBadgeNumber(0)
+      // }
     },
 
     // ANDROID ONLY: FCM Sender ID (product_number) (optional - not required for local notifications, but is need to receive remote push notifications)
@@ -36,11 +38,11 @@ export function configure(callback){
   })
 }
 
-function notify(txt){
-  PushNotification.localNotification({
-    ignoreInForeground: true,
-    message: txt, // (required)
-    playSound: false, // (optional) default: true
-    soundName: "default",
-  })
-}
+// function notify(txt){
+//   PushNotification.localNotification({
+//     ignoreInForeground: true,
+//     message: txt, // (required)
+//     playSound: false, // (optional) default: true
+//     soundName: "default",
+//   })
+// }

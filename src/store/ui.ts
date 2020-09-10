@@ -189,7 +189,7 @@ export class UiStore {
   @observable is24HourFormat: boolean
   @action setIs24HourFormat(b: boolean) {
     this.is24HourFormat = b
-  }b
+  }
 
   @observable replyUUID: string
   @action async setReplyUUID(s) {

@@ -5,10 +5,14 @@ import { View, ActivityIndicator, StyleSheet, Text, TextInput } from 'react-nati
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Button } from 'react-native-paper'
 import { useStores } from '../../store'
+import {randString} from '../../crypto/rand'
 
 export default function Webview({ url }) {
   const { user, msg, auth } = useStores()
   const [bridge, setBridge] = useState(null)
+  const [password,setPassword] = useState('')
+  const [savedPubkey,setSavedPubkey] = useState('')
+  const [savedBudget,setSavedBudget] = useState(0)
   const ref = useRef(null)
 
   async function onMessage(m) {
@@ -31,15 +35,28 @@ export default function Webview({ url }) {
         })
         postMessage({
           type: 'KEYSEND',
-          application: 'Sphinx',
           success: true,
         })
       }
       if (d.type === 'UPDATED') {
         postMessage({
           type: 'UPDATED',
-          application: 'Sphinx',
           success: true,
+        })
+      }
+      if(data.type==='RELOAD') {
+        const pass = data.password
+        let success = false
+        let budget = 0
+        let pubkey = ''
+        if(pass && pass===password) {
+          success = true
+          budget = savedBudget || 0
+          pubkey = savedPubkey || ''
+        }
+        postMessage({
+          type: 'RELOAD',
+          success, budget, pubkey
         })
       }
     } catch (e) {
@@ -47,9 +64,17 @@ export default function Webview({ url }) {
     }
   }
 
-  function postMessage(obj) {
+  async function postMessage(args) {
     if (ref && ref.current) {
-      ref.current.postMessage(JSON.stringify(obj))
+      const pass:string = await randString(16)
+      setPassword(pass)
+      if(args.budget || args.budget===0) setSavedBudget(args.budget)
+      if(args.pubkey) setSavedPubkey(args.pubkey)
+      ref.current.postMessage(JSON.stringify({
+        ...args,
+        application:'Sphinx',
+        password:pass
+      }))
     }
   }
 
@@ -60,7 +85,6 @@ export default function Webview({ url }) {
     }
     postMessage({
       type: 'AUTHORIZE',
-      application: 'Sphinx',
       budget: parseInt(amt) || 0,
       pubkey: user.publicKey,
       signature: sig,
@@ -73,6 +97,7 @@ export default function Webview({ url }) {
       authorize={authorize}
     />}
     <WebView ref={ref}
+      userAgent="Sphinx"
       incognito={true}
       nativeConfig={{ props: { webContentsDebuggingEnabled: true } }}
       onMessage={onMessage}
@@ -108,22 +133,25 @@ function LoadingView() {
 function BridgeModal({ params, authorize, onClose }) {
   const [amt, setAmt] = useState('1000')
   const [authorizing, setAuthorizing] = useState(false)
+  const showBudget = params.noBudget?false:true
   return <View style={styles.bridgeModal}>
     <Icon name="shield-check" size={54} color="#6289FD"
       style={{ marginRight: 4, marginLeft: 4 }}
     />
     <Text style={styles.modalText}>Do you want to authorize</Text>
     <Text style={styles.modalURL}>{params.url}</Text>
-    <Text style={styles.modalText}>To withdraw up to</Text>
-    <View style={styles.inputWrap}>
-      <View style={styles.inputInnerWrap}>
-        <TextInput value={amt}
-          onChangeText={t => setAmt(t)}
-          placeholder="Application Budget"
-        />
-        <Text style={styles.modalSats}>sats</Text>
+    {showBudget && <>
+      <Text style={styles.modalText}>To withdraw up to</Text>
+      <View style={styles.inputWrap}>
+        <View style={styles.inputInnerWrap}>
+          <TextInput value={amt}
+            onChangeText={t => setAmt(t)}
+            placeholder="Application Budget"
+          />
+          <Text style={styles.modalSats}>sats</Text>
+        </View>
       </View>
-    </View>
+    </>}
     <View style={styles.modalButtonWrap}>
       <Button labelStyle={{ color: 'grey' }} mode="contained" dark={true} style={{ ...styles.button, backgroundColor: '#ccc' }}
         onPress={onClose}>
@@ -133,7 +161,7 @@ function BridgeModal({ params, authorize, onClose }) {
         onPress={async () => {
           if (authorizing) return
           setAuthorizing(true)
-          await authorize(amt, params.challenge)
+          await authorize(showBudget?amt:0, params.challenge)
           setAuthorizing(false)
         }} loading={authorizing}>
         Yes

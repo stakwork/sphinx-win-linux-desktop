@@ -77,7 +77,7 @@ export default function Head({height,appMode,setAppMode}){
         </IconButton>
       </Left>}
       <Right>
-        {isTribeOwner && <Btn onClick={()=> ui.toggleBotsChatId(chat.id)}><BotIcon /></Btn>}
+        {false && isTribeOwner && <Btn onClick={()=> ui.toggleBotsChatId(chat.id)}><BotIcon /></Btn>}
         {appURL && <> {appMode ? <ChatIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
           onClick={()=> setAppMode(false)}
         /> : <OpenInBrowserIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}

@@ -125,9 +125,9 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
 }
 
 function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, viewable, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
-  if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
-    return <View style={{ height: 50, width: 1 }} />
-  }
+  // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
+  //   return <View style={{ height: 50, width: 1 }} />
+  // }
   if (m.dateLine) {
     return <DateLine dateString={m.dateLine} />
   }

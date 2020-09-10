@@ -11,6 +11,7 @@ import MediaMsg from './mediaMsg'
 import PaymentMessage from './paymentMsg'
 import InvoiceMsg from './invoiceMsg'
 import MoreVertButton from '@material-ui/icons/MoreVert';
+import BotResMsg from './botRes'
 import moment from 'moment'
 
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
@@ -63,6 +64,8 @@ function Message(props) {
       return <PaymentMessage {...props} />
     case 'direct_payment':
       return <PaymentMessage {...props} />
+    case 'bot_res':
+      return <BotResMsg {...props} />
     default:
       return <></>
   }
