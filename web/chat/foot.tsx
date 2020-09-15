@@ -95,7 +95,7 @@ export default function Foot({ height }) {
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
-    if(ui.botsChatId) {
+    if(ui.showBots) {
       return <></>
     }
     if (recording) {
