@@ -90,6 +90,7 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
     const appURL = ui.applicationURL
 
     useEffect(() => {
+      // console.log('user.currentIP',user.currentIP)
       if (!chat) return
       (async () => {
         setAppMode(true)
@@ -126,8 +127,8 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
         <CircularProgress size={32} style={{ color: 'white' }} />
       </LoadingWrap>
     }
-    if (chat && ui.botsChatId) {
-      return <Bots chat={chat} />
+    if (ui.showBots) {
+      return <Bots />
     }
     return (
 

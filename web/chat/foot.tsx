@@ -98,7 +98,7 @@ export default function Foot({ height }) {
     const msgs = chat && msg.messages[chat.id]
     const replyMsg = msgs && ui.replyUUID && msgs.find(m => m.uuid === ui.replyUUID)
 
-    if (ui.botsChatId) {
+    if(ui.showBots) {
       return <></>
     }
     if (recording) {

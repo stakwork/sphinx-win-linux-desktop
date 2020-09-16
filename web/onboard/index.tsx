@@ -31,6 +31,14 @@ function Onboard(props){
         return
       }
     } catch(e) {}
+
+    const {ip,password} = await user.signupWithCode(text)
+    await sleep(200)
+    if (ip) {
+      const token = await user.generateToken(password||'')
+      if(token) setShowAliasInput(true)
+    }
+    setChecking(false)
   }
 
   // from relay QR code
