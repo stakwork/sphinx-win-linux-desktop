@@ -47,6 +47,7 @@ export interface Msg {
 
   reply_message_content: string
   reply_message_sender_alias: string
+  reply_message_sender: number
 
   temp_uid: string // tempory unique id to mark the sent msg, so once returned it we can fill will all values
 }

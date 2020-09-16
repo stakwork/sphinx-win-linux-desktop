@@ -13,6 +13,7 @@ import InvoiceMsg from './invoiceMsg'
 import MoreVertButton from '@material-ui/icons/MoreVert';
 import BotResMsg from './botRes'
 import moment from 'moment'
+import {useAvatarColor} from '../../../src/store/hooks/msg'
 
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
 
@@ -38,6 +39,13 @@ export default function Msg(props) {
       {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
       <BubbleWrap style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
         <Bubble style={{ background: isMe ? theme.highlight : theme.extraDeep }}>
+          {(props.reply_message_content ? true : false) &&
+            <ReplyContent
+              reply_message_content={props.reply_message_content}
+              reply_message_sender_alias={props.reply_message_sender_alias}
+              reply_message_sender={props.reply_message_sender} 
+              sender = {props.sender}
+            />}
           <Message {...props} />
         </Bubble>
         <MoreVertButton aria-controls="simple-menu" aria-haspopup="true" onClick={e => props.handleClick(e)}
@@ -76,6 +84,32 @@ function DeletedMessage(props) {
     </DeletedInnerBox>
   </DeletedMsgRow>
 }
+
+function ReplyContent({ reply_message_content, reply_message_sender_alias, sender, reply_message_sender }) {
+  const replyMe = reply_message_sender === 1
+  const isMe = sender === 1
+  const color = useAvatarColor(reply_message_sender_alias)
+  return <ReplyWrapper color={color}>
+    <div>{replyMe ? 'You' : reply_message_sender_alias}</div>
+    <ReplyText style={{color: isMe ? "#829cba" : "#535f6e"}}>{reply_message_content}</ReplyText>
+  </ReplyWrapper>
+}
+
+const ReplyText = styled.div`
+    margin-top: 4px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+`
+
+const ReplyWrapper = styled.div`
+  margin: 5px 5px 5px 10px;
+  padding-left: 10px;
+  border-left: 5px solid ${p => p.color};
+  font-size: 14px;
+  width: 100%;
+  max-width: 425px;
+`
 
 const Time = styled.div`
   display: flex;
