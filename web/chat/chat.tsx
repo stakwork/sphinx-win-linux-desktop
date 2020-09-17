@@ -125,7 +125,6 @@ function ChatContent({ appMode, setAppMode }) {
     }
     return (
 
-
       <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
           {({ getRootProps, getInputProps, isDragActive }) => (

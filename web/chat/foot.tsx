@@ -43,7 +43,7 @@ export default function Foot({ height }) {
         contact_id,
         text,
         chat_id: chat.id || null,
-        amount: 0,
+        amount: 0, // 5, // CHANGE THIS
         reply_uuid: ''
       })
       setText('')
