@@ -80,6 +80,7 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
       }
       if(repmsg) msg.reply_message_content = repmsg.message_content
       msg.reply_message_sender_alias = senderAlias
+      if(repmsg) msg.reply_message_sender = repmsg.sender
     }
 
     if(hideTypes.includes(typ)) skip=true
@@ -165,4 +166,25 @@ export function useParsedGiphyMsg(message_content:string){
   } catch(e) {
     return {}
   }
+}
+
+const colorz = ["#FF70E9", "#7077FF", "#DBD23C", "#F57D25", "#9F70FF", "#9BC351", "#FF3D3D", "#C770FF", "#62C784", "#C99966", "#76D6CA", "#ABDB50", "#FF708B", "#5AD7F7", "#5FC455", "#FF9270", "#3FABFF", "#56D978", "#FFBA70", "#5078F2", "#618AFF"]
+
+export function useAvatarColor(s) {
+  const hc = hashCode(s.repeat(Math.round(32 / s.length)))
+  const int = Math.round(Math.abs(
+    hc / 2147483647 * colorz.length
+  ))
+  return colorz[Math.min(int, 20)]
+}
+
+function hashCode(str) {
+  var hash = 0;
+  if (str.length == 0) return hash;
+  for (var i = 0; i < str.length; i++) {
+    var char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash;
 }

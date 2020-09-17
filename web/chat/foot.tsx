@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import theme from '../theme'
-import {constants} from '../../src/constants'
+import { constants } from '../../src/constants'
 import SendIcon from '@material-ui/icons/Send';
 import IconButton from '@material-ui/core/IconButton';
 import BlinkingButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import Check from '@material-ui/icons/Check'
 import Close from '@material-ui/icons/Close'
+import CloseButton from '@material-ui/icons/Close';
 import AddIcon from '@material-ui/icons/Add';
 import { useStores } from '../../src/store'
 import { useObserver } from 'mobx-react-lite'
@@ -94,6 +95,8 @@ export default function Foot({ height }) {
     };
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
+    const msgs = chat && msg.messages[chat.id]
+    const replyMsg = msgs && ui.replyUUID && msgs.find(m => m.uuid === ui.replyUUID)
 
     if(ui.showBots) {
       return <></>
@@ -130,7 +133,12 @@ export default function Foot({ height }) {
     }
 
     return <Wrap style={{ background: theme.bg, height, display: 'flex', alignItems: 'center' }}>
-      <IconButton style={{ pointerEvents: chat && chat.type===constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
+      {replyMsg &&
+        <ReplyMsg style={{ background: 'red' }}>
+          {replyMsg.message_content}
+          <CloseButton onClick={() => ui.setReplyUUID(null)} />
+        </ReplyMsg>}
+      <IconButton style={{ pointerEvents: chat && chat.type === constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
         onClick={() => ui.setSendRequestModal(chat)}>
         <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
       </IconButton>
@@ -156,7 +164,7 @@ export default function Foot({ height }) {
         placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
         disabled={!chat}
         onKeyPress={e => {
-          if (e.key === 'Enter') {e.preventDefault(), sendMessage()}
+          if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
         }}
       ></Input>
       <IconButton style={{
@@ -181,6 +189,10 @@ const Blinker = styled.div`
   from, to { opacity: 1 }
   50% { opacity: 0 }
 }
+`
+const ReplyMsg = styled.div`
+  width: 100%;
+  height: 50px;
 `
 
 const MicWrap = styled.div`
