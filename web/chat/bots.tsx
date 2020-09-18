@@ -36,6 +36,7 @@ export default function Bots(){
   return useObserver(()=>  {
     return <Wrap>
       <H2>SPHINX BOTS</H2>
+      <p>[for developers]</p>
       {!showCreate && <>
         {loading && <CircularProgress style={{color:'white'}} />}
         {!loading && noBots && <Zero>No Bots</Zero>}
@@ -138,6 +139,7 @@ const Wrap = styled.div`
 `
 const H2 = styled.h2`
   color:white;
+  margin-bottom:0;
 `
 const Zero = styled.div`
   color:white;
