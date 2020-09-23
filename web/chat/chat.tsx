@@ -26,22 +26,55 @@ var link = null
 
 const headHeight = 65
 function Chat() {
-  const { ui } = useStores()
+  const { chats, ui } = useStores()
   const [appMode, setAppMode] = useState(true)
+  const [pricePerMessage, setPricePerMessage] = useState(0)
+  const [tribeBots, setTribeBots] = useState([])
   let footHeight = 65
 
   return useObserver(() => {
-    if (ui.replyUUID) footHeight = 115
+    if(ui.replyUUID) footHeight=115
+    const chat = ui.selectedChat
+
+    useEffect(() => {
+      setPricePerMessage(0)
+      setTribeBots([])
+      // console.log('user.currentIP',user.currentIP)
+      if (!chat) return
+      (async () => {
+        setAppMode(true)
+        let isAppURL = false
+        if (chat.type === constants.chat_types.tribe) {
+          ui.setLoadingChat(true)
+          const params = await chats.getTribeDetails(chat.host, chat.uuid)
+          if(params) {
+            setPricePerMessage(params.price_per_message + params.escrow_amount)
+            if (params.app_url) {
+              isAppURL = true
+              ui.setApplicationURL(params.app_url)
+            }
+            if(params.bots && Array.isArray(params.bots)) {
+              setTribeBots(params.bots)
+            }
+            ui.setLoadingChat(false)
+          }
+        }
+        if (!isAppURL) {
+          ui.setApplicationURL('')
+        }
+      })()
+    }, [chat])
+
     return <Section style={{ background: theme.deep }}>
-      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
-      <ChatContent appMode={appMode} setAppMode={setAppMode} footHeight={footHeight} />
-      <Foot height={footHeight} />
-    </Section>
+    <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
+    <ChatContent appMode={appMode} footHeight={footHeight} />
+    <Foot height={footHeight} pricePerMessage={pricePerMessage} tribeBots={tribeBots} />
+  </Section>
   })
 }
 
 
-function ChatContent({ appMode, setAppMode, footHeight }) {
+function ChatContent({ appMode, footHeight }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -90,26 +123,6 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
     const chat = ui.selectedChat
     const appURL = ui.applicationURL
 
-    useEffect(() => {
-      // console.log('user.currentIP',user.currentIP)
-      if (!chat) return
-      (async () => {
-        setAppMode(true)
-        let isAppURL = false
-        if (chat.type === constants.chat_types.tribe) {
-          ui.setLoadingChat(true)
-          const params = await chats.getTribeDetails(chat.host, chat.uuid)
-          if (params && params.app_url) {
-            isAppURL = true
-            ui.setApplicationURL(params.app_url)
-          }
-          ui.setLoadingChat(false)
-        }
-        if (!isAppURL) {
-          ui.setApplicationURL('')
-        }
-      })()
-    }, [chat])
     const link = useHasLink(menuMessage)
 
     async function deleteMessage() {

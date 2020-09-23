@@ -22,6 +22,7 @@ export default function Chat() {
   const [replyUuid, setReplyUUID] = useState('')
   const [loadingChat, setLoadingChat] = useState(false)
   const [appMode, setAppMode] = useState(false)
+  const [tribeBots,setTribeBots] = useState([])
   
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -69,9 +70,12 @@ export default function Chat() {
         setPricePerMessage(params.price_per_message + params.escrow_amount)
         setShowPricePerMessage(true)
         chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
-        if (params.app_url) {
+        if(params.app_url) {
           isAppURL = true
           ui.setApplicationURL(params.app_url)
+        }
+        if(params.bots && Array.isArray(params.bots)) {
+          setTribeBots(params.bots)
         }
       }
       setLoadingChat(false)
@@ -95,6 +99,7 @@ export default function Chat() {
       {theShow && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         replyUuid={replyUuid} setReplyUUID={setReplyUUID}
+        tribeBots={tribeBots}
       />}
       <Snackbar
         visible={showPricePerMessage}

@@ -196,6 +196,14 @@ export class ChatStore {
     try{
       const r = await fetch(`https://${theHost}/tribes/${uuid}`)
       const j = await r.json()
+      if(j.bots) {
+        try {
+          const bots = JSON.parse(j.bots)
+          j.bots = bots
+        } catch(e) {
+          j.bots = []
+        }
+      }
       return j
     } catch(e){
       console.log(e)

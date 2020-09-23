@@ -19,9 +19,9 @@ import Popover from '@material-ui/core/Popover';
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import { uploadFile } from '../utils/meme'
-import TouchRipple from '@material-ui/core/ButtonBase/TouchRipple';
+import {calcBotPrice} from '../../src/store/hooks/chat'
 
-export default function Foot({ height }) {
+export default function Foot({ height, pricePerMessage, tribeBots }) {
   const { ui, msg, meme } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
@@ -40,11 +40,12 @@ export default function Foot({ height }) {
     function sendMessage() {
       if (!text) return
       let contact_id = chat.contact_ids.find(cid => cid !== 1)
+      let botPrice = calcBotPrice(tribeBots,text)
       msg.sendMessage({
         contact_id,
         text,
         chat_id: chat.id || null,
-        amount: 0,
+        amount: (pricePerMessage+botPrice) || 0, // 5, // CHANGE THIS
         reply_uuid: ''
       })
       setText('')

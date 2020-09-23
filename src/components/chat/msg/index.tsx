@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Avatar from './avatar'
 import MemberRequest from './memberRequest'
 import Clipboard from "@react-native-community/clipboard";
+import BotResMsg from './botResMsg'
 
 export default function MsgRow(props) {
   const [showReply, setShowReply] = useState(false)
@@ -182,6 +183,8 @@ function Message(props) {
       return <PaymentMessage {...props} />
     case 'attachment':
       return <TextMsg {...props} />
+    case 'bot_res':
+      return <BotResMsg {...props} />
     default:
       return <></>
   }
