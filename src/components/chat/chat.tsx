@@ -62,7 +62,7 @@ export default function Chat() {
     const isTribe = chat && chat.type === constants.chat_types.tribe
     const isTribeAdmin = isTribe && chat.owner_pubkey === user.publicKey
     let isAppURL = false
-    if (isTribe && !isTribeAdmin) {
+    if (isTribe) { //&& !isTribeAdmin) {
       setAppMode(true)
       setLoadingChat(true)
       const params = await chats.getTribeDetails(chat.host, chat.uuid)

@@ -68,7 +68,9 @@ function Chat() {
     return <Section style={{ background: theme.deep }}>
     <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
     <ChatContent appMode={appMode} footHeight={footHeight} />
-    <Foot height={footHeight} pricePerMessage={pricePerMessage} tribeBots={tribeBots} />
+    <Foot height={footHeight} tribeBots={tribeBots} 
+      pricePerMessage={pricePerMessage}
+    />
   </Section>
   })
 }

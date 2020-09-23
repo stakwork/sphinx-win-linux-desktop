@@ -192,7 +192,7 @@
     "@babel/core": "^7.0.0",
     "@types/lodash": "^4.14.149",
     "@types/react": "^16.9.23",
-    "@types/react-native": "~0.60.23",
+    "@types/react-native": "^0.63.20",
     "babel-jest": "~24.9.0",
     "customize-cra": "^1.0.0",
     "electron": "^9.2.0",

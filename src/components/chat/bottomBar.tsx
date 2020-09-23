@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated } from 'react-native'
+import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated, ToastAndroid } from 'react-native'
 import {IconButton, Portal, ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
@@ -36,12 +36,16 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   function sendMessage(){
     if(!text) return
     let contact_id=chat.contact_ids.find(cid=>cid!==1)
-    const botPrice = calcBotPrice(tribeBots,text)
+    let {price, failureMessage} = calcBotPrice(tribeBots,text)
+    if(failureMessage) {
+      ToastAndroid.showWithGravityAndOffset(failureMessage, ToastAndroid.SHORT, ToastAndroid.TOP, 0, 125)
+      return
+    }
     msg.sendMessage({
       contact_id,
       text,
       chat_id: chat.id||null,
-      amount:(botPrice+pricePerMessage)||0,
+      amount:(price+pricePerMessage)||0,
       reply_uuid:replyUuid||''
     })
     setText('')
