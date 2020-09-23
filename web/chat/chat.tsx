@@ -31,12 +31,12 @@ function Chat() {
   let footHeight = 65
 
   return useObserver(() => {
-    if(ui.replyUUID) footHeight=115
+    if (ui.replyUUID) footHeight = 115
     return <Section style={{ background: theme.deep }}>
-    <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
-    <ChatContent appMode={appMode} setAppMode={setAppMode} footHeight={footHeight} />
-    <Foot height={footHeight} />
-  </Section>
+      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
+      <ChatContent appMode={appMode} setAppMode={setAppMode} footHeight={footHeight} />
+      <Foot height={footHeight} />
+    </Section>
   })
 }
 
@@ -49,6 +49,7 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
   const [menuMessage, setMenuMessage] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [msgCount, setMsgCount] = useState(20)
 
   async function dropzoneUpload(files) {
     const file = files[0]
@@ -130,8 +131,15 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
     if (ui.showBots) {
       return <Bots />
     }
-    return (
 
+    const shownMsgs = msgs.slice(0, msgCount)
+
+    function handleScroll(e) {
+      if (e.target.scrollTop === 0) { 
+        setMsgCount(c => c + 20) }
+    }
+
+    return (
 
       <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
@@ -144,8 +152,9 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
                 </DropZoneInner>
               </DropZoneContainer>}
               <Layer show={!appMode} style={{ background: theme.deep }}>
-                <MsgList className="msg-list">
-                  {msgs.map((m, i) => {
+
+                <MsgList className="msg-list" onScroll={handleScroll}>
+                  {shownMsgs.map((m, i) => {
                     let senderAlias = ''
                     const sender = contacts.contacts.find(c => c.id === m.sender)
                     const senderPhoto = !isTribe && (sender && sender.photo_url) || ''
@@ -177,31 +186,31 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
                       backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep
                     },
                   }}>
-                  <MenuItem onClick={() => { navigator.clipboard.writeText(menuMessage.message_content), handleMenuClose(), onCopy('Text') }} 
-                  style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                  <MenuItem onClick={() => { navigator.clipboard.writeText(menuMessage.message_content), handleMenuClose(), onCopy('Text') }}
+                    style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" style={{ fill: 'white', marginRight: 8 }}>
                       <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                     </svg>Copy Text
             </MenuItem>
                   {link &&
-                    <MenuItem onClick={() => { navigator.clipboard.writeText(link), handleMenuClose(), onCopy('Link') }} 
-                    style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                    <MenuItem onClick={() => { navigator.clipboard.writeText(link), handleMenuClose(), onCopy('Link') }}
+                      style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                       <LinkIcon style={{ fontSize: 'medium', marginRight: 8 }} />Copy Link
-            </MenuItem> }
+            </MenuItem>}
 
 
-                  <MenuItem onClick={() => {ui.setReplyUUID(menuMessage.uuid), handleMenuClose()}} 
-                  style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                  <MenuItem onClick={() => { ui.setReplyUUID(menuMessage.uuid), handleMenuClose() }}
+                    style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                     <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
                   </MenuItem>
 
 
                   {isMe(menuMessage) &&
-                    <MenuItem onClick={deleteMessage} 
-                    style={{ fontSize: 14, color: '#fe5251', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                    <MenuItem onClick={deleteMessage}
+                      style={{ fontSize: 14, color: '#fe5251', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                       <DeleteForeverIcon style={{ color: 'red', fontSize: 'medium', marginRight: 8 }} />
                       {deleting ? 'Deleting...' : 'Delete Message'}
-                    </MenuItem> }
+                    </MenuItem>}
                 </Menu>
               </Layer>
               {appURL && <Layer show={appMode} style={{ background: theme.deep, height: 'calc(100% + 63px)' }}>
@@ -210,7 +219,7 @@ function ChatContent({ appMode, setAppMode, footHeight }) {
             </div>
           )}
         </Dropzone>
-        
+
       </Wrap>
 
 
@@ -226,7 +235,7 @@ function DateLine({ dateString }) {
       {dateString}
     </DateString>
   </DateWrap>
-} 
+}
 
 const DropZoneContainer = styled.div`
   position: absolute;
