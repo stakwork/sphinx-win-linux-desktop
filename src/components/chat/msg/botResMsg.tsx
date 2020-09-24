@@ -5,8 +5,9 @@ import HTML from "react-native-render-html";
 
 export default function TextMsg(props) {
   const { message_content } = props
+  const onLongPressHandler = () => props.onLongPress(props)
   return <TouchableOpacity style={shared.innerPad}
-    onLongPress={() => props.onLongPress(props)}>
+    onLongPress={onLongPressHandler}>
     <HTML html={message_content}
       // imagesMaxWidth={Dimensions.get("window").width}
     />

@@ -52,7 +52,7 @@ export default function Invoice(props) {
     </View>}
     {showPayButton && !isExpired && <View style={{ ...styles.row, marginTop: 12 }}>
       <Button style={styles.payButton} mode="contained" dark={true}
-        onPress={() => openConfirmModal()}
+        onPress={openConfirmModal}
         icon="arrow-top-right">
         Pay
       </Button>

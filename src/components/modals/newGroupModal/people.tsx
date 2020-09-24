@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../../store'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native'
 import { Contact, SelectedContact } from './items'
 
 export default function People(props) {
@@ -37,31 +37,47 @@ export default function People(props) {
   function selectAll() {
     setSelected(contactsToShow.map(c => c.id))
   }
-  return useObserver(() => <>
-    {showSelectedContacts && <ScrollView horizontal={true} style={styles.selContacts}>
-      {initialContactsToShow.map((cts, i) => {
-        return <SelectedContact key={i} contact={cts} onPress={() => { }} removable={false} />
-      })}
-      {selectedContacts.map((sc, i) => {
-        return <SelectedContact key={i} contact={sc} onPress={() => add(sc.id)} removable={true} />
-      })}
-    </ScrollView>}
 
+  /**
+   * renderContactsToShow
+   */
+  const renderContactsToShow: any = ({ item, index }) => (
+    <Contact
+      key={index}
+      contact={item}
+      onPress={() => add(item.id)}
+      selected={selected.includes(item.id)}
+    />
+  )
+
+  const flatListHeader: any = () => (
     <View style={styles.topBar}>
       <Text style={styles.title}>CONTACTS</Text>
-      {noInitials && <TouchableOpacity style={styles.all} onPress={selectAll}>
+      {!noInitials && <TouchableOpacity style={styles.all} onPress={selectAll}>
         <Text style={styles.allText}>SELECT ALL</Text>
       </TouchableOpacity>}
     </View>
+  )
 
-    <ScrollView style={styles.scroller}>
-      {contactsToShow.map((c, i) => {
-        return <Contact key={i} contact={c}
-          onPress={() => add(c.id)}
-          selected={selected.includes(c.id)}
-        />
-      })}
-    </ScrollView>
+  return useObserver(() => <>
+    {showSelectedContacts && (
+      <ScrollView horizontal={true} style={styles.selContacts}>
+        {initialContactsToShow.map((cts, i) => {
+          return <SelectedContact key={i} contact={cts} onPress={() => { }} removable={false} />
+        })}
+        {selectedContacts.map((sc, i) => {
+          return <SelectedContact key={i} contact={sc} onPress={() => add(sc.id)} removable={true} />
+        })}
+      </ScrollView>
+    )}
+
+    <FlatList
+      style={styles.scroller}
+      data={contactsToShow}
+      renderItem={renderContactsToShow}
+      keyExtractor={(item: any) => String(item.id)}
+      ListHeaderComponent={flatListHeader}
+    />
   </>)
 }
 

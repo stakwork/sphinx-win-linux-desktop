@@ -76,11 +76,15 @@ export default function MediaMsg(props) {
   let wrapHeight = minHeight
   if (showPurchaseButton) wrapHeight += 38
 
+  const onButtonPressHandler = () => {
+    if (!purchased) buy(amt)
+  }
+
   return <View collapsable={false}>
     <TouchableOpacity style={{ ...styles.wrap, minHeight: wrapHeight }}
-      //onPressIn={tap} onPressOut={untap} 
+      //onPressIn={tap} onPressOut={untap}
       // onLongPress={()=>longPress()}
-      onPress={() => press()}
+      onPress={press}
       activeOpacity={0.65}>
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
@@ -102,9 +106,7 @@ export default function MediaMsg(props) {
         <Text style={styles.text}>{message_content}</Text>
       </View>}
       {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
-        onPress={() => {
-          if (!purchased) buy(amt)
-        }}
+        onPress={onButtonPressHandler}
         loading={buying}
         icon={purchased ? 'check' : 'arrow-top-right'}>
         <Text style={{ fontSize: 11 }}>

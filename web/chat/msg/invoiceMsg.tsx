@@ -45,7 +45,7 @@ export default function InvoiceMsg(props) {
             <Sat>sat</Sat>
         </Top>
         {hasContent && <Message>{props.message_content}</Message>}
-        {showPayButton && <Button disabled={isExpired} onClick={() => openConfirmModal()}
+        {showPayButton && <Button disabled={isExpired} onClick={openConfirmModal}
             style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', color: 'white', backgroundColor: isExpired ? '#7f7f7f' : '#4AC998', width: '100%', borderRadius: 5, cursor: 'pointer', marginTop: 10 }}
         >
             <div></div><div style={{ marginLeft: 15 }}>{isExpired ? 'Expired' : 'Pay'}</div>

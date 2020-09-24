@@ -85,6 +85,8 @@ export default function Chat() {
     if (!isAppURL) ui.setApplicationURL('') // remove the app_url
   }
 
+  const onDismissHandler = () => setShowPricePerMessage(false)
+
   const appURL = ui.applicationURL
   const theShow = show && !loadingChat
   return <View style={styles.main}>
@@ -104,7 +106,7 @@ export default function Chat() {
       <Snackbar
         visible={showPricePerMessage}
         duration={1000}
-        onDismiss={() => setShowPricePerMessage(false)}>
+        onDismiss={onDismissHandler}>
         {`Price per Message: ${pricePerMessage} sat`}
       </Snackbar>
     </View>
