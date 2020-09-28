@@ -15,8 +15,9 @@ export default function TextMsg(props) {
       style={{ width: 120 * (aspectRatio || 1), height: 120 }} resizeMode={'cover'}
     />
   }
+  const onLongPressHandler = () => props.onLongPress(props)
   return <TouchableOpacity style={isLink ? { width: 280, paddingLeft: 7, minHeight: 72 } : shared.innerPad}
-    onLongPress={() => props.onLongPress(props)}>
+    onLongPress={onLongPressHandler}>
     {isLink ? <RNUrlPreview {...linkStyles}
       text={message_content}
     /> :

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, StyleSheet,ScrollView,Text} from 'react-native'
+import {View, StyleSheet,Text, FlatList} from 'react-native'
 import {ActivityIndicator} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
@@ -27,15 +27,29 @@ export default function PaymentHistory({visible}) {
     })()
   },[visible])
 
+   /**
+   * renderItem component
+   * @param {object} item - item object getting from map payment array
+   * @param {number} index - index of item in the array
+   */
+  const renderItem: any = ({ item, index }: any) => <Payment key={index} {...item} />
+
   return useObserver(() => <ModalWrap onClose={close} visible={visible} noSwipe>
     <View style={styles.wrap}>
       <Header title="Payment History" onClose={close} />
-      <ScrollView style={styles.scroller}>
-        {loading && <View style={styles.loading}>
-          <ActivityIndicator animating={true} color="grey" />  
-        </View>}
-        {!loading && payments && payments.map((invoice,i)=> <Payment key={i} {...invoice} />)}
-      </ScrollView>
+      {!loading && (
+        <FlatList<any>
+          style={styles.scroller}
+          data={payments}
+          renderItem={renderItem}
+          keyExtractor={(item) => String(item.payment_hash)}
+        />
+      )}
+      {loading && (
+        <View style={styles.loading}>
+          <ActivityIndicator animating color="grey" />
+        </View>
+      )}
     </View>
   </ModalWrap>)
 }
@@ -111,8 +125,8 @@ const styles = StyleSheet.create({
     alignItems:'center',
   },
   loading:{
-    display:'flex',
-    alignItems:'center',
+    flexGrow:1,
+    width:'100%',
     justifyContent:'center',
     marginTop:40
   },

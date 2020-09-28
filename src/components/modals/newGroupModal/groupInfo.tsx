@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../../store'
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native'
 import { Portal, IconButton, Button, Dialog } from 'react-native-paper'
 import ModalWrap from '../modalWrap'
 import Header from './header'
@@ -84,6 +84,39 @@ export default function GroupInfo({ visible }) {
   const isTribe = group && group.type === constants.chat_types.tribe
   const isTribeAdmin = isTribe && group.owner_pubkey === user.publicKey
 
+  /**
+   * RenderContact
+   */
+  const renderContact: any = ({ item, index }: any) => {
+    if (isTribeAdmin) {
+      return <DeletableContact key={index} contact={item} onDelete={onKickContact} />
+    }
+    return <Contact key={index} contact={item} unselectable={true} />
+  }
+
+  /**
+   * RenderPendingContactsToShow
+   */
+  const renderPendingContactsToShow: any = ({ item, index }: any) => (
+    <PendingContact
+      key={index}
+      contact={item}
+      onApproveOrDenyMember={onApproveOrDenyMember}
+    />
+  )
+
+  const dotsVerticalHandler = () => {
+    if (isTribeAdmin) setEditDialog(true)
+    else setLeaveDialog(true)
+  }
+
+  const onSetAddPeopleHandler = () => setAddPeople(true)
+  const setLeaveDialogToFalseHandler = () => setLeaveDialog(false)
+  const onExitGroupHandler = () => {
+    if (!loading) exitGroup()
+  }
+  const setEditDialogToFalseHandler = () => setEditDialog(false)
+
   return useObserver(() => {
     const contactsToShow = contacts.contacts.filter(c => {
       return c.id > 1 && group && group.contact_ids.includes(c.id)
@@ -98,8 +131,8 @@ export default function GroupInfo({ visible }) {
       <Portal.Host>
         <Header title={addPeople ? 'Add Contacts' : 'New Group'}
           showNext={addPeople && showSelectedContacts}
-          onClose={() => close()} nextButtonText="Add"
-          next={() => addGroupMembers()} loading={loading}
+          onClose={close} nextButtonText="Add"
+          next={addGroupMembers} loading={loading}
         />
 
         <FadeView opacity={!addPeople ? 1 : 0} style={styles.content}>
@@ -118,41 +151,31 @@ export default function GroupInfo({ visible }) {
             </View>
             <IconButton icon="dots-vertical" size={32} color="#666"
               style={{ marginLeft: 0, marginRight: 0 }}
-              onPress={() => {
-                if (isTribeAdmin) setEditDialog(true)
-                else setLeaveDialog(true)
-              }}
+              onPress={dotsVerticalHandler}
             />
           </View>}
 
           {(!isTribe || isTribeAdmin) && <View style={styles.members}>
             {contactsToShow && contactsToShow.length > 0 && <>
               <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
-              <ScrollView style={styles.scroller}>
-                {contactsToShow.map((c, i) => {
-                  if (isTribeAdmin) {
-                    return <DeletableContact key={i} contact={c}
-                      onDelete={onKickContact}
-                    />
-                  }
-                  return <Contact key={i} contact={c}
-                    unselectable={true}
-                  />
-                })}
-              </ScrollView>
+              <FlatList
+                style={styles.scroller}
+                data={contactsToShow}
+                renderItem={renderContact}
+                keyExtractor={(item) => String(item.id)}
+              />
             </>}
             {isTribeAdmin && pendingContactsToShow.length > 0 && <>
               <Text style={styles.membersTitle}>PENDING GROUP MEMBERS</Text>
-              <ScrollView style={styles.scroller}>
-                {pendingContactsToShow.map((c, i) => {
-                  return <PendingContact key={i} contact={c}
-                    onApproveOrDenyMember={onApproveOrDenyMember}
-                  />
-                })}
-              </ScrollView>
+              <FlatList
+                style={styles.scroller}
+                data={pendingContactsToShow}
+                renderItem={renderPendingContactsToShow}
+                keyExtractor={(item) => String(item.id)}
+              />
             </>}
             {!isTribeAdmin && <Button mode="contained" dark={true} icon="plus"
-              onPress={() => setAddPeople(true)}
+              onPress={onSetAddPeopleHandler}
               style={styles.addPeople}>
               Add People
             </Button>}
@@ -168,15 +191,13 @@ export default function GroupInfo({ visible }) {
 
         <Portal>
           <Dialog visible={leaveDialog} style={{ bottom: 10, zIndex: 99 }}
-            onDismiss={() => setLeaveDialog(false)}>
+            onDismiss={setLeaveDialogToFalseHandler}>
             <Dialog.Title>Exit Group?</Dialog.Title>
             <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-              <Button icon="cancel" onPress={() => setLeaveDialog(false)} color="#888">
+              <Button icon="cancel" onPress={setLeaveDialogToFalseHandler} color="#888">
                 Cancel
               </Button>
-              <Button icon="exit-to-app" onPress={() => {
-                if (!loading) exitGroup()
-              }}
+              <Button icon="exit-to-app" onPress={onExitGroupHandler}
                 loading={loading} color="#DB5554">
                 Exit Group
               </Button>
@@ -186,7 +207,7 @@ export default function GroupInfo({ visible }) {
 
         <Portal>
           <Dialog visible={editDialog} style={{ bottom: 10, zIndex: 99 }}
-            onDismiss={() => setEditDialog(false)}>
+            onDismiss={setEditDialogToFalseHandler}>
             <Dialog.Title>Group Settings</Dialog.Title>
             <Dialog.Actions style={{ justifyContent: 'space-between', flexDirection: 'column', alignItems: 'flex-start', height: 150 }}>
               <Button loading={loadingTribe} icon="pencil" onPress={async () => {
@@ -204,7 +225,7 @@ export default function GroupInfo({ visible }) {
               }}>
                 Share Group
               </Button>
-              <Button icon="cancel" onPress={() => setEditDialog(false)} color="#888">
+              <Button icon="cancel" onPress={setEditDialogToFalseHandler} color="#888">
                 Cancel
               </Button>
             </Dialog.Actions>

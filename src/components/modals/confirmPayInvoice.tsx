@@ -25,15 +25,15 @@ export default function ConfirmPayInvoice({visible}) {
   const amt = ui.confirmInvoiceMsg && ui.confirmInvoiceMsg.amount
   return (
     <Modal isVisible={visible}
-      onSwipeComplete={()=>close()} 
+      onSwipeComplete={close}
       style={{...styles.modal,top:height-200}}
       swipeDirection="down" swipeThreshold={20}>
       <View style={styles.main}>
-        <Header amt={amt} onClose={()=>close()} />
+        <Header amt={amt} onClose={close} />
         <View style={styles.confirmWrap}>
           <Button style={styles.confirm}
             loading={loading}
-            onPress={()=> pay()}
+            onPress={pay}
             mode="contained" dark={true}>
             CONFIRM
           </Button>
@@ -56,7 +56,7 @@ function Header(props){
       color="#DB5554"
       size={22}
       style={{marginRight:32,marginTop:8}}
-      onPress={() => onClose()}
+      onPress={onClose}
     />
   </View>
 }
