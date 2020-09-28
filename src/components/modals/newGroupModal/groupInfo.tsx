@@ -89,7 +89,7 @@ export default function GroupInfo({ visible }) {
       return c.id > 1 && group && group.contact_ids.includes(c.id)
     })
     const pendingContactsToShow = (contacts.contacts.filter(c => {
-      return c.id > 1 && group && group.pending_contact_ids.includes(c.id)
+      return c.id > 1 && group && group.pending_contact_ids && group.pending_contact_ids.includes(c.id)
     })) || []
     const selectedContacts = contacts.contacts.filter(c => selected.includes(c.id))
     const showSelectedContacts = selectedContacts.length > 0

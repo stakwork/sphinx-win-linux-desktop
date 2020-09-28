@@ -32,7 +32,22 @@ function Chat() {
   const [tribeBots, setTribeBots] = useState([])
   let footHeight = 65
 
+  // function joinEvanTest(){
+  //   chats.joinTribe({
+  //     name:'Evan Test',
+  //     uuid:'XyyNsiAM4pbbX4vjtYz2kcFye-h4dd9Nd2twi2Az8gGDQdIbM3HU1WV3XoASXLedCaVpl0YrAvjvBpAPt9ZB0-rpV4Y1',
+  //     group_key:'MIIBCgKCAQEA8oGCKreUM09hDXKDoe3laNZY9fzyNMUUZMt+yC5WhoUIzvW1PtRJ6AWH+xwAK3nD+sUK8LP6y9nNSK1z5SNvFem0fmEq1JBPGEUMlqIA4CUeCbJB7cUan1s4DWDosEQBY/fiQNslNKWko97dEyjGEEi0KJkE2kNTgsmpEPfH4+V886Ei4/NP7qTR/3H4ohC5MlUiXyv/Ah1GuhmAM8Hu57fdVe26AJ1jXFkMikC/+84ysseycoQZmCLDvLd6R0nnQ/LOafV2vCC36HChSzylU7qkFHkdbUg6GXO0nxk6dzGFrJpjppJzhrRxmfrL+9RcsuMXkDAQFUZg8wAipPXmrwIDAQAB',
+  //     host:'tribes.sphinx.chat',
+  //     amount:10,
+  //     img:'',
+  //     owner_alias:'Evan',
+  //     owner_pubkey:'02290714deafd0cb33d2be3b634fc977a98a9c9fa1dd6c53cf17d99b350c08c67b',
+  //     is_private:true,
+  //   })
+  // }
+
   return useObserver(() => {
+    
     if(ui.replyUUID) footHeight=115
     const chat = ui.selectedChat
 
