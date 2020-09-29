@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, hooks } from '../../store'
-import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions } from 'react-native'
+import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native'
 import { Chat } from '../../store/chats'
 import Message from './msg'
 import { useNavigation } from '@react-navigation/native'
@@ -13,6 +13,12 @@ const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: Chat, setReplyUUID, replyUuid }) {
   const { msg, ui, user, chats } = useStores()
+  const [limit, setLimit] = useState(25)
+
+  function onLoadMoreMsgs() {
+    setLimit(c => c + 20)
+  }
+
   async function onDelete(id) {
     await msg.deleteMessage(id)
   }
@@ -25,29 +31,42 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
     await chats.exitGroup(chat.id)
   }
   return useObserver(() => {
-    const msgs = useMsgs(chat) || []
-    return <MsgList msgs={msgs} msgsLength={(msgs && msgs.length) || 0}
-      chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid}
-      onDelete={onDelete} myPubkey={user.publicKey}
+    const msgs = useMsgs(chat, limit) || []
+    return <MsgList
+      msgs={msgs}
+      msgsLength={(msgs && msgs.length) || 0}
+      chat={chat}
+      setReplyUUID={setReplyUUID}
+      replyUuid={replyUuid}
+      onDelete={onDelete}
+      myPubkey={user.publicKey}
       onApproveOrDenyMember={onApproveOrDenyMember}
       onDeleteChat={onDeleteChat}
+      onLoadMoreMsgs={onLoadMoreMsgs}
     />
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat }) {
+function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs }) {
   const scrollViewRef = useRef(null)
   const [viewableIds, setViewableIds] = useState({})
   const { contacts } = useStores()
 
   const [refreshing, setRefreshing] = useState(false)
-  const onRefresh = useCallback(() => {
+  // const onRefresh = useCallback(() => {
+  //   console.log("ON REFRSH")
+  //   setRefreshing(true)
+  //   wait(2000).then(() => setRefreshing(false))
+  // }, [refreshing])
+
+  async function onEndReached() {
     setRefreshing(true)
-    wait(2000).then(() => setRefreshing(false))
-  }, [refreshing])
+    wait(10).then(onLoadMoreMsgs)
+    wait(200).then(() => setRefreshing(false))
+  }
 
   useEffect(() => {
-    setTimeout(() => {
+    const ref = setTimeout(() => {
       if (scrollViewRef && scrollViewRef.current && msgs.length) {
         scrollViewRef.current.scrollToOffset({ offset: 0 })
       }
@@ -57,6 +76,11 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
         scrollViewRef.current.scrollToOffset({ offset: 0 })
       }
     })
+    return () => {
+      clearTimeout(ref)
+      Keyboard.removeListener('keyboardDidShow', () => {})
+      scrollViewRef.current = null;
+    }
   }, [msgsLength])
 
   if (chat.status === constants.chat_statuses.pending) {
@@ -71,7 +95,12 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
   const isTribe = chat.type === tribe
   const initialNumToRender = 9
 
-  return (
+  return (<>
+    {refreshing && <View style={styles.refreshingWrap}>
+      <View style={styles.refreshingCircle}>
+        <ActivityIndicator animating={true} color="grey" size={25} />
+      </View>
+    </View>}
     <VirtualizedList
       inverted
       windowSize={4} // ?
@@ -80,6 +109,8 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
       extraData={replyUuid}
       initialNumToRender={initialNumToRender}
       initialScrollIndex={0}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.1}
       viewabilityConfig={{
         waitForInteraction: false,
         viewAreaCoveragePercentThreshold: 20
@@ -121,7 +152,7 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
       getItem={(data, index) => (data[index])}
       ListHeaderComponent={<View style={{ height: 13 }} />}
     />
-  )
+  </>)
 }
 
 function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, viewable, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
@@ -181,6 +212,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingLeft: 16,
     paddingRight: 16
+  },
+  refreshingWrap:{
+    position:'absolute',
+    zIndex:102,
+    top:55,
+    width:'100%',
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center',
+    height:60
+  },
+  refreshingCircle:{
+    height:42,width:42,
+    borderRadius:25,
+    backgroundColor:'white',
+    borderWidth:1,
+    borderColor:'#ddd',
+    borderStyle:'solid',
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'center',
   }
 })
 
@@ -196,4 +250,8 @@ function debounce(func, delay) {
   const args = arguments
   clearTimeout(inDebounce)
   inDebounce = setTimeout(() => func.apply(context, args), delay)
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }

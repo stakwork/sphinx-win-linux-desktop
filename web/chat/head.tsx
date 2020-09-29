@@ -77,7 +77,6 @@ export default function Head({height,appMode,setAppMode}){
         </IconButton>
       </Left>}
       <Right>
-        {false && isTribeOwner && <Btn onClick={()=> ui.toggleBotsChatId(chat.id)}><BotIcon /></Btn>}
         {appURL && <> {appMode ? <ChatIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
           onClick={()=> setAppMode(false)}
         /> : <OpenInBrowserIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
@@ -87,9 +86,12 @@ export default function Head({height,appMode,setAppMode}){
           <HighlightOffIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
             onClick={()=> {setShowURL(false); clearURL()}}
           /> :
-          <PublicIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
-            onClick={()=> {setShowURL(true); ui.setSelectedChat(null)}}
-          />}
+          <IconzWrap>
+            <PublicIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
+              onClick={()=> {setShowURL(true); ui.setSelectedChat(null)}}
+            />
+            {!chat && <Btn onClick={()=> ui.toggleBots(ui.showBots?false:true)}><BotIcon /></Btn>}
+          </IconzWrap>}
         </>}
       </Right>
     </Wrap>
@@ -143,7 +145,9 @@ const ChatInfo = styled.div`
 const Name = styled.div`
   font-weight:bold;
 `
-const Info = styled.div`
+const IconzWrap = styled.div`
+  display:flex;
+  align-items:center;
 `
 const Left = styled.div`
   display:flex;

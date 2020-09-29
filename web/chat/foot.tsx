@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import theme from '../theme'
-import {constants} from '../../src/constants'
+import { constants } from '../../src/constants'
 import SendIcon from '@material-ui/icons/Send';
 import IconButton from '@material-ui/core/IconButton';
 import BlinkingButton from '@material-ui/core/IconButton';
 import MicIcon from '@material-ui/icons/Mic';
 import Check from '@material-ui/icons/Check'
 import Close from '@material-ui/icons/Close'
+import CloseButton from '@material-ui/icons/Close';
 import AddIcon from '@material-ui/icons/Add';
 import { useStores } from '../../src/store'
 import { useObserver } from 'mobx-react-lite'
@@ -18,9 +19,9 @@ import Popover from '@material-ui/core/Popover';
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import { uploadFile } from '../utils/meme'
-import TouchRipple from '@material-ui/core/ButtonBase/TouchRipple';
+import {calcBotPrice} from '../../src/store/hooks/chat'
 
-export default function Foot({ height }) {
+export default function Foot({ height, pricePerMessage, tribeBots }) {
   const { ui, msg, meme } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
@@ -39,11 +40,15 @@ export default function Foot({ height }) {
     function sendMessage() {
       if (!text) return
       let contact_id = chat.contact_ids.find(cid => cid !== 1)
+      let {price, failureMessage} = calcBotPrice(tribeBots,text)
+      if(failureMessage) {
+        return alert(failureMessage)
+      }
       msg.sendMessage({
         contact_id,
         text,
         chat_id: chat.id || null,
-        amount: 0,
+        amount: (pricePerMessage+price) || 0, // 5, // CHANGE THIS
         reply_uuid: ''
       })
       setText('')
@@ -94,8 +99,10 @@ export default function Foot({ height }) {
     };
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
+    const msgs = chat && msg.messages[chat.id]
+    const replyMsg = msgs && ui.replyUUID && msgs.find(m => m.uuid === ui.replyUUID)
 
-    if(ui.botsChatId) {
+    if(ui.showBots) {
       return <></>
     }
     if (recording) {
@@ -130,7 +137,12 @@ export default function Foot({ height }) {
     }
 
     return <Wrap style={{ background: theme.bg, height, display: 'flex', alignItems: 'center' }}>
-      <IconButton style={{ pointerEvents: chat && chat.type===constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
+      {replyMsg &&
+        <ReplyMsg style={{ background: 'red' }}>
+          {replyMsg.message_content}
+          <CloseButton onClick={() => ui.setReplyUUID(null)} />
+        </ReplyMsg>}
+      <IconButton style={{ pointerEvents: chat && chat.type === constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
         onClick={() => ui.setSendRequestModal(chat)}>
         <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
       </IconButton>
@@ -156,7 +168,7 @@ export default function Foot({ height }) {
         placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
         disabled={!chat}
         onKeyPress={e => {
-          if (e.key === 'Enter') {e.preventDefault(), sendMessage()}
+          if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
         }}
       ></Input>
       <IconButton style={{
@@ -181,6 +193,10 @@ const Blinker = styled.div`
   from, to { opacity: 1 }
   50% { opacity: 0 }
 }
+`
+const ReplyMsg = styled.div`
+  width: 100%;
+  height: 50px;
 `
 
 const MicWrap = styled.div`

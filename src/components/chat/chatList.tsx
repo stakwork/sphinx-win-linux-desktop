@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, hooks } from '../../store'
-import { TouchableOpacity, ScrollView, RefreshControl, View, Text, StyleSheet, Image, Dimensions } from 'react-native'
+import { TouchableOpacity, FlatList, View, Text, StyleSheet, Dimensions } from 'react-native'
 import { Button } from 'react-native-paper'
 import InviteRow, { styles } from './inviteRow'
 import { useNavigation } from '@react-navigation/native'
@@ -12,7 +12,7 @@ const { useChats, useChatRow } = hooks
 
 export default function ChatList() {
   const { ui, contacts, msg, details } = useStores()
-
+  
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async () => {
     ReactNativeHapticFeedback.trigger("impactLight", {
@@ -26,30 +26,49 @@ export default function ChatList() {
     setRefreshing(false)
   }, [refreshing])
 
+  /**
+   * renderItem component
+   * @param {object} item - item object getting from map chatToShow array
+   * @param {number} index - index of item in the array
+   */
+  const renderItem: any = ({ item, index }) => {
+    const chatID = (item.id || rando()) + ''
+    let showInvite = false
+    if (item.invite && item.invite.status !== 4) showInvite = true
+    if (showInvite) return <InviteRow key={`invite_${index}`} {...item} />
+    return <ChatRow key={chatID} {...item} />
+  }
+
+  const setAddFriendModalHandler = () => ui.setAddFriendModal(true)
+  const setNewGroupModalHandler = () => ui.setNewGroupModal(true)
+
+  const footerComponent: any = () => (
+    <View style={moreStyles.buttonsWrap}>
+      <Button mode="contained" dark={true} icon="plus"
+        onPress={setAddFriendModalHandler}
+        style={{ ...moreStyles.button, backgroundColor: '#55D1A9' }}>
+        Friend
+      </Button>
+      <Button mode="contained" dark={true} icon="plus"
+        style={moreStyles.button}
+        onPress={setNewGroupModalHandler}>
+        Group
+      </Button>
+    </View>
+  )
+
   return useObserver(() => {
     const chatsToShow = useChats()
-    return <ScrollView style={{ width: '100%', flex: 1 }}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      {chatsToShow.map((c, i) => {
-        const chatID = (c.id || rando()) + ''
-        let showInvite = false
-        if (c.invite && c.invite.status !== 4) showInvite = true
-        if (showInvite) return <InviteRow key={`invite_${i}`} {...c} />
-        return <ChatRow key={chatID} {...c} />
-      })}
-      <View style={moreStyles.buttonsWrap}>
-        <Button mode="contained" dark={true} icon="plus"
-          onPress={() => ui.setAddFriendModal(true)}
-          style={{ ...moreStyles.button, backgroundColor: '#55D1A9' }}>
-          Friend
-        </Button>
-        <Button mode="contained" dark={true} icon="plus"
-          style={moreStyles.button}
-          onPress={() => ui.setNewGroupModal(true)}>
-          Group
-        </Button>
-      </View>
-    </ScrollView>
+    return <View style={{ width: '100%', flex: 1 }}>
+      <FlatList<any>
+        data={chatsToShow}
+        renderItem={renderItem}
+        keyExtractor={(item) => String(item.id)}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ListFooterComponent={footerComponent}
+      />
+    </View>
   })
 }
 
@@ -57,6 +76,16 @@ function ChatRow(props) {
   const { id, name, contact_ids } = props
   const navigation = useNavigation()
   const { msg, user } = useStores()
+
+  const onSeeChatHandler = () => {
+    setTimeout(()=>{
+      msg.seeChat(props.id)
+      // msg.getMessages()
+      navigation.navigate('Dashboard', {
+        screen: 'Chat', params: props
+      })
+    },1)
+  }
 
   return useObserver(() => {
     let uri = useChatPicSrc(props)
@@ -66,13 +95,7 @@ function ChatRow(props) {
 
     const w = Math.round(Dimensions.get('window').width)
     return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
-      onPress={() => {
-        msg.seeChat(props.id)
-        // msg.getMessages()
-        navigation.navigate('Dashboard', {
-          screen: 'Chat', params: props
-        })
-      }}>
+      onPress={onSeeChatHandler}>
       <View style={styles.avatarWrap}>
         <Avatar big alias={name} photo={uri || ''} />
         {hasUnseen && <View style={moreStyles.badgeWrap}>

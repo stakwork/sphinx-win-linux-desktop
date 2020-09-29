@@ -8,6 +8,7 @@ import { ActivityIndicator, Button } from 'react-native-paper'
 import AudioPlayer from './audioPlayer'
 import { parseLDAT } from '../../utils/ldat'
 import Video from 'react-native-video';
+import FileMsg from './fileMsg'
 
 export default function MediaMsg(props) {
   const { meme, ui, msg } = useStores()
@@ -63,24 +64,34 @@ export default function MediaMsg(props) {
   const showStats = isMe && amt
   const sold = props.sold
 
-  let minHeight = 200
+  let minHeight = 60
   let showPayToUnlockMessage = false
-  if (media_type === 'text/plain') {
+  if (media_type === 'sphinx/text') {
     minHeight = isMe ? 72 : 42
     if (!isMe && !loading && !paidMessageText) showPayToUnlockMessage = true
   }
   if (media_type.startsWith('audio')) {
     minHeight = 50
   }
+  if (media_type.startsWith('image')) {
+    minHeight = 200
+  }
+  if (media_type.startsWith('video')) {
+    minHeight = 200
+  }
 
   let wrapHeight = minHeight
   if (showPurchaseButton) wrapHeight += 38
 
+  const onButtonPressHandler = () => {
+    if (!purchased) buy(amt)
+  }
+
   return <View collapsable={false}>
     <TouchableOpacity style={{ ...styles.wrap, minHeight: wrapHeight }}
-      //onPressIn={tap} onPressOut={untap} 
+      //onPressIn={tap} onPressOut={untap}
       // onLongPress={()=>longPress()}
-      onPress={() => press()}
+      onPress={press}
       activeOpacity={0.65}>
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
@@ -97,14 +108,14 @@ export default function MediaMsg(props) {
           <Text style={styles.payToUnlockMessage}>Pay to unlock message</Text>
         </View>}
       </View>}
-      {hasImgData && <Media type={media_type} data={data} uri={uri} />}
+      {hasImgData && <Media type={media_type} data={data} uri={uri} 
+        filename={meme.filenameCache[props.id]}
+      />}
       {hasContent && <View style={shared.innerPad}>
         <Text style={styles.text}>{message_content}</Text>
       </View>}
       {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
-        onPress={() => {
-          if (!purchased) buy(amt)
-        }}
+        onPress={onButtonPressHandler}
         loading={buying}
         icon={purchased ? 'check' : 'arrow-top-right'}>
         <Text style={{ fontSize: 11 }}>
@@ -115,9 +126,9 @@ export default function MediaMsg(props) {
   </View>
 }
 
-function Media({ type, data, uri }) {
-  // console.log(type,uri)
-  if (type === 'text/plain') return <></>
+function Media({ type, data, uri, filename }) {
+  // console.log("MEDIA:",type,uri)
+  if (type === 'sphinx/text') return <></>
   if (type.startsWith('image')) {
     return <Image style={styles.img} resizeMode='cover' source={{ uri: uri || data }} />
   }
@@ -127,7 +138,7 @@ function Media({ type, data, uri }) {
   if (type.startsWith('video') && uri) {
     return <Video source={{ uri }} style={styles.backgroundVideo} />
   }
-  return <></>
+  return <FileMsg type={type} uri={uri} filename={filename} />
 }
 
 const styles = StyleSheet.create({

@@ -60,6 +60,11 @@ class MemeStore {
     this.cacheTS[muid] = moment().unix()
   }
 
+  @persist('object') @observable filenameCache: {[k:number]:string} = {}
+  @action addToFilenameCache(id:number,name:string){
+    this.filenameCache[id] = name
+  }
+
 }
 
 export const memeStore = new MemeStore()

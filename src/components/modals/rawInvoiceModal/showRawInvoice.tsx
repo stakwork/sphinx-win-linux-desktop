@@ -1,15 +1,19 @@
 import React, {useState} from 'react'
-import {View,Text,StyleSheet,Dimensions} from 'react-native'
-import {Button,Snackbar} from 'react-native-paper'
+import {View,Text,StyleSheet,Dimensions,ToastAndroid} from 'react-native'
+import {Button} from 'react-native-paper'
 import QRCode from '../../utils/qrcode'
 import Share from 'react-native-share'
 import Clipboard from "@react-native-community/clipboard";
 
 export default function ShowRawInvoice({amount,payreq,paid}){
-  const [copied, setCopied] = useState(false)
   function copy(){
     Clipboard.setString(payreq)
-    setCopied(true)
+    ToastAndroid.showWithGravityAndOffset(
+      'Payment Request Copied',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
   }
   async function share(){
     try{
@@ -39,9 +43,6 @@ export default function ShowRawInvoice({amount,payreq,paid}){
         Copy
       </Button>
     </View>
-    <Snackbar visible={copied} onDismiss={()=> setCopied(false)}>
-      Payment Request Copied!
-    </Snackbar>
   </View>
 }
 

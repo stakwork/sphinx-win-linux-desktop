@@ -9,7 +9,8 @@ import ContactList from './contactList'
 
 export default function Contacts() {
   const { ui } = useStores()
-
+  const setAddFriendModalHandler = () => ui.setAddFriendModal(true)
+  const onChangeTextHandler = (txt: string) => ui.setContactsSearchTerm(txt)
   return useObserver(() =>
     <View style={{flex:1}}>
       <Header />
@@ -17,9 +18,7 @@ export default function Contacts() {
         <View style={styles.searchBarWrap}>
           <Searchbar
             placeholder="Search"
-            onChangeText={txt=>{
-              ui.setContactsSearchTerm(txt)
-            }}
+            onChangeText={onChangeTextHandler}
             value={ui.contactsSearchTerm}
             style={{elevation:0,height:38}}
             inputStyle={{color:'#666',fontSize:13}}
@@ -30,7 +29,7 @@ export default function Contacts() {
             icon="account-plus"
             color="#aaa"
             size={20}
-            onPress={() => ui.setAddFriendModal(true)}
+            onPress={setAddFriendModalHandler}
           />
         </View>
       </View>
@@ -41,9 +40,10 @@ export default function Contacts() {
 
 function Header() {
   const navigation = useNavigation()
+  const onGoBackHandler = () => navigation.goBack()
   return (
     <Appbar.Header style={{width:'100%',elevation:0,backgroundColor:'white'}}>
-      <Appbar.BackAction onPress={()=> navigation.goBack()} color="#666" />
+      <Appbar.BackAction onPress={onGoBackHandler} color="#666" />
       <Appbar.Content title="Address Book" />
     </Appbar.Header>
   )

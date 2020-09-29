@@ -17,13 +17,19 @@ export default function TheDrawer(props) {
   const uri = usePicSrc(me)
   const height = Math.round(Dimensions.get('window').height)
   const hasImg = uri?true:false
+  const { navigation: { navigate } } = props
+  const goToDashboardHandler = () => navigate('Dashboard')
+  const goToContactsHandler = () => navigate('Contacts')
+  const goToProfileHandler = () => navigate('Profile')
+  const openAddFriendModalHandler = () => ui.setAddFriendModal(true)
+  const openSupportModalHandler = () => ui.setSupportModal(true)
   return useObserver(() =>
     <DrawerContentScrollView {...props}>
       <View style={{height:height-52,...styles.wrap}}>
         <View style={styles.drawerContent}>
           <View style={styles.userInfoSection}>
             <View style={styles.userName}>
-              <Image resizeMode="cover" 
+              <Image resizeMode="cover"
                 source={hasImg?{uri}:require('../../../android_assets/avatar.png')}
                 style={{width:50,height:50,borderRadius:25}}
               />
@@ -43,25 +49,25 @@ export default function TheDrawer(props) {
               <AntDesign name="message1" color={color} size={size} />
             )}
             label="Dashboard"
-            onPress={() => props.navigation.navigate('Dashboard')}
+            onPress={goToDashboardHandler}
           />
           <DrawerItem style={itemStyle}
             icon={({ color, size }) => (
               <MaterialCommunityIcons name="account-multiple" color={color} size={size} />
             )}
             label="Contacts"
-            onPress={() => props.navigation.navigate('Contacts')}
+            onPress={goToContactsHandler}
           />
           <DrawerItem style={itemStyle}
             icon={({ color, size }) => (
               <MaterialCommunityIcons name="account" color={color} size={size} />
             )}
             label="Profile"
-            onPress={() => props.navigation.navigate('Profile')}
+            onPress={goToProfileHandler}
           />
         </Drawer.Section>
         <Button icon="plus" mode="contained" dark={true}
-          onPress={() => ui.setAddFriendModal(true)}
+          onPress={openAddFriendModalHandler}
           style={{backgroundColor:'#55D1A9',borderRadius:25,width:'60%',height:50,display:'flex',justifyContent:'center',marginLeft:20,marginTop:15}}>
           Add Friend
         </Button>
@@ -72,7 +78,7 @@ export default function TheDrawer(props) {
         </View>
         <View style={styles.supportWrap}>
           <Button style={styles.supportButton} icon="email"
-            onPress={()=>ui.setSupportModal(true)}>
+            onPress={openSupportModalHandler}>
             Support
           </Button>
         </View>

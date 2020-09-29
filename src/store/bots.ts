@@ -28,9 +28,9 @@ class BotStore {
     }
   }
 
-  @action async createBot(chat_id: number, name: string){
+  @action async createBot(name: string, webhook:string){
     const r = await relay.post('bot', {
-      chat_id, name
+      name, webhook
     })
     if(r){
       console.log(r)

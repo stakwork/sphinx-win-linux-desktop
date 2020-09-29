@@ -1,27 +1,16 @@
 import React from 'react'
 import { TouchableOpacity, Text, StyleSheet, Image } from 'react-native'
 import shared from './sharedStyles'
-import RNUrlPreview from 'react-native-url-preview';
-import { useParsedGiphyMsg } from '../../../store/hooks/msg'
+import HTML from "react-native-render-html";
 
 export default function TextMsg(props) {
   const { message_content } = props
-  const isLink = message_content && (message_content.toLowerCase().startsWith('http://') || message_content.toLowerCase().startsWith('https://'))
-
-  const isGiphy = message_content && message_content.startsWith('giphy::')
-  if (isGiphy) {
-    const { url, aspectRatio } = useParsedGiphyMsg(message_content)
-    return <Image source={{ uri: url }}
-      style={{ width: 120 * (aspectRatio || 1), height: 120 }} resizeMode={'cover'}
-    />
-  }
   const onLongPressHandler = () => props.onLongPress(props)
-  return <TouchableOpacity style={isLink ? { width: 280, paddingLeft: 7, minHeight: 72 } : shared.innerPad}
+  return <TouchableOpacity style={shared.innerPad}
     onLongPress={onLongPressHandler}>
-    {isLink ? <RNUrlPreview {...linkStyles}
-      text={message_content}
-    /> :
-      <Text style={styles.text}>{message_content}</Text>}
+    <HTML html={message_content}
+      // imagesMaxWidth={Dimensions.get("window").width}
+    />
   </TouchableOpacity>
 }
 

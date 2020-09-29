@@ -12,11 +12,13 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import { SwipeRow } from 'react-native-swipe-list-view'
 import { IconButton, ActivityIndicator } from 'react-native-paper'
 import ReplyContent from './replyContent'
-import { Popover, PopoverTouchable, PopoverController } from 'react-native-modal-popover';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Avatar from './avatar'
 import MemberRequest from './memberRequest'
 import Clipboard from "@react-native-community/clipboard";
+import BotResMsg from './botResMsg'
+import Popover from 'react-native-popover-view';
+
 
 export default function MsgRow(props) {
   const [showReply, setShowReply] = useState(false)
@@ -54,6 +56,17 @@ export default function MsgRow(props) {
   const isMe = props.sender === 1
   const w = props.windowWidth
   // console.log("RERENDER MESG",props.id)
+
+  const onRowOpenHandler = () => {
+    if (props.setReplyUUID && props.message_content) {
+      props.setReplyUUID(props.uuid)
+      setShowReply(true)
+    }
+  }
+  const onRowCloseHandler = () => {
+    if (props.setReplyUUID) props.setReplyUUID('')
+    setShowReply(false)
+  }
   return <View style={{
     display: 'flex', width: '100%', flexDirection: 'row',
     marginTop: props.showInfoBar ? 20 : 0
@@ -69,16 +82,8 @@ export default function MsgRow(props) {
         disableRightSwipe={true} friction={100}
         disableLeftSwipe={!props.message_content}
         rightOpenValue={-60} stopRightSwipe={-60}
-        onRowOpen={() => {
-          if (props.setReplyUUID && props.message_content) {
-            props.setReplyUUID(props.uuid)
-            setShowReply(true)
-          }
-        }}
-        onRowClose={() => {
-          if (props.setReplyUUID) props.setReplyUUID('')
-          setShowReply(false)
-        }}
+        onRowOpen={onRowOpenHandler}
+        onRowClose={onRowCloseHandler}
       >
         <View style={styles.replyWrap}>
           {showReply && <IconButton icon="reply" size={32} color="#aaa"
@@ -96,6 +101,7 @@ function MsgBubble(props) {
   const isMe = props.sender === 1
   const isInvoice = props.type === constants.message_types.invoice
   const isPaid = props.status === constants.statuses.confirmed
+  const [showPopover, setShowPopover] = useState(false)
 
   let dashed = false
   let backgroundColor = isMe ? 'whitesmoke' : 'white'
@@ -107,62 +113,63 @@ function MsgBubble(props) {
     if (!isMe) borderColor = '#4AC998'
   }
   const isDeleted = props.status === constants.statuses.deleted
-  return <PopoverController>
-    {({ openPopover, closePopover, popoverVisible, setPopoverAnchor, popoverAnchorRect }) => (
-      <>
-        <View ref={setPopoverAnchor} style={{
-          ...sharedStyles.bubble,
-          alignSelf: isMe ? 'flex-end' : 'flex-start',
-          backgroundColor, borderColor,
-          borderStyle: dashed ? 'dashed' : 'solid',
-          overflow: 'hidden',
-        }}>
-          {isDeleted && <DeletedMsg />}
-          {!isDeleted && (props.reply_message_content ? true : false) && <ReplyContent
-            reply_message_content={props.reply_message_content}
-            reply_message_sender_alias={props.reply_message_sender_alias}
-          />}
-          {!isDeleted && <Message {...props} onLongPress={() => {
-            ReactNativeHapticFeedback.trigger("impactLight", {
-              enableVibrateFallback: true,
-              ignoreAndroidSystemSettings: false
-            })
-            openPopover()
-          }} />}
-        </View>
-        <Popover
-          contentStyle={styles.content}
-          arrowStyle={styles.arrow}
-          backgroundStyle={styles.background}
-          visible={popoverVisible}
-          onClose={closePopover}
-          fromRect={popoverAnchorRect}
-          placement="top"
-          supportedOrientations={['portrait', 'landscape']}
-        >
-          <TouchableOpacity onPress={() => {
-            Clipboard.setString(props.message_content || '')
-            closePopover()
-          }}
-            style={{ padding: 6 }}>
+  const onRequestCloseHandler = () => setShowPopover(false)
+  const onLongPressHandler = () => {
+    ReactNativeHapticFeedback.trigger("impactLight", {
+      enableVibrateFallback: true,
+      ignoreAndroidSystemSettings: false
+    })
+    setShowPopover(true)
+  }
+  const onCopyHandler = () => {
+    Clipboard.setString(props.message_content || '')
+    onRequestCloseHandler()
+  }
+  const onDeleteHandler = async () => {
+    if (!deleting) {
+      setDeleting(true)
+      await props.onDelete(props.id)
+      setDeleting(false)
+      onRequestCloseHandler()
+    }
+  }
+
+  return (
+      <Popover
+        isVisible={showPopover}
+        onRequestClose={onRequestCloseHandler}
+        from={(
+          <View
+            style={{
+            ...sharedStyles.bubble,
+            alignSelf: isMe ? 'flex-end' : 'flex-start',
+            backgroundColor, borderColor,
+            borderStyle: dashed ? 'dashed' : 'solid',
+            overflow: 'hidden',
+          }}>
+            {isDeleted && <DeletedMsg />}
+            {!isDeleted && (props.reply_message_content ? true : false) && <ReplyContent
+              reply_message_content={props.reply_message_content}
+              reply_message_sender_alias={props.reply_message_sender_alias}
+            />}
+            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} />}
+          </View>
+        )}
+      >
+          <TouchableOpacity
+            onPress={onCopyHandler}
+            style={{ padding: 10 }}
+          >
             <Text style={{ textAlign: 'center' }}>Copy</Text>
           </TouchableOpacity>
-          {(isMe || props.isTribeOwner) && <TouchableOpacity onPress={async () => {
-            if (!deleting) {
-              setDeleting(true)
-              await props.onDelete(props.id)
-              closePopover()
-              setDeleting(false)
-            }
-          }}
-            style={{ padding: 6, borderTopWidth: 1, borderTopColor: '#ddd', display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
+          {(isMe || props.isTribeOwner) && <TouchableOpacity onPress={onDeleteHandler}
+            style={{ padding: 10, borderTopWidth: 1, borderTopColor: '#ddd', display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
             {deleting && <ActivityIndicator color="#888" size={10} />}
             <Text style={{ textAlign: 'center', marginLeft: 6 }}>Delete</Text>
           </TouchableOpacity>}
-        </Popover>
-      </>
-    )}
-  </PopoverController>
+      </Popover>
+
+  )
 }
 
 // only show "messages"
@@ -182,6 +189,8 @@ function Message(props) {
       return <PaymentMessage {...props} />
     case 'attachment':
       return <TextMsg {...props} />
+    case 'bot_res':
+      return <BotResMsg {...props} />
     default:
       return <></>
   }

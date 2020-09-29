@@ -51,7 +51,7 @@ export default function ImgViewer(props) {
 
     setUploading(true)
     inputRef.current.blur()
-    type = showMsgMessage?'text/plain':'image/jpg';
+    type = showMsgMessage?'sphinx/text':'image/jpg';
     name = showMsgMessage?'Message.txt':'Image.jpg';
 
     if (isGif) {

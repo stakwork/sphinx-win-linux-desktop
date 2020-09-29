@@ -15,6 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ReplyIcon from '@material-ui/icons/Reply';
 import LinkIcon from '@material-ui/icons/Link';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Button from '@material-ui/core/Button';
 import Dropzone from 'react-dropzone'
 import { uploadFile } from '../utils/meme'
 import Bots from './bots'
@@ -26,17 +27,73 @@ var link = null
 var link = null
 
 const headHeight = 65
-const footHeight = 65
 function Chat() {
+  const { chats, ui } = useStores()
   const [appMode, setAppMode] = useState(true)
-  return <Section style={{ background: theme.deep }}>
+  const [pricePerMessage, setPricePerMessage] = useState(0)
+  const [tribeBots, setTribeBots] = useState([])
+  let footHeight = 65
+
+  // function joinEvanTest(){
+  //   chats.joinTribe({
+  //     name:'Evan Test',
+  //     uuid:'XyyNsiAM4pbbX4vjtYz2kcFye-h4dd9Nd2twi2Az8gGDQdIbM3HU1WV3XoASXLedCaVpl0YrAvjvBpAPt9ZB0-rpV4Y1',
+  //     group_key:'MIIBCgKCAQEA8oGCKreUM09hDXKDoe3laNZY9fzyNMUUZMt+yC5WhoUIzvW1PtRJ6AWH+xwAK3nD+sUK8LP6y9nNSK1z5SNvFem0fmEq1JBPGEUMlqIA4CUeCbJB7cUan1s4DWDosEQBY/fiQNslNKWko97dEyjGEEi0KJkE2kNTgsmpEPfH4+V886Ei4/NP7qTR/3H4ohC5MlUiXyv/Ah1GuhmAM8Hu57fdVe26AJ1jXFkMikC/+84ysseycoQZmCLDvLd6R0nnQ/LOafV2vCC36HChSzylU7qkFHkdbUg6GXO0nxk6dzGFrJpjppJzhrRxmfrL+9RcsuMXkDAQFUZg8wAipPXmrwIDAQAB',
+  //     host:'tribes.sphinx.chat',
+  //     amount:10,
+  //     img:'',
+  //     owner_alias:'Evan',
+  //     owner_pubkey:'02290714deafd0cb33d2be3b634fc977a98a9c9fa1dd6c53cf17d99b350c08c67b',
+  //     is_private:true,
+  //   })
+  // }
+
+  return useObserver(() => {
+    
+    if(ui.replyUUID) footHeight=115
+    const chat = ui.selectedChat
+
+    useEffect(() => {
+      setPricePerMessage(0)
+      setTribeBots([])
+      // console.log('user.currentIP',user.currentIP)
+      if (!chat) return
+      (async () => {
+        setAppMode(true)
+        let isAppURL = false
+        if (chat.type === constants.chat_types.tribe) {
+          ui.setLoadingChat(true)
+          const params = await chats.getTribeDetails(chat.host, chat.uuid)
+          if(params) {
+            setPricePerMessage(params.price_per_message + params.escrow_amount)
+            if (params.app_url) {
+              isAppURL = true
+              ui.setApplicationURL(params.app_url)
+            }
+            if(params.bots && Array.isArray(params.bots)) {
+              setTribeBots(params.bots)
+            }
+            ui.setLoadingChat(false)
+          }
+        }
+        if (!isAppURL) {
+          ui.setApplicationURL('')
+        }
+      })()
+    }, [chat])
+
+    return <Section style={{ background: theme.deep }}>
     <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
-    <ChatContent appMode={appMode} setAppMode={setAppMode} />
-    <Foot height={footHeight} />
+    <ChatContent appMode={appMode} footHeight={footHeight} />
+    <Foot height={footHeight} tribeBots={tribeBots} 
+      pricePerMessage={pricePerMessage}
+    />
   </Section>
+  })
 }
 
-function ChatContent({ appMode, setAppMode }) {
+
+function ChatContent({ appMode, footHeight }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -44,6 +101,7 @@ function ChatContent({ appMode, setAppMode }) {
   const [menuMessage, setMenuMessage] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [msgCount, setMsgCount] = useState(20)
 
   async function dropzoneUpload(files) {
     const file = files[0]
@@ -84,29 +142,10 @@ function ChatContent({ appMode, setAppMode }) {
     const chat = ui.selectedChat
     const appURL = ui.applicationURL
 
-    useEffect(() => {
-      if (!chat) return
-      (async () => {
-        setAppMode(true)
-        let isAppURL = false
-        if (chat.type === constants.chat_types.tribe) {
-          ui.setLoadingChat(true)
-          const params = await chats.getTribeDetails(chat.host, chat.uuid)
-          if (params && params.app_url) {
-            isAppURL = true
-            ui.setApplicationURL(params.app_url)
-          }
-          ui.setLoadingChat(false)
-        }
-        if (!isAppURL) {
-          ui.setApplicationURL('')
-        }
-      })()
-    }, [chat])
     const link = useHasLink(menuMessage)
 
-    async function deleteMessage(){
-      if(deleting) return
+    async function deleteMessage() {
+      if (deleting) return
       setDeleting(true)
       await msg.deleteMessage(menuMessage.id)
       setDeleting(false)
@@ -121,11 +160,18 @@ function ChatContent({ appMode, setAppMode }) {
         <CircularProgress size={32} style={{ color: 'white' }} />
       </LoadingWrap>
     }
-    if (chat && ui.botsChatId) {
-      return <Bots chat={chat} />
+    if (ui.showBots) {
+      return <Bots />
     }
-    return (
 
+    const shownMsgs = msgs.slice(0, msgCount)
+
+    function handleScroll(e) {
+      if (e.target.scrollTop === 0) { 
+        setMsgCount(c => c + 20) }
+    }
+
+    return (
 
       <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
@@ -138,8 +184,9 @@ function ChatContent({ appMode, setAppMode }) {
                 </DropZoneInner>
               </DropZoneContainer>}
               <Layer show={!appMode} style={{ background: theme.deep }}>
-                <MsgList className="msg-list">
-                  {msgs.map((m, i) => {
+
+                <MsgList className="msg-list" onScroll={handleScroll}>
+                  {shownMsgs.map((m, i) => {
                     let senderAlias = ''
                     const sender = contacts.contacts.find(c => c.id === m.sender)
                     const senderPhoto = !isTribe && (sender && sender.photo_url) || ''
@@ -157,12 +204,7 @@ function ChatContent({ appMode, setAppMode }) {
                 </MsgList>
                 {alert && <Alert style={{ position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
                 <Menu
-                  id="simple-menu"
-                  anchorEl={anchorEl}
-                  getContentAnchorEl={null}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
+                  id="simple-menu" anchorEl={anchorEl} getContentAnchorEl={null} keepMounted open={Boolean(anchorEl)} onClose={handleMenuClose}
                   anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: isMe(menuMessage) ? 'left' : 'right',
@@ -176,23 +218,31 @@ function ChatContent({ appMode, setAppMode }) {
                       backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep
                     },
                   }}>
-                  <MenuItem onClick={() => { navigator.clipboard.writeText(menuMessage.message_content), handleMenuClose(), onCopy('Text') }} style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                  <MenuItem onClick={() => { navigator.clipboard.writeText(menuMessage.message_content), handleMenuClose(), onCopy('Text') }}
+                    style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" style={{ fill: 'white', marginRight: 8 }}>
                       <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                     </svg>Copy Text
             </MenuItem>
-                  { link ?
-                    <MenuItem onClick={() => { navigator.clipboard.writeText(link), handleMenuClose(), onCopy('Link') }} style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                  {link &&
+                    <MenuItem onClick={() => { navigator.clipboard.writeText(link), handleMenuClose(), onCopy('Link') }}
+                      style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                       <LinkIcon style={{ fontSize: 'medium', marginRight: 8 }} />Copy Link
-            </MenuItem> : <div></div>}
-                  {/* <MenuItem onClick={handleMenuClose} style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
+            </MenuItem>}
+
+
+                  <MenuItem onClick={() => { ui.setReplyUUID(menuMessage.uuid), handleMenuClose() }}
+                    style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                     <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
-                  </MenuItem> */}
-                  {isMe(menuMessage) ?
-                    <MenuItem onClick={deleteMessage} style={{ fontSize: 14, color: '#fe5251', backgroundColor: theme.highlight }}>
+                  </MenuItem>
+
+
+                  {isMe(menuMessage) &&
+                    <MenuItem onClick={deleteMessage}
+                      style={{ fontSize: 14, color: '#fe5251', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                       <DeleteForeverIcon style={{ color: 'red', fontSize: 'medium', marginRight: 8 }} />
-                      {deleting ? 'Deleting...' : 'Delete Message' }
-            </MenuItem> : <div></div>}
+                      {deleting ? 'Deleting...' : 'Delete Message'}
+                    </MenuItem>}
                 </Menu>
               </Layer>
               {appURL && <Layer show={appMode} style={{ background: theme.deep, height: 'calc(100% + 63px)' }}>
@@ -201,6 +251,7 @@ function ChatContent({ appMode, setAppMode }) {
             </div>
           )}
         </Dropzone>
+
       </Wrap>
 
 

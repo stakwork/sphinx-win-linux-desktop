@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native'
-import { Dialog, Portal, Button, Snackbar } from 'react-native-paper'
+import { TouchableOpacity, View, Text, StyleSheet, Image, ToastAndroid } from 'react-native'
+import { Dialog, Portal, Button } from 'react-native-paper'
 import { constantCodes } from '../../constants'
 import { useStores } from '../../store'
 import moment from 'moment'
@@ -11,7 +11,6 @@ export default function InviteRow(props) {
   const { name, invite } = props
   const [dialogOpen, setDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [notEnuff, setNotEnuff] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const statusString = constantCodes['invite_statuses'][invite.status]
 
@@ -28,8 +27,30 @@ export default function InviteRow(props) {
   function doAction() {
     if (actions[statusString]) actions[statusString]()
   }
+  function setDialogOpenToFalseHandler() {
+    setDialogOpen(false)
+  }
+  async function onConfirmHandler() {
+    const balance = details.balance
+    if (balance < invite.price) {
+      ToastAndroid.showWithGravityAndOffset(
+        'Not Enough Balance',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+        0, 125
+      );
+      setDialogOpen(false)
+    } else {
+      setLoading(true)
+      await contacts.payInvite(invite.invite_string)
+      setConfirmed(true)
+      setDialogOpen(false)
+      setLoading(false)
+    }
+  }
+
   return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
-    onPress={() => doAction()}>
+    onPress={doAction}>
     <View style={styles.inviteQR}>
       <Image style={{ height: 40, width: 40 }} source={require('../../../android_assets/invite_qr.png')} />
     </View>
@@ -46,38 +67,20 @@ export default function InviteRow(props) {
 
     <Portal>
       <Dialog visible={dialogOpen} style={{ bottom: 10 }}
-        onDismiss={() => setDialogOpen(false)}>
+        onDismiss={setDialogOpenToFalseHandler}>
         <Dialog.Title>{`Pay for invitation?`}</Dialog.Title>
         <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-          <Button onPress={() => setDialogOpen(false)} labelStyle={{ color: 'grey' }}>
+          <Button onPress={setDialogOpenToFalseHandler} labelStyle={{ color: 'grey' }}>
             <Icon name="cancel" size={14} color="grey" />
             <View style={{ width: 4, height: 6 }}></View>
             <Text>Cancel</Text>
           </Button>
-          <Button icon="credit-card" loading={loading} onPress={async () => {
-            const balance = details.balance
-            if (balance < invite.price) {
-              setNotEnuff(true)
-              setDialogOpen(false)
-            } else {
-              setLoading(true)
-              await contacts.payInvite(invite.invite_string)
-              setConfirmed(true)
-              setDialogOpen(false)
-              setLoading(false)
-            }
-          }}>
+          <Button icon="credit-card" loading={loading} onPress={onConfirmHandler}>
             Confirm
           </Button>
         </Dialog.Actions>
       </Dialog>
 
-      <Snackbar
-        visible={notEnuff}
-        duration={3000}
-        onDismiss={() => setNotEnuff(false)}>
-        Not enough balance
-      </Snackbar>
     </Portal>
 
   </TouchableOpacity>

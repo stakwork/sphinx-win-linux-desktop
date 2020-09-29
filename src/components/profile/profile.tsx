@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
-import { Appbar, Dialog, Button, Portal, ActivityIndicator, Snackbar } from 'react-native-paper'
+import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
 import { Card, Title } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
@@ -25,7 +25,6 @@ export default function Profile() {
   const [takingPhoto, setTakingPhoto] = useState(false)
   const [saving,setSaving] = useState(false)
   const [photo_url, setPhotoUrl] = useState('')
-  const [copied,setCopied] = useState(false)
   const [_,setTapCount] = useState(0)
   const [sharing,setSharing] = useState(false)
   const [showPIN,setShowPIN] = useState(false)
@@ -56,7 +55,12 @@ export default function Profile() {
     const enc = await e2e.encrypt(str,pin)
     const final = btoa(`keys::${enc}`)
     Clipboard.setString(final)
-    setCopied(true)
+    ToastAndroid.showWithGravityAndOffset(
+      'Export Keys Copied',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
     setExporting(false)
   }
 
@@ -182,13 +186,6 @@ export default function Profile() {
           }
         </Text>
       </TouchableOpacity>
-      <Snackbar
-        visible={copied}
-        duration={3000}
-        onDismiss={()=> setCopied(false)}>
-        Export keys copied to clipboard
-      </Snackbar>
-      
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}

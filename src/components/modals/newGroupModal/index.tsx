@@ -21,11 +21,11 @@ export default function NewGroup({ visible }) {
   function close() {
     ui.setNewGroupModal(false)
     ui.setEditTribeParams(null)
-    setTimeout(() => {
-      setNext(false)
-      setMode('')
-      setSelected([])
-    }, 200)
+    // setTimeout(() => {
+    //   setNext(false)
+    //   setMode('')
+    //   setSelected([])
+    // }, 200)
   }
   const contactsToShow = contacts.contacts.filter(c => c.id > 1)
   const selectedContacts = contactsToShow.filter(c => selected.includes(c.id))

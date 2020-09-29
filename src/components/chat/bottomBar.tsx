@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated } from 'react-native'
+import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated, ToastAndroid } from 'react-native'
 import {IconButton, Portal, ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {useStores} from '../../store'
@@ -16,13 +16,13 @@ import * as e2e from '../../crypto/e2e'
 import {randString} from '../../crypto/rand'
 import { fetchGifs } from './helpers'
 import { Giphy } from './components';
+import {calcBotPrice} from '../../store/hooks/chat'
 
 const conversation = constants.chat_types.conversation
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
-export default function BottomBar(props) {
-  const {chat,pricePerMessage} = props
+export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,replyUuid}) {
   const {ui,msg,contacts,meme} = useStores()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
@@ -41,15 +41,20 @@ export default function BottomBar(props) {
   function sendMessage(){
     if(!text) return
     let contact_id=chat.contact_ids.find(cid=>cid!==1)
+    let {price, failureMessage} = calcBotPrice(tribeBots,text)
+    if(failureMessage) {
+      ToastAndroid.showWithGravityAndOffset(failureMessage, ToastAndroid.SHORT, ToastAndroid.TOP, 0, 125)
+      return
+    }
     msg.sendMessage({
       contact_id,
       text,
       chat_id: chat.id||null,
-      amount:pricePerMessage||0,
-      reply_uuid:props.replyUuid||''
+      amount:(price+pricePerMessage)||0,
+      reply_uuid:replyUuid||''
     })
     setText('')
-    props.setReplyUUID('')
+    setReplyUUID('')
     // inputRef.current.blur()
     // setInputFocused(false)
   }
@@ -219,7 +224,7 @@ export default function BottomBar(props) {
 
   let theID = chat&&chat.id
   const thisChatMsgs = theID && msg.messages[theID]
-  const replyMessage = props.replyUuid&&thisChatMsgs&&thisChatMsgs.find(m=>m.uuid===props.replyUuid)
+  const replyMessage = replyUuid&&thisChatMsgs&&thisChatMsgs.find(m=>m.uuid===replyUuid)
   let replyMessageSenderAlias = replyMessage&&replyMessage.sender_alias
   if(!isTribe && !replyMessageSenderAlias && replyMessage && replyMessage.sender){
     const sender = contacts.contacts.find(c=> c.id===replyMessage.sender)
@@ -234,7 +239,7 @@ export default function BottomBar(props) {
         reply_message_content={replyMessage.message_content}
         reply_message_sender_alias={replyMessageSenderAlias}
         extraStyles={{width:'100%',marginTop:inputFocused?0:8,marginBottom:inputFocused?6:0}} 
-        onClose={()=> props.setReplyUUID('')}
+        onClose={()=> setReplyUUID('')}
       />}
       <View style={styles.barInner}>
 

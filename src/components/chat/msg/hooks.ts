@@ -18,7 +18,7 @@ export function useCachedEncryptedFile(props, ldat) {
   const [uri, setURI] = useState('')
   const [loading, setLoading] = useState(false)
   const [paidMessageText, setPaidMessageText] = useState(null)
-  const isPaidMessage = media_type === 'text/plain'
+  const isPaidMessage = media_type === 'sphinx/text'
 
   function dispose() {
     RNFetchBlob.session(sess).dispose().then(() => {
@@ -63,6 +63,17 @@ export function useCachedEncryptedFile(props, ldat) {
           Authorization: `Bearer ${server.token}`,
         })
       console.log('The file saved to ', res.path())
+      
+      const headers = res.info().headers
+      const disp = headers['Content-Disposition']
+      
+      if(disp) {
+        const arr = disp.split('=')
+        if(arr.length===2) {
+          const filename=arr[1]
+          if(filename) meme.addToFilenameCache(id,filename)
+        }
+      }
 
       const path = res.path()
       const status = res.info().status

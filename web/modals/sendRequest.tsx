@@ -57,15 +57,32 @@ export default function SendRequest() {
         return inv
     }
 
+    function sendRequestModalHandler() {
+        ui.setSendRequestModal(null)
+    }
+
+    function onChangeMemoHandler(e: any) {
+        setInputMsg(e.target.value)
+    }
+
+    function onConfirmHandler() {
+        if (mode === 'Request') {
+            sendInvoice(inputAmt, inputMsg)
+        }
+        if (mode !== 'Request') {
+            sendPayment(inputAmt, inputMsg)
+        }
+    }
+
     if (mode) {
         return <Modal
             open={true}
-            onClose={() => ui.setSendRequestModal(null)}
+            onClose={sendRequestModalHandler}
             className="view-img-modal-wrap"
         >
             <RequestContent bg={theme.bg}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontWeight: 'bold' }}>
-                    <ClearRoundedIcon onClick={() => ui.setSendRequestModal(null)} style={{ color: '#4f565d', width: 25, height: 25 }} />
+                    <ClearRoundedIcon onClick={sendRequestModalHandler} style={{ color: '#4f565d', width: 25, height: 25 }} />
                     <div style={{ paddingTop: 5 }}>{mode === 'Request' ? 'REQUEST AMOUNT' : 'SEND PAYMENT'}</div>
                     <div style={{ width: 25, height: 25 }}></div>
                 </div>
@@ -88,10 +105,10 @@ export default function SendRequest() {
                         multiline
                         rowsMax={4}
                         value={inputMsg}
-                        onChange={(e) => { setInputMsg(e.target.value) }}
+                        onChange={onChangeMemoHandler}
                     />
                 </TextInputWrapper>
-                <Button color='primary' loading={loading} onClick={() => mode === 'Request' ? sendInvoice(inputAmt, inputMsg) : sendPayment(inputAmt, inputMsg)}>
+                <Button color='primary' loading={loading} onClick={onConfirmHandler}>
                     CONFIRM
                 </Button>
             </RequestContent>
@@ -99,7 +116,7 @@ export default function SendRequest() {
     }
     return <Modal
         open={true}
-        onClose={() => ui.setSendRequestModal(null)}
+        onClose={sendRequestModalHandler}
         className="view-img-modal-wrap"
     >
         <Content bg={theme.bg}>
@@ -111,7 +128,7 @@ export default function SendRequest() {
                 <CallMadeIcon style={{ color: 'white', marginRight: 25, fontSize: 30 }} />
                 Send
             </RowButton>
-            <Cancel bg={theme.bg} onClick={() => ui.setSendRequestModal(null)}>
+            <Cancel bg={theme.bg} onClick={sendRequestModalHandler}>
                 CANCEL
             </Cancel>
         </Content>
