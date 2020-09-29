@@ -1,9 +1,9 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet} from 'react-native'
+import {View, Text, StyleSheet, ToastAndroid} from 'react-native'
 import Modal from "./modalWrap"
-import { Button, Snackbar } from 'react-native-paper'
+import { Button } from 'react-native-paper'
 import QRCode from '../utils/qrcode'
 import Header from './modalHeader'
 import Share from 'react-native-share'
@@ -11,11 +11,15 @@ import Clipboard from "@react-native-community/clipboard";
 
 export default function ShareTribe({visible}) {
   const { ui, chats } = useStores()
-  const [copied, setCopied] = useState(false)
 
   function copy(){
     Clipboard.setString(uuid)
-    setCopied(true)
+    ToastAndroid.showWithGravityAndOffset(
+      'Tribe QR Copied!',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
   }
   async function share(){
     try{
@@ -49,11 +53,6 @@ export default function ShareTribe({visible}) {
           Copy
         </Button>
       </View>
-      <Snackbar
-        visible={copied}
-        onDismiss={()=> setCopied(false)}>
-        Tribe QR Copied!
-      </Snackbar>
     </Modal>
   )
 }

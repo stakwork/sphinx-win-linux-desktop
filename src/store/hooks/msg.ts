@@ -10,7 +10,7 @@ import * as base64 from 'base-64'
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
-export function useMsgs(chat){
+export function useMsgs(chat, limit?:number){
     const {chats,msg,contacts} = useStores()
     if(!chat) return
     let theID = chat.id
@@ -20,7 +20,10 @@ export function useMsgs(chat){
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
-    const messages = processMsgs(msgs, isTribe, contacts.contacts)
+
+    const shownMsgs = msgs.slice(0, (limit||1000))
+
+    const messages = processMsgs(shownMsgs, isTribe, contacts.contacts)
 
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
@@ -60,7 +63,7 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
       if(ldat&&ldat.muid&&ldat.meta&&ldat.meta.amt) {
         const purchase = msgs.find(m=>{
           const mtype = constantCodes['message_types'][m.type]
-          const start =   (ldat.host)+"."+ldat.muid
+          const start = urlBase64FromAscii(ldat.host)+"."+ldat.muid
           return mtype==='purchase'&&m.media_token.startsWith(start)
         })
         if(purchase) {

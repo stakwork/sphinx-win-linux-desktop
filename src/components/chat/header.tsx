@@ -42,9 +42,11 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
     const name = (chat && chat.name) || (contact && contact.alias)
 
     function onBackHandler() {
-      msg.seeChat(chat.id)
-      details.getBalance()
-      navigation.navigate('Home', { params: { rnd: Math.random() } })
+      setTimeout(()=>{
+        msg.seeChat(chat.id)
+        details.getBalance()
+        navigation.navigate('Home', { params: { rnd: Math.random() } })
+      },1)
     }
 
     function setAppModeHandler() {

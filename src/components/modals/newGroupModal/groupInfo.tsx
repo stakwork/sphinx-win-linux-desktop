@@ -31,10 +31,10 @@ export default function GroupInfo({ visible }) {
 
   function close() {
     ui.closeGroupModal()
-    setTimeout(() => {
-      setSelected([])
-      setLeaveDialog(false)
-    }, 200)
+    // setTimeout(() => {
+    //   setSelected([])
+    //   setLeaveDialog(false)
+    // }, 200)
   }
 
   async function addGroupMembers() {

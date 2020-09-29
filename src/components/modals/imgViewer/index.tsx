@@ -48,7 +48,7 @@ export default function ImgViewer(props) {
     setUploading(true)
     inputRef.current.blur()
 
-    const type = showMsgMessage?'text/plain':'image/jpg'
+    const type = showMsgMessage?'sphinx/text':'image/jpg'
     const name = showMsgMessage?'Message.txt':'Image.jpg'
 
     // const server = meme.getDefaultServer()

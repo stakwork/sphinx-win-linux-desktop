@@ -78,11 +78,13 @@ function ChatRow(props) {
   const { msg, user } = useStores()
 
   const onSeeChatHandler = () => {
-    msg.seeChat(props.id)
-    // msg.getMessages()
-    navigation.navigate('Dashboard', {
-      screen: 'Chat', params: props
-    })
+    setTimeout(()=>{
+      msg.seeChat(props.id)
+      // msg.getMessages()
+      navigation.navigate('Dashboard', {
+        screen: 'Chat', params: props
+      })
+    },1)
   }
 
   return useObserver(() => {

@@ -18,11 +18,11 @@ export default function AddFriend({visible}) {
   const [loading, setLoading] = useState(false)
   function close(){
     ui.setAddFriendModal(false)
-    setTimeout(()=>{
-      setHideButtons(false)
-      setAddContact(false)
-      setInviteNewUser(false)
-    },200)
+    // setTimeout(()=>{
+    //   setHideButtons(false)
+    //   setAddContact(false)
+    //   setInviteNewUser(false)
+    // },200)
   }
   function onNewToSphinxHandler() {
     setHideButtons(true)

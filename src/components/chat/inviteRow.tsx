@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native'
-import { Dialog, Portal, Button, Snackbar } from 'react-native-paper'
+import { TouchableOpacity, View, Text, StyleSheet, Image, ToastAndroid } from 'react-native'
+import { Dialog, Portal, Button } from 'react-native-paper'
 import { constantCodes } from '../../constants'
 import { useStores } from '../../store'
 import moment from 'moment'
@@ -11,7 +11,6 @@ export default function InviteRow(props) {
   const { name, invite } = props
   const [dialogOpen, setDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [notEnuff, setNotEnuff] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const statusString = constantCodes['invite_statuses'][invite.status]
 
@@ -34,7 +33,12 @@ export default function InviteRow(props) {
   async function onConfirmHandler() {
     const balance = details.balance
     if (balance < invite.price) {
-      setNotEnuff(true)
+      ToastAndroid.showWithGravityAndOffset(
+        'Not Enough Balance',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+        0, 125
+      );
       setDialogOpen(false)
     } else {
       setLoading(true)
@@ -44,9 +48,7 @@ export default function InviteRow(props) {
       setLoading(false)
     }
   }
-  function setNotEnuffHandler() {
-    setNotEnuff(false)
-  }
+
   return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
     onPress={doAction}>
     <View style={styles.inviteQR}>
@@ -79,12 +81,6 @@ export default function InviteRow(props) {
         </Dialog.Actions>
       </Dialog>
 
-      <Snackbar
-        visible={notEnuff}
-        duration={3000}
-        onDismiss={setNotEnuffHandler}>
-        Not enough balance
-      </Snackbar>
     </Portal>
 
   </TouchableOpacity>

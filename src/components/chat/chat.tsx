@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, InteractionManager, BackHandler } from 'react-native'
+import { View, StyleSheet, InteractionManager, BackHandler, ToastAndroid } from 'react-native'
 import Header from './header'
 import MsgList from './msgList'
 import BottomBar from './bottomBar'
@@ -9,7 +9,7 @@ import { useStores } from '../../store'
 import { contactForConversation } from './utils'
 import EE from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
-import { ActivityIndicator, Snackbar } from 'react-native-paper'
+import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
 
@@ -18,7 +18,6 @@ export default function Chat() {
 
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
-  const [showPricePerMessage, setShowPricePerMessage] = useState(false)
   const [replyUuid, setReplyUUID] = useState('')
   const [loadingChat, setLoadingChat] = useState(false)
   const [appMode, setAppMode] = useState(false)
@@ -64,11 +63,17 @@ export default function Chat() {
     let isAppURL = false
     if (isTribe) { //&& !isTribeAdmin) {
       setAppMode(true)
-      setLoadingChat(true)
+      // setLoadingChat(true)
       const params = await chats.getTribeDetails(chat.host, chat.uuid)
       if (params) {
-        setPricePerMessage(params.price_per_message + params.escrow_amount)
-        setShowPricePerMessage(true)
+        const price = params.price_per_message + params.escrow_amount
+        setPricePerMessage(price)
+        ToastAndroid.showWithGravityAndOffset(
+          'Price Per Message: '+price+' sat',
+          ToastAndroid.SHORT,
+          ToastAndroid.TOP,
+          0, 125
+        );
         chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
         if(params.app_url) {
           isAppURL = true
@@ -78,14 +83,12 @@ export default function Chat() {
           setTribeBots(params.bots)
         }
       }
-      setLoadingChat(false)
+      // setLoadingChat(false)
     } else {
       setAppMode(false)
     }
     if (!isAppURL) ui.setApplicationURL('') // remove the app_url
   }
-
-  const onDismissHandler = () => setShowPricePerMessage(false)
 
   const appURL = ui.applicationURL
   const theShow = show && !loadingChat
@@ -103,12 +106,6 @@ export default function Chat() {
         replyUuid={replyUuid} setReplyUUID={setReplyUUID}
         tribeBots={tribeBots}
       />}
-      <Snackbar
-        visible={showPricePerMessage}
-        duration={1000}
-        onDismiss={onDismissHandler}>
-        {`Price per Message: ${pricePerMessage} sat`}
-      </Snackbar>
     </View>
   </View>
 }

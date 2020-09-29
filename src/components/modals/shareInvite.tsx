@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, Image, TouchableWithoutFeedback} from 'react-native'
-import {Button, Portal, Snackbar} from 'react-native-paper'
+import {View, Text, StyleSheet, Image, TouchableWithoutFeedback, ToastAndroid} from 'react-native'
+import {Button, Portal} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
 import QRCode from '../utils/qrcode'
@@ -11,14 +11,18 @@ import Clipboard from "@react-native-community/clipboard";
 
 export default function ShareInvite({visible}) {
   const { ui, contacts } = useStores()
-  const [copied, setCopied] = useState(false)
 
   function close(){
     ui.clearShareInviteModal()
   }
  function copy(){
     Clipboard.setString(ui.shareInviteString)
-    setCopied(true)
+    ToastAndroid.showWithGravityAndOffset(
+      'Invite Copied!',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
   }
   async function share(){
     try{
@@ -51,11 +55,6 @@ export default function ShareInvite({visible}) {
             style={styles.shareButton}>
             Share
           </Button>
-          <Snackbar
-            visible={copied}
-            onDismiss={()=> setCopied(false)}>
-              Invite Copied!
-          </Snackbar>
         </View>
       </TouchableWithoutFeedback>
     </Portal.Host>

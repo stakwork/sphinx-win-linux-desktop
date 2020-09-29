@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, TextInput, ScrollView, Clipboard, Linking} from 'react-native'
-import {Button, Portal, ActivityIndicator, Snackbar} from 'react-native-paper'
+import {View, Text, StyleSheet, TextInput, ScrollView, Clipboard, Linking, ToastAndroid} from 'react-native'
+import {Button, Portal, ActivityIndicator} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
 
@@ -10,7 +10,6 @@ export default function Support({visible}) {
   const { ui, details } = useStores()
   const [loading,setLoading] = useState(true)
   const [text,setText] = useState('')
-  const [copied,setCopied] = useState(false)
   function close(){
     ui.setSupportModal(false)
   }
@@ -23,7 +22,12 @@ export default function Support({visible}) {
 
   function copy(){
     Clipboard.setString(details.logs)
-    setCopied(true)
+    ToastAndroid.showWithGravityAndOffset(
+      'Logs Copied',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
   }
 
   function email(){
@@ -73,11 +77,6 @@ export default function Support({visible}) {
           </Button>
         </View>
       </View>
-      <Snackbar
-        visible={copied}
-        onDismiss={()=> setCopied(false)}>
-        Logs Copied
-      </Snackbar>
     </Portal.Host>
   </ModalWrap>)
 }

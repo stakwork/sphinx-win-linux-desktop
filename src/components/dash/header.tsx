@@ -14,10 +14,11 @@ export default function Header() {
   const showStatusHandler = () => {
     const status = ui.connected ? 'Connected node' : 'Disconnected node'
 
-    ToastAndroid.showWithGravity(
+    ToastAndroid.showWithGravityAndOffset(
       status,
       ToastAndroid.SHORT,
-      ToastAndroid.CENTER
+      ToastAndroid.TOP,
+      0, 125
     );
   };
 
