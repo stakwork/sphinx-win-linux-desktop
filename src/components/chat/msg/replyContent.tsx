@@ -4,6 +4,9 @@ import { IconButton } from 'react-native-paper'
 
 export default function ReplyContent(props) {
   const extraStyles = props.extraStyles || {}
+  const onCloseHandler = () => {
+    if (props.onClose) props.onClose()
+  }
   return <View style={{ ...styles.replyMsg, ...extraStyles }}>
     <View style={styles.replyMsgBar} />
     <View style={{ ...styles.replyMsgContent, width: props.showClose ? '85%' : '100%' }}>
@@ -16,9 +19,7 @@ export default function ReplyContent(props) {
     </View>
     {props.showClose && <IconButton icon="close" size={18} color="#666"
       style={{ marginLeft: 6, marginRight: 0 }}
-      onPress={() => {
-        if (props.onClose) props.onClose()
-      }}
+      onPress={onCloseHandler}
     />}
   </View>
 }

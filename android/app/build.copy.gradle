@@ -97,7 +97,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -122,6 +122,9 @@ android {
     }
     buildTypes {
         release {
+            debuggable false
+            shrinkResources true
+            useProguard true
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -167,6 +170,7 @@ dependencies {
     implementation project(':react-native-audio-recorder-player')
     implementation project(':@react-native-community_audio-toolkit')
     implementation project(':@react-native-community_datetimepicker')
+    implementation project(':@react-native-community_clipboard')
     implementation project(':react-native-webview')
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-share')
@@ -186,6 +190,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation 'com.facebook.fresco:animated-gif:2.0.0'
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

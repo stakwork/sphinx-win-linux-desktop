@@ -1,11 +1,8 @@
 import 'react-native-gesture-handler';
-import { AppRegistry, Platform } from 'react-native'
+import { AppRegistry, Platform, LogBox } from 'react-native'
 import App from './App'
-import {YellowBox} from 'react-native';
 
-YellowBox.ignoreWarnings([
-    'Require cycle:',
-]);
+LogBox.ignoreLogs(['Require cycle:'])
 
 // fetch logger
 global._fetch = fetch;

@@ -40,13 +40,20 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
     }
 
     const name = (chat && chat.name) || (contact && contact.alias)
+
+    function onBackHandler() {
+      msg.seeChat(chat.id)
+      details.getBalance()
+      navigation.navigate('Home', { params: { rnd: Math.random() } })
+    }
+
+    function setAppModeHandler() {
+      setAppMode(!appMode)
+    }
+
     return (
       <Appbar.Header style={{ width: '100%', backgroundColor: 'white', elevation: 5, zIndex: 102, position: 'relative' }}>
-        <Appbar.BackAction onPress={() => {
-          msg.seeChat(chat.id)
-          details.getBalance()
-          navigation.navigate('Home', { params: { rnd: Math.random() } })
-        }} />
+        <Appbar.BackAction onPress={onBackHandler} />
         <Appbar.Content title={name} onPress={clickTitle} />
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
         {theChat && <Appbar.Action icon={isMuted ? 'bell-off' : 'bell'}
@@ -54,7 +61,7 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
         />}
         {theChat && theChat.type === tribe && (ui.applicationURL?true:false) && <Appbar.Action color="grey"
           icon={appMode ? 'android-messages' : 'open-in-app'}
-          onPress={() => setAppMode(!appMode)}
+          onPress={setAppModeHandler}
         />}
       </Appbar.Header>
     )

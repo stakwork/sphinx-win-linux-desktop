@@ -24,24 +24,26 @@ export default function AddFriend({visible}) {
       setInviteNewUser(false)
     },200)
   }
+  function onNewToSphinxHandler() {
+    setHideButtons(true)
+    setTimeout(()=> setInviteNewUser(true), 100)
+  }
+  function onAlreadyOnSphinxHandler() {
+    setHideButtons(true)
+    setTimeout(()=> setAddContact(true), 100)
+  }
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>
-      <Header title="Add Friend" onClose={()=>close()} />
+      <Header title="Add Friend" onClose={close} />
 
       <FadeView opacity={hideButtons?0:1} style={styles.content}>
         <Button mode="contained" dark={true}
-          onPress={() => {
-            setHideButtons(true)
-            setTimeout(()=> setInviteNewUser(true), 100)
-          }}
+          onPress={onNewToSphinxHandler}
           style={{backgroundColor:'#55D1A9',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center'}}>
           New to Sphinx
         </Button>
         <Button mode="contained" dark={true}
-          onPress={() => {
-            setHideButtons(true)
-            setTimeout(()=> setAddContact(true), 100)
-          }}
+          onPress={onAlreadyOnSphinxHandler}
           style={{backgroundColor:'#6289FD',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center',marginTop:28}}>
           Already on Sphinx
         </Button>
@@ -62,7 +64,7 @@ export default function AddFriend({visible}) {
       </FadeView>
 
       <FadeView opacity={inviteNewUser?1:0} style={styles.content}>
-        {inviteNewUser && <InviteNewUser done={()=> close()} />}
+        {inviteNewUser && <InviteNewUser done={close} />}
       </FadeView>
 
     </Portal.Host>

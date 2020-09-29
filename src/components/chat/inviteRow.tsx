@@ -28,8 +28,27 @@ export default function InviteRow(props) {
   function doAction() {
     if (actions[statusString]) actions[statusString]()
   }
+  function setDialogOpenToFalseHandler() {
+    setDialogOpen(false)
+  }
+  async function onConfirmHandler() {
+    const balance = details.balance
+    if (balance < invite.price) {
+      setNotEnuff(true)
+      setDialogOpen(false)
+    } else {
+      setLoading(true)
+      await contacts.payInvite(invite.invite_string)
+      setConfirmed(true)
+      setDialogOpen(false)
+      setLoading(false)
+    }
+  }
+  function setNotEnuffHandler() {
+    setNotEnuff(false)
+  }
   return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
-    onPress={() => doAction()}>
+    onPress={doAction}>
     <View style={styles.inviteQR}>
       <Image style={{ height: 40, width: 40 }} source={require('../../../android_assets/invite_qr.png')} />
     </View>
@@ -46,27 +65,15 @@ export default function InviteRow(props) {
 
     <Portal>
       <Dialog visible={dialogOpen} style={{ bottom: 10 }}
-        onDismiss={() => setDialogOpen(false)}>
+        onDismiss={setDialogOpenToFalseHandler}>
         <Dialog.Title>{`Pay for invitation?`}</Dialog.Title>
         <Dialog.Actions style={{ justifyContent: 'space-between' }}>
-          <Button onPress={() => setDialogOpen(false)} labelStyle={{ color: 'grey' }}>
+          <Button onPress={setDialogOpenToFalseHandler} labelStyle={{ color: 'grey' }}>
             <Icon name="cancel" size={14} color="grey" />
             <View style={{ width: 4, height: 6 }}></View>
             <Text>Cancel</Text>
           </Button>
-          <Button icon="credit-card" loading={loading} onPress={async () => {
-            const balance = details.balance
-            if (balance < invite.price) {
-              setNotEnuff(true)
-              setDialogOpen(false)
-            } else {
-              setLoading(true)
-              await contacts.payInvite(invite.invite_string)
-              setConfirmed(true)
-              setDialogOpen(false)
-              setLoading(false)
-            }
-          }}>
+          <Button icon="credit-card" loading={loading} onPress={onConfirmHandler}>
             Confirm
           </Button>
         </Dialog.Actions>
@@ -75,7 +82,7 @@ export default function InviteRow(props) {
       <Snackbar
         visible={notEnuff}
         duration={3000}
-        onDismiss={() => setNotEnuff(false)}>
+        onDismiss={setNotEnuffHandler}>
         Not enough balance
       </Snackbar>
     </Portal>
