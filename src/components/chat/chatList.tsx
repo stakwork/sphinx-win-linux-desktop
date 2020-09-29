@@ -12,7 +12,7 @@ const { useChats, useChatRow } = hooks
 
 export default function ChatList() {
   const { ui, contacts, msg, details } = useStores()
-  const chatsToShow = useChats()
+  
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async () => {
     ReactNativeHapticFeedback.trigger("impactLight", {
@@ -58,6 +58,7 @@ export default function ChatList() {
   )
 
   return useObserver(() => {
+    const chatsToShow = useChats()
     return <View style={{ width: '100%', flex: 1 }}>
       <FlatList<any>
         data={chatsToShow}

@@ -14,8 +14,6 @@ const tribe = constants.chat_types.tribe
 export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: Chat, setReplyUUID, replyUuid }) {
   const { msg, ui, user, chats } = useStores()
 
-  const msgs = useMsgs(chat) || []
-
   async function onDelete(id) {
     await msg.deleteMessage(id)
   }
@@ -28,6 +26,7 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
     await chats.exitGroup(chat.id)
   }
   return useObserver(() => {
+    const msgs = useMsgs(chat) || []
     return <MsgList
       msgs={msgs}
       msgsLength={(msgs && msgs.length) || 0}
@@ -83,6 +82,8 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
   const isTribe = chat.type === tribe
   const initialNumToRender = 9
 
+  console.log('===========================')
+  console.log(msgs.length)
   return (
     <VirtualizedList
       inverted
