@@ -24,6 +24,8 @@ const { useMsgs } = hooks
 
 var link = null
 
+var link = null
+
 const headHeight = 65
 function Chat() {
   const { chats, ui } = useStores()
