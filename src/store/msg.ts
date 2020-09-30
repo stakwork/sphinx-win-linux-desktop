@@ -105,16 +105,6 @@ class MsgStore {
     }
   }
 
-  @action // only if it contains a "chat"
-  async gotNewMessage(m) {
-    let newMsg = await decodeSingle(m)
-    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
-    if(chatID){
-      putIn(this.messages, newMsg, chatID)
-      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
-    }
-  }
-
   async messagePosted(m) {
     let newMsg = await decodeSingle(m)
     if(newMsg.chat && newMsg.chat.id){
@@ -327,6 +317,36 @@ class MsgStore {
     }
   }
 
+  @action // only if it contains a "chat"
+  async gotNewMessage(m) {
+    let newMsg = await decodeSingle(m)
+    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    if(chatID){
+      putIn(this.messages, newMsg, chatID)
+      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
+    }
+  }
+
+  @action // only if it contains a "chat"
+  async gotNewMessageFromWS(m) {
+    let newMsg = await decodeSingle(m)
+    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    if(chatID){
+      msgsBuffer.push(newMsg)
+      debounce(() => {
+        this.concatNewMsgs()
+      }, 1000)
+      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
+    }
+  }
+
+  @action concatNewMsgs() {
+    const msgs = JSON.parse(JSON.stringify(msgsBuffer))
+    msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
+    this.messages = orgMsgsFromExisting(this.messages, msgs)
+    msgsBuffer = []
+  }
+
 }
 
 async function encryptText({contact_id, text}) {
@@ -434,3 +454,13 @@ export const msgStore = new MsgStore()
 function rando(){
   return Math.random().toString(12).substring(0)
 }
+
+let inDebounce
+function debounce(func, delay) {
+  const context = this
+  const args = arguments
+  clearTimeout(inDebounce)
+  inDebounce = setTimeout(() => func.apply(context, args), delay)
+}
+
+let msgsBuffer = []
