@@ -21,7 +21,7 @@ export function useMsgs(chat, limit?:number){
     }
     const msgs = msg.messages[theID]
 
-    const shownMsgs = msgs.slice(0, (limit||1000))
+    const shownMsgs = msgs && msgs.slice(0, (limit||1000))
 
     const messages = processMsgs(shownMsgs, isTribe, contacts.contacts)
 

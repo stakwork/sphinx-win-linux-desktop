@@ -202,10 +202,14 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   }
 
   async function onGiphyHandler() {
-    const gifs = await fetchGifs(searchGif);
-    if (gifs.meta.status === 200) setGifs(gifs.data);
-    setDialogOpen(false);
-    setShowGiphyModal(true);
+    try {
+      const gifs = await fetchGifs(searchGif);
+      if (gifs.meta.status === 200) setGifs(gifs.data);
+      setDialogOpen(false);
+      setShowGiphyModal(true);
+    } catch(e) {
+      console.warn(e)
+    }
   }
 
   async function getGifsBySearch() {

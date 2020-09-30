@@ -63,7 +63,7 @@ function App() {
 
   useEffect(()=>{
     (async () => {
-      console.log("USER",user.currentIP)
+      console.log("=> USER",user)
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){

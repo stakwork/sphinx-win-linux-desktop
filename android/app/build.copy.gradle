@@ -97,7 +97,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = true
+def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -122,11 +122,9 @@ android {
     }
     buildTypes {
         release {
-            debuggable false
-            shrinkResources true
-            useProguard true
+            debuggable true
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            consumerProguardFiles 'proguard-rules.pro'
         }
     }
     // applicationVariants are e.g. debug, release

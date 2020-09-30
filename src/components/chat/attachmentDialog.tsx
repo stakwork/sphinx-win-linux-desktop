@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useState} from 'react'
+import {Text, ActivityIndicator} from 'react-native'
 import { Portal, Button, Dialog } from 'react-native-paper'
 import ImagePicker from 'react-native-image-picker'
 
@@ -13,6 +14,9 @@ export default function AttachmentDialog({
     isConversation,
     onGiphyHandler,
   }) {
+
+  const [fetchingGifs,setFetchingGifs] = useState(false)
+
   async function pickImage() {
     ImagePicker.launchImageLibrary({}, result => {
       if (!result.didCancel) {
@@ -29,6 +33,11 @@ export default function AttachmentDialog({
   const doPaidMessageHandler = () => doPaidMessage()
   const requestHandler = () => request()
   const sendHandler = () => send()
+  const pickGif = async () => {
+    setFetchingGifs(true)
+    await onGiphyHandler()
+    setFetchingGifs(false)
+  }
 
   return <Portal>
     <Dialog visible={open} style={{ bottom: 10 }}
@@ -45,7 +54,8 @@ export default function AttachmentDialog({
         <Button icon="image" onPress={pickImageHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
           Photo Library
         </Button>
-        <Button icon="gif" onPress={onGiphyHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="gif" onPress={pickGif} style={{ width: '100%', alignItems: 'flex-start' }}
+          loading={fetchingGifs}>
           Gif
         </Button>
         <Button icon="message" onPress={doPaidMessageHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
