@@ -33,6 +33,7 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
   return useObserver(() => {
     const msgs = useMsgs(chat, limit) || []
     return <MsgList
+      lastUpdated={msg.lastUpdated}
       msgs={msgs}
       msgsLength={(msgs && msgs.length) || 0}
       chat={chat}
@@ -47,7 +48,7 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs }) {
+function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, lastUpdated }) {
   const scrollViewRef = useRef(null)
   const [viewableIds, setViewableIds] = useState({})
   const { contacts } = useStores()
@@ -103,7 +104,7 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
     </View>}
     <VirtualizedList
       inverted
-      windowSize={4} // ?
+      windowSize={8} // ?
       ref={scrollViewRef}
       data={msgs}
       extraData={replyUuid}
@@ -170,7 +171,7 @@ function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, viewable
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
     onDelete={onDelete} myPubkey={myPubkey} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
-  />, [viewable, m.id, m.type, m.media_token, replyUuid, m.status])
+  />, [viewable, m.id, m.type, m.media_token, replyUuid, m.status, m.sold])
 }
 
 function DateLine({ dateString }) {

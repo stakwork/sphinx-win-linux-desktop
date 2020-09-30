@@ -55,6 +55,10 @@ export default function Chat() {
 
     fetchTribeParams()
 
+    return () => {
+      ui.setApplicationURL('')
+    }
+
   }, [])
 
   async function fetchTribeParams() {

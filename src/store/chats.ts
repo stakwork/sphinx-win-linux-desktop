@@ -142,6 +142,25 @@ export class ChatStore {
   }
 
   @action
+  async joinDefaultTribe() {
+    const params = await this.getTribeDetails(
+      'tribes.sphinx.chat',
+      'X3IWAiAW5vNrtOX5TLEJzqNWWr3rrUaXUwaqsfUXRMGNF7IWOHroTGbD4Gn2_rFuRZcsER0tZkrLw3sMnzj4RFAk_sx0'
+    )
+    await this.joinTribe({
+      name: params.name,
+      group_key: params.group_key,
+      owner_alias: params.owner_alias,
+      owner_pubkey: params.owner_pubkey,
+      host: params.host || 'tribes.sphinx.chat',
+      uuid: params.uuid,
+      img: params.img,
+      amount:params.price_to_join||0,
+      is_private:params.private
+    })
+  }
+
+  @action
   async addGroupMembers(chatID: number, contact_ids: number[]) {
     await relay.put(`chat/${chatID}`, {
       contact_ids

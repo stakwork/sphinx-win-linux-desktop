@@ -59,11 +59,18 @@ export default function ChatList() {
 
   return useObserver(() => {
     const chatsToShow = useChats()
+    console.log("=> chatsToShow.length",chatsToShow.length)
     return <View style={{ width: '100%', flex: 1 }}>
       <FlatList<any>
         data={chatsToShow}
         renderItem={renderItem}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => {
+          if(!item.id) {
+            const contact_id = item.contact_ids.find(id=>id!==1)
+            return 'contact_'+String(contact_id)
+          }
+          return String(item.id)
+        }}
         refreshing={refreshing}
         onRefresh={onRefresh}
         ListFooterComponent={footerComponent}

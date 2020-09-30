@@ -2,6 +2,7 @@ import { observable, action } from 'mobx'
 import * as api from '../api'
 import {randString} from '../crypto/rand'
 import { persist } from 'mobx-persist'
+import {uiStore} from './ui'
 
 class UserStore {
 
@@ -54,7 +55,12 @@ class UserStore {
     const token = arr[3]
     this.setCurrentIP(ip)
     this.setAuthToken(token)
-    api.instantiateRelay(ip, token)
+    console.log("RESTORE NOW!")
+    api.instantiateRelay(ip, token, 
+      ()=>uiStore.setConnected(true),
+      ()=>uiStore.setConnected(false),
+    )
+    await sleep(650)
     return priv
   }
 
@@ -116,7 +122,10 @@ class UserStore {
         token
       })
       this.authToken = token
-      api.instantiateRelay(this.currentIP, token)
+      api.instantiateRelay(this.currentIP, token,
+        ()=>uiStore.setConnected(true),
+        ()=>uiStore.setConnected(false),  
+      )
       return token
     } catch(e) {
       console.log(e)

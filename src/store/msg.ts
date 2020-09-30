@@ -63,6 +63,9 @@ class MsgStore {
   @persist @observable
   lastFetched: number
 
+  @persist @observable
+  lastUpdated: number
+
   @action clearAllMessages(){
     this.messages = {}
   }
@@ -84,7 +87,7 @@ class MsgStore {
     let route = 'messages'
     if(this.lastFetched) {
       const mult = 1
-      const dateq = moment.utc(this.lastFetched-1000000*mult).format('YYYY-MM-DD%20HH:mm:ss')
+      const dateq = moment.utc(this.lastFetched-1000*mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else { // else just get last week
       const start = moment().subtract(7, 'days').format('YYYY-MM-DD%20HH:mm:ss')
@@ -92,6 +95,7 @@ class MsgStore {
     }
     try {
       const r = await relay.get(route)
+      console.log("=> NEW MSGS LENGTH", r.new_messages.length)
       const msgs = await decodeMessages(r.new_messages) // this takes a longass time
       msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
       this.messages = orgMsgsFromExisting(this.messages, msgs)
@@ -132,6 +136,7 @@ class MsgStore {
         const invoice = msgs.find(c=>c.payment_hash===m.payment_hash)
         if(invoice){
           invoice.status = constants.statuses.confirmed
+          this.lastUpdated = new Date().getTime()
         }
       }
     }
@@ -298,6 +303,7 @@ class MsgStore {
   seeChat(id) {
     if(!id) return
     this.lastSeen[id] = new Date().getTime()
+    relay.post(`messages/${id}/read`)
   }
 
   @action

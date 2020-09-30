@@ -14,7 +14,9 @@ export function registerWsHandlers(hs: {[k: string]: DataHandler}) {
 let io: any = null
 
 export function connectWebSocket(ip: string, authToken:string, connectedCallback?:Function, disconnectCallback?:Function) {
-  if(io) return // dont reconnect if already exists
+  if(io) {
+    return // dont reconnect if already exists
+  }
   
   io = socketio.connect(ip, {
     reconnection:true,
