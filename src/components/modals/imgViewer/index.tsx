@@ -12,6 +12,8 @@ import SetPrice from './setPrice'
 import EE from '../../utils/ee'
 import { constants } from '../../../constants'
 import {fileUpload} from '../../chat/fileUpload'
+import * as base64 from 'base-64'
+import FastImage from 'react-native-fast-image'
 
 export default function ImgViewer(props) {
   const {params} = props
@@ -42,41 +44,36 @@ export default function ImgViewer(props) {
     ui.setImgViewerParams(null)
   }
 
+  async function sendGif(){
+    const gifJSON = JSON.stringify({
+      id: params.id,
+      url: params.uri,
+      aspect_ratio: params.aspect_ratio,
+      text:showMsgMessage?'':text,
+    })
+    const b64 = base64.encode(gifJSON)
+    await msg.sendMessage({
+      contact_id, chat_id,
+      text: 'giphy::'+b64,
+      reply_uuid: '',
+      amount:0,
+    })
+    ui.setImgViewerParams(null)
+  }
+
   async function sendAttachment(){
-    let type = '';
-    let name = '';
     if(uploading) return
 
     const isGif = uri.split(/[#?]/)[0].split('.').pop().trim() === 'gif';
+    if(isGif){
+      sendGif()
+      return
+    }
 
     setUploading(true)
     inputRef.current.blur()
-    type = showMsgMessage?'sphinx/text':'image/jpg';
-    name = showMsgMessage?'Message.txt':'Image.jpg';
-
-    if (isGif) {
-      type = 'image/gif';
-      name = 'Image.gif';
-    }
-
-    // const server = meme.getDefaultServer()
-    // console.log("ADFASDF")
-    // fileUpload({
-    //   filename:name, filetype:type,
-    //   text, isTextMsg:showMsgMessage,
-    //   server, uri,
-    //   setUploadedPercent,
-    //   finished: async(j)=>{
-    //     j.price=price
-    //     await sendFinalMsg({
-    //       muid:j.muid,
-    //       media_key:j.media_key,
-    //       media_type:j.media_type,
-    //       price
-    //     })
-    //     setUploading(false)
-    //   }
-    // })
+    const type = showMsgMessage?'sphinx/text':'image/jpg';
+    const name = showMsgMessage?'Message.txt':'Image.jpg';
 
     const pwd = await randString(32)
     const server = meme.getDefaultServer()
@@ -87,17 +84,7 @@ export default function ImgViewer(props) {
     if (showMsgMessage) {
       enc = await e2e.encrypt(text, pwd)
     } else {
-      if (!isGif) {
-        enc = await e2e.encryptFile(uri, pwd)
-      }
-      if (isGif) {
-        const { config, fs } = RNFetchBlob;
-        const resp = await config({
-          fileCache: true
-        }).fetch('GET', uri)
-        const base64 = await resp.readFile('base64')
-        enc = await e2e.encryptFileFromBase64(base64, pwd)
-      }
+      enc = await e2e.encryptFile(uri, pwd)
     }
 
     RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
@@ -162,7 +149,7 @@ export default function ImgViewer(props) {
       {/* {showInput && !isTribe && <SetPrice setAmount={amt=> setPrice(amt)} />} */}
       {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
 
-      {showImg && <Image resizeMode='contain' source={{uri:uri||data}}
+      {showImg && <FastImage resizeMode='contain' source={{uri:uri||data}}
         style={{...styles.img,...boxStyles}} 
       />}
       {showMsgMessage && !uploading && <View style={{...styles.msgMessage,...boxStyles}}>

@@ -33,7 +33,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   const [recordingStartTime, setRecordingStartTime] = useState(null)
   const [uploading,setUploading] = useState(false)
   const [gifs, setGifs] = useState([])
-  const [searchGif, setSearchGif] = useState('Dogs')
+  const [searchGif, setSearchGif] = useState('Bitcoin')
   const [showGiphyModal, setShowGiphyModal] = useState(false)
 
   const inputRef = useRef(null)
@@ -215,7 +215,17 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
 
   async function onSendGifHandler(gif: any) {
     setShowGiphyModal(false);
-    tookPic({ uri: gif.images.original.url })
+    setDialogOpen(false)
+    setTimeout(()=>{
+      setTakingPhoto(false)
+      const height = parseInt(gif.images.original.height) || 200
+      const width = parseInt(gif.images.original.width) || 200
+      openImgViewer({
+        uri: gif.images.original.url,
+        aspect_ratio: width/height,
+        id: gif.id,
+      })
+    },150)
   };
 
   const isConversation = chat.type===conversation

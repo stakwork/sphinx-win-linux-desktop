@@ -15,14 +15,14 @@ import styles from './styles';
  * @param {Function} onSubmitEditing - function that search the type of gifs
  */
 export default function Giphy({
-    gifs,
-    open,
-    onClose,
-    searchGif,
-    onSendGifHandler,
-    setSearchGif,
-    getGifsBySearch,
-  }) {
+  gifs,
+  open,
+  onClose,
+  searchGif,
+  onSendGifHandler,
+  setSearchGif,
+  getGifsBySearch,
+}) {
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -51,17 +51,18 @@ export default function Giphy({
           />
           <ScrollView>
             <View style={styles.gifContainer}>
-              {gifs.map((gif) => (
-                  <TouchableOpacity
-                    key={gif.id}
-                    onPress={() => onSendGifHandler(gif)}
-                  >
-                    <Image
-                      source={{ uri: gif.images.original.url }}
-                      style={styles.gif}
-                    />
-                  </TouchableOpacity>
-                ))}
+              {gifs.map((gif) => {
+                const thumb = gif.images.original.url.replace(/giphy.gif/g, '100w.gif')
+                return (<TouchableOpacity
+                  key={gif.id}
+                  onPress={() => onSendGifHandler(gif)}
+                >
+                  <Image
+                    source={{ uri: thumb }}
+                    style={styles.gif}
+                  />
+                </TouchableOpacity>)
+              })}
             </View>
           </ScrollView>
         </View>
