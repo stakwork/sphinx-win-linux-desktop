@@ -1,6 +1,7 @@
 import React from 'react'
 import {View, Text, StyleSheet, TouchableHighlight, ToastAndroid} from 'react-native'
 import { Appbar } from 'react-native-paper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { DrawerActions, useNavigation } from '@react-navigation/native'
 import {useStores} from '../../store'
 import { useObserver } from 'mobx-react-lite'
@@ -62,5 +63,10 @@ const styles=StyleSheet.create({
   sat:{
     color:'#ccc',
     marginLeft:15
+  },
+  bolt: {
+    position: 'absolute',
+    top: 20,
+    left: 380
   }
 })

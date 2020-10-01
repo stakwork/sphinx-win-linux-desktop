@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores } from '../../store'
-import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid} from 'react-native'
+import {View, Text, TouchableOpacity, Image, ToastAndroid} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
-import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
-import { Card, Title } from 'react-native-paper'
+import { Portal, ActivityIndicator } from 'react-native-paper'
+import { Title } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
 import Form from '../form'
@@ -17,6 +17,9 @@ import * as e2e from '../../crypto/e2e'
 import {encode as btoa} from 'base-64'
 import PIN, {userPinCode} from '../utils/pin'
 import Clipboard from "@react-native-community/clipboard";
+import styles from './styles'
+import { Header } from './components'
+import { shareContactKey, tookPic } from './utils'
 
 export default function Profile() {
   const { details, user, contacts, meme } = useStores()
@@ -29,15 +32,6 @@ export default function Profile() {
   const [sharing,setSharing] = useState(false)
   const [showPIN,setShowPIN] = useState(false)
   const [exporting,setExporting] = useState(false)
-
-  async function shareContactKey(){
-    const me = contacts.contacts.find(c=> c.id===1)
-    const contact_key = me.contact_key
-    if(!contact_key) return
-    setSharing(true)
-    await contacts.updateContact(1, {contact_key})
-    setSharing(false)
-  }
 
   async function exportKeys(pin){
     setShowPIN(false)
@@ -64,20 +58,7 @@ export default function Profile() {
     setExporting(false)
   }
 
-  async function tookPic(img){
-    setDialogOpen(false)
-    setTakingPhoto(false)
-    setUploading(true)
-    try {
-      await upload(img.uri)
-    } catch(e){
-      console.log(e)
-      setUploading(false)
-    }
-  }
-
   async function upload(uri){
-
     const type = 'image/jpg'
     const name = 'Image.jpg'
     const server = meme.getDefaultServer()
@@ -104,8 +85,8 @@ export default function Profile() {
       setUploading(false)
     })
     .catch((err) => {
-       console.log(err)
-       setUploading(false)
+      console.log(err)
+      setUploading(false)
     })
   }
 
@@ -121,7 +102,7 @@ export default function Profile() {
     }
 
     return <View style={styles.wrap}>
-      <Header />
+      <Header useNavigation={useNavigation} drawerActions={DrawerActions} />
       <View style={styles.userInfoSection}>
         <View >
           <TouchableOpacity onPress={()=>setDialogOpen(true)}
@@ -141,7 +122,7 @@ export default function Profile() {
             <TouchableOpacity onPress={()=>{
               setTapCount(cu=>{
                 if(cu>=6) { // seventh tap
-                  shareContactKey()
+                  shareContactKey(contacts, setSharing)
                   return 0
                 }
                 return cu+1
@@ -178,7 +159,6 @@ export default function Profile() {
           }}
         />
       </View>
-
       <TouchableOpacity style={styles.export} onPress={()=>setShowPIN(true)}>
         <Text style={styles.exportText}>
           {!exporting ? 'Want to switch devices? Export keys' :
@@ -189,112 +169,14 @@ export default function Profile() {
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}
-        onPick={res=> tookPic(res)}
+        onPick={res=> tookPic(res, setDialogOpen, setTakingPhoto, setUploading, upload)}
         onChooseCam={()=> setTakingPhoto(true)}
       />
-
       {takingPhoto && <Portal>
-        <Cam onCancel={()=>setTakingPhoto(false)} 
-          onSnap={pic=> tookPic(pic)}
+        <Cam onCancel={()=>setTakingPhoto(false)}
+          onSnap={pic=> tookPic(pic, setDialogOpen, setTakingPhoto, setUploading, upload)}
         />
       </Portal>}
-
     </View>}
   )
 }
-
-function Header() {
-  const navigation = useNavigation()
-  return (
-    <Appbar.Header style={{width:'100%',backgroundColor:'white'}}>
-      <Appbar.Action icon="menu" onPress={()=>navigation.dispatch(DrawerActions.openDrawer())} />
-      <Appbar.Content title="Profile" />
-    </Appbar.Header>
-  )
-}
-
-const styles = StyleSheet.create({
-  wrap:{
-    flex:1,
-  },
-  content:{
-    flex:1,
-    width:'100%',
-    marginTop:10,
-    alignItems:'center',
-  },
-  userInfoSection: {
-    paddingLeft: 20,
-    marginBottom:25,
-    marginTop:25,
-    flexDirection:'row'
-  },
-  drawerSection: {
-    marginTop: 25,
-  },
-  userPic:{
-    flexDirection:'row',
-    alignItems:'center',
-    minHeight:62,minWidth:62,
-    height:62,width:62,
-    flexShrink:0,
-    borderColor:'#ddd',
-    borderWidth:1,
-    borderRadius:31,
-    position:'relative'
-  },
-  userInfo:{
-    display:'flex',
-    flexDirection:'column',
-    alignItems:'flex-start',
-    justifyContent:'flex-start',
-    marginLeft:15
-  },
-  title: {
-    fontWeight: 'bold',
-    flexDirection:'row',
-    alignItems:'center',
-  },
-  userBalance:{
-    flexDirection:'row',
-    alignItems:'center',
-  },
-  img:{
-    height:50,
-    width:50,
-    borderRadius:25,
-  },
-  spinner:{
-    position:'absolute',
-    left:19,
-    top:19
-  },
-  formWrap:{
-    backgroundColor:'white',
-    flex:1,
-    paddingBottom:30,
-    maxHeight:365,
-    position:'relative',
-    borderBottomWidth:1,
-    borderBottomColor:'#ddd',
-    borderTopWidth:1,
-    borderTopColor:'#ddd',
-  },
-  export:{
-    width:'100%',
-    backgroundColor:'white',
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center',
-    height:50,
-    marginTop:10,
-    borderBottomWidth:1,
-    borderBottomColor:'#ddd',
-    borderTopWidth:1,
-    borderTopColor:'#ddd',
-  },
-  exportText:{
-    color:'#6289FD',
-    fontSize:12,
-  }
-})

@@ -6,7 +6,7 @@ import Tags from './tags'
 import Number from './number'
 import PhotoURI from './photoURI'
 import Radio from './radio'
-import MultiBox from './multiBox'
+import MultiBox from './MultiBox'
 
 export default function Input(props){
   switch (props.type) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import Chat from '../chat/chat'
+import Chat from '../chat'
 import Dashboard from './dashboard'
 import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack'
 import {DashStackParamList} from '../../../src/types'

@@ -1,6 +1,6 @@
 import React from 'react'
-import Contacts from './contacts'
-import Contact from './contact'
+import Contacts from './ContactsComponent'
+import Contact from './ContactComponent'
 import { createStackNavigator } from '@react-navigation/stack'
 import {ContactsStackParamList} from '../../../src/types'
 
