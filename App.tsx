@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper'
 import Main from './src/components/main'
 import Onboard from './src/components/onboard'
-import {useStores} from './src/store'
+import {useStores, useTheme} from './src/store'
 import {instantiateRelay} from './src/api'
 import {useObserver} from 'mobx-react-lite'
 import Loading from './src/components/loading'
@@ -14,6 +14,7 @@ import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
 // import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
+import { useDarkMode } from 'react-native-dynamic'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -50,6 +51,7 @@ export default function Wrap(){
 
 function App() {
   const {user,msg,ui} = useStores()
+  const theme = useTheme()
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
   const [pinned, setPinned] = useState(false)
@@ -61,7 +63,10 @@ function App() {
     ui.setConnected(false)
   }
 
+  const isDarkMode = useDarkMode()
   useEffect(()=>{
+    console.log("DARK?",isDarkMode)
+    theme.setDark(isDarkMode);
     (async () => {
       console.log("=> USER",user)
       const isSignedUp = (user.currentIP && user.authToken)?true:false
@@ -85,9 +90,25 @@ function App() {
       }}
     />
   }
+
+  const paperTheme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#6289FD',
+      accent: '#55D1A9',
+      text:theme.title,
+      placeholder:theme.subtitle,
+      background:theme.bg,
+      surface:theme.main
+    },
+    dark:theme.dark
+  }
+
   return (<>
     <NavigationContainer>
-      <PaperProvider theme={theme}>
+      <PaperProvider theme={paperTheme}>
         {/* <StatusBar /> */}
         {signedUp && <Main />}
         {!signedUp && <Onboard onFinish={()=>{
@@ -97,16 +118,6 @@ function App() {
       </PaperProvider>
     </NavigationContainer>
   </>)
-}
-
-const theme = {
-  ...DefaultTheme,
-  roundness: 2,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#6289FD',
-    accent: '#55D1A9',
-  },
 }
 
 async function sleep(ms) {

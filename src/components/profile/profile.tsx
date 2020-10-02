@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
 import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
@@ -20,6 +20,7 @@ import Clipboard from "@react-native-community/clipboard";
 
 export default function Profile() {
   const { details, user, contacts, meme } = useStores()
+  const theme = useTheme()
   const [uploading, setUploading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
@@ -120,7 +121,7 @@ export default function Profile() {
       />
     }
 
-    return <View style={styles.wrap}>
+    return <View style={{...styles.wrap,backgroundColor:theme.bg}}>
       <Header />
       <View style={styles.userInfoSection}>
         <View >
@@ -136,7 +137,7 @@ export default function Profile() {
         <View style={styles.userInfo}>
           <Title style={styles.title}>{user.alias}</Title>  
           <View style={styles.userBalance}>
-            <Text>{details.balance}</Text>
+            <Text style={{color:theme.title}}>{details.balance}</Text>
             <Text style={{marginLeft:10,marginRight:10,color:'#c0c0c0'}}>sat</Text>
             <TouchableOpacity onPress={()=>{
               setTapCount(cu=>{
@@ -157,7 +158,9 @@ export default function Profile() {
           </View>
         </View>
       </View>
-      <View style={styles.formWrap}>
+      <View style={{...styles.formWrap,backgroundColor:theme.main,
+        borderBottomColor:theme.dark?'#181818':'#ddd',borderTopColor:theme.dark?'#181818':'#ddd'
+      }}>
         <Form schema={me} loading={saving}
           buttonText="Save"
           readOnlyFields={['public_key']}
@@ -179,7 +182,10 @@ export default function Profile() {
         />
       </View>
 
-      <TouchableOpacity style={styles.export} onPress={()=>setShowPIN(true)}>
+      <TouchableOpacity style={{...styles.export,backgroundColor:theme.main,
+        borderBottomColor:theme.dark?'#181818':'#ddd',borderTopColor:theme.dark?'#181818':'#ddd'
+      }}
+        onPress={()=>setShowPIN(true)}>
         <Text style={styles.exportText}>
           {!exporting ? 'Want to switch devices? Export keys' :
             'Encrypting keys with your PIN........'
@@ -205,8 +211,9 @@ export default function Profile() {
 
 function Header() {
   const navigation = useNavigation()
+  const theme = useTheme()
   return (
-    <Appbar.Header style={{width:'100%',backgroundColor:'white'}}>
+    <Appbar.Header style={{width:'100%',backgroundColor:theme.main}}>
       <Appbar.Action icon="menu" onPress={()=>navigation.dispatch(DrawerActions.openDrawer())} />
       <Appbar.Content title="Profile" />
     </Appbar.Header>
@@ -270,28 +277,22 @@ const styles = StyleSheet.create({
     top:19
   },
   formWrap:{
-    backgroundColor:'white',
     flex:1,
     paddingBottom:30,
     maxHeight:365,
     position:'relative',
     borderBottomWidth:1,
-    borderBottomColor:'#ddd',
     borderTopWidth:1,
-    borderTopColor:'#ddd',
   },
   export:{
     width:'100%',
-    backgroundColor:'white',
     display:'flex',
     alignItems:'center',
     justifyContent:'center',
     height:50,
     marginTop:10,
     borderBottomWidth:1,
-    borderBottomColor:'#ddd',
     borderTopWidth:1,
-    borderTopColor:'#ddd',
   },
   exportText:{
     color:'#6289FD',

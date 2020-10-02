@@ -3,7 +3,6 @@ const inputStyles = {
   maxHeight:58,
   flex:1,
   marginBottom:25,
-  backgroundColor:'#fff',
 }
 
 const inputStylesHalf = {
@@ -11,7 +10,6 @@ const inputStylesHalf = {
   maxHeight:58,
   flex:1,
   marginBottom:25,
-  backgroundColor:'#fff',
   width:'40%',
 }
 

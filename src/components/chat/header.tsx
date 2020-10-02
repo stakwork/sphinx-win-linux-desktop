@@ -3,7 +3,7 @@ import { useObserver } from 'mobx-react-lite'
 import { Appbar } from 'react-native-paper'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Chat } from '../../store/chats'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import { contactForConversation } from './utils'
 import { constants } from '../../constants'
 import { randAscii } from '../../crypto/rand'
@@ -13,6 +13,7 @@ const tribe = constants.chat_types.tribe
 
 export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appMode: boolean, setAppMode: Function }) {
   const { contacts, ui, msg, details, chats } = useStores()
+  const theme = useTheme()
   const navigation = useNavigation()
   return useObserver(() => {
     const theChat = chats.chats.find(c => c.id === chat.id)
@@ -54,7 +55,7 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
     }
 
     return (
-      <Appbar.Header style={{ width: '100%', backgroundColor: 'white', elevation: 5, zIndex: 102, position: 'relative' }}>
+      <Appbar.Header style={{ width: '100%', backgroundColor: theme.main, elevation: 5, zIndex: 102, position: 'relative' }}>
         <Appbar.BackAction onPress={onBackHandler} />
         <Appbar.Content title={name} onPress={clickTitle} />
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}

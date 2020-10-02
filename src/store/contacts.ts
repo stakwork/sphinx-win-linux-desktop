@@ -55,6 +55,7 @@ class ContactStore {
   async getContacts() {
     try {
       const r = await relay.get('contacts')
+      if(!r) return
       if(r.contacts) {
         this.contacts = r.contacts
         const me = r.contacts.find(c=> c.id===1)
@@ -86,6 +87,7 @@ class ContactStore {
     try {
       if(!v.public_key) return console.log('no pub key')
       const r = await relay.post('contacts', {...v,status:1})
+      if(!r) return
       const existingContact = this.contacts.find(c=> c.id===r.id)
       if(existingContact) {
         if(r.alias) existingContact.alias = r.alias
@@ -104,6 +106,7 @@ class ContactStore {
   async updateContact(id, v) {
     try {
       const r = await relay.put(`contacts/${id}`, v)
+      if(!r) return
       const cs = [...this.contacts]
       console.log('updated contact:', r)
       this.contacts = cs.map(c=>{
@@ -143,6 +146,7 @@ class ContactStore {
     try {
       const data = createFormData(file, params)
       const r = await relay.upload(`upload`, data)
+      if(!r) return
       console.log(r)
     } catch(e) {
       console.log(e)
@@ -186,6 +190,7 @@ class ContactStore {
   async payInvite(invite_string){
     try{
       const inv = await relay.post(`invites/${invite_string}/pay`,{})
+      if(!inv) return
       this.updateInvite(inv.invite)
     } catch(e) {
       console.log('could not pay invite', e)

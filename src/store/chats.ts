@@ -94,6 +94,7 @@ export class ChatStore {
     const r = await relay.post('group', {
       name, contact_ids
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }
@@ -111,6 +112,7 @@ export class ChatStore {
       unlisted: unlisted||false,
       private: is_private||false,
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }
@@ -128,6 +130,7 @@ export class ChatStore {
       unlisted: unlisted||false,
       private: is_private||false,
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }
@@ -137,6 +140,7 @@ export class ChatStore {
     const r = await relay.post('tribe', {
       name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private:is_private,
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }

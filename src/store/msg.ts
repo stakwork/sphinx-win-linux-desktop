@@ -74,6 +74,7 @@ class MsgStore {
   async getAllMessages() {
     try {
       const r = await relay.get('messages')
+      if(!r) return
       const msgs = await decodeMessages(r.new_messages)
       this.messages = orgMsgs(msgs)
       this.lastFetched = new Date().getTime()
@@ -95,6 +96,7 @@ class MsgStore {
     }
     try {
       const r = await relay.get(route)
+      if(!r) return
       console.log("=> NEW MSGS LENGTH", r.new_messages.length)
       const msgs = await decodeMessages(r.new_messages) // this takes a longass time
       msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
@@ -150,10 +152,12 @@ class MsgStore {
       // this.gotNewMessage(r)
       if(!chat_id) {
         const r = await relay.post('messages', v)
+        if(!r) return
         this.gotNewMessage(r)
       } else {
         putIn(this.messages, {...v,id:-1,sender:1,date:moment().toISOString(),type:0,message_content:text}, chat_id)
         const r = await relay.post('messages', v)
+        if(!r) return
         // console.log("RESULT")
         this.messagePosted(r)
       }
@@ -183,6 +187,7 @@ class MsgStore {
       }
       // return
       const r = await relay.post('attachment', v)
+      if(!r) return
       this.gotNewMessage(r)
     } catch(e) {
       console.log(e)
@@ -215,6 +220,7 @@ class MsgStore {
         remote_text: encMemo
       }
       const r = await relay.post('payment', v)
+      if(!r) return
       if(contact_id||chat_id) this.gotNewMessage(r)
       if(r.amount) detailsStore.addToBalance(r.amount*-1)
     } catch(e) {
@@ -251,6 +257,7 @@ class MsgStore {
         remote_memo: encMemo,
       }
       const r = await relay.post('invoices', v) // raw invoice: 
+      if(!r) return
       this.gotNewMessage(r)
     } catch(e) {
       console.log(e)
@@ -274,6 +281,7 @@ class MsgStore {
     try {
       const v = {payment_request}
       const r = await relay.put('invoices', v)
+      if(!r) return
       this.invoicePaid({...r,amount})
     } catch(e) {
       console.log(e)
@@ -284,6 +292,7 @@ class MsgStore {
   async deleteMessage(id) {
     if(!id) return console.log("NO ID!")
     const r = await relay.del(`message/${id}`)
+    if(!r) return
     if(r.chat && r.chat.id) {
       putIn(this.messages, r, r.chat.id)
     }
@@ -294,6 +303,23 @@ class MsgStore {
     if(!id) return
     this.lastSeen[id] = new Date().getTime()
     relay.post(`messages/${id}/read`)
+  }
+
+  @action
+  countUnseenMessages():number {
+    const now = new Date().getTime()
+    let unseenCount = 0
+    const lastSeenObj = this.lastSeen
+    Object.entries(this.messages).forEach(function([id,msgs]){
+      const lastSeen = lastSeenObj[id||'_'] || now
+      msgs.forEach(m=>{
+        if(m.sender!==1){
+          const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
+          if(unseen) unseenCount+=1
+        }
+      })
+    })
+    return unseenCount
   }
 
   @action

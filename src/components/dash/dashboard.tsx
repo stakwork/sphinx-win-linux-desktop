@@ -1,6 +1,6 @@
 import React from 'react'
 import {useObserver} from 'mobx-react-lite'
-import {useStores} from '../../store'
+import {useStores,useTheme} from '../../store'
 import { View, StyleSheet } from 'react-native'
 import { Searchbar } from 'react-native-paper'
 import Header from './header'
@@ -9,18 +9,33 @@ import BottomBar from './bottomBar'
 
 export default function Dashboard() {
   const {ui} = useStores()
+  const theme = useTheme()
   return useObserver(()=>
-    <View style={styles.main}>
+    <View style={{...styles.main,backgroundColor:theme.bg}}>
       <Header />
-      <View style={styles.searchWrap}>
+      <View style={{
+        ...styles.searchWrap,
+        backgroundColor:theme.main,
+        borderBottomColor:theme.dark?'#141d26':'#e5e5e5'
+      }}>
         <Searchbar
           placeholder="Search"
           onChangeText={txt=>{
             ui.setSearchTerm(txt)
           }}
           value={ui.searchTerm}
-          style={{elevation:0,height:38}}
-          inputStyle={{color:'#666',fontSize:13}}
+          style={{
+            elevation:0,
+            height:38,
+            backgroundColor:theme.bg,
+            borderRadius:5,
+          }}
+          inputStyle={{
+            color:'#666',
+            fontSize:13,
+          }}
+          iconColor={theme.title}
+          placeholderTextColor={theme.title}
         />
       </View>
       <ChatList />
@@ -36,8 +51,8 @@ const styles = StyleSheet.create({
     backgroundColor:'#f3f3f3',
   },
   searchWrap:{
-    backgroundColor:'#f0f0f0',
     padding:5,
     width:'100%',
+    borderBottomWidth:1,
   },
 })

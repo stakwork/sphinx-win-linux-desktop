@@ -5,7 +5,7 @@ import MsgList from './msgList'
 import BottomBar from './bottomBar'
 import { ChatRouteProp } from '../../types'
 import { useRoute } from '@react-navigation/native'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import { contactForConversation } from './utils'
 import EE from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
@@ -15,6 +15,7 @@ import Frame from './frame'
 
 export default function Chat() {
   const { contacts, user, chats, ui } = useStores()
+  const theme = useTheme()
 
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
@@ -96,14 +97,14 @@ export default function Chat() {
 
   const appURL = ui.applicationURL
   const theShow = show && !loadingChat
-  return <View style={styles.main}>
+  return <View style={{...styles.main,backgroundColor:theme.bg}}>
     <Header chat={chat} appMode={appMode} setAppMode={setAppMode} />
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }}>
       <Frame url={appURL} />
     </View>}
-    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100 }}>
-      {!theShow && <View style={styles.loadWrap}>
-        <ActivityIndicator animating={true} color="grey" />
+    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.bg }}>
+      {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
+        <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
       {theShow && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
@@ -118,13 +119,11 @@ const styles = StyleSheet.create({
   main: {
     display: 'flex',
     width: '100%', height: '100%',
-    backgroundColor: 'white',
     position: 'relative',
   },
   layer: {
     display: 'flex',
     width: '100%', height: '100%',
-    backgroundColor: 'white',
     position: 'absolute',
     paddingTop: 50
   },

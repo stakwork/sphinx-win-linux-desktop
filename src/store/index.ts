@@ -9,6 +9,7 @@ import { userStore } from './user'
 import { memeStore } from './meme'
 import { authStore } from './auth'
 import { botStore } from './bots'
+import { themeStore } from './theme'
 import { create } from 'mobx-persist'
 import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
@@ -56,5 +57,7 @@ const ctx = React.createContext({
 })
 
 export const useStores = () => React.useContext(ctx)
+
+export const useTheme = () => React.useContext(React.createContext(themeStore))
 
 export const hooks = hookz

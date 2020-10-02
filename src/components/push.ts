@@ -1,6 +1,6 @@
 import * as PushNotification from 'react-native-push-notification'
 
-export function configure(callback){
+export function configure(callback, finishCallback){
   PushNotification.configure({
     // (optional) Called when Token is generated (iOS and Android)
     onRegister: function (token) {
@@ -15,6 +15,7 @@ export function configure(callback){
     onNotification: function (notification) {
       console.log("NOTIFICATION:", notification);
       notification.finish()
+      finishCallback(notification)
       // notification.data&&notification.data.message && notify(notification.data.message)
       // if(notification.userInteraction && notification.finish) {
       //   notification.finish()

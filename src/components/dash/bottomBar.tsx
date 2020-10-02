@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import {useStores} from '../../store'
+import {useStores,useTheme} from '../../store'
 import {View,StyleSheet} from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
@@ -11,19 +11,22 @@ import {qrActions} from '../../qrActions'
 export default function BottomTabs() {
   const {ui,chats} = useStores()
   const [scanning, setScanning] = useState(false)
-
+  const theme = useTheme()
   return useObserver(()=>
-    <View style={styles.bar}>
-      <IconButton icon="arrow-bottom-left" size={32} color="#666"
+    <View style={{...styles.bar,
+      backgroundColor:theme.main,
+      borderColor:theme.bg
+    }}>
+      <IconButton icon="arrow-bottom-left" size={32} color={theme.title}
         onPress={()=> ui.setPayMode('invoice', null)}  // chat here   
       />
-      <IconButton icon="format-list-bulleted" size={29} color="#666"
+      <IconButton icon="format-list-bulleted" size={29} color={theme.title}
         onPress={()=> ui.setPaymentHistory(true)} 
       />
-      <IconButton icon="qrcode-scan" size={25} color="#666"
+      <IconButton icon="qrcode-scan" size={25} color={theme.title}
         onPress={()=> setScanning(true)} // after scan, set {amount,payment_request}
       />
-      <IconButton icon="arrow-top-right" size={32} color="#666"
+      <IconButton icon="arrow-top-right" size={32} color={theme.title}
         onPress={()=> ui.setPayMode('payment', null)}  // chat here   
       />
 
@@ -87,10 +90,8 @@ const styles=StyleSheet.create({
     height:60,
     maxHeight:60,
     minHeight:60,
-    backgroundColor:'white',
     elevation:5,
     borderWidth: 2,
-    borderColor: '#ddd',
     borderBottomWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,

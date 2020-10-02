@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores, hooks } from '../../store'
+import { useStores, hooks, useTheme } from '../../store'
 import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native'
 import { Chat } from '../../store/chats'
 import Message from './msg'
@@ -50,6 +50,7 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
 
 function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, lastUpdated }) {
   const scrollViewRef = useRef(null)
+  const theme = useTheme()
   const [viewableIds, setViewableIds] = useState({})
   const { contacts } = useStores()
 

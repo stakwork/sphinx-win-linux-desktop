@@ -1,5 +1,5 @@
 import React from 'react'
-import {useStores} from '../../store'
+import {useStores,useTheme} from '../../store'
 import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, ScrollView, SectionList, View, Text, StyleSheet, Image } from 'react-native'
 import {SwipeRow} from 'react-native-swipe-list-view'
@@ -9,6 +9,7 @@ import FastImage from 'react-native-fast-image'
 
 export default function ContactList() {
   const {ui, contacts} = useStores()
+  const theme = useTheme()
   return useObserver(()=> {
     const contactsToShow = contacts.contacts.filter(c=> {
       if (!ui.contactsSearchTerm) return true
@@ -16,7 +17,7 @@ export default function ContactList() {
     })
     const contactsNotMe = contactsToShow.filter(c=> c.id!==1).sort((a,b)=> a.alias>b.alias?1:-1)
     const contactsNotFromGroups = contactsNotMe.filter(c=> !c.from_group)
-    return <View style={styles.container}>
+    return <View style={{...styles.container,backgroundColor:theme.bg}}>
       <SectionList
         style={styles.list}
         sections={grouper(contactsNotFromGroups)}
@@ -27,8 +28,8 @@ export default function ContactList() {
           onPress={contact=> ui.setEditContactModal(contact)} 
         />}
         renderSectionHeader={({ section: { title } }) => (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{title}</Text>
+          <View style={{...styles.section,backgroundColor:theme.dark?'#212e39':'#eee'}}>
+            <Text style={{...styles.sectionTitle,color:theme.subtitle}}>{title}</Text>
           </View>
         )}
       />
@@ -38,7 +39,7 @@ export default function ContactList() {
 
 function Item({ contact, onPress }) {
   const {ui, contacts} = useStores()
-  
+  const theme = useTheme()
   const uri = usePicSrc(contact)
   const hasImg = uri?true:false
   return (
@@ -53,7 +54,7 @@ function Item({ contact, onPress }) {
           style={{marginRight:20}}
         />
       </View>
-      <View style={styles.frontSwipeRow}>
+      <View style={{...styles.frontSwipeRow,backgroundColor:theme.bg}}>
         <TouchableOpacity style={styles.contactTouch} activeOpacity={0.5}
           onPress={()=>onPress(contact)}>
           <View style={styles.avatar}>
@@ -62,7 +63,7 @@ function Item({ contact, onPress }) {
             />
           </View>
           <View style={styles.contactContent}>
-            <Text style={styles.contactName}>{contact.alias}</Text>
+            <Text style={{...styles.contactName,color:theme.subtitle}}>{contact.alias}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -87,7 +88,6 @@ function grouper(data){
 
 const styles = StyleSheet.create({
   container:{
-    backgroundColor:'white',
     flex:1,
   },
   list:{
@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
     flex:1,
     flexDirection:'row',
     alignItems:'center',
-    backgroundColor:'#eee',
   },
   sectionTitle:{
     fontWeight:'bold',
@@ -141,7 +140,6 @@ const styles = StyleSheet.create({
     justifyContent:'flex-end'
   },
   frontSwipeRow:{
-    backgroundColor:'white',
     flex:1,
     height:80
   }

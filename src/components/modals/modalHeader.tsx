@@ -1,9 +1,11 @@
 import React from 'react'
 import {View,Text,StyleSheet} from 'react-native'
 import {IconButton} from 'react-native-paper'
+import { useTheme } from '../../store'
 
 export default function Header(props){
   const {title,onClose,leftArrow} = props
+  const theme = useTheme()
   return <View style={{...styles.header, ...props.background&&{backgroundColor:props.background}}}>
     <View style={styles.headerLefty}>
       {leftArrow && <IconButton
@@ -14,7 +16,7 @@ export default function Header(props){
         onPress={() => onClose()}
       />}
     </View>
-    <Text style={styles.headerTitle}>{title}</Text>
+    <Text style={{...styles.headerTitle,color:theme.title}}>{title}</Text>
     <View style={styles.headerLefty}>
       {!leftArrow && <IconButton
         icon="close"
@@ -43,7 +45,6 @@ const styles = StyleSheet.create({
     fontSize:16
   },
   headerLefty:{
-    backgroundColor:'white',
     width:51,height:50,
     borderRadius:18,
     marginLeft:5

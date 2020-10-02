@@ -149,8 +149,6 @@ export const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -161,7 +159,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
     backgroundColor: 'white',
   },
   chatContent: {
@@ -193,7 +190,6 @@ export const styles = StyleSheet.create({
     marginRight: 12,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#666',
     marginBottom: 4,
   },
   chatMsgWrap: {
@@ -202,7 +198,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chatMsg: {
-    color: '#7e7e7e',
     fontSize: 13,
   },
 })

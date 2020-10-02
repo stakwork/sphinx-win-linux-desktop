@@ -1,7 +1,7 @@
 
 import React from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {ScrollView, View, Text, StyleSheet} from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Appbar, Searchbar, IconButton } from 'react-native-paper'
@@ -11,17 +11,33 @@ export default function Contacts() {
   const { ui } = useStores()
   const setAddFriendModalHandler = () => ui.setAddFriendModal(true)
   const onChangeTextHandler = (txt: string) => ui.setContactsSearchTerm(txt)
+  const theme = useTheme()
   return useObserver(() =>
     <View style={{flex:1}}>
       <Header />
-      <View style={styles.searchWrap}>
-        <View style={styles.searchBarWrap}>
+      <View style={{...styles.searchWrap,
+        backgroundColor:theme.main
+      }}>
+        <View style={{...styles.searchBarWrap,
+          backgroundColor:theme.main,
+          borderBottomColor:theme.dark?'#141d26':'#e5e5e5'
+        }}>
           <Searchbar
             placeholder="Search"
             onChangeText={onChangeTextHandler}
             value={ui.contactsSearchTerm}
-            style={{elevation:0,height:38}}
-            inputStyle={{color:'#666',fontSize:13}}
+            style={{
+              elevation:0,
+              height:38,
+              backgroundColor:theme.bg,
+              borderRadius:5,
+            }}
+            inputStyle={{
+              color:theme.title,
+              fontSize:13,
+            }}
+            iconColor={theme.title}
+            placeholderTextColor={theme.title}
           />
         </View>
         <View style={styles.iconWrap}>
@@ -41,8 +57,9 @@ export default function Contacts() {
 function Header() {
   const navigation = useNavigation()
   const onGoBackHandler = () => navigation.goBack()
+  const theme = useTheme()
   return (
-    <Appbar.Header style={{width:'100%',elevation:0,backgroundColor:'white'}}>
+    <Appbar.Header style={{width:'100%',elevation:0,backgroundColor:theme.main}}>
       <Appbar.BackAction onPress={onGoBackHandler} color="#666" />
       <Appbar.Content title="Address Book" />
     </Appbar.Header>
@@ -61,7 +78,6 @@ const styles = StyleSheet.create({
   },
   searchBarWrap:{
     flex:1,
-    borderColor:'#ddd',
     borderWidth:1,
     borderRadius:5,
   },

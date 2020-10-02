@@ -1,10 +1,10 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {StyleSheet, View, Text, Image, Dimensions} from 'react-native'
 import {DrawerContentScrollView,DrawerItem} from '@react-navigation/drawer'
 import {Title,Drawer,Button} from 'react-native-paper'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import { useObserver } from 'mobx-react-lite'
 import {usePicSrc} from '../utils/picSrc'
 import VERSION from '../../version'
@@ -13,6 +13,7 @@ const itemStyle = {height:60,paddingLeft:15}
 
 export default function TheDrawer(props) {
   const {ui, details, user, contacts} = useStores()
+  const theme = useTheme()
   const me = contacts.contacts.find(c=> c.id===1)
   const uri = usePicSrc(me)
   const height = Math.round(Dimensions.get('window').height)
@@ -24,7 +25,7 @@ export default function TheDrawer(props) {
   const openAddFriendModalHandler = () => ui.setAddFriendModal(true)
   const openSupportModalHandler = () => ui.setSupportModal(true)
   return useObserver(() =>
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props} style={{...props.style,backgroundColor:theme.main}}>
       <View style={{height:height-52,...styles.wrap}}>
         <View style={styles.drawerContent}>
           <View style={styles.userInfoSection}>
@@ -36,34 +37,37 @@ export default function TheDrawer(props) {
               <Title style={styles.title}>{user.alias}</Title>
             </View>
             <View style={styles.userBalance}>
-              <Text style={{marginLeft:60}}>{details.balance}</Text>
+              <Text style={{marginLeft:60,color:theme.title}}>{details.balance}</Text>
               <Text style={{marginLeft:10,marginRight:10,color:'#c0c0c0'}}>sat</Text>
               <AntDesign name="wallet" color="#d0d0d0" size={20} />
             </View>
           </View>
         </View>
-        <View style={styles.break}></View>
+        <View style={{...styles.break,borderBottomColor:theme.bg}}></View>
         <Drawer.Section style={styles.drawerSection}>
           <DrawerItem style={itemStyle}
             icon={({ color, size }) => (
-              <AntDesign name="message1" color={color} size={size} />
+              <AntDesign name="message1" color={theme.title} size={size} />
             )}
             label="Dashboard"
             onPress={goToDashboardHandler}
+            labelStyle={{color:theme.title}}
           />
           <DrawerItem style={itemStyle}
             icon={({ color, size }) => (
-              <MaterialCommunityIcons name="account-multiple" color={color} size={size} />
+              <MaterialCommunityIcons name="account-multiple" color={theme.title} size={size} />
             )}
             label="Contacts"
             onPress={goToContactsHandler}
+            labelStyle={{color:theme.title}}
           />
           <DrawerItem style={itemStyle}
             icon={({ color, size }) => (
-              <MaterialCommunityIcons name="account" color={color} size={size} />
+              <MaterialCommunityIcons name="account" color={theme.title} size={size} />
             )}
             label="Profile"
             onPress={goToProfileHandler}
+            labelStyle={{color:theme.title}}
           />
         </Drawer.Section>
         <Button icon="plus" mode="contained" dark={true}
@@ -72,7 +76,7 @@ export default function TheDrawer(props) {
           Add Friend
         </Button>
         <View style={styles.versionWrap}>
-          <Text style={styles.versionWrap}>
+          <Text style={{...styles.versionWrap,color:theme.title}}>
             {`Version: ${VERSION}`}
           </Text>
         </View>
@@ -121,7 +125,6 @@ const styles = StyleSheet.create({
   break:{
     height:20,
     borderBottomWidth:1,
-    borderBottomColor:'#eee'
   },
   version:{
     fontSize:15,

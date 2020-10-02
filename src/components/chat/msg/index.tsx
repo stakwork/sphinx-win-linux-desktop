@@ -18,9 +18,10 @@ import MemberRequest from './memberRequest'
 import Clipboard from "@react-native-community/clipboard";
 import BotResMsg from './botResMsg'
 import Popover from 'react-native-popover-view';
-
+import {useTheme} from '../../../store'
 
 export default function MsgRow(props) {
+  const theme = useTheme()
   const [showReply, setShowReply] = useState(false)
 
   const swipeRowRef = useRef<any>(null)
@@ -97,6 +98,7 @@ export default function MsgRow(props) {
 }
 
 function MsgBubble(props) {
+  const theme = useTheme()
   const [deleting, setDeleting] = useState(false)
   const isMe = props.sender === 1
   const isInvoice = props.type === constants.message_types.invoice
@@ -104,10 +106,12 @@ function MsgBubble(props) {
   const [showPopover, setShowPopover] = useState(false)
 
   let dashed = false
-  let backgroundColor = isMe ? 'whitesmoke' : 'white'
-  let borderColor = '#DADFE2'
+  let backgroundColor = isMe ? 
+    (theme.dark?'#3d6188':'whitesmoke') : 
+    (theme.dark?'#202a36':'white')
+  let borderColor = theme.dark?'#202a36':'#DADFE2'
   if (isInvoice && !isPaid) {
-    backgroundColor = 'white'
+    backgroundColor = (theme.dark?'#202a36':'white')
     dashed = true
     borderColor = '#777'
     if (!isMe) borderColor = '#4AC998'

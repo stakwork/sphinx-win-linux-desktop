@@ -3,7 +3,7 @@ import {useObserver} from 'mobx-react-lite'
 import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated, ToastAndroid } from 'react-native'
 import {IconButton, Portal, ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {useStores} from '../../store'
+import {useStores,useTheme} from '../../store'
 import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import { constants } from '../../constants'
@@ -24,6 +24,7 @@ const audioRecorderPlayer = new AudioRecorderPlayer()
 
 export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,replyUuid}) {
   const {ui,msg,contacts,meme} = useStores()
+  const theme = useTheme()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
@@ -248,7 +249,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   if(replyMessage) fullHeight+=48
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:fullHeight}} />
-    <View style={{...styles.bar,height:fullHeight,bottom:0}}>
+    <View style={{...styles.bar,height:fullHeight,bottom:0,backgroundColor:theme.main,borderColor:theme.border}}>
       {(replyMessage?true:false) && <ReplyContent showClose={true}
         reply_message_content={replyMessage.message_content}
         reply_message_sender_alias={replyMessageSenderAlias}
@@ -257,7 +258,8 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
       />}
       <View style={styles.barInner}>
 
-        {!recordingStartTime && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+        {!recordingStartTime && <TouchableOpacity style={{...styles.img, backgroundColor:theme.bg, borderColor:theme.border}}
+          onPress={()=> setDialogOpen(true)}>
           <Icon name="plus" color="#888" size={27} />
         </TouchableOpacity>}
         {!recordingStartTime && <TextInput textAlignVertical="top"
@@ -272,8 +274,12 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
           style={{...styles.input,
             marginLeft:hideMic?15:0,
             height:textInputHeight,
-            maxHeight:98
+            maxHeight:98,
+            backgroundColor:theme.bg,
+            borderColor:theme.border,
+            color:theme.title
           }}
+          placeholderTextColor={theme.subtitle}
           onFocus={(e)=> setInputFocused(true)}
           onBlur={()=> setInputFocused(false)}
           onChangeText={e=> setText(e)}
@@ -356,10 +362,8 @@ const styles=StyleSheet.create({
     flexDirection:'column',
     alignItems:'center',
     justifyContent:'center',
-    backgroundColor:'white',
     elevation:5,
     borderWidth: 2,
-    borderColor: '#ddd',
     borderBottomWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,
@@ -376,8 +380,6 @@ const styles=StyleSheet.create({
   input:{
     flex:1,
     borderRadius:22,
-    borderColor:'#ccc',
-    backgroundColor:'whitesmoke',
     paddingLeft:18,
     paddingRight:18,
     borderWidth:1,

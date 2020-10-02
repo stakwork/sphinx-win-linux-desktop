@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores, hooks } from '../../store'
+import { useStores, hooks, useTheme } from '../../store'
 import { TouchableOpacity, FlatList, View, Text, StyleSheet, Dimensions } from 'react-native'
 import { Button } from 'react-native-paper'
 import InviteRow, { styles } from './inviteRow'
@@ -94,6 +94,7 @@ function ChatRow(props) {
     },1)
   }
 
+  const theme = useTheme()
   return useObserver(() => {
     let uri = useChatPicSrc(props)
     const hasImg = uri ? true : false
@@ -101,7 +102,11 @@ function ChatRow(props) {
     const { lastMsgText, hasLastMsg, unseenCount, hasUnseen } = useChatRow(props.id)
 
     const w = Math.round(Dimensions.get('window').width)
-    return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
+    return <TouchableOpacity style={{
+      ...styles.chatRow,
+      backgroundColor:theme.main,
+      borderBottomColor: theme.dark?'#0d1319':'#e5e5e5',
+    }} activeOpacity={0.5}
       onPress={onSeeChatHandler}>
       <View style={styles.avatarWrap}>
         <Avatar big alias={name} photo={uri || ''} />
@@ -112,12 +117,13 @@ function ChatRow(props) {
         </View>}
       </View>
       <View style={styles.chatContent}>
-        <Text style={styles.chatName}>{name}</Text>
+        <Text style={{...styles.chatName,color:theme.dark?'#ddd':'#666'}}>{name}</Text>
         {hasLastMsg && <Text numberOfLines={1}
           style={{
             ...styles.chatMsg,
             fontWeight: hasUnseen ? 'bold' : 'normal',
-            maxWidth: w - 105
+            maxWidth: w - 105,
+            color: theme.dark?'#8b98b4':'#7e7e7e',
           }}>
           {lastMsgText}
         </Text>}

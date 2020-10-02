@@ -4,6 +4,7 @@ import android.app.Application;
 import android.webkit.WebView;
 import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.facebook.react.ReactApplication;
+import me.jhen.react.BadgePackage;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
@@ -54,6 +55,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new WebRTCModulePackage(),
           new MainReactPackage(),
+          new BadgePackage(),
           new ClipboardPackage(),
           new RNDateTimePickerPackage(),
           new AudioPackage(),

@@ -3,8 +3,10 @@ import { StyleSheet, View, BackHandler } from 'react-native'
 import Header from '../modals/modalHeader'
 import Scanner from './scanner'
 import {TextInput,Button} from 'react-native-paper'
+import {useTheme} from '../../store'
 
 export default function QR({onCancel,onScan,showPaster}) {
+  const theme = useTheme()
   const [hasPermission, setHasPermission] = useState(null)
   const [scanned, setScanned] = useState(false)
   const [text,setText] = useState('')
@@ -37,13 +39,13 @@ export default function QR({onCancel,onScan,showPaster}) {
   return (
     <View style={styles.wrap}>
       <Header title="Scan QR Code" onClose={()=>onCancel()} 
-        background="white"
+        background={theme.main}
       />
       <Scanner scanned={scanned?true:false}
         handleBarCodeScanned={handleBarCodeScanned}
         smaller
       />
-      {showPaster && <View style={styles.bottom}>
+      {showPaster && <View style={{...styles.bottom,backgroundColor:theme.main}}>
         <View style={styles.textInputWrap}>
           <TextInput value={text} onChangeText={e=>setText(e)} 
             label="Paste invoice or Sphinx code"
@@ -79,7 +81,6 @@ const styles = StyleSheet.create({
   bottom:{
     width:'100%',
     height:153,
-    backgroundColor:'white'
   },
   textInputWrap:{
     marginLeft:20,

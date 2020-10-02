@@ -6,6 +6,7 @@ import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
 import { is24HourFormat } from 'react-native-device-time-format'
 import * as rsa from '../crypto/rsa'
+import * as BadgeAndroid from 'react-native-android-badge'
 
 async function createPrivateKeyIfNotExists(contacts){
   const priv = await rsa.getPrivateKey()
@@ -16,6 +17,14 @@ async function createPrivateKeyIfNotExists(contacts){
     contact_key: keyPair.public
   })
 }
+
+let pushToken = ''
+push.configure((t)=>{
+  console.log("PUSH TOKEN:",t&&t.token)
+  pushToken = t.token
+},(n)=>{
+  console.log("ON FINISH",n)
+})
 
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
@@ -31,6 +40,10 @@ export default function Main() {
   function handleAppStateChange(nextAppState) {
     if (appState.current.match(/inactive|background/) && nextAppState === "active") {
       loadHistory()
+    }
+    if (appState.current.match(/active/) && nextAppState === "background") {
+      const count = msg.countUnseenMessages()
+      BadgeAndroid.setBadge(count);
     }
     appState.current = nextAppState;
   }
@@ -52,12 +65,9 @@ export default function Main() {
 
       initPicSrc()
 
-      push.configure((t)=>{
-        // console.log("PUSH TOKEN:",t&&t.token)
-        if(!user.deviceId || user.deviceId!==t.token) {
-          user.registerMyDeviceId(t.token)
-        }
-      })
+      if(pushToken && !user.deviceId || user.deviceId!==pushToken) {
+        user.registerMyDeviceId(pushToken)
+      }
 
       const is24Hour = await is24HourFormat()
       ui.setIs24HourFormat(is24Hour)

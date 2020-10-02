@@ -1,6 +1,6 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {View, Text, StyleSheet, ToastAndroid} from 'react-native'
 import Modal from "./modalWrap"
 import { Button } from 'react-native-paper'
@@ -11,7 +11,7 @@ import Clipboard from "@react-native-community/clipboard";
 
 export default function PubKey({visible, pubkey, onClose}) {
   const { ui } = useStores()
-
+  const theme = useTheme()
   function copy(){
     Clipboard.setString(pubkey)
     ToastAndroid.showWithGravityAndOffset(
@@ -33,7 +33,7 @@ export default function PubKey({visible, pubkey, onClose}) {
       <View style={styles.qrWrap}>
         <QRCode value={pubkey} size={250} />
       </View>
-      <Text style={styles.pubkeyText}>{pubkey}</Text>
+      <Text style={{...styles.pubkeyText,color:theme.title}}>{pubkey}</Text>
       <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true} 
           onPress={()=> share()}
