@@ -50,13 +50,15 @@ export default function Main() {
 
   async function loadHistory(){
     ui.setLoadingHistory(true)
-    await contacts.getContacts().then(()=>{
-      meme.authenticateAll()
-    })
-    await details.getBalance()
-    await msg.getMessages()
+    await Promise.all([
+      contacts.getContacts(),
+      details.getBalance(),
+      msg.getMessages()
+    ])
     ui.setLoadingHistory(false)
     msg.initLastSeen()
+    await sleep(1000)
+    meme.authenticateAll()
   }
 
   useEffect(()=>{
@@ -77,4 +79,8 @@ export default function Main() {
   },[])
 
   return <MainNav />
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }
