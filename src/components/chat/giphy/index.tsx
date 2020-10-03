@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { IconButton, TextInput, Text } from 'react-native-paper';
-
+import {useTheme} from '../../../store'
 import styles from './styles';
 
 /**
@@ -23,6 +23,7 @@ export default function Giphy({
   setSearchGif,
   getGifsBySearch,
 }) {
+  const theme = useTheme()
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -32,12 +33,12 @@ export default function Giphy({
         animationType="slide"
         transparent={true}
       >
-        <View style={styles.modalView}>
+        <View style={{...styles.modalView,backgroundColor:theme.bg,borderColor:theme.border}}>
           <View style={styles.header}>
-            <Text style={styles.select}>Select gif</Text>
+            <Text style={{...styles.select,color:theme.title}}>Select gif</Text>
             <IconButton
               icon="close"
-              color={'black'}
+              color={theme.subtitle}
               size={20}
               onPress={() => onClose(false)}
             />

@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, useTheme } from '../../store'
-import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid, ScrollView} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
-import { Appbar, Dialog, Button, Portal, ActivityIndicator } from 'react-native-paper'
-import { Card, Title } from 'react-native-paper'
+import { Appbar, Portal, ActivityIndicator } from 'react-native-paper'
+import { Title } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
 import Form from '../form'
@@ -17,6 +17,8 @@ import * as e2e from '../../crypto/e2e'
 import {encode as btoa} from 'base-64'
 import PIN, {userPinCode} from '../utils/pin'
 import Clipboard from "@react-native-community/clipboard";
+import Toggler from './toggler'
+import { useDarkMode } from 'react-native-dynamic'
 
 export default function Profile() {
   const { details, user, contacts, meme } = useStores()
@@ -30,6 +32,14 @@ export default function Profile() {
   const [sharing,setSharing] = useState(false)
   const [showPIN,setShowPIN] = useState(false)
   const [exporting,setExporting] = useState(false)
+
+  const isDark = useDarkMode()
+  function selectAppearance(a){
+    if(a==='System') theme.setDark(isDark);
+    if(a==='Dark') theme.setDark(true);
+    if(a==='Light') theme.setDark(false);
+    theme.setMode(a)
+  }
 
   async function shareContactKey(){
     const me = contacts.contacts.find(c=> c.id===1)
@@ -121,8 +131,14 @@ export default function Profile() {
       />
     }
 
+    const cardStyles = {
+      backgroundColor:theme.main,
+      borderBottomColor:theme.dark?'#181818':'#ddd',
+      borderTopColor:theme.dark?'#181818':'#ddd'
+    }
     return <View style={{...styles.wrap,backgroundColor:theme.bg}}>
       <Header />
+
       <View style={styles.userInfoSection}>
         <View >
           <TouchableOpacity onPress={()=>setDialogOpen(true)}
@@ -158,40 +174,50 @@ export default function Profile() {
           </View>
         </View>
       </View>
-      <View style={{...styles.formWrap,backgroundColor:theme.main,
-        borderBottomColor:theme.dark?'#181818':'#ddd',borderTopColor:theme.dark?'#181818':'#ddd'
-      }}>
-        <Form schema={me} loading={saving}
-          buttonText="Save"
-          readOnlyFields={['public_key']}
-          forceEnable={photo_url}
-          initialValues={{
-            alias: user.alias,
-            public_key: user.publicKey,
-            private_photo: meContact.private_photo||false
-          }}
-          onSubmit={async values=> {
-            setSaving(true)
-            await contacts.updateContact(1,{
-              alias: values.alias,
-              private_photo: values.private_photo,
-              ...photo_url && {photo_url},
-            })
-            setSaving(false)
-          }}
-        />
-      </View>
 
-      <TouchableOpacity style={{...styles.export,backgroundColor:theme.main,
-        borderBottomColor:theme.dark?'#181818':'#ddd',borderTopColor:theme.dark?'#181818':'#ddd'
-      }}
-        onPress={()=>setShowPIN(true)}>
-        <Text style={styles.exportText}>
-          {!exporting ? 'Want to switch devices? Export keys' :
-            'Encrypting keys with your PIN........'
-          }
-        </Text>
-      </TouchableOpacity>
+      <ScrollView style={styles.scroller}>
+
+        <View style={{...styles.formWrap,...cardStyles}}>
+          <Form schema={me} loading={saving}
+            buttonText="Save"
+            readOnlyFields={['public_key']}
+            forceEnable={photo_url}
+            initialValues={{
+              alias: user.alias,
+              public_key: user.publicKey,
+              private_photo: meContact.private_photo||false
+            }}
+            onSubmit={async values=> {
+              setSaving(true)
+              await contacts.updateContact(1,{
+                alias: values.alias,
+                private_photo: values.private_photo,
+                ...photo_url && {photo_url},
+              })
+              setSaving(false)
+            }}
+          />
+        </View>
+
+        <View style={{...styles.options,...cardStyles}}>
+          <Text style={{...styles.label,color:theme.subtitle}}>Appearance</Text>
+          <Toggler 
+            onSelect={selectAppearance}
+            selectedItem={theme.mode}
+            items={['System','Dark','Light']}
+          />
+        </View>
+
+        <TouchableOpacity style={{...styles.export,...cardStyles}}
+          onPress={()=>setShowPIN(true)}>
+          <Text style={styles.exportText}>
+            {!exporting ? 'Want to switch devices? Export keys' :
+              'Encrypting keys with your PIN........'
+            }
+          </Text>
+        </TouchableOpacity>
+
+      </ScrollView>
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}
@@ -234,7 +260,11 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     marginBottom:25,
     marginTop:25,
+    display:'flex',
     flexDirection:'row'
+  },
+  scroller:{
+    display:'flex',
   },
   drawerSection: {
     marginTop: 25,
@@ -280,7 +310,15 @@ const styles = StyleSheet.create({
     flex:1,
     paddingBottom:30,
     maxHeight:365,
+    minHeight:365,
     position:'relative',
+    borderBottomWidth:1,
+    borderTopWidth:1,
+    marginBottom:10,
+  },
+  options:{
+    maxHeight:100,
+    minHeight:100,
     borderBottomWidth:1,
     borderTopWidth:1,
   },
@@ -297,5 +335,11 @@ const styles = StyleSheet.create({
   exportText:{
     color:'#6289FD',
     fontSize:12,
+  },
+  label:{
+    fontSize:12,
+    marginTop:15,
+    marginLeft:20,
+    marginBottom:10,
   }
 })

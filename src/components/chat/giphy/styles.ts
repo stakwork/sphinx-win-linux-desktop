@@ -27,7 +27,6 @@ export default StyleSheet.create({
   },
   modalView: {
     margin: 20,
-    backgroundColor: "white",
     borderRadius: 20,
     padding: 10,
     alignItems: "center",
@@ -38,7 +37,8 @@ export default StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 3
+    elevation: 3,
+    borderWidth:1,
   },
   header: {
     width: '100%',

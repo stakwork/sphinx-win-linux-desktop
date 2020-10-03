@@ -1,7 +1,17 @@
 
 import { observable, action } from 'mobx'
+import { persist } from 'mobx-persist'
+
+type Mode = 'System' | 'Dark' | 'Light'
 
 export class ThemeStore {
+
+  @persist @observable
+  mode:Mode = 'System'
+
+  @action setMode(m:Mode) {
+    this.mode = m
+  }
 
   @observable dark: boolean = false
   @action setDark(d:boolean) {
@@ -18,6 +28,9 @@ export class ThemeStore {
   @observable title: string = '#666'
   @observable subtitle: string = '#7e7e7e'
   @observable border: string = '#ccc'
+
+  primary: string = '#6289FD'
+  accent: string = '#55D1A9'
 
 }
 

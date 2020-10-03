@@ -1,4 +1,3 @@
-// import ReconnectingWebSocket from 'reconnecting-websocket';
 import socketio from 'socket.io-client';
 
 type WSMessage = {[k: string]: any}

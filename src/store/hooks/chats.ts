@@ -42,9 +42,14 @@ function lastMessageText(msg){
     if(msg.message_content.startsWith('giphy::')) return 'GIF received'
     return msg.message_content
   }
-  if(msg.media_token) {
-    if(msg.sender===1) return 'Picture Sent'
-    return 'Picture Received'
+  if(msg.media_token && msg.media_type) {
+    const mediaType = msg.media_type
+    let fileType = 'File'
+    if(mediaType.startsWith('video')) fileType='Video'
+    if(mediaType.startsWith('image')) fileType='Picture'
+    if(mediaType.startsWith('audio')) fileType='Audio'
+    if(msg.sender===1) return fileType+' Sent'
+    return fileType+' Received'
   }
   return ''
 }

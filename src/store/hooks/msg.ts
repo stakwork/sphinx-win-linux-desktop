@@ -173,7 +173,8 @@ export function useParsedGiphyMsg(message_content:string){
 
 const colorz = ["#FF70E9", "#7077FF", "#DBD23C", "#F57D25", "#9F70FF", "#9BC351", "#FF3D3D", "#C770FF", "#62C784", "#C99966", "#76D6CA", "#ABDB50", "#FF708B", "#5AD7F7", "#5FC455", "#FF9270", "#3FABFF", "#56D978", "#FFBA70", "#5078F2", "#618AFF"]
 
-export function useAvatarColor(s) {
+export function useAvatarColor(str) {
+  const s = str||'Sphinx'
   const hc = hashCode(s.repeat(Math.round(32 / s.length)))
   const int = Math.round(Math.abs(
     hc / 2147483647 * colorz.length

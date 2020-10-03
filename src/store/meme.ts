@@ -27,8 +27,9 @@ class MemeStore {
 
   @action
   async authenticateAll() {
+    const lastAuth = this.lastAuthenticated || 0
     const days = 7  // one week
-    const isOld = moment(new Date(this.lastAuthenticated)).isBefore(moment().subtract((days*24-1), 'hours'))
+    const isOld = moment(new Date(lastAuth)).isBefore(moment().subtract((days*24-1), 'hours'))
     if(isOld) {
       await asyncForEach(this.servers, async (s)=> {
         await this.authenticate(s)

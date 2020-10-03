@@ -1,12 +1,14 @@
 import React, {useState} from 'react'
-import {View, StyleSheet, Text, TextInput, Dimensions} from 'react-native'
-import {Button,Avatar} from 'react-native-paper'
+import {View, StyleSheet, Text, Dimensions} from 'react-native'
+import {Button,Avatar,TextInput} from 'react-native-paper'
 import NumKey from '../../utils/numkey'
 import {usePicSrc} from '../../utils/picSrc'
-import { useStores } from '../../../store'
+import { useStores, useTheme } from '../../../store'
+import {useAvatarColor} from '../../../store/hooks/msg'
 
 export default function Main({contact,loading,confirmOrContinue,contactless}){
   const {ui, details} = useStores()
+  const theme = useTheme()
   const [amt, setAmt] = useState('0')
   const [text, setText] = useState('')
   const [inputFocused,setInputFocused] = useState(false)
@@ -34,6 +36,8 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
       setAmt(newAmt)
     }
   }
+
+  const nameColor = contact && useAvatarColor(contact.alias)
   return <View style={{...styles.wrap,maxHeight:height,minHeight:height,
     justifyContent:contact?'space-around':'center'
   }}>
@@ -41,17 +45,17 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
     {contact && <View style={styles.contactWrap}>
       <Avatar.Image
         source={hasImg?{uri}:require('../../../../android_assets/avatar.png')}
-        size={32}
+        size={42}
       />
       <View style={styles.contactAliasWrap}>
         <Text style={styles.contactAliasLabel}>{ui.payMode==='invoice'?'From':'To'}</Text>
-        <Text>{contact.alias}</Text>
+        <Text style={{color:nameColor}}>{contact.alias}</Text>
       </View>
    </View>}
 
     <View style={styles.amtWrap}>
       <View style={styles.amtInnerWrap}>
-        <Text style={styles.amt}>{amt}</Text>
+        <Text style={{...styles.amt,color:theme.title}}>{amt}</Text>
         <Text style={styles.sat}>sat</Text>
       </View>
     </View>
@@ -72,10 +76,9 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
 
       {ui.payMode==='invoice' && <View style={styles.memoWrap}>
         <TextInput value={text} placeholder="Add Message"
+          mode="outlined"
           onChangeText={v=> setText(v)}
-          style={{...styles.input,
-            borderBottomColor:inputFocused?'#6289FD':'#ddd'
-          }}
+          style={styles.input}
           onFocus={()=> setInputFocused(true)}
           onBlur={()=> setInputFocused(false)}
         />
@@ -125,7 +128,6 @@ const styles=StyleSheet.create({
   },
   amt:{
     fontSize:45,
-    color:'black',
   },
   sat:{
     position:'absolute',
@@ -163,8 +165,7 @@ const styles=StyleSheet.create({
     height:42,
     maxHeight:42,
     flex:1,
-    marginBottom:5,
-    backgroundColor:'#fff',
+    marginBottom:10,
     textAlign:'center',
     borderBottomWidth:1,
     fontSize:16

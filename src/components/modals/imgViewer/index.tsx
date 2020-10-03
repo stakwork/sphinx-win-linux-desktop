@@ -64,7 +64,7 @@ export default function ImgViewer(props) {
   async function sendAttachment(){
     if(uploading) return
 
-    const isGif = uri.split(/[#?]/)[0].split('.').pop().trim() === 'gif';
+    const isGif = uri && (uri.split(/[#?]/)[0].split('.').pop().trim() === 'gif');
     if(isGif){
       sendGif()
       return
@@ -134,6 +134,13 @@ export default function ImgViewer(props) {
 
   const theChat = chat_id && chats.chats.find(c=> c.id===chat_id)
   const isTribe = theChat && theChat.type===constants.chat_types.tribe
+
+  function onShowAmount(){
+    if(inputRef.current) {
+      inputRef.current.blur()
+    }
+  }
+
   return useObserver(() =>
     <View style={styles.wrap}>
       <IconButton
@@ -147,7 +154,9 @@ export default function ImgViewer(props) {
       />
 
       {/* {showInput && !isTribe && <SetPrice setAmount={amt=> setPrice(amt)} />} */}
-      {showInput && <SetPrice setAmount={amt=> setPrice(amt)} />}
+      {showInput && <SetPrice setAmount={amt=> setPrice(amt)} 
+        onShow={onShowAmount}
+      />}
 
       {showImg && <FastImage resizeMode='contain' source={{uri:uri||data}}
         style={{...styles.img,...boxStyles}} 

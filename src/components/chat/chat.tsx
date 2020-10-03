@@ -102,7 +102,7 @@ export default function Chat() {
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }}>
       <Frame url={appURL} />
     </View>}
-    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.bg }}>
+    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }}>
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}

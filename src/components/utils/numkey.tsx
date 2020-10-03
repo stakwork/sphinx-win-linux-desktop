@@ -1,16 +1,18 @@
 import React from 'react'
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native'
 import {IconButton} from 'react-native-paper'
+import {useTheme} from '../../store'
 
 const keys = [
   [1,2,3],[4,5,6],[7,8,9],['_',0,'back']
 ]
 
 export default function NumKey(props) {
+  const theme = useTheme()
   const h = props.squish?240:260
   return <View style={{...styles.wrap, 
       height:h, maxHeight:h, minHeight:h,
-      backgroundColor: props.dark?'#212932':'white'
+      backgroundColor: (props.dark||theme.dark)?'#212932':'white'
     }}>
     {keys.map((row,i)=>{
       return <View key={i} style={styles.row}>
@@ -21,14 +23,14 @@ export default function NumKey(props) {
               onPress={()=>{
                 if(props.onBackspace) props.onBackspace()
               }}>
-              <IconButton icon="backspace" color={props.dark?'white':'#AAA'} />
+              <IconButton icon="backspace" color={(props.dark||theme.dark)?'white':'#AAA'} />
             </TouchableOpacity>
           }
           return <TouchableOpacity key={key} style={styles.key}
             onPress={()=>{
               if(props.onKeyPress) props.onKeyPress(key)
             }}>
-            <Text style={{...styles.keyText,color:props.dark?'white':'#777'}}>
+            <Text style={{...styles.keyText,color:(props.dark||theme.dark)?'white':'#777'}}>
               {key}
             </Text>
           </TouchableOpacity>

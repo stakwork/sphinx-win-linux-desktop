@@ -1,11 +1,13 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {View,Text,StyleSheet,Dimensions,ToastAndroid} from 'react-native'
 import {Button} from 'react-native-paper'
 import QRCode from '../../utils/qrcode'
 import Share from 'react-native-share'
 import Clipboard from "@react-native-community/clipboard";
+import {useTheme} from '../../../store'
 
 export default function ShowRawInvoice({amount,payreq,paid}){
+  const theme = useTheme()
   function copy(){
     Clipboard.setString(payreq)
     ToastAndroid.showWithGravityAndOffset(
@@ -32,7 +34,7 @@ export default function ShowRawInvoice({amount,payreq,paid}){
         <Text style={styles.paid}>PAID</Text>
       </View>}
     </View>
-    <Text style={styles.payreqText}>{payreq}</Text>
+    <Text style={{...styles.payreqText,color:theme.title}}>{payreq}</Text>
     <View style={styles.buttonsWrap}>
       <Button mode="contained" dark={true} 
         onPress={()=> share()} style={styles.button}>

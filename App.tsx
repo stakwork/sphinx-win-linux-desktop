@@ -50,7 +50,7 @@ export default function Wrap(){
 }
 
 function App() {
-  const {user,msg,ui} = useStores()
+  const {user,ui} = useStores()
   const theme = useTheme()
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false)
@@ -65,8 +65,9 @@ function App() {
 
   const isDarkMode = useDarkMode()
   useEffect(()=>{
-    console.log("DARK?",isDarkMode)
-    theme.setDark(isDarkMode);
+    if(theme.mode==='System') {
+      theme.setDark(isDarkMode);
+    }
     (async () => {
       console.log("=> USER",user)
       const isSignedUp = (user.currentIP && user.authToken)?true:false
@@ -81,43 +82,45 @@ function App() {
     })()
   },[])
 
-  if(loading) return <Loading />
-  if(signedUp && !pinned) { // checking if the pin was entered recently
-    return <PINCode
-      onFinish={async() => {
-        await sleep(240)
-        setPinned(true)
-      }}
-    />
-  }
+  return useObserver(()=>{
 
-  const paperTheme = {
-    ...DefaultTheme,
-    roundness: 2,
-    colors: {
-      ...DefaultTheme.colors,
-      primary: '#6289FD',
-      accent: '#55D1A9',
-      text:theme.title,
-      placeholder:theme.subtitle,
-      background:theme.bg,
-      surface:theme.main
-    },
-    dark:theme.dark
-  }
+    if(loading) return <Loading />
+    if(signedUp && !pinned) { // checking if the pin was entered recently
+      return <PINCode
+        onFinish={async() => {
+          await sleep(240)
+          setPinned(true)
+        }}
+      />
+    }
 
-  return (<>
-    <NavigationContainer>
-      <PaperProvider theme={paperTheme}>
-        {/* <StatusBar /> */}
-        {signedUp && <Main />}
-        {!signedUp && <Onboard onFinish={()=>{
-          setSignedUp(true) // signed up w key export
-          setPinned(true)   // also PIN has been set 
-        }} />}
-      </PaperProvider>
-    </NavigationContainer>
-  </>)
+    const paperTheme = {
+      ...DefaultTheme,
+      roundness: 2,
+      colors: {
+        ...DefaultTheme.colors,
+        primary: '#6289FD',
+        accent: '#55D1A9',
+        text:theme.title,
+        placeholder:theme.subtitle,
+        background:theme.bg,
+        surface:theme.main
+      },
+      dark:theme.dark
+    }
+    return (<>
+      <NavigationContainer>
+        <PaperProvider theme={paperTheme}>
+          {/* <StatusBar /> */}
+          {signedUp && <Main />}
+          {!signedUp && <Onboard onFinish={()=>{
+            setSignedUp(true) // signed up w key export
+            setPinned(true)   // also PIN has been set 
+          }} />}
+        </PaperProvider>
+      </NavigationContainer>
+    </>)
+  })
 }
 
 async function sleep(ms) {

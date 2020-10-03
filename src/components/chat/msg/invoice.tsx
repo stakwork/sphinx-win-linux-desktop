@@ -3,12 +3,13 @@ import { View, Text, StyleSheet } from 'react-native'
 import { Button } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { constants } from '../../../constants'
-import { useStores } from '../../../store'
+import { useStores, useTheme } from '../../../store'
 import { calcExpiry } from './utils'
 import shared from './sharedStyles'
 
 export default function Invoice(props) {
   const { ui } = useStores()
+  const theme = useTheme()
 
   const { amount } = props
   const isMe = props.sender === 1
@@ -44,11 +45,11 @@ export default function Invoice(props) {
       <Text style={{ ...styles.label, color }}>{label}</Text>
     </View>
     <View style={{ ...styles.row, marginTop: 12 }}>
-      <Text style={styles.amount}>{amount}</Text>
+      <Text style={{...styles.amount,color:theme.title}}>{amount}</Text>
       <Text style={styles.sat}>sat</Text>
     </View>
     {hasContent && <View style={{ ...styles.row, marginTop: 12 }}>
-      <Text style={styles.text}>{props.message_content}</Text>
+      <Text style={{...styles.text,color:theme.title}}>{props.message_content}</Text>
     </View>}
     {showPayButton && !isExpired && <View style={{ ...styles.row, marginTop: 12 }}>
       <Button style={styles.payButton} mode="contained" dark={true}
@@ -66,7 +67,6 @@ const styles = StyleSheet.create({
     maxWidth: 200,
   },
   amount: {
-    color: '#333',
     fontSize: 28,
     marginRight: 8
   },
@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    color: '#333',
     fontSize: 16,
   },
   payButton: {

@@ -40,6 +40,8 @@ function init(){
     uiStore.setReady(true)
     hydrate('msg', msgStore)
   })
+
+  hydrate('theme', themeStore)
 }
 init()
 

@@ -12,11 +12,12 @@ import ReplyContent from './msg/replyContent'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import RecDot from './recDot'
 import RNFetchBlob from 'rn-fetch-blob'
-import * as e2e from '../../crypto/e2e'
-import {randString} from '../../crypto/rand'
 import { fetchGifs } from './helpers'
-import { Giphy } from './components';
+import Giphy from './giphy';
 import {calcBotPrice} from '../../store/hooks/chat'
+import {requestAudioPermissions, uploadAudioFile} from './audioHelpers'
+
+let dirs = RNFetchBlob.fs.dirs
 
 const conversation = constants.chat_types.conversation
 
@@ -91,7 +92,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   async function startRecord() {
     setRecordSecs('0:00')
     try{
-      await audioRecorderPlayer.startRecorder()
+      await audioRecorderPlayer.startRecorder(dirs.CacheDir+'/sound.mp4')
       audioRecorderPlayer.addRecordBackListener((e) => {
         const str = audioRecorderPlayer.mmssss(
           Math.floor(e.current_position),
@@ -100,7 +101,9 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
         setRecordSecs(str.substr(1,idx-1))
       })
       setRecordingStartTime(Date.now().valueOf())
-    } catch(e){console.log(e)}
+    } catch(e){
+      console.log(e||'ERROR')
+    }
   }
 
   async function stopRecord(cb,time?) {
@@ -115,7 +118,18 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
       audioRecorderPlayer.removeRecordBackListener()
       setRecordSecs('0:00')
       if(cb && !tooShort) cb(result)
-    } catch(e){console.log(e)}
+    } catch(e){
+      console.log(e||'ERROR')
+    }
+  }
+
+  async function doneUploadingAudio(muid,pwd,type){
+    await sendFinalMsg({
+      muid:muid,
+      media_key:pwd,
+      media_type:type,
+    })
+    setUploading(false)
   }
 
   // const position = useRef(new Animated.ValueXY()).current;
@@ -123,13 +137,13 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
     onStartShouldSetPanResponder: (evt, gestureState)=> true,
     onMoveShouldSetPanResponderCapture: ()=> true,
     onPanResponderStart:()=>{
-      startRecord()
+      requestAudioPermissions().then(startRecord)
     },
     onPanResponderEnd:async()=>{
       await sleep(10)
       function callback(path){
         setUploading(true)
-        uploadAudioFile(path)
+        uploadAudioFile(path, meme.getDefaultServer(), doneUploadingAudio)
       }
       setRecordingStartTime(current=>{
         if(current) stopRecord(callback,current)
@@ -152,45 +166,6 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
     },
     onPanResponderRelease: (evt, gestureState) => {},
   }), []);
-
-  async function uploadAudioFile(uri){
-    const pwd = await randString(32)
-    const server = meme.getDefaultServer()
-    if(!server) return
-    if(!uri) return
-
-    const type = 'audio/mp4'
-    const filename = 'sound.mp4'
-    let enc = await e2e.encryptFile(uri, pwd)
-    RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
-      Authorization: `Bearer ${server.token}`,
-      'Content-Type': 'multipart/form-data'
-    }, [{
-        name:'file',
-        filename,
-        type: type,
-        data: enc,
-      }, {name:'name', data:filename}
-    ])
-    // listen to upload progress event, emit every 250ms
-    .uploadProgress({ interval : 250 },(written, total) => {
-        console.log('uploaded', written / total)
-        // setUploadedPercent(Math.round((written / total)*100))
-    })
-    .then(async (resp) => {
-      let json = resp.json()
-      console.log('done uploading',json)
-      await sendFinalMsg({
-        muid:json.muid,
-        media_key:pwd,
-        media_type:type,
-      })
-      setUploading(false)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-  }
 
   async function sendFinalMsg({muid,media_key,media_type}){
     await msg.sendAttachment({
@@ -290,11 +265,11 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
         {recordingStartTime && <View style={styles.recording}>
           <RecDot />
           <View style={styles.recordSecs}>
-            <Text style={styles.recordSecsText}>{recordSecs}</Text>
+            <Text style={{...styles.recordSecsText,color:theme.title}}>{recordSecs}</Text>
           </View>
           <View style={{display:'flex',flexDirection:'row',alignItems:'center'}}>
             <Icon name="rewind" size={16} color="grey" />
-            <Text style={{marginLeft:5}}>Swipe to cancel</Text>  
+            <Text style={{marginLeft:5,color:theme.subtitle}}>Swipe to cancel</Text>  
           </View>
         </View>}
 

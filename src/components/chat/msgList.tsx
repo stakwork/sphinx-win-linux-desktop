@@ -13,10 +13,10 @@ const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: Chat, setReplyUUID, replyUuid }) {
   const { msg, ui, user, chats } = useStores()
-  const [limit, setLimit] = useState(25)
+  const [limit, setLimit] = useState(40)
 
   function onLoadMoreMsgs() {
-    setLimit(c => c + 20)
+    setLimit(c => c + 40)
   }
 
   async function onDelete(id) {
@@ -62,9 +62,10 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
   // }, [refreshing])
 
   async function onEndReached() {
-    setRefreshing(true)
-    wait(10).then(onLoadMoreMsgs)
-    wait(200).then(() => setRefreshing(false))
+    onLoadMoreMsgs()
+    // setRefreshing(true)
+    // wait(10).then(onLoadMoreMsgs)
+    // wait(200).then(() => setRefreshing(false))
   }
 
   useEffect(() => {
@@ -176,9 +177,15 @@ function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, viewable
 }
 
 function DateLine({ dateString }) {
+  const theme = useTheme()
   return <View style={styles.dateLine}>
     <View style={styles.line}></View>
-    <Text style={styles.dateString}>{dateString}</Text>
+    <Text style={{...styles.dateString,
+      backgroundColor:theme.dark?theme.bg:'white',
+      color:theme.title
+    }}>
+      {dateString}
+    </Text>
   </View>
 }
 
