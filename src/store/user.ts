@@ -84,7 +84,10 @@ class UserStore {
       const r = await api.invite.post('signup',{
         invite_string:code
       })
-      console.log("signup r",r)
+      if(!r) {
+        console.log("no invite response")
+        return
+      }
       if(!r.invite) {
         console.log('no invite data')
         return 

@@ -13,6 +13,8 @@ export async function qrActions(j, ui, chats){
       ui.setOauthParams(j)
     case 'donation':
       ui.setSubModalParams(j)
+    case 'redeem_sats':
+      ui.setRedeemModalParams(j)
     case 'tribe':
       try{
         const tribeParams = await chats.getTribeDetails(j.host,j.uuid)

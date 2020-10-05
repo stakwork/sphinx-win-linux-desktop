@@ -18,6 +18,7 @@ import Oauth from './oauth'
 import Support from './support'
 import Subscribe from './subscribe'
 import ShareTribe from './shareTribe'
+import Redeem from './redeem'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -32,6 +33,7 @@ export default function Modals(){
     const showOauth = ui.oauthParams?true:false
     const showSubModal = ui.subModalParams?true:false
     const showShareTribeUUID = ui.shareTribeUUID?true:false
+    const showRedeemModal = ui.redeemModalParams?true:false
     return <>
       {showAddFriendModal && <AddFriend visible={true} />}
       {ui.showPayModal && <Payment visible={true} />}
@@ -48,6 +50,7 @@ export default function Modals(){
       {showOauth && <Oauth visible={true} />}
       {ui.supportModal && <Support visible={true} />}
       {showSubModal && <Subscribe visible={true} />}
+      {showRedeemModal && <Redeem visible={true} />}
       {showShareTribeUUID && <ShareTribe visible={true} />}
     </>
   })

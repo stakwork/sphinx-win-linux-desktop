@@ -46,8 +46,12 @@ export class UiStore {
 
   @observable subModalParams: {[k:string]:any} = null
   @action setSubModalParams(o) {
-    console.log('setSubModalParams',o)
     this.subModalParams = o
+  }
+
+  @observable redeemModalParams: {[k:string]:any} = null
+  @action setRedeemModalParams(o) {
+    this.redeemModalParams = o
   }
 
   @observable editContactModal: boolean = false

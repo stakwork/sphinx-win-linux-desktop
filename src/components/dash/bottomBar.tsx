@@ -4,9 +4,9 @@ import {useStores,useTheme} from '../../store'
 import {View,StyleSheet} from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
-import * as ln from '../utils/decode'
 import * as utils from '../utils/utils'
 import {qrActions} from '../../qrActions'
+import {isLN,parseLightningInvoice,removeLightningPrefix} from '../utils/ln'
 
 export default function BottomTabs() {
   const {ui,chats} = useStores()
@@ -38,14 +38,10 @@ export default function BottomTabs() {
             onScan={async data=>{
               console.log(data)
               if(isLN(data)) {
-                let inv:any
-                let theData = data
-                if(data.indexOf(':')>=0){ // some are like "lightning:ln....""
-                  theData = data.split(':')[1]
-                }
-                try{inv = ln.decode(theData.toLowerCase())} catch(e){}
-                if(!(inv&&inv.human_readable_part))return
-                const millisats = inv.human_readable_part.amount
+                const theData = removeLightningPrefix(data)
+                const inv = parseLightningInvoice(data)
+                if(!(inv&&inv.human_readable_part&&inv.human_readable_part.amount)) return
+                const millisats = parseInt(inv.human_readable_part.amount)
                 const sats = millisats && Math.round(millisats/1000)
                 ui.setConfirmInvoiceMsg({payment_request:theData,amount:sats})
                 setTimeout(()=>{
@@ -71,12 +67,6 @@ export default function BottomTabs() {
       </Portal>
     </View>
   )
-}
-
-const lnPrefixes = ['ln','LIGHTNING:ln']
-function isLN(s){
-  const ok = lnPrefixes.find(p=>s.toLowerCase().startsWith(p.toLowerCase()))
-  return ok?true:false
 }
 
 const styles=StyleSheet.create({
