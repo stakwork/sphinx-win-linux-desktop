@@ -122,7 +122,7 @@ android {
     }
     buildTypes {
         release {
-            debuggable true
+            // debuggable true
             minifyEnabled enableProguardInReleaseBuilds
             consumerProguardFiles 'proguard-rules.pro'
         }
@@ -164,6 +164,7 @@ dependencies {
     implementation project(':react-native-image-picker')
     implementation project(':react-native-camera')
 
+    compile project(':react-native-android-badge')
     compile project(':react-native-fast-image')
     implementation project(':react-native-audio-recorder-player')
     implementation project(':@react-native-community_audio-toolkit')
@@ -189,6 +190,11 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
+
+    // fixes memory leak related crash
+    compile "com.squareup.okhttp3:okhttp:4.2.1"
+    compile "com.squareup.okhttp3:logging-interceptor:4.2.1"
+    compile "com.squareup.okhttp3:okhttp-urlconnection:4.2.1"
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
