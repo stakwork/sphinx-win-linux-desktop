@@ -53,7 +53,7 @@ function App() {
   const {user,ui} = useStores()
   const theme = useTheme()
   const [loading, setLoading] = useState(true) // default
-  const [signedUp, setSignedUp] = useState(false)
+  const [signedUp, setSignedUp] = useState(false) // <=
   const [pinned, setPinned] = useState(false)
 
   function connectedHandler() {
@@ -108,6 +108,7 @@ function App() {
       },
       dark:theme.dark
     }
+
     return (<>
       <NavigationContainer>
         <PaperProvider theme={paperTheme}>
