@@ -11,7 +11,10 @@ import { randAscii } from '../../crypto/rand'
 const conversation = constants.chat_types.conversation
 const tribe = constants.chat_types.tribe
 
-export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appMode: boolean, setAppMode: Function }) {
+export default function Header(
+  { chat, appMode, setAppMode, setShowPod, showPod }: 
+  { chat: Chat, appMode: boolean, setAppMode: Function, setShowPod: Function, showPod: boolean }
+) {
   const { contacts, ui, msg, details, chats } = useStores()
   const theme = useTheme()
   const navigation = useNavigation()
@@ -53,6 +56,9 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
     function setAppModeHandler() {
       setAppMode(!appMode)
     }
+    function setShowPodHandler() {
+      setShowPod(!showPod)
+    }
 
     return (
       <Appbar.Header style={{ width: '100%', backgroundColor: theme.main, elevation: 5, zIndex: 102, position: 'relative' }}>
@@ -61,6 +67,10 @@ export default function Header({ chat, appMode, setAppMode }: { chat: Chat, appM
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
         {theChat && <Appbar.Action icon={isMuted ? 'bell-off' : 'bell'}
           onPress={muteChat} color="grey"
+        />}
+        {theChat && theChat.type === tribe && (ui.feedURL?true:false) && <Appbar.Action 
+          icon="rss" color={showPod?'#bbb':'grey'}
+          onPress={setShowPodHandler}
         />}
         {theChat && theChat.type === tribe && (ui.applicationURL?true:false) && <Appbar.Action color="grey"
           icon={appMode ? 'android-messages' : 'open-in-app'}

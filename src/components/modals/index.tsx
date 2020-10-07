@@ -19,6 +19,7 @@ import Support from './support'
 import Subscribe from './subscribe'
 import ShareTribe from './shareTribe'
 import Redeem from './redeem'
+import VidViewer from './vidViewer'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -34,6 +35,7 @@ export default function Modals(){
     const showSubModal = ui.subModalParams?true:false
     const showShareTribeUUID = ui.shareTribeUUID?true:false
     const showRedeemModal = ui.redeemModalParams?true:false
+    const showVid = ui.vidViewerParams?true:false
     return <>
       {showAddFriendModal && <AddFriend visible={true} />}
       {ui.showPayModal && <Payment visible={true} />}
@@ -52,6 +54,7 @@ export default function Modals(){
       {showSubModal && <Subscribe visible={true} />}
       {showRedeemModal && <Redeem visible={true} />}
       {showShareTribeUUID && <ShareTribe visible={true} />}
+      {showVid && <VidViewer params={ui.vidViewerParams} />}
     </>
   })
 }

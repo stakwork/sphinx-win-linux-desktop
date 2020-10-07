@@ -15,6 +15,7 @@ import {qrActions} from './src/qrActions'
 // import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 import { useDarkMode } from 'react-native-dynamic'
+import { is24HourFormat } from 'react-native-device-time-format'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -62,12 +63,21 @@ function App() {
   function disconnectedHandler() {
     ui.setConnected(false)
   }
+  async function check24Hour(){
+    const is24Hour = await is24HourFormat()
+    ui.setIs24HourFormat(is24Hour)
+  }
 
   const isDarkMode = useDarkMode()
   useEffect(()=>{
     if(theme.mode==='System') {
       theme.setDark(isDarkMode);
+    } else {
+      theme.setDark(theme.dark?true:false);
     }
+
+    check24Hour();
+
     (async () => {
       console.log("=> USER",user)
       const isSignedUp = (user.currentIP && user.authToken)?true:false

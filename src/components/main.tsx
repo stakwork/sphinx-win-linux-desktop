@@ -4,7 +4,6 @@ import MainNav from './mainnav'
 import {useStores} from '../store'
 import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
-import { is24HourFormat } from 'react-native-device-time-format'
 import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
 
@@ -52,12 +51,13 @@ export default function Main() {
     ui.setLoadingHistory(true)
     await Promise.all([
       contacts.getContacts(),
-      details.getBalance(),
       msg.getMessages()
     ])
     ui.setLoadingHistory(false)
     msg.initLastSeen()
-    await sleep(1000)
+    await sleep(500)
+    details.getBalance()
+    await sleep(500)
     meme.authenticateAll()
   }
 
@@ -70,9 +70,6 @@ export default function Main() {
       if(pushToken && !user.deviceId || user.deviceId!==pushToken) {
         user.registerMyDeviceId(pushToken)
       }
-
-      const is24Hour = await is24HourFormat()
-      ui.setIs24HourFormat(is24Hour)
 
       createPrivateKeyIfNotExists(contacts)
     })()

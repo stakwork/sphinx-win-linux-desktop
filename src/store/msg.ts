@@ -324,7 +324,7 @@ class MsgStore {
 
   @action
   initLastSeen() {
-    const obj = this.lastSeen?{...this.lastSeen}:{}
+    const obj = this.lastSeen?JSON.parse(JSON.stringify(this.lastSeen)):{}
     chatStore.chats.forEach(c=>{
       if(!obj[c.id]) obj[c.id] = new Date().getTime()
     })

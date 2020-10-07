@@ -24,6 +24,11 @@ export class UiStore {
     this.applicationURL = s
   }
 
+  @observable feedURL: string
+  @action setFeedURL(s){
+    this.feedURL = s
+  }
+
   @observable searchTerm: string = ''
   @action setSearchTerm(term) {
     this.searchTerm = term
@@ -178,6 +183,11 @@ export class UiStore {
   @observable imgViewerParams: {[k:string]:any} = null
   @action setImgViewerParams(obj:{[k:string]:any}) {
     this.imgViewerParams = obj
+  }
+
+  @observable vidViewerParams: {[k:string]:any} = null
+  @action setVidViewerParams(obj:{[k:string]:any}) {
+    this.vidViewerParams = obj
   }
 
   @observable rtcParams: {[k:string]:any} = null

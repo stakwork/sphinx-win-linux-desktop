@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
+import PodDrop from './podDrop'
 
 export default function Chat() {
   const { contacts, user, chats, ui } = useStores()
@@ -22,6 +23,7 @@ export default function Chat() {
   const [replyUuid, setReplyUUID] = useState('')
   const [loadingChat, setLoadingChat] = useState(false)
   const [appMode, setAppMode] = useState(false)
+  const [showPod, setShowPod] = useState(false)
   const [tribeBots,setTribeBots] = useState([])
   
   const route = useRoute<ChatRouteProp>()
@@ -84,6 +86,9 @@ export default function Chat() {
           isAppURL = true
           ui.setApplicationURL(params.app_url)
         }
+        if(params.feed_url) {
+          ui.setFeedURL(params.feed_url)
+        }
         if(params.bots && Array.isArray(params.bots)) {
           setTribeBots(params.bots)
         }
@@ -97,11 +102,17 @@ export default function Chat() {
 
   const appURL = ui.applicationURL
   const theShow = show && !loadingChat
+
   return <View style={{...styles.main,backgroundColor:theme.bg}}>
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} />
+
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} setShowPod={setShowPod} showPod={showPod} />
+
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }}>
       <Frame url={appURL} />
     </View>}
+
+    <PodDrop show={showPod&&ui.feedURL} host={chat.host} uuid={chat.uuid} url={ui.feedURL} />
+
     <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }}>
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
@@ -112,6 +123,7 @@ export default function Chat() {
         tribeBots={tribeBots}
       />}
     </View>
+
   </View>
 }
 

@@ -6,6 +6,8 @@ import { Chat } from '../../store/chats'
 import Message from './msg'
 import { useNavigation } from '@react-navigation/native'
 import { constants } from '../../constants'
+import EE from '../utils/ee'
+
 const { useMsgs } = hooks
 
 const group = constants.chat_types.group
@@ -51,10 +53,9 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
 function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, lastUpdated }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
-  const [viewableIds, setViewableIds] = useState({})
+  // const [viewableIds, setViewableIds] = useState({})
   const { contacts } = useStores()
 
-  const [refreshing, setRefreshing] = useState(false)
   // const onRefresh = useCallback(() => {
   //   console.log("ON REFRSH")
   //   setRefreshing(true)
@@ -62,10 +63,8 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
   // }, [refreshing])
 
   async function onEndReached() {
-    onLoadMoreMsgs()
-    // setRefreshing(true)
-    // wait(10).then(onLoadMoreMsgs)
-    // wait(200).then(() => setRefreshing(false))
+    EE.emit('show-refresher')
+    wait(10).then(onLoadMoreMsgs)
   }
 
   useEffect(() => {
@@ -96,17 +95,13 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
 
   const isGroup = chat.type === group
   const isTribe = chat.type === tribe
-  const initialNumToRender = 9
+  const initialNumToRender = 20
 
   return (<>
-    {refreshing && <View style={styles.refreshingWrap}>
-      <View style={styles.refreshingCircle}>
-        <ActivityIndicator animating={true} color="grey" size={25} />
-      </View>
-    </View>}
+    <Refresher />
     <VirtualizedList
       inverted
-      windowSize={8} // ?
+      windowSize={10} // ?
       ref={scrollViewRef}
       data={msgs}
       extraData={replyUuid}
@@ -119,15 +114,15 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
         viewAreaCoveragePercentThreshold: 20
       }}
       onViewableItemsChanged={({ viewableItems, changed }) => {
-        debounce(() => {
-          const ids = {}
-          if (viewableItems) {
-            viewableItems.forEach(c => {
-              if (c.item.id) ids[c.item.id] = true
-            })
-          }
-          setViewableIds(current => ({ ...current, ...ids }))
-        }, 200)
+        // debounce(() => {
+        //   const ids = {}
+        //   if (viewableItems) {
+        //     viewableItems.forEach(c => {
+        //       if (c.item.id) ids[c.item.id] = true
+        //     })
+        //   }
+        //   setViewableIds(current => ({ ...current, ...ids }))
+        // }, 200)
       }}
       renderItem={({ item, index }) => {
         let senderAlias = ''
@@ -140,7 +135,7 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
         }
         return <ListItem key={item.id}
           windowWidth={windowWidth}
-          viewable={viewableIds[item.id] === true}
+          // viewable={viewableIds[item.id] === true}
           m={item} chat={chat}
           senderAlias={senderAlias} senderPhoto={senderPhoto}
           isGroup={isGroup} isTribe={isTribe}
@@ -158,7 +153,27 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
   </>)
 }
 
-function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, viewable, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
+function Refresher(){
+  const [show,setShow] = useState(false)
+  useEffect(()=>{
+    function doShow(){
+      setShow(true)
+      setTimeout(()=>{
+        setShow(false)
+      }, 1000)
+    }
+    EE.on('show-refresher', doShow)
+    return ()=> EE.removeListener('show-refresher',doShow)
+  },[])
+  if(!show) return <></>
+  return <View style={{...styles.refreshingWrap,height:show?60:0}}>
+    <View style={styles.refreshingCircle}>
+      <ActivityIndicator animating={true} color="grey" size={25} />
+    </View>
+  </View>
+}
+
+function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -167,13 +182,13 @@ function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, viewable
   }
   const msg = m
   if (!m.chat) msg.chat = chat
-  return useMemo(() => <Message {...msg} viewable={viewable}
+  return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
     senderAlias={senderAlias} senderPhoto={senderPhoto}
     setReplyUUID={setReplyUUID} replyUuid={replyUuid}
     onDelete={onDelete} myPubkey={myPubkey} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
-  />, [viewable, m.id, m.type, m.media_token, replyUuid, m.status, m.sold])
+  />, [m.id, m.type, m.media_token, replyUuid, m.status, m.sold])
 }
 
 function DateLine({ dateString }) {
@@ -231,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     justifyContent:'center',
-    height:60
+    overflow:'hidden'
   },
   refreshingCircle:{
     height:42,width:42,

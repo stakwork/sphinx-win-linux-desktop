@@ -28,9 +28,13 @@ export default function MediaMsg(props) {
   }
   const { data, uri, loading, trigger, paidMessageText } = useCachedEncryptedFile(props, ldat)
 
+  // useEffect(() => {
+  //   if (props.viewable) trigger()
+  // }, [props.viewable, props.media_token]) // refresh when scroll, or when purchase accepted
+
   useEffect(() => {
-    if (props.viewable) trigger()
-  }, [props.viewable, props.media_token]) // refresh when scroll, or when purchase accepted
+    trigger()
+  }, [props.media_token]) // refresh when scroll, or when purchase accepted
 
   async function buy(amount) {
     setBuying(true)
@@ -149,24 +153,23 @@ function Media({ type, data, uri, filename }) {
     return <AudioPlayer source={uri || data} type={type} />
   }
   if (type.startsWith('video') && uri) {
-    return <VideoPlayer source={{ uri }} resizeMode="cover" />
+    return <VideoPlayer uri={{ uri }} />
   }
   return <FileMsg type={type} uri={uri} filename={filename} />
 }
 
 function VideoPlayer(props){
-  const [play,setPlay] = useState(false)
-  const videoRef = useRef<Video>()
+  const { ui } = useStores()
   function onEnd() {
-    setPlay(false)
-    videoRef.current.seek(0);
+    
   }
   function onPlay(){
-    setPlay(true)
+    ui.setVidViewerParams(props)
   }
   return <>
-    <Video ref={videoRef} {...props} paused={!play} 
-      onEnd={onEnd} style={{
+    <Video source={props.uri} resizeMode="cover"
+      paused={true} onEnd={onEnd} 
+      style={{
         position: 'absolute',
         top: 0,
         left: 0,
@@ -175,10 +178,10 @@ function VideoPlayer(props){
         zIndex:100,
       }}
     />
-    {!play && <IconButton icon="play" size={55} color="white" 
+    <IconButton icon="play" size={55} color="white" 
       style={{position:'absolute',top:50,left:50,zIndex:101}} 
       onPress={onPlay}
-    />}
+    />
   </>
 }
 

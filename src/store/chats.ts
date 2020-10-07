@@ -233,6 +233,18 @@ export class ChatStore {
     }
   }
 
+  @action 
+  async loadFeed(host:string,uuid:string,url:string){
+    if(!host || !uuid || !url) return
+    const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
+    try{
+      const r = await fetch(`https://${theHost}/podcast?url=${url}`)
+      return r.json()
+    } catch(e){
+      console.log(e)
+    }
+  }
+
 }
 
 export const chatStore = new ChatStore()
