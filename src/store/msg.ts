@@ -98,10 +98,12 @@ class MsgStore {
       const r = await relay.get(route)
       if(!r) return
       console.log("=> NEW MSGS LENGTH", r.new_messages.length)
-      const msgs = await decodeMessages(r.new_messages) // this takes a longass time
-      msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
-      this.messages = orgMsgsFromExisting(this.messages, msgs)
-      this.lastFetched = new Date().getTime()
+      if(r.new_messages.length) {
+        const msgs = await decodeMessages(r.new_messages) // this takes a longass time
+        msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
+        this.messages = orgMsgsFromExisting(this.messages, msgs)
+        this.lastFetched = new Date().getTime()
+      }
     } catch(e) {
       console.log(e)
     }
@@ -359,10 +361,13 @@ class MsgStore {
     const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
     if(chatID){
       msgsBuffer.push(newMsg)
+      if(msgsBuffer.length===1) {
+        this.pushFirstFromBuffer()
+      }
       debounce(() => {
         this.concatNewMsgs()
       }, 1000)
-      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
+      // if(newMsg.chat) chatStore.gotChat(newMsg.chat) // IS THIS NEEDED????
     }
   }
 
@@ -371,6 +376,13 @@ class MsgStore {
     msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
     this.messages = orgMsgsFromExisting(this.messages, msgs)
     msgsBuffer = []
+  }
+
+  @action pushFirstFromBuffer() {
+    const msg = msgsBuffer[0]
+    const msgs = [msg]
+    const orged = orgMsgsFromExisting(this.messages, msgs)
+    this.messages = orged
   }
 
 }

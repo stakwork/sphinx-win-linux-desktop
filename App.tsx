@@ -16,6 +16,7 @@ import {qrActions} from './src/qrActions'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 import { useDarkMode } from 'react-native-dynamic'
 import { is24HourFormat } from 'react-native-device-time-format'
+import TrackPlayer from 'react-native-track-player';
 
 declare var global: {HermesInternal: null | {}}
 
@@ -73,10 +74,12 @@ function App() {
     if(theme.mode==='System') {
       theme.setDark(isDarkMode);
     } else {
-      theme.setDark(theme.dark?true:false);
+      theme.setDark(theme.mode==='Dark');
     }
 
     check24Hour();
+
+    TrackPlayer.setupPlayer();
 
     (async () => {
       console.log("=> USER",user)

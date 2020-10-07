@@ -22,7 +22,7 @@ push.configure((t)=>{
   console.log("PUSH TOKEN:",t&&t.token)
   pushToken = t.token
 },(n)=>{
-  console.log("ON FINISH",n)
+  // console.log("ON FINISH",n)
 })
 
 export default function Main() {
@@ -54,7 +54,7 @@ export default function Main() {
       msg.getMessages()
     ])
     ui.setLoadingHistory(false)
-    msg.initLastSeen()
+    // msg.initLastSeen()
     await sleep(500)
     details.getBalance()
     await sleep(500)

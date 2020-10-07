@@ -47,7 +47,7 @@ export default function Header(
 
     function onBackHandler() {
       setTimeout(()=>{
-        msg.seeChat(chat.id)
+        // msg.seeChat(chat.id)
         details.getBalance()
         navigation.navigate('Home', { params: { rnd: Math.random() } })
       },1)

@@ -21,7 +21,6 @@ export default function Chat() {
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [replyUuid, setReplyUUID] = useState('')
-  const [loadingChat, setLoadingChat] = useState(false)
   const [appMode, setAppMode] = useState(false)
   const [showPod, setShowPod] = useState(false)
   const [tribeBots,setTribeBots] = useState([])
@@ -101,7 +100,7 @@ export default function Chat() {
   }
 
   const appURL = ui.applicationURL
-  const theShow = show && !loadingChat
+  const theShow = show
 
   return <View style={{...styles.main,backgroundColor:theme.bg}}>
 

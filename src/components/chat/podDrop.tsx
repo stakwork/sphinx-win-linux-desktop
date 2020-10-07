@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Text, ActivityIndicator, Image } from 'react-native'
+import { View, StyleSheet, Text, ActivityIndicator, Image, TouchableOpacity } from 'react-native'
 import { useStores, useTheme } from '../../store'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment'
@@ -13,6 +13,7 @@ export default function PodDrop({ show, host, uuid, url }) {
   const [params, setParams] = useState(null)
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
+  const [duration,setDuration] = useState(0)
 
   async function loadParams() {
     setLoading(true)
@@ -29,20 +30,24 @@ export default function PodDrop({ show, host, uuid, url }) {
   }
 
   const start = async (ps) => {
-    console.log(ps)
-    // Set up the player
-    await TrackPlayer.setupPlayer();
+    const episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
+    if(!episode) return
     // Add a track to the queue
     await TrackPlayer.add({
-      id: ps.id,
-      url: ps.enclosureUrl,
-      title: ps.title,
-      artist: ps.author || 'author',
-      artwork: ps.image
+      id: episode.id,
+      url: episode.enclosureUrl,
+      title: episode.title,
+      artist: episode.author || 'author',
+      artwork: episode.image
     });
     // Start playing it
     await TrackPlayer.play();
     setPlaying(true)
+
+    setTimeout(async ()=>{
+      const dur = await TrackPlayer.getDuration()
+      setDuration(dur)
+    },850)
   };
 
   async function checkState(){
@@ -60,27 +65,37 @@ export default function PodDrop({ show, host, uuid, url }) {
       checkState()
       if(!params) loadParams()
     }
-    if (!show) {
-      TrackPlayer.stop()
-    }
+    // if (!show) {
+    //   TrackPlayer.stop()
+    // }
   }, [show])
 
   if (!show) {
     return <></>
   }
-  return <View style={{ ...styles.wrap, backgroundColor: theme.bg, borderBottomColor: theme.border }}>
-    {loading && <ActivityIndicator animating={true} color="#bbb" />}
-    {!loading && params && <View style={styles.inner}>
+  const height = 215
+  const episode = params && params.episodes && params.episodes.length && params.episodes[0]
+  return <View style={{ ...styles.wrap, backgroundColor: theme.bg, borderBottomColor: theme.border, height }}>
+    {loading && <View style={{height, ...styles.spinWrap}}>
+      <ActivityIndicator animating={true} color="#bbb" />
+    </View>}
+    {!loading && episode && <View style={styles.inner}>
       <View style={styles.top}>
-        {params.image && <Image source={{ uri: params.image }}
+        {episode.image && <Image source={{ uri: episode.image }}
           style={{ width: 88, height: 88 }} resizeMode={'cover'}
         />}
         <View style={styles.info}>
-          {params.title && <Text style={{ color: theme.title }}>{params.title}</Text>}
+          {params.title && <Text style={{ color: theme.title, ...styles.podcastTitle }} numberOfLines={1}>
+            {params.title}
+          </Text>}
+          {episode.title && <Text style={{ color: theme.title, fontSize:13 }} numberOfLines={1}>
+            {episode.title}
+          </Text>}
         </View>
       </View>
       <View style={styles.track}>
         <PlayerBar theme={theme} onToggle={onToggle} playing={playing} 
+          duration={duration}
         />
       </View>
     </View>}
@@ -88,22 +103,58 @@ export default function PodDrop({ show, host, uuid, url }) {
 }
 
 class PlayerBar extends TrackPlayer.ProgressComponent {
+  fastForward = () => {
+    TrackPlayer.seekTo(this.state.position+10);
+  }
+  rewind = () => {
+    TrackPlayer.seekTo(this.state.position<10?0:this.state.position-10)
+  }
+  track = (e) => {
+    const {duration} = this.props
+    if(duration) {
+      const x = e.nativeEvent.locationX
+      this.bar.measure( (fx, fy, width, height, px, py) => {
+        const ratio = x/width
+        const secs = duration*ratio
+        TrackPlayer.seekTo(secs);
+      })
+    }
+  }
   render() {
+    const {theme,onToggle,playing,duration} = this.props
+    let time = moment.duration(this.state.position,'seconds').format('hh:mm:ss')
+    if(duration) {
+      time += ` / ${moment.duration(duration,'seconds').format('hh:mm:ss')}`
+    }
     return (
       <View style={styles.progressWrap}>
         <View style={styles.progressWrapTop}>
-          <IconButton icon={this.props.playing?'pause':'play'} 
-            color={this.props.theme.title} size={26} 
-            onPress={()=> this.props.onToggle(this.state.position)}
-          />
-          <Text style={{color:this.props.theme.title}}>
-            {moment.duration(this.state.position,'seconds').format('hh:mm:ss')}
+          <View style={{height:1,width:100}}/>
+          <View style={styles.controls}>
+            <IconButton icon="rewind-10"
+              color={theme.title} size={20} 
+              onPress={this.rewind}
+            />
+            <IconButton icon={playing?'pause':'play'} 
+              color={theme.title} size={26} 
+              onPress={()=> onToggle(this.state.position)}
+            />
+            <IconButton icon="fast-forward-10"
+              color={theme.title} size={20} 
+              onPress={this.fastForward}
+            />
+          </View>
+          <Text style={{color:theme.title,width:110,textAlign:'right',fontSize:11}}>
+            {time}
           </Text>
         </View>
-        <ProgressBar color="#6289FD"
-          progress={this.getProgress()}
-          // buffered={this.getBufferedProgress()}
-        />
+        <TouchableOpacity onPress={this.track} style={styles.progressTouch}
+          ref={r=> this.bar=r}>
+          <ProgressBar color="#6289FD"
+            progress={this.getProgress()}
+            // buffered={this.getBufferedProgress()}
+          />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -114,9 +165,14 @@ const styles = StyleSheet.create({
   wrap: {
     position: 'relative',
     width: '100%',
-    height: 208,
     zIndex: 150,
     borderBottomWidth: 2
+  },
+  spinWrap:{
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    width:'100%',
   },
   title: {
     color: 'white'
@@ -132,7 +188,18 @@ const styles = StyleSheet.create({
   info:{
     marginLeft:15,
     display:'flex',
+    flex:1,
     justifyContent:'space-around'
+  },
+  podcastTitle:{
+    fontSize:15, 
+    marginBottom:8,
+    maxWidth:'100%'
+  },
+  controls:{
+    display:'flex',
+    alignItems:'center',
+    flexDirection:'row'
   },
   track: {
     width:'100%',
@@ -143,12 +210,16 @@ const styles = StyleSheet.create({
     display:'flex',
     width:'100%',
   },
+  progressTouch:{
+    height:45,
+    display:'flex',
+    justifyContent:'center'
+  },
   progressWrapTop:{
     display:'flex',
     flexDirection:'row',
     justifyContent:'space-between',
     alignItems:'center',
     width:'100%',
-    marginBottom:5,
   }
 })
