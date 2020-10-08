@@ -136,6 +136,11 @@ function ChatContent({ appMode, footHeight }) {
     const msgs = useMsgs(chat) || []
     const isTribe = chat && chat.type === constants.chat_types.tribe
     const h = `calc(100% - ${headHeight + footHeight}px)`
+
+    useEffect(()=> {
+      setMsgCount(20)
+    }, [(chat && chat.id)]) 
+
     if (ui.loadingChat) {
       return <LoadingWrap style={{ maxHeight: h, minHeight: h }}>
         <CircularProgress size={32} style={{ color: 'white' }} />

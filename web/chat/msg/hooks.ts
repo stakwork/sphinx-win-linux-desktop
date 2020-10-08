@@ -42,6 +42,11 @@ export function useCachedEncryptedFile(props, ldat){
         headers: {Authorization: `Bearer ${server.token}`}
       })
       const blob = await r.blob() // need to do "text" for paid msg???
+      const headers =  r.headers.get("content-disposition")
+      let filename = 'file'
+      console.log(r.headers)
+      console.log(headers)
+      r.headers.forEach((a)=> console.log(a))
       let reader = new FileReader();
       reader.onload = async function(){ // file content
         const res = String(reader.result)
@@ -56,7 +61,7 @@ export function useCachedEncryptedFile(props, ldat){
           const dec = await aes.decrypt(b64, media_key)
           if(dec) {
             setPaidMessageText(dec)
-            meme.addToCache(ldat.muid, String(dec))
+            meme.addToCache(ldat.muid, String(dec), filename)
           }
         } else {
           console.log("DECRYPT NOW!!!!",media_type)
@@ -65,7 +70,7 @@ export function useCachedEncryptedFile(props, ldat){
             let mime = media_type
             if(mime==='audio/m4a') mime='audio/wav'
             setData(`data:${mime};base64,${dec}`)
-            meme.addToCache(ldat.muid, `data:${mime};base64,${dec}`)
+            meme.addToCache(ldat.muid, `data:${mime};base64,${dec}`, filename)
           }         
         }
         setLoading(false)
