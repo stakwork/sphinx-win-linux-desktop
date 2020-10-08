@@ -64,9 +64,11 @@ class MemeStore {
 
   @persist('object') @observable cache: {[k:string]:string} = {}
   @persist('object') @observable cacheTS: {[k:string]:number} = {}
-  @action addToCache(muid:string,data:string){
+  @persist('object') @observable cacheFileName: {[k:string]:string} = {}
+  @action addToCache(muid:string,data:string,filename?:string){
     this.cache[muid] = data
     this.cacheTS[muid] = moment().unix()
+    if(filename) this.cacheFileName[muid] = filename
   }
 
   @persist('object') @observable filenameCache: {[k:number]:string} = {}
