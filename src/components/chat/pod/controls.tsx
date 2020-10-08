@@ -43,10 +43,10 @@ export default class Controls extends TrackPlayer.ProgressComponent {
       <View style={styles.progressWrap}>
         <View style={styles.progressWrapTop}>
           <View style={{ height: 50, width: 100, display:'flex', justifyContent:'center' }}>
-            <IconButton icon="chat"
+            {/* <IconButton icon="chat"
               color={theme.title} size={20}
               onPress={this.feedClip}
-            />
+            /> */}
           </View>
           <View style={styles.controls}>
             <IconButton icon="rewind-10"
