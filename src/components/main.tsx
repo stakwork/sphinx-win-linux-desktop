@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useState} from 'react'
 import {AppState} from 'react-native'
 import MainNav from './mainnav'
 import {useStores} from '../store'
@@ -63,6 +63,7 @@ export default function Main() {
 
   useEffect(()=>{
     (async () => {
+
       loadHistory()
 
       initPicSrc()

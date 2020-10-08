@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
-import PodDrop from './podDrop'
+import PodDrop from './pod/podDrop'
 
 export default function Chat() {
   const { contacts, user, chats, ui } = useStores()

@@ -16,6 +16,7 @@ import { fetchGifs } from './helpers'
 import Giphy from './giphy';
 import {calcBotPrice} from '../../store/hooks/chat'
 import {requestAudioPermissions, uploadAudioFile} from './audioHelpers'
+import EE from '../utils/ee'
 
 let dirs = RNFetchBlob.fs.dirs
 
@@ -60,6 +61,21 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
     // inputRef.current.blur()
     // setInputFocused(false)
   }
+
+  function makeFeedClip(body){
+    console.log("make feed clip",body)
+  }
+  function gotReplyUUID(){
+
+  }
+  useEffect(()=>{
+    EE.on('feed-clip', makeFeedClip)
+    EE.on('reply-uuid', gotReplyUUID)
+    return ()=> {
+      EE.removeListener('feed-clip',makeFeedClip)
+      EE.removeListener('reply-uuid',gotReplyUUID)
+    }
+  },[])
 
   async function tookPic(img){
     setDialogOpen(false)
