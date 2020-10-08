@@ -21,12 +21,14 @@ var link = null
 var link = null
 
 const headHeight = 65
+
 function Chat() {
   const { chats, ui } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [tribeBots, setTribeBots] = useState([])
   let footHeight = 65
+  if(ui.replyUUID) footHeight=115
 
   // function joinEvanTest(){
   //   chats.joinTribe({
