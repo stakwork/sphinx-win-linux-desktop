@@ -28,7 +28,7 @@ export default function MediaMsg(props) {
   }
   const needsPurchase = amt && !purchased
 
-  const { data, loading, trigger, paidMessageText } = useCachedEncryptedFile(props, ldat)
+  const { data, loading, trigger, paidMessageText, filename } = useCachedEncryptedFile(props, ldat)
 
   let showPayToUnlockMessage = false
   let isPaidMsg = false
@@ -71,7 +71,7 @@ export default function MediaMsg(props) {
       <NeedsPurchase>
         <CamIcon style={{ color: 'grey', fontSize: 30 }} />
       </NeedsPurchase> :
-      <Media type={media_type} data={data} onClick={() => ui.setImgViewerParams({ data })} />
+      <Media type={media_type} data={data} filename={filename} onClick={() => ui.setImgViewerParams({ data })} />
     }
     {message_content && <Content>
       {message_content}
@@ -103,7 +103,7 @@ function BuyIcon({ purchased, loading }) {
   return <CallMadeIcon style={{ color: 'white', fontSize: 15 }} />
 }
 
-function Media({ type, data, onClick }) {
+function Media({ type, data, onClick, filename }) {
   // console.log(type,data)
   if (type === 'text/plain') return <></>
   if (type.startsWith('image')) {
@@ -116,16 +116,16 @@ function Media({ type, data, onClick }) {
   //   <Player><source src={data} /></Player>
   // }
   return <>
-    <Download src={data} onClick={() => download(data)}>
-        Download Attachment
-        <GetAppIcon style={{marginLeft: 10}}/>
+    <Download src={data} filename={filename} onClick={() => download(data, filename)}>
+      <span>Download file: {filename || "Attachment"}</span>
+      <GetAppIcon style={{ marginLeft: 10 }} />
     </Download>
   </>
 }
 
-function download(dataURL) {
+function download(dataURL, filename) {
   var a = document.createElement("a");
-  a.download = "file";
+  a.download = filename || "file";
   a.href = dataURL;
   document.body.appendChild(a);
   a.click();
@@ -137,9 +137,16 @@ const Wrap = styled.div`
 const Download = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: 13px;
+  padding: 0px 15px;
+  max-width: 300px;
   cursor: pointer;
+  & span{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 `
 
 const Image = styled.div`
