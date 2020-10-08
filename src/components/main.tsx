@@ -1,11 +1,11 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useState} from 'react'
 import {AppState} from 'react-native'
 import MainNav from './mainnav'
 import {useStores} from '../store'
 import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
-import { is24HourFormat } from 'react-native-device-time-format'
 import * as rsa from '../crypto/rsa'
+import * as BadgeAndroid from 'react-native-android-badge'
 
 async function createPrivateKeyIfNotExists(contacts){
   const priv = await rsa.getPrivateKey()
@@ -16,6 +16,14 @@ async function createPrivateKeyIfNotExists(contacts){
     contact_key: keyPair.public
   })
 }
+
+let pushToken = ''
+push.configure((t)=>{
+  console.log("PUSH TOKEN:",t&&t.token)
+  pushToken = t.token
+},(n)=>{
+  // console.log("ON FINISH",n)
+})
 
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
@@ -32,39 +40,45 @@ export default function Main() {
     if (appState.current.match(/inactive|background/) && nextAppState === "active") {
       loadHistory()
     }
+    if (appState.current.match(/active/) && nextAppState === "background") {
+      const count = msg.countUnseenMessages()
+      BadgeAndroid.setBadge(count);
+    }
     appState.current = nextAppState;
   }
 
   async function loadHistory(){
     ui.setLoadingHistory(true)
-    await contacts.getContacts().then(()=>{
-      meme.authenticateAll()
-    })
-    await details.getBalance()
-    await msg.getMessages()
+    await Promise.all([
+      contacts.getContacts(),
+      msg.getMessages()
+    ])
     ui.setLoadingHistory(false)
-    msg.initLastSeen()
+    // msg.initLastSeen()
+    await sleep(500)
+    details.getBalance()
+    await sleep(500)
+    meme.authenticateAll()
   }
 
   useEffect(()=>{
     (async () => {
+
       loadHistory()
 
       initPicSrc()
 
-      push.configure((t)=>{
-        // console.log("PUSH TOKEN:",t&&t.token)
-        if(!user.deviceId || user.deviceId!==t.token) {
-          user.registerMyDeviceId(t.token)
-        }
-      })
-
-      const is24Hour = await is24HourFormat()
-      ui.setIs24HourFormat(is24Hour)
+      if(pushToken && !user.deviceId || user.deviceId!==pushToken) {
+        user.registerMyDeviceId(pushToken)
+      }
 
       createPrivateKeyIfNotExists(contacts)
     })()
   },[])
 
   return <MainNav />
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }

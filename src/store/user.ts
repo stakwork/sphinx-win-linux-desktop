@@ -2,6 +2,7 @@ import { observable, action } from 'mobx'
 import * as api from '../api'
 import {randString} from '../crypto/rand'
 import { persist } from 'mobx-persist'
+import {uiStore} from './ui'
 
 class UserStore {
 
@@ -54,7 +55,12 @@ class UserStore {
     const token = arr[3]
     this.setCurrentIP(ip)
     this.setAuthToken(token)
-    api.instantiateRelay(ip, token)
+    console.log("RESTORE NOW!")
+    api.instantiateRelay(ip, token, 
+      ()=>uiStore.setConnected(true),
+      ()=>uiStore.setConnected(false),
+    )
+    await sleep(650)
     return priv
   }
 
@@ -62,6 +68,7 @@ class UserStore {
   async registerMyDeviceId(device_id) {
     try {
       const r = await api.relay.put(`contacts/1`, {device_id})
+      if(!r) return
       if(r.device_id) {
         this.deviceId = r.device_id
       }
@@ -77,7 +84,10 @@ class UserStore {
       const r = await api.invite.post('signup',{
         invite_string:code
       })
-      console.log("signup r",r)
+      if(!r) {
+        console.log("no invite response")
+        return
+      }
       if(!r.invite) {
         console.log('no invite data')
         return 
@@ -116,7 +126,10 @@ class UserStore {
         token
       })
       this.authToken = token
-      api.instantiateRelay(this.currentIP, token)
+      api.instantiateRelay(this.currentIP, token,
+        ()=>uiStore.setConnected(true),
+        ()=>uiStore.setConnected(false),  
+      )
       return token
     } catch(e) {
       console.log(e)

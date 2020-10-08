@@ -40,12 +40,15 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
     function sendMessage() {
       if (!text) return
       let contact_id = chat.contact_ids.find(cid => cid !== 1)
-      let botPrice = calcBotPrice(tribeBots,text)
+      let {price, failureMessage} = calcBotPrice(tribeBots,text)
+      if(failureMessage) {
+        return alert(failureMessage)
+      }
       msg.sendMessage({
         contact_id,
         text,
         chat_id: chat.id || null,
-        amount: (pricePerMessage+botPrice) || 0, // 5, // CHANGE THIS
+        amount: (pricePerMessage+price) || 0, // 5, // CHANGE THIS
         reply_uuid: ''
       })
       setText('')

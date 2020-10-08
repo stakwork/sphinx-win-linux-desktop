@@ -21,7 +21,7 @@ export default function SendPayment({visible}) {
 
   useEffect(()=>{
     if(visible) setMain(true)
-    if(!visible) setTimeout(()=>setMain(false),500)
+    // if(!visible) setTimeout(()=>setMain(false),500)
   },[visible])
 
   const chat = ui.chatForPayModal

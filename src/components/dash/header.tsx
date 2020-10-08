@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, StyleSheet} from 'react-native'
+import {View, Text, StyleSheet, TouchableHighlight, ToastAndroid} from 'react-native'
 import { Appbar } from 'react-native-paper'
 import { DrawerActions, useNavigation } from '@react-navigation/native'
 import {useStores} from '../../store'
@@ -10,6 +10,18 @@ import {ActivityIndicator} from 'react-native-paper'
 export default function Header() {
   const navigation = useNavigation()
   const {details,ui} = useStores()
+
+  const showStatusHandler = () => {
+    const status = ui.connected ? 'Connected node' : 'Disconnected node'
+
+    ToastAndroid.showWithGravityAndOffset(
+      status,
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
+  };
+
   return useObserver(()=> {
     return <Appbar.Header dark={true} style={{width:'100%',backgroundColor:'#6289FD',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
       <Appbar.Action icon="menu" onPress={()=>{
@@ -19,11 +31,16 @@ export default function Header() {
         <Text style={styles.amt}>{details.balance}</Text>
         <Text style={styles.sat}>sat</Text>
       </View>
-      {ui.loadingHistory ? 
+      {ui.loadingHistory ?
         <ActivityIndicator animating={true} color="white" size={18} style={{marginRight:10}} /> :
-        <Icon name="flash" size={18} style={{marginRight:10,marginTop:4}} 
-          color={ui.connected ? '#49ca97' : '#febd59'}
-        />
+        <TouchableHighlight onPress={showStatusHandler}>
+          <Icon
+            name="flash"
+            size={18}
+            style={{marginRight:10,marginTop:4}}
+            color={ui.connected ? '#49ca97' : '#febd59'}
+          />
+        </TouchableHighlight>
       }
     </Appbar.Header>
   })

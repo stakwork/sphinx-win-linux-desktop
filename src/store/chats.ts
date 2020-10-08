@@ -94,6 +94,7 @@ export class ChatStore {
     const r = await relay.post('group', {
       name, contact_ids
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }
@@ -111,6 +112,7 @@ export class ChatStore {
       unlisted: unlisted||false,
       private: is_private||false,
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }
@@ -128,6 +130,7 @@ export class ChatStore {
       unlisted: unlisted||false,
       private: is_private||false,
     })
+    if(!r) return
     this.gotChat(r)
     return r
   }
@@ -137,8 +140,28 @@ export class ChatStore {
     const r = await relay.post('tribe', {
       name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private:is_private,
     })
+    if(!r) return
     this.gotChat(r)
     return r
+  }
+
+  @action
+  async joinDefaultTribe() {
+    const params = await this.getTribeDetails(
+      'tribes.sphinx.chat',
+      'X3IWAiAW5vNrtOX5TLEJzqNWWr3rrUaXUwaqsfUXRMGNF7IWOHroTGbD4Gn2_rFuRZcsER0tZkrLw3sMnzj4RFAk_sx0'
+    )
+    await this.joinTribe({
+      name: params.name,
+      group_key: params.group_key,
+      owner_alias: params.owner_alias,
+      owner_pubkey: params.owner_pubkey,
+      host: params.host || 'tribes.sphinx.chat',
+      uuid: params.uuid,
+      img: params.img,
+      amount:params.price_to_join||0,
+      is_private:params.private
+    })
   }
 
   @action
@@ -205,6 +228,18 @@ export class ChatStore {
         }
       }
       return j
+    } catch(e){
+      console.log(e)
+    }
+  }
+
+  @action 
+  async loadFeed(host:string,uuid:string,url:string){
+    if(!host || !url) return
+    const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
+    try{
+      const r = await fetch(`https://${theHost}/podcast?url=${url}`)
+      return r.json()
     } catch(e){
       console.log(e)
     }

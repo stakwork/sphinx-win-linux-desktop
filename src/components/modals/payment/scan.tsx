@@ -12,10 +12,11 @@ export default function Scan({pay,loading}){
   const w = Dimensions.get('screen').width
   const h = Dimensions.get('screen').height
 
+  const boxHeight = h
   const hasAddy=addy?true:false
   return <View style={{...styles.wrap,height:h-125}}>
     <View style={styles.top}>
-      <View style={{...styles.scannerWrap,width:w,height:w,maxWidth:w,maxHeight:w}}>
+      <View style={{...styles.scannerWrap,width:w,height:boxHeight,maxWidth:w,maxHeight:boxHeight}}>
         <Scanner height={w} scanned={hasAddy}
           handleBarCodeScanned={scanned}
         />
@@ -26,6 +27,7 @@ export default function Scan({pay,loading}){
           style={styles.input}
           onChangeText={e=> setAddy(e)}
           value={addy}
+          mode="outlined"
           onBlur={()=>setFocused(false)}
           onFocus={()=>setFocused(true)}
         />
@@ -67,17 +69,14 @@ const styles = StyleSheet.create({
   },
   inputWrap:{
     width:'100%',
-    height:100,
+    height:150,
     display:'flex',
     alignItems:'center',
-    justifyContent:'center'
   },
   input:{
     height:58,
     maxHeight:58,
     flex:1,
-    marginBottom:25,
-    backgroundColor:'#fff',
     width:'80%'
   },
   confirmWrap:{

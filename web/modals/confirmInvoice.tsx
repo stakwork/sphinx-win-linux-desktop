@@ -22,20 +22,24 @@ export default function ConfirmInvoice({ params }) {
         ui.setConfirmInvoiceMsg(null)
     }
 
+    function setConfirmInvoiceMsgHandler() {
+        ui.setConfirmInvoiceMsg(null)
+    }
+
     return <Modal
         open={true}
-        onClose={() => ui.setConfirmInvoiceMsg(null)}
+        onClose={setConfirmInvoiceMsgHandler}
         className="view-img-modal-wrap"
     >
         <Content bg={theme.bg}>
             <Title>Confirm</Title>
             <Message>Do you want to pay this invoice for {amount} sats?</Message>
             <Buttons>
-                <Button onClick={() => ui.setConfirmInvoiceMsg(null)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.bg, backgroundColor: '#7f7f7f', width: 125 }}>
+                <Button onClick={setConfirmInvoiceMsgHandler} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.bg, backgroundColor: '#7f7f7f', width: 125 }}>
                     Cancel
                     <CancelIcon style={{ color: theme.bg, marginLeft: 10 }} />
                 </Button>
-                <Button disabled={loading} onClick={() => pay()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', backgroundColor: '#4AC998', width: 125 }}>
+                <Button disabled={loading} onClick={pay} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', backgroundColor: '#4AC998', width: 125 }}>
                     <div>Confirm</div>
                     <div style={{ display: 'flex', height: 20, marginTop: 2 }}>
                         {!loading ? <CallMadeIcon style={{ backgroundColor: 'white', color: '#4AC998', borderRadius: 5, fontSize: 'medium', height: 20, width: 20, marginLeft: 10 }} />

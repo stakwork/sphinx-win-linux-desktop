@@ -4,7 +4,7 @@ import DashNav from './dash/dashnav'
 import ContactsNav from './contacts/contactsNav'
 import Profile from './profile/profile'
 import DrawerContent from './menu/drawer'
-import {useStores} from '../store'
+import {useStores,useTheme} from '../store'
 import Modals from './modals'
 import {setTint} from './utils/statusBar'
 
@@ -12,16 +12,17 @@ const Drawer = createDrawerNavigator()
 
 export default function MainNav() {
   const {details} = useStores()
+  const theme = useTheme()
   function dash(){
     setTint('dark')
     details.getBalance()
   }
   function profile(){
-    setTint('light')
+    setTint(theme.dark?'black':'light')
     details.getBalance()
   }
   function contacts(){
-    setTint('light')
+    setTint(theme.dark?'black':'light')
   }
   return (<>
     <Drawer.Navigator initialRouteName="Dashboard" 

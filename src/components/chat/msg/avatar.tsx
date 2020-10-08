@@ -1,8 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import FastImage from 'react-native-fast-image'
-
-const colorz = ["#FF70E9", "#7077FF", "#DBD23C", "#F57D25", "#9F70FF", "#9BC351", "#FF3D3D", "#C770FF", "#62C784", "#C99966", "#76D6CA", "#ABDB50", "#FF708B", "#5AD7F7", "#5FC455", "#FF9270", "#3FABFF", "#56D978", "#FFBA70", "#5078F2", "#618AFF"]
+import {useAvatarColor} from '../../../store/hooks/msg'
 
 export default function Avatar(props) {
   const name = props.alias || 'Sphinx'
@@ -24,7 +23,7 @@ export default function Avatar(props) {
   return <View style={{
     ...styles.wrap, height: size, width: size, borderRadius,
     opacity: props.hide ? 0 : 1,
-    backgroundColor: getColor(name)
+    backgroundColor: useAvatarColor(name)
   }}>
     <Text style={{
       ...styles.initial,
@@ -34,25 +33,6 @@ export default function Avatar(props) {
       {initial}
     </Text>
   </View>
-}
-
-function getColor(s) {
-  const hc = hashCode(s.repeat(Math.round(32 / s.length)))
-  const int = Math.round(Math.abs(
-    hc / 2147483647 * colorz.length
-  ))
-  return colorz[Math.min(int, 20)]
-}
-
-function hashCode(str) {
-  var hash = 0;
-  if (str.length == 0) return hash;
-  for (var i = 0; i < str.length; i++) {
-    var char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return hash;
 }
 
 const styles = StyleSheet.create({
@@ -74,8 +54,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
     position: 'relative',
     overflow: 'hidden',
   },

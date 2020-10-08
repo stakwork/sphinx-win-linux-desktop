@@ -8,14 +8,15 @@ import CloseButton from '@material-ui/icons/Close';
 
 export default function ViewImg({ params }) {
   const { ui } = useStores()
+  const setImgViewerParamsHandler = () => ui.setImgViewerParams(null)
 
   return <Modal
     open={true}
-    onClose={() => ui.setImgViewerParams(null)}
+    onClose={setImgViewerParamsHandler}
     className="view-img-modal-wrap"
   >
     <Content>
-      <CloseButton onClick={() => ui.setImgViewerParams(null)} style={{cursor: 'pointer', position: 'absolute'}}/>
+      <CloseButton onClick={setImgViewerParamsHandler} style={{cursor: 'pointer', position: 'absolute'}}/>
       <ImgWrapper>
       <Img src={params.data} />
       </ImgWrapper>

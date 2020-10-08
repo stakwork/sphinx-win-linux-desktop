@@ -9,8 +9,10 @@ import { userStore } from './user'
 import { memeStore } from './meme'
 import { authStore } from './auth'
 import { botStore } from './bots'
+import { themeStore } from './theme'
 import { create } from 'mobx-persist'
-import { AsyncStorage, Platform } from 'react-native'
+import { Platform } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage'
 import * as hookz from './hooks'
 import * as localForage from 'localforage'
 
@@ -38,6 +40,8 @@ function init(){
     uiStore.setReady(true)
     hydrate('msg', msgStore)
   })
+
+  hydrate('theme', themeStore)
 }
 init()
 
@@ -55,5 +59,7 @@ const ctx = React.createContext({
 })
 
 export const useStores = () => React.useContext(ctx)
+
+export const useTheme = () => React.useContext(React.createContext(themeStore))
 
 export const hooks = hookz

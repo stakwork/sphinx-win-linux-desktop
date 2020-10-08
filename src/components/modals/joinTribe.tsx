@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {View, Text, StyleSheet, Image} from 'react-native'
 import {Button, Portal} from 'react-native-paper'
 import ModalWrap from './modalWrap'
@@ -8,6 +8,7 @@ import Header from './modalHeader'
 
 export default function JoinTribe({visible}) {
   const { ui, chats } = useStores()
+  const theme = useTheme()
   const [loading,setLoading] = useState(false)
 
   function close(){
@@ -50,19 +51,23 @@ export default function JoinTribe({visible}) {
           style={{width:150,height:150,borderRadius:75,marginTop:15}} resizeMode={'cover'}
         /> : <View style={{height:150}} />}
 
-        <Text style={{marginTop:15,fontWeight:'bold',fontSize:22}}>
+        <Text style={{marginTop:15,fontWeight:'bold',fontSize:22,color:theme.title}}>
           {params.name}
         </Text>
 
-        <Text style={{marginTop:10,marginBottom:10,paddingLeft:15,paddingRight:15}}>
+        <Text style={{marginTop:10,marginBottom:10,paddingLeft:15,paddingRight:15,color:theme.title}}>
           {params.description}
         </Text>
 
         <View style={styles.table}>
           {prices && prices.map((p,i)=>{
             return <View key={i} style={{...styles.tableRow,borderBottomWidth:i===prices.length-1?0:1}}>
-              <Text style={styles.tableRowLabel}>{`${p.label}:`}</Text>
-              <Text style={styles.tableRowValue}>{p.value||0}</Text>
+              <Text style={{...styles.tableRowLabel,color:theme.title}}>
+                {`${p.label}:`}
+              </Text>
+              <Text style={{...styles.tableRowValue,color:theme.title}}>
+                {p.value||0}
+              </Text>
             </View>
           })}
         </View>

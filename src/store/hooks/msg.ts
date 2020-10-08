@@ -10,7 +10,7 @@ import * as base64 from 'base-64'
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
-export function useMsgs(chat){
+export function useMsgs(chat, limit?:number){
     const {chats,msg,contacts} = useStores()
     if(!chat) return
     let theID = chat.id
@@ -20,7 +20,10 @@ export function useMsgs(chat){
       if(theChat) theID = theChat.id // new chat pops in, from first message confirmation!
     }
     const msgs = msg.messages[theID]
-    const messages = processMsgs(msgs, isTribe, contacts.contacts)
+
+    const shownMsgs = msgs && msgs.slice(0, (limit||1000))
+
+    const messages = processMsgs(shownMsgs, isTribe, contacts.contacts)
 
     const msgsWithDates = msgs && injectDates(messages)
     const ms = msgsWithDates || []
@@ -60,7 +63,7 @@ function processMsgs(msgs: Msg[], isTribe:boolean, contacts: Contact[]){
       if(ldat&&ldat.muid&&ldat.meta&&ldat.meta.amt) {
         const purchase = msgs.find(m=>{
           const mtype = constantCodes['message_types'][m.type]
-          const start =   (ldat.host)+"."+ldat.muid
+          const start = urlBase64FromAscii(ldat.host)+"."+ldat.muid
           return mtype==='purchase'&&m.media_token.startsWith(start)
         })
         if(purchase) {
@@ -170,7 +173,8 @@ export function useParsedGiphyMsg(message_content:string){
 
 const colorz = ["#FF70E9", "#7077FF", "#DBD23C", "#F57D25", "#9F70FF", "#9BC351", "#FF3D3D", "#C770FF", "#62C784", "#C99966", "#76D6CA", "#ABDB50", "#FF708B", "#5AD7F7", "#5FC455", "#FF9270", "#3FABFF", "#56D978", "#FFBA70", "#5078F2", "#618AFF"]
 
-export function useAvatarColor(s) {
+export function useAvatarColor(str) {
+  const s = str||'Sphinx'
   const hc = hashCode(s.repeat(Math.round(32 / s.length)))
   const int = Math.round(Math.abs(
     hc / 2147483647 * colorz.length

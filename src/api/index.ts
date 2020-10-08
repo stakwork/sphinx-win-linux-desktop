@@ -10,6 +10,8 @@ let relay = null
 export function instantiateRelay(ip:string, authToken?:string, connectedCallback?:Function, disconnectCallback?:Function){
   if(!ip) return console.log("cant instantiate Relay, no IP")
 
+  if(relay) relay = null
+
   let protocol = 'http://'
   if(ip.endsWith('nodl.it')) {
     protocol='https://'

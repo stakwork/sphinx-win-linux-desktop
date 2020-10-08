@@ -122,8 +122,9 @@ android {
     }
     buildTypes {
         release {
+            // debuggable true
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            consumerProguardFiles 'proguard-rules.pro'
         }
     }
     // applicationVariants are e.g. debug, release
@@ -154,7 +155,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.3.0'
 
     implementation project(':react-native-push-notification')
-    compile project(':WebRTCModule')
     
     implementation project(':react-native-get-random-values')
     implementation project(':react-native-gesture-handler')
@@ -163,10 +163,12 @@ dependencies {
     implementation project(':react-native-image-picker')
     implementation project(':react-native-camera')
 
+    compile project(':react-native-android-badge')
     compile project(':react-native-fast-image')
     implementation project(':react-native-audio-recorder-player')
     implementation project(':@react-native-community_audio-toolkit')
     implementation project(':@react-native-community_datetimepicker')
+    implementation project(':@react-native-community_clipboard')
     implementation project(':react-native-webview')
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-share')
@@ -186,6 +188,19 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation 'com.facebook.fresco:animated-gif:2.0.0'
+
+    compile project(':react-native-track-player')
+    
+    // fixes memory leak related crash
+    compile "com.squareup.okhttp3:okhttp:4.2.1"
+    compile "com.squareup.okhttp3:logging-interceptor:4.2.1"
+    compile "com.squareup.okhttp3:okhttp-urlconnection:4.2.1"
+
+    compile project(':WebRTCModule')
+    // implementation(project(':react-native-jitsi-meet')) {
+    //   exclude group: 'com.facebook.react',module:'react-native-vector-icons'
+    // }
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

@@ -1,10 +1,11 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { constants } from '../../../constants'
-import { useStores } from '../../../store'
+import { useStores, useTheme } from '../../../store'
 
 export default function GroupNotification(props) {
   const { contacts } = useStores()
+  const theme = useTheme()
 
   let senderAlias = 'Unknown'
   if (props.isTribe) {
@@ -17,7 +18,10 @@ export default function GroupNotification(props) {
   const isJoin = props.type === constants.message_types.group_join
 
   return <View style={styles.wrap}>
-    <View style={styles.content}>
+    <View style={{...styles.content,
+      backgroundColor:theme.dark?'#202a36':'#F9FAFC',
+      borderColor:theme.main
+    }}>
       <Text style={styles.text}>
         {`${senderAlias} has ${isJoin ? 'joined' : 'left'} the group`}
       </Text>
@@ -42,8 +46,8 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     borderRadius: 12,
+    height:23,
     borderColor: '#DADFE2',
-    backgroundColor: '#F9FAFC',
     marginTop: 5,
   },
   text: {

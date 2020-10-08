@@ -1,11 +1,12 @@
 import React, {useState, useRef} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../../store'
+import { useTheme } from '../../../store'
 import {View, StyleSheet,Text,TouchableOpacity} from 'react-native'
 import NumKey from '../../utils/numkey'
 import {Button} from 'react-native-paper'
 
-export default function SetPrice({setAmount}) {
+export default function SetPrice({setAmount,onShow}) {
+  const theme = useTheme()
   const [price, setPrice] = useState('SET PRICE')
   const [showNum, setShowNum] = useState(false)
   const [amt, setAmt] = useState('0')
@@ -22,14 +23,18 @@ export default function SetPrice({setAmount}) {
       setAmt(newAmt)
     }
   }
+  function open(){
+    onShow()
+    setShowNum(true)
+  }
   return useObserver(() => <>
-    <TouchableOpacity style={styles.priceButton} onPress={()=>setShowNum(true)}>
+    <TouchableOpacity style={styles.priceButton} onPress={open}>
       <Text style={styles.priceTxt}>{price}</Text>
     </TouchableOpacity> 
 
-    {showNum && <View style={styles.num}>
+    {showNum && <View style={{...styles.num,backgroundColor:theme.main}}>
       <View style={styles.amtWrap}>
-        <Text style={styles.amt}>{amt}</Text>
+        <Text style={{...styles.amt,color:theme.title}}>{amt}</Text>
         <Text style={styles.sat}>sat</Text>
       </View>
       <NumKey onKeyPress={v=> go(v)} onBackspace={()=> backspace()} 
@@ -69,7 +74,6 @@ const styles = StyleSheet.create({
   },
   num:{
     borderRadius:10,
-    backgroundColor:'white',
     width:240,
     height:400,
     position:'absolute',

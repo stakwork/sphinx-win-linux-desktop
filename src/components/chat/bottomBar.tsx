@@ -1,9 +1,9 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated } from 'react-native'
+import { TouchableOpacity, View, Text, TextInput, StyleSheet, PanResponder, Animated, ToastAndroid } from 'react-native'
 import {IconButton, Portal, ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import {useStores} from '../../store'
+import {useStores,useTheme} from '../../store'
 import Cam from '../utils/cam'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import { constants } from '../../constants'
@@ -12,9 +12,13 @@ import ReplyContent from './msg/replyContent'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import RecDot from './recDot'
 import RNFetchBlob from 'rn-fetch-blob'
-import * as e2e from '../../crypto/e2e'
-import {randString} from '../../crypto/rand'
+import { fetchGifs } from './helpers'
+import Giphy from './giphy';
 import {calcBotPrice} from '../../store/hooks/chat'
+import {requestAudioPermissions, uploadAudioFile} from './audioHelpers'
+import EE from '../utils/ee'
+
+let dirs = RNFetchBlob.fs.dirs
 
 const conversation = constants.chat_types.conversation
 
@@ -22,6 +26,7 @@ const audioRecorderPlayer = new AudioRecorderPlayer()
 
 export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,replyUuid}) {
   const {ui,msg,contacts,meme} = useStores()
+  const theme = useTheme()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
@@ -30,18 +35,25 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   const [textInputHeight, setTextInputHeight] = useState(40)
   const [recordingStartTime, setRecordingStartTime] = useState(null)
   const [uploading,setUploading] = useState(false)
+  const [gifs, setGifs] = useState([])
+  const [searchGif, setSearchGif] = useState('Bitcoin')
+  const [showGiphyModal, setShowGiphyModal] = useState(false)
 
   const inputRef = useRef(null)
 
   function sendMessage(){
     if(!text) return
     let contact_id=chat.contact_ids.find(cid=>cid!==1)
-    const botPrice = calcBotPrice(tribeBots,text)
+    let {price, failureMessage} = calcBotPrice(tribeBots,text)
+    if(failureMessage) {
+      ToastAndroid.showWithGravityAndOffset(failureMessage, ToastAndroid.SHORT, ToastAndroid.TOP, 0, 125)
+      return
+    }
     msg.sendMessage({
       contact_id,
       text,
       chat_id: chat.id||null,
-      amount:(botPrice+pricePerMessage)||0,
+      amount:(price+pricePerMessage)||0,
       reply_uuid:replyUuid||''
     })
     setText('')
@@ -49,6 +61,21 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
     // inputRef.current.blur()
     // setInputFocused(false)
   }
+
+  function makeFeedClip(body){
+    console.log("make feed clip",body)
+  }
+  function gotReplyUUID(){
+
+  }
+  useEffect(()=>{
+    EE.on('feed-clip', makeFeedClip)
+    EE.on('reply-uuid', gotReplyUUID)
+    return ()=> {
+      EE.removeListener('feed-clip',makeFeedClip)
+      EE.removeListener('reply-uuid',gotReplyUUID)
+    }
+  },[])
 
   async function tookPic(img){
     setDialogOpen(false)
@@ -81,7 +108,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   async function startRecord() {
     setRecordSecs('0:00')
     try{
-      await audioRecorderPlayer.startRecorder()
+      await audioRecorderPlayer.startRecorder(dirs.CacheDir+'/sound.mp4')
       audioRecorderPlayer.addRecordBackListener((e) => {
         const str = audioRecorderPlayer.mmssss(
           Math.floor(e.current_position),
@@ -90,7 +117,9 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
         setRecordSecs(str.substr(1,idx-1))
       })
       setRecordingStartTime(Date.now().valueOf())
-    } catch(e){console.log(e)}
+    } catch(e){
+      console.log(e||'ERROR')
+    }
   }
 
   async function stopRecord(cb,time?) {
@@ -105,7 +134,18 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
       audioRecorderPlayer.removeRecordBackListener()
       setRecordSecs('0:00')
       if(cb && !tooShort) cb(result)
-    } catch(e){console.log(e)}
+    } catch(e){
+      console.log(e||'ERROR')
+    }
+  }
+
+  async function doneUploadingAudio(muid,pwd,type){
+    await sendFinalMsg({
+      muid:muid,
+      media_key:pwd,
+      media_type:type,
+    })
+    setUploading(false)
   }
 
   // const position = useRef(new Animated.ValueXY()).current;
@@ -113,13 +153,13 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
     onStartShouldSetPanResponder: (evt, gestureState)=> true,
     onMoveShouldSetPanResponderCapture: ()=> true,
     onPanResponderStart:()=>{
-      startRecord()
+      requestAudioPermissions().then(startRecord)
     },
     onPanResponderEnd:async()=>{
       await sleep(10)
       function callback(path){
         setUploading(true)
-        uploadAudioFile(path)
+        uploadAudioFile(path, meme.getDefaultServer(), doneUploadingAudio)
       }
       setRecordingStartTime(current=>{
         if(current) stopRecord(callback,current)
@@ -143,45 +183,6 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
     onPanResponderRelease: (evt, gestureState) => {},
   }), []);
 
-  async function uploadAudioFile(uri){
-    const pwd = await randString(32)
-    const server = meme.getDefaultServer()
-    if(!server) return
-    if(!uri) return
-
-    const type = 'audio/mp4'
-    const filename = 'sound.mp4'
-    let enc = await e2e.encryptFile(uri, pwd)
-    RNFetchBlob.fetch('POST', `https://${server.host}/file`, {
-      Authorization: `Bearer ${server.token}`,
-      'Content-Type': 'multipart/form-data'
-    }, [{
-        name:'file',
-        filename,
-        type: type,
-        data: enc,
-      }, {name:'name', data:filename}
-    ])
-    // listen to upload progress event, emit every 250ms
-    .uploadProgress({ interval : 250 },(written, total) => {
-        console.log('uploaded', written / total)
-        // setUploadedPercent(Math.round((written / total)*100))
-    })
-    .then(async (resp) => {
-      let json = resp.json()
-      console.log('done uploading',json)
-      await sendFinalMsg({
-        muid:json.muid,
-        media_key:pwd,
-        media_type:type,
-      })
-      setUploading(false)
-    })
-    .catch((err) => {
-       console.log(err)
-    })
-  }
-
   async function sendFinalMsg({muid,media_key,media_type}){
     await msg.sendAttachment({
       contact_id:null, chat_id:chat.id,
@@ -191,6 +192,37 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
       amount:0
     })
   }
+
+  async function onGiphyHandler() {
+    try {
+      const gifs = await fetchGifs(searchGif);
+      if (gifs.meta.status === 200) setGifs(gifs.data);
+      setDialogOpen(false);
+      setShowGiphyModal(true);
+    } catch(e) {
+      console.warn(e)
+    }
+  }
+
+  async function getGifsBySearch() {
+    const gifs = await fetchGifs(searchGif);
+    if (gifs.meta.status === 200) setGifs(gifs.data);
+  };
+
+  async function onSendGifHandler(gif: any) {
+    setShowGiphyModal(false);
+    setDialogOpen(false)
+    setTimeout(()=>{
+      setTakingPhoto(false)
+      const height = parseInt(gif.images.original.height) || 200
+      const width = parseInt(gif.images.original.width) || 200
+      openImgViewer({
+        uri: gif.images.original.url,
+        aspect_ratio: width/height,
+        id: gif.id,
+      })
+    },150)
+  };
 
   const isConversation = chat.type===conversation
   const isTribe = chat.type===constants.chat_types.tribe
@@ -208,7 +240,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   if(replyMessage) fullHeight+=48
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:fullHeight}} />
-    <View style={{...styles.bar,height:fullHeight,bottom:0}}>
+    <View style={{...styles.bar,height:fullHeight,bottom:0,backgroundColor:theme.main,borderColor:theme.border}}>
       {(replyMessage?true:false) && <ReplyContent showClose={true}
         reply_message_content={replyMessage.message_content}
         reply_message_sender_alias={replyMessageSenderAlias}
@@ -217,7 +249,8 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
       />}
       <View style={styles.barInner}>
 
-        {!recordingStartTime && <TouchableOpacity style={styles.img} onPress={()=> setDialogOpen(true)}>
+        {!recordingStartTime && <TouchableOpacity style={{...styles.img, backgroundColor:theme.bg, borderColor:theme.border}}
+          onPress={()=> setDialogOpen(true)}>
           <Icon name="plus" color="#888" size={27} />
         </TouchableOpacity>}
         {!recordingStartTime && <TextInput textAlignVertical="top"
@@ -232,8 +265,12 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
           style={{...styles.input,
             marginLeft:hideMic?15:0,
             height:textInputHeight,
-            maxHeight:98
+            maxHeight:98,
+            backgroundColor:theme.bg,
+            borderColor:theme.border,
+            color:theme.title
           }}
+          placeholderTextColor={theme.subtitle}
           onFocus={(e)=> setInputFocused(true)}
           onBlur={()=> setInputFocused(false)}
           onChangeText={e=> setText(e)}
@@ -244,11 +281,11 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
         {recordingStartTime && <View style={styles.recording}>
           <RecDot />
           <View style={styles.recordSecs}>
-            <Text style={styles.recordSecsText}>{recordSecs}</Text>
+            <Text style={{...styles.recordSecsText,color:theme.title}}>{recordSecs}</Text>
           </View>
           <View style={{display:'flex',flexDirection:'row',alignItems:'center'}}>
             <Icon name="rewind" size={16} color="grey" />
-            <Text style={{marginLeft:5}}>Swipe to cancel</Text>  
+            <Text style={{marginLeft:5,color:theme.subtitle}}>Swipe to cancel</Text>  
           </View>
         </View>}
 
@@ -268,7 +305,8 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
           </TouchableOpacity>
         </View>}
 
-        <AttachmentDialog isConversation={isConversation}
+        <AttachmentDialog
+          isConversation={isConversation}
           open={dialogOpen} onClose={()=>setDialogOpen(false)}
           onPick={res=> tookPic(res)}
           onChooseCam={()=> setTakingPhoto(true)}
@@ -281,11 +319,21 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
             setDialogOpen(false)
             ui.setPayMode('payment',chat)
           }}
+          onGiphyHandler={onGiphyHandler}
+        />
+        <Giphy
+          open={showGiphyModal}
+          onClose={setShowGiphyModal}
+          gifs={gifs}
+          searchGif={searchGif}
+          setSearchGif={setSearchGif}
+          onSendGifHandler={onSendGifHandler}
+          getGifsBySearch={getGifsBySearch}
         />
       </View>
 
       {takingPhoto && <Portal>
-        <Cam onCancel={()=>setTakingPhoto(false)} 
+        <Cam onCancel={()=>setTakingPhoto(false)}
           onSnap={pic=> tookPic(pic)}
         />
       </Portal>}
@@ -305,10 +353,8 @@ const styles=StyleSheet.create({
     flexDirection:'column',
     alignItems:'center',
     justifyContent:'center',
-    backgroundColor:'white',
     elevation:5,
     borderWidth: 2,
-    borderColor: '#ddd',
     borderBottomWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,
@@ -325,8 +371,6 @@ const styles=StyleSheet.create({
   input:{
     flex:1,
     borderRadius:22,
-    borderColor:'#ccc',
-    backgroundColor:'whitesmoke',
     paddingLeft:18,
     paddingRight:18,
     borderWidth:1,

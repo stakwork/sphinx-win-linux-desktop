@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import {View,StyleSheet,Text,Image,TextInput} from 'react-native'
+import React, {useState} from 'react'
+import {View,StyleSheet,Text,Image,TextInput,TouchableOpacity,Linking} from 'react-native'
 import {Title,IconButton,ActivityIndicator} from 'react-native-paper'
 import QR from '../utils/qr'
 import { useStores } from '../../store'
@@ -8,6 +8,7 @@ import {decode as atob} from 'base-64'
 import * as e2e from '../../crypto/e2e'
 import * as rsa from '../../crypto/rsa'
 import PINCode, {setPinCode} from '../utils/pin'
+import {isLN, parseLightningInvoice} from '../utils/ln'
 
 export default function Code(props) {
   const {onDone,z,onRestore} = props
@@ -17,6 +18,7 @@ export default function Code(props) {
   const [code, setCode] = useState('')
   const [checking, setChecking] = useState(false)
   const [showPin,setShowPin] = useState(false)
+  const [wrong,setWrong] = useState('')
 
   async function scan(data){
     setCode(data)
@@ -39,12 +41,33 @@ export default function Code(props) {
     if(token) onDone()
     setChecking(false)
   }
+
+  function detectCorrectString(s){
+    setWrong('')
+    let correct = true
+    if(s.length===66 && s.match(/[0-9a-fA-F]+/g)) {
+      setWrong("This looks like a pubkey, to sign up you'll need an invite code from:")
+      correct = false
+    }
+    if(isLN(s)) {
+      const inv = parseLightningInvoice(s)
+      if(inv) {
+        setWrong("This looks like an invoice, to sign up you'll need an invite code from:")
+        correct = false
+      }
+    }
+    setTimeout(()=> setWrong(''), 10000)
+    return correct
+  }
   
   // sign up from invitation code (or restore)
   async function checkInvite(theCode){
     if(!theCode || checking) return
+
+    const correct = detectCorrectString(theCode)
+    if(!correct) return
+
     setChecking(true)
-    // restore
     try {
       const codeString = atob(theCode)
       if(codeString.startsWith('keys::')) {
@@ -57,7 +80,20 @@ export default function Code(props) {
       }
     } catch(e) {}
 
-    const {ip,password} = await user.signupWithCode(theCode)
+    const isCorrect = theCode.length===40 && theCode.match(/[0-9a-fA-F]+/g)
+    if(!isCorrect) {
+      setWrong( "We don't recognize this code, to sign up you'll need an invite code from:")
+      setTimeout(()=> setWrong(''), 10000)
+      setChecking(false)
+      return
+    }
+
+    const codeR = await user.signupWithCode(theCode)
+    if(!codeR) {
+      setChecking(false)
+      return
+    }
+    const {ip,password} = codeR
     await sleep(200)
     if (ip) {
       const token = await user.generateToken(password||'')
@@ -114,6 +150,9 @@ export default function Code(props) {
           style={styles.input}
           onChangeText={text => setCode(text)}
           onBlur={()=> checkInvite(code)}
+          onFocus={()=> {
+            if(wrong) setWrong('')
+          }}
         />
         <IconButton
           icon="qrcode-scan"
@@ -126,6 +165,15 @@ export default function Code(props) {
       <View style={styles.spinWrap}>
         {checking && <ActivityIndicator animating={true} color="white" />}
       </View>
+
+      {(wrong?true:false) && <View style={styles.wrong}>
+        <Text style={styles.wrongText}>
+          {wrong}
+        </Text>
+        <TouchableOpacity onPress={()=>Linking.openURL('https://sphinx.chat')}>
+          <Text style={styles.linkText}>https://sphinx.chat</Text>
+        </TouchableOpacity>
+      </View>}
     </RadialGradient>
     {scanning && <View style={styles.qrWrap}>
       <QR showPaster={false}
@@ -166,7 +214,7 @@ const styles = StyleSheet.create({
     color:'white',
     fontSize:20,
     marginTop:15,
-    maxWidth:220,
+    maxWidth:240,
     lineHeight:29,
     textAlign:'center'
   },
@@ -192,8 +240,28 @@ const styles = StyleSheet.create({
   spinWrap:{
     height:20,
   },
+  wrong:{
+    position:'absolute',
+    bottom:32,
+    width:'80%',
+    left:'10%',
+    borderRadius:10,
+    backgroundColor:'rgba(0,0,0,0.5)',
+    height:145,
+  },
+  wrongText:{
+    color:'white',
+    margin:24,
+    fontSize:15,
+    textAlign:'center'
+  },
+  linkText:{
+    color:'#6289FD',
+    textAlign:'center',
+    fontSize:17,
+    fontWeight:'bold'
+  }
 })
-
 
 async function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))

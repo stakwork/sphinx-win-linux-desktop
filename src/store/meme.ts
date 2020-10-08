@@ -17,6 +17,9 @@ class MemeStore {
     {host:DEFAULT_MEME_SERVER,token:''}
   ]
 
+  @persist @observable
+  lastAuthenticated: number
+
   @action getDefaultServer(): Server {
     const server = this.servers.find(s=> s.host===DEFAULT_MEME_SERVER)
     return server
@@ -24,9 +27,15 @@ class MemeStore {
 
   @action
   async authenticateAll() {
-    this.servers.forEach(s=>{
-      this.authenticate(s)
-    })
+    const lastAuth = this.lastAuthenticated || 0
+    const days = 7  // one week
+    const isOld = moment(new Date(lastAuth)).isBefore(moment().subtract((days*24-1), 'hours'))
+    if(isOld) {
+      await asyncForEach(this.servers, async (s)=> {
+        await this.authenticate(s)
+      })
+      this.lastAuthenticated = new Date().getTime()
+    }
   }
 
   @action 
@@ -62,6 +71,17 @@ class MemeStore {
     this.cacheFileName[muid] = filename
   }
 
+  @persist('object') @observable filenameCache: {[k:number]:string} = {}
+  @action addToFilenameCache(id:number,name:string){
+    this.filenameCache[id] = name
+  }
+
 }
 
 export const memeStore = new MemeStore()
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}

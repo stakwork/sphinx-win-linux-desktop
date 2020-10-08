@@ -1,28 +1,20 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {View,StyleSheet,Text,Image} from 'react-native'
 import { useStores } from '../../store'
 import {useObserver} from 'mobx-react-lite'
 import {Button} from 'react-native-paper'
-import { constants } from '../../constants'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Slider from '../utils/slider'
 
 export default function Welcome(props) {
   const {onDone,z,show} = props
-  const {user,contacts} = useStores()
-  const [creatingContact, setCreatingContact] = useState(false)
+  const {user} = useStores()
 
-  async function go(){
-    setCreatingContact(true)
-    await contacts.addContact({
-      alias: user.invite.inviterNickname,
-      public_key: user.invite.inviterPubkey,
-      status: constants.contact_statuses.confirmed,
-    })
+  async function go(){    
     onDone()
   }
 
-  const hasInvite = user&&user.invite&&Object.keys(user.invite)&&Object.keys(user.invite).length>0
+  // const hasInvite = user&&user.invite&&Object.keys(user.invite)&&Object.keys(user.invite).length>0
   return useObserver(()=> {
     return <Slider z={z} show={show}>
       <Text style={styles.top}>
@@ -40,7 +32,6 @@ export default function Welcome(props) {
         </Text>
       </View>
       <Button mode="contained" dark={true}
-        loading={creatingContact}
         onPress={go}
         style={styles.button}>
         <Text>Get Started</Text>

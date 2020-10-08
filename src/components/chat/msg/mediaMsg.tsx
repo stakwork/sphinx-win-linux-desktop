@@ -1,16 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
-import { useStores } from '../../../store'
+import { useStores, useTheme } from '../../../store'
 import shared from './sharedStyles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useCachedEncryptedFile } from './hooks'
-import { ActivityIndicator, Button } from 'react-native-paper'
+import { ActivityIndicator, Button, IconButton } from 'react-native-paper'
 import AudioPlayer from './audioPlayer'
 import { parseLDAT } from '../../utils/ldat'
 import Video from 'react-native-video';
+import FileMsg from './fileMsg'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default function MediaMsg(props) {
   const { meme, ui, msg } = useStores()
+  const theme = useTheme()
   const [buying, setBuying] = useState(false)
   const { message_content, media_type, chat, media_token } = props
   const isMe = props.sender === 1
@@ -25,9 +28,13 @@ export default function MediaMsg(props) {
   }
   const { data, uri, loading, trigger, paidMessageText } = useCachedEncryptedFile(props, ldat)
 
+  // useEffect(() => {
+  //   if (props.viewable) trigger()
+  // }, [props.viewable, props.media_token]) // refresh when scroll, or when purchase accepted
+
   useEffect(() => {
-    if (props.viewable) trigger()
-  }, [props.viewable, props.media_token]) // refresh when scroll, or when purchase accepted
+    trigger()
+  }, [props.media_token]) // refresh when scroll, or when purchase accepted
 
   async function buy(amount) {
     setBuying(true)
@@ -63,61 +70,82 @@ export default function MediaMsg(props) {
   const showStats = isMe && amt
   const sold = props.sold
 
-  let minHeight = 200
+  let isImg = false
+  let minHeight = 60
   let showPayToUnlockMessage = false
-  if (media_type === 'text/plain') {
+  if (media_type === 'sphinx/text') {
     minHeight = isMe ? 72 : 42
     if (!isMe && !loading && !paidMessageText) showPayToUnlockMessage = true
   }
   if (media_type.startsWith('audio')) {
     minHeight = 50
   }
+  if (media_type.startsWith('image') || media_type.startsWith('video')) {
+    minHeight = 200
+    isImg = true
+  }
 
   let wrapHeight = minHeight
   if (showPurchaseButton) wrapHeight += 38
 
+  const onButtonPressHandler = () => {
+    if (!purchased) buy(amt)
+  }
+
   return <View collapsable={false}>
     <TouchableOpacity style={{ ...styles.wrap, minHeight: wrapHeight }}
-      //onPressIn={tap} onPressOut={untap} 
+      //onPressIn={tap} onPressOut={untap}
       // onLongPress={()=>longPress()}
-      onPress={() => press()}
+      onPress={press}
       activeOpacity={0.65}>
+
       {showStats && <View style={styles.stats}>
         <Text style={styles.satStats}>{`${amt} sat`}</Text>
         <Text style={{ ...styles.satStats, opacity: sold ? 1 : 0 }}>Purchased</Text>
       </View>}
+
       {!hasImgData && <View style={{ minHeight, ...styles.loading }}>
         {loading && <View style={{ minHeight, ...styles.loadingWrap }}>
           <ActivityIndicator animating={true} color="grey" />
         </View>}
         {paidMessageText && <View style={{ minHeight, ...styles.paidAttachmentText }}>
-          <Text>{paidMessageText}</Text>
+          <Text style={{color:theme.title}}>{paidMessageText}</Text>
         </View>}
         {showPayToUnlockMessage && <View style={{ ...styles.paidAttachmentText, alignItems: 'center' }}>
-          <Text style={styles.payToUnlockMessage}>Pay to unlock message</Text>
+          <Text style={{...styles.payToUnlockMessage,color:theme.subtitle}}>
+            Pay to unlock message
+          </Text>
         </View>}
       </View>}
-      {hasImgData && <Media type={media_type} data={data} uri={uri} />}
-      {hasContent && <View style={shared.innerPad}>
-        <Text style={styles.text}>{message_content}</Text>
+
+      {hasImgData && <Media type={media_type} data={data} uri={uri} 
+        filename={meme.filenameCache[props.id]}
+      />}
+
+      {isImg && (showPurchaseButton&&!purchased) && <View style={styles.imgIconWrap}>
+        <Icon name="image" color="grey" size={50} />
       </View>}
+
+      {hasContent && <View style={shared.innerPad}>
+        <Text style={{...styles.text,color:theme.title}}>{message_content}</Text>
+      </View>}
+
       {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
-        onPress={() => {
-          if (!purchased) buy(amt)
-        }}
+        onPress={onButtonPressHandler}
         loading={buying}
         icon={purchased ? 'check' : 'arrow-top-right'}>
         <Text style={{ fontSize: 11 }}>
           {purchased ? 'Purchased' : `Pay ${amt} sat`}
         </Text>
       </Button>}
+
     </TouchableOpacity>
   </View>
 }
 
-function Media({ type, data, uri }) {
-  // console.log(type,uri)
-  if (type === 'text/plain') return <></>
+function Media({ type, data, uri, filename }) {
+  // console.log("MEDIA:",type,uri)
+  if (type === 'sphinx/text') return <></>
   if (type.startsWith('image')) {
     return <Image style={styles.img} resizeMode='cover' source={{ uri: uri || data }} />
   }
@@ -125,14 +153,40 @@ function Media({ type, data, uri }) {
     return <AudioPlayer source={uri || data} type={type} />
   }
   if (type.startsWith('video') && uri) {
-    return <Video source={{ uri }} style={styles.backgroundVideo} />
+    return <VideoPlayer uri={{ uri }} />
   }
-  return <></>
+  return <FileMsg type={type} uri={uri} filename={filename} />
+}
+
+function VideoPlayer(props){
+  const { ui } = useStores()
+  function onEnd() {
+    
+  }
+  function onPlay(){
+    ui.setVidViewerParams(props)
+  }
+  return <>
+    <Video source={props.uri} resizeMode="cover"
+      paused={true} onEnd={onEnd} 
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
+        zIndex:100,
+      }}
+    />
+    <IconButton icon="play" size={55} color="white" 
+      style={{position:'absolute',top:50,left:50,zIndex:101}} 
+      onPress={onPlay}
+    />
+  </>
 }
 
 const styles = StyleSheet.create({
   text: {
-    color: '#333',
     fontSize: 16,
   },
   wrap: {
@@ -186,7 +240,6 @@ const styles = StyleSheet.create({
   },
   paidAttachmentText: {
     width: '100%',
-    color: 'grey',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -215,11 +268,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
   },
-  backgroundVideo: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-  },
+  imgIconWrap:{
+    position:'absolute',
+    width:'100%',
+    top:80,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center'
+  }
 })

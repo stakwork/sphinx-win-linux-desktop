@@ -1,8 +1,22 @@
-import React from 'react'
+import React, {useState} from 'react'
+import {Text, ActivityIndicator} from 'react-native'
 import { Portal, Button, Dialog } from 'react-native-paper'
 import ImagePicker from 'react-native-image-picker'
 
-export default function AttachmentDialog({ open, onClose, onPick, onChooseCam, doPaidMessage, request, send, isConversation }) {
+export default function AttachmentDialog({
+    open,
+    onClose,
+    onPick,
+    onChooseCam,
+    doPaidMessage,
+    request,
+    send,
+    isConversation,
+    onGiphyHandler,
+  }) {
+
+  const [fetchingGifs,setFetchingGifs] = useState(false)
+
   async function pickImage() {
     ImagePicker.launchImageLibrary({}, result => {
       if (!result.didCancel) {
@@ -12,28 +26,45 @@ export default function AttachmentDialog({ open, onClose, onPick, onChooseCam, d
       }
     })
   }
+
+  const onCloseHandler = () => onClose()
+  const onChooseCamHandler = () => onChooseCam()
+  const pickImageHandler = () => pickImage()
+  const doPaidMessageHandler = () => doPaidMessage()
+  const requestHandler = () => request()
+  const sendHandler = () => send()
+  const pickGif = async () => {
+    setFetchingGifs(true)
+    await onGiphyHandler()
+    setFetchingGifs(false)
+  }
+
   return <Portal>
     <Dialog visible={open} style={{ bottom: 10 }}
-      onDismiss={() => onClose()}>
+      onDismiss={onCloseHandler}>
       <Dialog.Title>Message Options</Dialog.Title>
       <Dialog.Actions style={{
         height: isConversation ? 260 : 160,
         display: 'flex', flexDirection: 'column',
         justifyContent: 'space-between', alignItems: 'flex-start'
       }}>
-        <Button icon="camera" onPress={() => onChooseCam()} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="camera" onPress={onChooseCamHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
           Camera
         </Button>
-        <Button icon="image" onPress={() => pickImage()} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="image" onPress={pickImageHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
           Photo Library
         </Button>
-        <Button icon="message" onPress={() => doPaidMessage()} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="gif" onPress={pickGif} style={{ width: '100%', alignItems: 'flex-start' }}
+          loading={fetchingGifs}>
+          Gif
+        </Button>
+        <Button icon="message" onPress={doPaidMessageHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
           Paid Message
         </Button>
-        {isConversation && <Button icon="arrow-bottom-left" onPress={() => request()} style={{ width: '100%', alignItems: 'flex-start' }}>
+        {isConversation && <Button icon="arrow-bottom-left" onPress={requestHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
           Request
         </Button>}
-        {isConversation && <Button icon="arrow-top-right" onPress={() => send()} style={{ width: '100%', alignItems: 'flex-start' }}>
+        {isConversation && <Button icon="arrow-top-right" onPress={sendHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
           Send
         </Button>}
       </Dialog.Actions>

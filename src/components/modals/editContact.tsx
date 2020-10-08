@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {View, Text, StyleSheet, ScrollView} from 'react-native'
 import {Button, Portal, IconButton, Switch} from 'react-native-paper'
 import Form from '../form'
@@ -15,6 +15,7 @@ const conversation = constants.chat_types.conversation
 
 export default function EditContact({visible}) {
   const { ui, contacts, chats } = useStores()
+  const theme = useTheme()
   const [loading, setLoading] = useState(false)
   const [sub,setSub] = useState(false)
   const [existingSub, setExistingSub] = useState(null)
@@ -127,7 +128,7 @@ export default function EditContact({visible}) {
             }}
           />
         </View>
-        <Text style={styles.headerTitle}>
+        <Text style={{...styles.headerTitle,color:theme.title}}>
           {sub?'Recurring':'Edit Contact'}
         </Text>
         <View style={styles.subWrap}>
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
     fontSize:16
   },
   headerLefty:{
-    backgroundColor:'white',
     width:101,height:50,
     borderRadius:18,
     marginLeft:5

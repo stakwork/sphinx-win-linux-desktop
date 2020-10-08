@@ -28,7 +28,7 @@ export default function AudioPlayer(props) {
       await audioRecorderPlayer.startPlayer(source)
       audioRecorderPlayer.addPlayBackListener((e) => {
         if (e.current_position === e.duration) {
-          audioRecorderPlayer.stopPlayer()
+          audioRecorderPlayer.stopPlayer().catch(()=>{})
           setPercent(0)
           audioRecorderPlayer.removePlayBackListener()
         } else {

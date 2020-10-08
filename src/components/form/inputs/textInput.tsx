@@ -1,8 +1,10 @@
 import React from 'react'
 import {TextInput} from 'react-native-paper'
 import {inputStyles} from './shared'
+import { useTheme } from '../../../store'
 
 export default function TheTextInput({name,label,required,error,handleChange,handleBlur,value,displayOnly}) {
+  const theme = useTheme()
   let lab = `${label.en}${required?' *':''}`
   if(error){
     lab = `${label.en} - ${error}`
@@ -11,7 +13,7 @@ export default function TheTextInput({name,label,required,error,handleChange,han
   return <TextInput
     error={error}
     label={lab}
-    style={inputStyles}
+    style={{...inputStyles,backgroundColor:theme.bg}}
     onChangeText={handleChange(name)}
     onBlur={handleBlur(name)}
     value={value}

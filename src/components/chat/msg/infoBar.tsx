@@ -4,7 +4,8 @@ import moment from 'moment'
 import { constants } from '../../../constants'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { calcExpiry } from './utils'
-import { useStores } from '../../../store'
+import { useStores, useTheme } from '../../../store'
+import {useAvatarColor} from '../../../store/hooks/msg'
 
 const received = constants.statuses.received
 
@@ -15,6 +16,7 @@ const encryptedTypes = [
 
 export default function InfoBar(props) {
   const { ui } = useStores()
+  const theme = useTheme()
 
   const isMe = props.sender === 1
   const isReceived = props.status === received
@@ -26,6 +28,7 @@ export default function InfoBar(props) {
   const hasExpiry = (!isPaid && expiry) ? true : false
 
   let senderAlias = props.senderAlias
+  const nameColor = useAvatarColor(senderAlias)
 
   const timeFormat = ui.is24HourFormat ? 'HH:mm A' : 'hh:mm A'
   return <View style={styles.wrap}>
@@ -35,7 +38,7 @@ export default function InfoBar(props) {
       flexDirection: isMe ? 'row-reverse' : 'row',
     }}>
       <View style={{ ...styles.innerContent, flexDirection: isMe ? 'row-reverse' : 'row' }}>
-        {senderAlias && !isMe && <Text style={styles.sender}>
+        {senderAlias && !isMe && <Text style={{...styles.sender,color:nameColor}}>
           {senderAlias}
         </Text>}
         <Text style={styles.time}>

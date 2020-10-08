@@ -63,6 +63,9 @@ class MsgStore {
   @persist @observable
   lastFetched: number
 
+  @persist @observable
+  lastUpdated: number
+
   @action clearAllMessages(){
     this.messages = {}
   }
@@ -71,6 +74,7 @@ class MsgStore {
   async getAllMessages() {
     try {
       const r = await relay.get('messages')
+      if(!r) return
       const msgs = await decodeMessages(r.new_messages)
       this.messages = orgMsgs(msgs)
       this.lastFetched = new Date().getTime()
@@ -84,7 +88,7 @@ class MsgStore {
     let route = 'messages'
     if(this.lastFetched) {
       const mult = 1
-      const dateq = moment.utc(this.lastFetched-1000000*mult).format('YYYY-MM-DD%20HH:mm:ss')
+      const dateq = moment.utc(this.lastFetched-1000*mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else { // else just get last week
       const start = moment().subtract(7, 'days').format('YYYY-MM-DD%20HH:mm:ss')
@@ -92,22 +96,16 @@ class MsgStore {
     }
     try {
       const r = await relay.get(route)
-      const msgs = await decodeMessages(r.new_messages) // this takes a longass time
-      msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
-      this.messages = orgMsgsFromExisting(this.messages, msgs)
-      this.lastFetched = new Date().getTime()
+      if(!r) return
+      console.log("=> NEW MSGS LENGTH", r.new_messages.length)
+      if(r.new_messages.length) {
+        const msgs = await decodeMessages(r.new_messages) // this takes a longass time
+        msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
+        this.messages = orgMsgsFromExisting(this.messages, msgs)
+        this.lastFetched = new Date().getTime()
+      }
     } catch(e) {
       console.log(e)
-    }
-  }
-
-  @action // only if it contains a "chat"
-  async gotNewMessage(m) {
-    let newMsg = await decodeSingle(m)
-    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
-    if(chatID){
-      putIn(this.messages, newMsg, chatID)
-      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
     }
   }
 
@@ -132,6 +130,7 @@ class MsgStore {
         const invoice = msgs.find(c=>c.payment_hash===m.payment_hash)
         if(invoice){
           invoice.status = constants.statuses.confirmed
+          this.lastUpdated = new Date().getTime()
         }
       }
     }
@@ -155,10 +154,12 @@ class MsgStore {
       // this.gotNewMessage(r)
       if(!chat_id) {
         const r = await relay.post('messages', v)
+        if(!r) return
         this.gotNewMessage(r)
       } else {
         putIn(this.messages, {...v,id:-1,sender:1,date:moment().toISOString(),type:0,message_content:text}, chat_id)
         const r = await relay.post('messages', v)
+        if(!r) return
         // console.log("RESULT")
         this.messagePosted(r)
       }
@@ -188,6 +189,7 @@ class MsgStore {
       }
       // return
       const r = await relay.post('attachment', v)
+      if(!r) return
       this.gotNewMessage(r)
     } catch(e) {
       console.log(e)
@@ -220,6 +222,7 @@ class MsgStore {
         remote_text: encMemo
       }
       const r = await relay.post('payment', v)
+      if(!r) return
       if(contact_id||chat_id) this.gotNewMessage(r)
       if(r.amount) detailsStore.addToBalance(r.amount*-1)
     } catch(e) {
@@ -256,6 +259,7 @@ class MsgStore {
         remote_memo: encMemo,
       }
       const r = await relay.post('invoices', v) // raw invoice: 
+      if(!r) return
       this.gotNewMessage(r)
     } catch(e) {
       console.log(e)
@@ -279,6 +283,7 @@ class MsgStore {
     try {
       const v = {payment_request}
       const r = await relay.put('invoices', v)
+      if(!r) return
       this.invoicePaid({...r,amount})
     } catch(e) {
       console.log(e)
@@ -289,6 +294,7 @@ class MsgStore {
   async deleteMessage(id) {
     if(!id) return console.log("NO ID!")
     const r = await relay.del(`message/${id}`)
+    if(!r) return
     if(r.chat && r.chat.id) {
       putIn(this.messages, r, r.chat.id)
     }
@@ -298,11 +304,29 @@ class MsgStore {
   seeChat(id) {
     if(!id) return
     this.lastSeen[id] = new Date().getTime()
+    relay.post(`messages/${id}/read`)
+  }
+
+  @action
+  countUnseenMessages():number {
+    const now = new Date().getTime()
+    let unseenCount = 0
+    const lastSeenObj = this.lastSeen
+    Object.entries(this.messages).forEach(function([id,msgs]){
+      const lastSeen = lastSeenObj[id||'_'] || now
+      msgs.forEach(m=>{
+        if(m.sender!==1){
+          const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
+          if(unseen) unseenCount+=1
+        }
+      })
+    })
+    return unseenCount
   }
 
   @action
   initLastSeen() {
-    const obj = this.lastSeen?{...this.lastSeen}:{}
+    const obj = this.lastSeen?JSON.parse(JSON.stringify(this.lastSeen)):{}
     chatStore.chats.forEach(c=>{
       if(!obj[c.id]) obj[c.id] = new Date().getTime()
     })
@@ -319,6 +343,46 @@ class MsgStore {
       // update chat
       chatStore.gotChat(r.chat)
     }
+  }
+
+  @action // only if it contains a "chat"
+  async gotNewMessage(m) {
+    let newMsg = await decodeSingle(m)
+    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    if(chatID){
+      putIn(this.messages, newMsg, chatID)
+      if(newMsg.chat) chatStore.gotChat(newMsg.chat)
+    }
+  }
+
+  @action // only if it contains a "chat"
+  async gotNewMessageFromWS(m) {
+    let newMsg = await decodeSingle(m)
+    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    if(chatID){
+      msgsBuffer.push(newMsg)
+      if(msgsBuffer.length===1) {
+        this.pushFirstFromBuffer()
+      }
+      debounce(() => {
+        this.concatNewMsgs()
+      }, 1000)
+      // if(newMsg.chat) chatStore.gotChat(newMsg.chat) // IS THIS NEEDED????
+    }
+  }
+
+  @action concatNewMsgs() {
+    const msgs = JSON.parse(JSON.stringify(msgsBuffer))
+    msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
+    this.messages = orgMsgsFromExisting(this.messages, msgs)
+    msgsBuffer = []
+  }
+
+  @action pushFirstFromBuffer() {
+    const msg = msgsBuffer[0]
+    const msgs = [msg]
+    const orged = orgMsgsFromExisting(this.messages, msgs)
+    this.messages = orged
   }
 
 }
@@ -428,3 +492,13 @@ export const msgStore = new MsgStore()
 function rando(){
   return Math.random().toString(12).substring(0)
 }
+
+let inDebounce
+function debounce(func, delay) {
+  const context = this
+  const args = arguments
+  clearTimeout(inDebounce)
+  inDebounce = setTimeout(() => func.apply(context, args), delay)
+}
+
+let msgsBuffer = []

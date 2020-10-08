@@ -4,8 +4,11 @@ import {View} from 'react-native'
 import {inputStyles} from './shared'
 import QR from '../../utils/qr'
 import PubKey from '../../modals/pubkey'
+import { useTheme } from '../../../store'
 
 export default function QrInput({name,label,required,handleChange,handleBlur,setValue,value,displayOnly}) {
+  const theme = useTheme()
+  
   const [scanning,setScanning] = useState(false)
   function scan(data){
     setValue(data)
@@ -21,7 +24,8 @@ export default function QrInput({name,label,required,handleChange,handleBlur,set
       onChangeText={handleChange(name)}
       onBlur={handleBlur(name)}
       value={value}
-      style={{backgroundColor:'#fff',paddingRight:32}}
+      style={{backgroundColor:theme.bg,paddingRight:32}}
+      placeholderTextColor={theme.subtitle}
     />
     <IconButton
       icon="qrcode-scan"

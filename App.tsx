@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper'
 import Main from './src/components/main'
 import Onboard from './src/components/onboard'
-import {useStores} from './src/store'
+import {useStores, useTheme} from './src/store'
 import {instantiateRelay} from './src/api'
 import {useObserver} from 'mobx-react-lite'
 import Loading from './src/components/loading'
@@ -14,6 +14,9 @@ import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
 // import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
+import { useDarkMode } from 'react-native-dynamic'
+import { is24HourFormat } from 'react-native-device-time-format'
+import TrackPlayer from 'react-native-track-player';
 
 declare var global: {HermesInternal: null | {}}
 
@@ -49,9 +52,10 @@ export default function Wrap(){
 }
 
 function App() {
-  const {user,msg,ui} = useStores()
+  const {user,ui} = useStores()
+  const theme = useTheme()
   const [loading, setLoading] = useState(true) // default
-  const [signedUp, setSignedUp] = useState(false)
+  const [signedUp, setSignedUp] = useState(false) // <=
   const [pinned, setPinned] = useState(false)
 
   function connectedHandler() {
@@ -60,10 +64,25 @@ function App() {
   function disconnectedHandler() {
     ui.setConnected(false)
   }
+  async function check24Hour(){
+    const is24Hour = await is24HourFormat()
+    ui.setIs24HourFormat(is24Hour)
+  }
 
+  const isDarkMode = useDarkMode()
   useEffect(()=>{
+    if(theme.mode==='System') {
+      theme.setDark(isDarkMode);
+    } else {
+      theme.setDark(theme.mode==='Dark');
+    }
+
+    check24Hour();
+
+    TrackPlayer.setupPlayer();
+
     (async () => {
-      console.log("USER",user.currentIP)
+      console.log("=> USER",user)
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){
@@ -76,37 +95,46 @@ function App() {
     })()
   },[])
 
-  if(loading) return <Loading />
-  if(signedUp && !pinned) { // checking if the pin was entered recently
-    return <PINCode
-      onFinish={async() => {
-        await sleep(240)
-        setPinned(true)
-      }}
-    />
-  }
-  return (<>
-    <NavigationContainer>
-      <PaperProvider theme={theme}>
-        {/* <StatusBar /> */}
-        {signedUp && <Main />}
-        {!signedUp && <Onboard onFinish={()=>{
-          setSignedUp(true) // signed up w key export
-          setPinned(true)   // also PIN has been set 
-        }} />}
-      </PaperProvider>
-    </NavigationContainer>
-  </>)
-}
+  return useObserver(()=>{
 
-const theme = {
-  ...DefaultTheme,
-  roundness: 2,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#6289FD',
-    accent: '#55D1A9',
-  },
+    if(loading) return <Loading />
+    if(signedUp && !pinned) { // checking if the pin was entered recently
+      return <PINCode
+        onFinish={async() => {
+          await sleep(240)
+          setPinned(true)
+        }}
+      />
+    }
+
+    const paperTheme = {
+      ...DefaultTheme,
+      roundness: 2,
+      colors: {
+        ...DefaultTheme.colors,
+        primary: '#6289FD',
+        accent: '#55D1A9',
+        text:theme.title,
+        placeholder:theme.subtitle,
+        background:theme.bg,
+        surface:theme.main
+      },
+      dark:theme.dark
+    }
+
+    return (<>
+      <NavigationContainer>
+        <PaperProvider theme={paperTheme}>
+          {/* <StatusBar /> */}
+          {signedUp && <Main />}
+          {!signedUp && <Onboard onFinish={()=>{
+            setSignedUp(true) // signed up w key export
+            setPinned(true)   // also PIN has been set 
+          }} />}
+        </PaperProvider>
+      </NavigationContainer>
+    </>)
+  })
 }
 
 async function sleep(ms) {

@@ -27,6 +27,7 @@ class SubStore {
   async getSubs() {
     try {
       const r = await relay.get('subscriptions')
+      if(!r) return
       this.subs = r
     } catch(e) {
       console.log(e)

@@ -1,29 +1,32 @@
 import React, {useState} from 'react'
 import {useObserver} from 'mobx-react-lite'
-import {useStores} from '../../store'
+import {useStores,useTheme} from '../../store'
 import {View,StyleSheet} from 'react-native'
 import {IconButton, Portal} from 'react-native-paper'
 import QR from '../utils/qr'
-import * as ln from '../utils/decode'
 import * as utils from '../utils/utils'
 import {qrActions} from '../../qrActions'
+import {isLN,parseLightningInvoice,removeLightningPrefix} from '../utils/ln'
 
 export default function BottomTabs() {
   const {ui,chats} = useStores()
   const [scanning, setScanning] = useState(false)
-
+  const theme = useTheme()
   return useObserver(()=>
-    <View style={styles.bar}>
-      <IconButton icon="arrow-bottom-left" size={32} color="#666"
+    <View style={{...styles.bar,
+      backgroundColor:theme.main,
+      borderColor:theme.bg
+    }}>
+      <IconButton icon="arrow-bottom-left" size={32} color={theme.title}
         onPress={()=> ui.setPayMode('invoice', null)}  // chat here   
       />
-      <IconButton icon="format-list-bulleted" size={29} color="#666"
+      <IconButton icon="format-list-bulleted" size={29} color={theme.title}
         onPress={()=> ui.setPaymentHistory(true)} 
       />
-      <IconButton icon="qrcode-scan" size={25} color="#666"
+      <IconButton icon="qrcode-scan" size={25} color={theme.title}
         onPress={()=> setScanning(true)} // after scan, set {amount,payment_request}
       />
-      <IconButton icon="arrow-top-right" size={32} color="#666"
+      <IconButton icon="arrow-top-right" size={32} color={theme.title}
         onPress={()=> ui.setPayMode('payment', null)}  // chat here   
       />
 
@@ -35,14 +38,10 @@ export default function BottomTabs() {
             onScan={async data=>{
               console.log(data)
               if(isLN(data)) {
-                let inv:any
-                let theData = data
-                if(data.indexOf(':')>=0){ // some are like "lightning:ln....""
-                  theData = data.split(':')[1]
-                }
-                try{inv = ln.decode(theData.toLowerCase())} catch(e){}
-                if(!(inv&&inv.human_readable_part))return
-                const millisats = inv.human_readable_part.amount
+                const theData = removeLightningPrefix(data)
+                const inv = parseLightningInvoice(data)
+                if(!(inv&&inv.human_readable_part&&inv.human_readable_part.amount)) return
+                const millisats = parseInt(inv.human_readable_part.amount)
                 const sats = millisats && Math.round(millisats/1000)
                 ui.setConfirmInvoiceMsg({payment_request:theData,amount:sats})
                 setTimeout(()=>{
@@ -70,12 +69,6 @@ export default function BottomTabs() {
   )
 }
 
-const lnPrefixes = ['ln','LIGHTNING:ln']
-function isLN(s){
-  const ok = lnPrefixes.find(p=>s.toLowerCase().startsWith(p.toLowerCase()))
-  return ok?true:false
-}
-
 const styles=StyleSheet.create({
   bar:{
     flex:1,
@@ -87,10 +80,8 @@ const styles=StyleSheet.create({
     height:60,
     maxHeight:60,
     minHeight:60,
-    backgroundColor:'white',
     elevation:5,
     borderWidth: 2,
-    borderColor: '#ddd',
     borderBottomWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,

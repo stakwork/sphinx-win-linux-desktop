@@ -4,14 +4,23 @@ import {Button} from 'react-native-paper'
 import { useStores } from '../../store'
 import RadialGradient from 'react-native-radial-gradient'
 import Slider from '../utils/slider'
+import { constants } from '../../constants'
 
 export default function Ready(props) {
   const {z,show,onDone} = props
-  const {user} = useStores()
+  const {user,contacts,chats} = useStores()
   const [loading, setLoading] = useState(false)
   async function finish(){
     setLoading(true)
-    await user.finishInvite()
+    await Promise.all([
+      user.finishInvite(),
+      contacts.addContact({
+        alias: user.invite.inviterNickname,
+        public_key: user.invite.inviterPubkey,
+        status: constants.contact_statuses.confirmed,
+      }),
+      chats.joinDefaultTribe()
+    ])
     setLoading(false)
     onDone()
   }

@@ -37,7 +37,7 @@ export function setTint(s:Tint='light'){
     StatusBar.setBackgroundColor('white')
   } else if(s==='black'){
     StatusBar.setBarStyle('light-content')
-    StatusBar.setBackgroundColor('#102b44')
+    StatusBar.setBackgroundColor('#1c252e')
   } else {
     StatusBar.setBarStyle('light-content')
     StatusBar.setBackgroundColor('#6289FD')

@@ -66,6 +66,10 @@ React-Native Android and Web client for Sphinx network
 
 
 ### note
+
+`react-native-track-player` has a dependency conflict w react-native-video, so must be 1.1.4 https://github.com/react-native-kit/react-native-track-player/issues/698
+
+### note
 ```ts
 //add this @types/react-native/index.d.ts
 

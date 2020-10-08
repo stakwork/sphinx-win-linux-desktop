@@ -55,12 +55,12 @@ function addMethod(m: string, rootUrl: string): Function {
       opts.method = m === 'UPLOAD' ? 'POST' : m
       if (m === 'BLOB') opts.method = 'GET'
 
-      console.log('=>',opts.method,rootUrl + url)
+      // console.log('=>',opts.method,rootUrl + url)
 
       const r = await fetch(rootUrl + url, opts)
       if (!r.ok) {
-        console.log(r)
-        throw new Error('Not OK!')
+        console.log('Not OK!',r)
+        return
       }
       let res
       if (m === 'BLOB') res = await r.blob()
@@ -70,7 +70,8 @@ function addMethod(m: string, rootUrl: string): Function {
           // localStorage.setItem(tokenName, res.token)
         }
         if (res.error) {
-          throw res.error
+          console.warn(res.error)
+          return
         }
         if (res.status && res.status==='ok') { // invite server
           return res.object
@@ -81,7 +82,7 @@ function addMethod(m: string, rootUrl: string): Function {
         return res
       }
     } catch (e) {
-      throw e
+      console.warn(e)
     }
   }
 }

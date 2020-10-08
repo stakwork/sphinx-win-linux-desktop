@@ -1,24 +1,29 @@
 import React from 'react'
 import { View, StyleSheet, Text } from 'react-native'
 import { IconButton } from 'react-native-paper'
+import {useTheme} from '../../../store'
+import {useAvatarColor} from '../../../store/hooks/msg'
 
 export default function ReplyContent(props) {
+  const theme = useTheme()
   const extraStyles = props.extraStyles || {}
+  const onCloseHandler = () => {
+    if (props.onClose) props.onClose()
+  }
+  const nameColor = useAvatarColor(props.reply_message_sender_alias || '')
   return <View style={{ ...styles.replyMsg, ...extraStyles }}>
     <View style={styles.replyMsgBar} />
     <View style={{ ...styles.replyMsgContent, width: props.showClose ? '85%' : '100%' }}>
-      <Text style={styles.replyMsgSenderAlias} numberOfLines={1}>
+      <Text style={{...styles.replyMsgSenderAlias,color:nameColor}} numberOfLines={1}>
         {props.reply_message_sender_alias || ''}
       </Text>
-      <Text style={styles.replyMsgText} numberOfLines={1}>
+      <Text style={{...styles.replyMsgText,color:theme.title}} numberOfLines={1}>
         {props.reply_message_content}
       </Text>
     </View>
     {props.showClose && <IconButton icon="close" size={18} color="#666"
       style={{ marginLeft: 6, marginRight: 0 }}
-      onPress={() => {
-        if (props.onClose) props.onClose()
-      }}
+      onPress={onCloseHandler}
     />}
   </View>
 }

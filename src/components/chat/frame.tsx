@@ -92,8 +92,18 @@ export default function Webview({ url }) {
     setBridge(null)
   }
 
+  function onErrorHandler() {
+    if (ref && ref.current) {
+      ref.current.reload()
+    }
+  }
+
+  function onCloseBridgeHandler() {
+    setBridge(null)
+  }
+
   return <View style={styles.webview}>
-    {bridge && bridge.url && <BridgeModal params={bridge} onClose={() => setBridge(null)}
+    {bridge && bridge.url && <BridgeModal params={bridge} onClose={onCloseBridgeHandler}
       authorize={authorize}
     />}
     <WebView ref={ref}
@@ -110,11 +120,7 @@ export default function Webview({ url }) {
       javaScriptEnabled={true}
       scrollEnabled={false}
       originWhitelist={['*']}
-      onError={() => {
-        if (ref && ref.current) {
-          ref.current.reload()
-        }
-      }}
+      onError={onErrorHandler}
     />
   </View>
 }
@@ -134,6 +140,14 @@ function BridgeModal({ params, authorize, onClose }) {
   const [amt, setAmt] = useState('1000')
   const [authorizing, setAuthorizing] = useState(false)
   const showBudget = params.noBudget?false:true
+
+  async function onAuthorizingHandler() {
+    if (authorizing) return
+    setAuthorizing(true)
+    await authorize(showBudget?amt:0, params.challenge)
+    setAuthorizing(false)
+  }
+
   return <View style={styles.bridgeModal}>
     <Icon name="shield-check" size={54} color="#6289FD"
       style={{ marginRight: 4, marginLeft: 4 }}
@@ -158,12 +172,7 @@ function BridgeModal({ params, authorize, onClose }) {
         No
       </Button>
       <Button mode="contained" dark={true} style={{ ...styles.button }}
-        onPress={async () => {
-          if (authorizing) return
-          setAuthorizing(true)
-          await authorize(showBudget?amt:0, params.challenge)
-          setAuthorizing(false)
-        }} loading={authorizing}>
+        onPress={onAuthorizingHandler} loading={authorizing}>
         Yes
       </Button>
     </View>

@@ -1,9 +1,9 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
-import {View, Text, StyleSheet} from 'react-native'
+import { useStores, useTheme } from '../../store'
+import {View, Text, StyleSheet, ToastAndroid} from 'react-native'
 import Modal from "./modalWrap"
-import { Button, Snackbar } from 'react-native-paper'
+import { Button } from 'react-native-paper'
 import QRCode from '../utils/qrcode'
 import Header from './modalHeader'
 import Share from 'react-native-share'
@@ -11,11 +11,15 @@ import Clipboard from "@react-native-community/clipboard";
 
 export default function PubKey({visible, pubkey, onClose}) {
   const { ui } = useStores()
-  const [copied, setCopied] = useState(false)
-
+  const theme = useTheme()
   function copy(){
     Clipboard.setString(pubkey)
-    setCopied(true)
+    ToastAndroid.showWithGravityAndOffset(
+      'Public Key Copied!',
+      ToastAndroid.SHORT,
+      ToastAndroid.TOP,
+      0, 125
+    );
   }
   async function share(){
     try{
@@ -29,7 +33,7 @@ export default function PubKey({visible, pubkey, onClose}) {
       <View style={styles.qrWrap}>
         <QRCode value={pubkey} size={250} />
       </View>
-      <Text style={styles.pubkeyText}>{pubkey}</Text>
+      <Text style={{...styles.pubkeyText,color:theme.title}}>{pubkey}</Text>
       <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true} 
           onPress={()=> share()}
@@ -42,11 +46,6 @@ export default function PubKey({visible, pubkey, onClose}) {
           Copy
         </Button>
       </View>
-      <Snackbar
-        visible={copied}
-        onDismiss={()=> setCopied(false)}>
-          Public Key Copied!
-      </Snackbar>
     </Modal>
   )
 }

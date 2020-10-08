@@ -1,9 +1,12 @@
 package com.sphinx;
 
+import androidx.annotation.Nullable;
 import android.app.Application;
 import android.webkit.WebView;
 import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.facebook.react.ReactApplication;
+import me.jhen.react.BadgePackage;
+import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
@@ -36,6 +39,8 @@ import com.facebook.soloader.SoLoader;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
+// import com.reactnativejitsimeet.RNJitsiMeetPackage;
+import com.guichaguri.trackplayer.TrackPlayer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +57,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new WebRTCModulePackage(),
+          // new RNJitsiMeetPackage(),
           new MainReactPackage(),
+          new TrackPlayer(),
+          new BadgePackage(),
           new ClipboardPackage(),
           new RNDateTimePickerPackage(),
           new AudioPackage(),
