@@ -12,11 +12,14 @@ import {constants} from '../../src/constants'
 import ChatIcon from '@material-ui/icons/Chat';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import { SvgIcon } from '@material-ui/core';
+import RssFeedIcon from '@material-ui/icons/RssFeed';
+import Pod from './pod'
 
 export default function Head({height,appMode,setAppMode}){
   const [showURL,setShowURL] = useState(false)
   const [URL,setURL] = useState('')
   const {contacts,ui,details} = useStores()
+  const [showPod, setShowPod] = useState(false)
 
   return useObserver(()=>  {
     const chat = ui.selectedChat
@@ -24,6 +27,7 @@ export default function Head({height,appMode,setAppMode}){
     const owner = contacts.contacts.find(c=>c.id===1)
     const isTribeOwner = owner&&owner.public_key===ownerPubkey
     const appURL = ui.applicationURL
+    const feedURL = ui.feedURL
 
     function goToURL(){
       ui.setApplicationURL(URL)
@@ -77,6 +81,9 @@ export default function Head({height,appMode,setAppMode}){
         </IconButton>
       </Left>}
       <Right>
+        {feedURL && <RssFeedIcon onClick={()=> setShowPod(true)} 
+          style={{marginRight:12,cursor:'pointer'}}
+        />}
         {appURL && <> {appMode ? <ChatIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
           onClick={()=> setAppMode(false)}
         /> : <OpenInBrowserIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
@@ -94,6 +101,8 @@ export default function Head({height,appMode,setAppMode}){
           </IconzWrap>}
         </>}
       </Right>
+
+      {showPod && <Pod top={height} url={feedURL} host={chat.host} />}
     </Wrap>
   })
 }
@@ -112,6 +121,8 @@ const Wrap = styled.div`
   align-items:center;
   justify-content:space-between;
   box-shadow: 5px 0px 17px 0px rgba(0,0,0,0.45);
+  position:relative; 
+  z-index:100;
 `
 const Placeholder=styled.div`
   max-width:100%;

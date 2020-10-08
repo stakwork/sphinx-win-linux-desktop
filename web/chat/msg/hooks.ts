@@ -94,17 +94,3 @@ export function useHasLink(m) {
 }
 
 
-export function useHasLink(m) {
-  if(!(m && m.message_content)) return null
-  var messageArray = m.message_content.split(` `)
-  var urlRegex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi
-  var link = null
-  messageArray.forEach(function (element) {
-    if (urlRegex.test(element)) {
-      if (!element.startsWith(`https://`)) { element = `https://` + element }
-      link = element
-    }
-  });
-  return link
-}
-

@@ -49,8 +49,8 @@ function Chat() {
   // }
 
   return useObserver(() => {
-    
-    if(ui.replyUUID) footHeight=115
+
+    if (ui.replyUUID) footHeight = 115
     const chat = ui.selectedChat
 
     useEffect(() => {
@@ -64,13 +64,16 @@ function Chat() {
         if (chat.type === constants.chat_types.tribe) {
           ui.setLoadingChat(true)
           const params = await chats.getTribeDetails(chat.host, chat.uuid)
-          if(params) {
+          if (params) {
             setPricePerMessage(params.price_per_message + params.escrow_amount)
             if (params.app_url) {
               isAppURL = true
               ui.setApplicationURL(params.app_url)
             }
-            if(params.bots && Array.isArray(params.bots)) {
+            if (params.feed_url) {
+              ui.setFeedURL(params.feed_url)
+            }
+            if (params.bots && Array.isArray(params.bots)) {
               setTribeBots(params.bots)
             }
             ui.setLoadingChat(false)
@@ -83,12 +86,12 @@ function Chat() {
     }, [chat])
 
     return <Section style={{ background: theme.deep }}>
-    <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
-    <ChatContent appMode={appMode} footHeight={footHeight} />
-    <Foot height={footHeight} tribeBots={tribeBots} 
-      pricePerMessage={pricePerMessage}
-    />
-  </Section>
+      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
+      <ChatContent appMode={appMode} footHeight={footHeight} />
+      <Foot height={footHeight} tribeBots={tribeBots}
+        pricePerMessage={pricePerMessage}
+      />
+    </Section>
   })
 }
 
@@ -167,8 +170,9 @@ function ChatContent({ appMode, footHeight }) {
     const shownMsgs = msgs.slice(0, msgCount)
 
     function handleScroll(e) {
-      if (e.target.scrollTop === 0) { 
-        setMsgCount(c => c + 20) }
+      if (e.target.scrollTop === 0) {
+        setMsgCount(c => c + 20)
+      }
     }
 
     return (
@@ -223,19 +227,16 @@ function ChatContent({ appMode, footHeight }) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" style={{ fill: 'white', marginRight: 8 }}>
                       <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                     </svg>Copy Text
-            </MenuItem>
-                  {link &&
-                    <MenuItem onClick={() => { navigator.clipboard.writeText(link), handleMenuClose(), onCopy('Link') }}
-                      style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
-                      <LinkIcon style={{ fontSize: 'medium', marginRight: 8 }} />Copy Link
-            </MenuItem>}
-
-
+                  </MenuItem>
+                    {link &&
+                      <MenuItem onClick={() => { navigator.clipboard.writeText(link), handleMenuClose(), onCopy('Link') }}
+                        style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
+                        <LinkIcon style={{ fontSize: 'medium', marginRight: 8 }} />Copy Link
+                  </MenuItem>}
                   <MenuItem onClick={() => { ui.setReplyUUID(menuMessage.uuid), handleMenuClose() }}
                     style={{ fontSize: 14, color: 'white', backgroundColor: isMe(menuMessage) ? theme.highlight : theme.extraDeep }}>
                     <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
                   </MenuItem>
-
 
                   {isMe(menuMessage) &&
                     <MenuItem onClick={deleteMessage}
@@ -309,6 +310,8 @@ const Wrap = styled.div`
   min-height: ${p => p.h};
   max-height: ${p => p.h};
   width:100%;
+  position: relative;  
+  z-index:99;
 `
 const Section = styled.section`
   height:100%;
