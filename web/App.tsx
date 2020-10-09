@@ -14,6 +14,7 @@ import Chat from './chat/chat'
 import * as localForage from 'localforage'
 import Modals from './modals'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import 'react-h5-audio-player/lib/styles.css';
 
 const palette = {
   primary: {

@@ -53,10 +53,15 @@ function Chat() {
       setPricePerMessage(0)
       setTribeBots([])
       // console.log('user.currentIP',user.currentIP)
-      if (!chat) return
+      if (!chat) {
+        ui.setFeedURL(null)
+        ui.setApplicationURL(null)
+        return
+      }
       (async () => {
         setAppMode(true)
         let isAppURL = false
+        let isFeedURL = false
         if (chat.type === constants.chat_types.tribe) {
           ui.setLoadingChat(true)
           const params = await chats.getTribeDetails(chat.host, chat.uuid)
@@ -68,12 +73,16 @@ function Chat() {
             }
             if (params.feed_url) {
               ui.setFeedURL(params.feed_url)
+              isFeedURL = true
             }
             if (params.bots && Array.isArray(params.bots)) {
               setTribeBots(params.bots)
             }
             ui.setLoadingChat(false)
           }
+        }
+        if (!isFeedURL) {
+          ui.setFeedURL(null)
         }
         if (!isAppURL) {
           ui.setApplicationURL('')
