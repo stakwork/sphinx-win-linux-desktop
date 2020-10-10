@@ -1,13 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 import theme from '../../theme'
-import CloseIcon from '@material-ui/icons/Close';
 import { useStores } from '../../../src/store'
 import CircularProgress from '@material-ui/core/CircularProgress';
-import AudioPlayer from 'react-h5-audio-player';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-
-
+import Player from './player'
 
 export default function Pod({ top, url, host, showPod, setShowPod }) {
   const [loading, setLoading] = useState(false)
@@ -23,7 +20,6 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
     console.log("THE POD", thepod)
     if (thepod) {
       setPod(thepod)
-
       const episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
       if (episode) setSelectedEpisodeId(episode.id)
     }
@@ -55,33 +51,19 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
         }
       </PodText>
     </PodInfo> : <Center><CircularProgress /></Center>}
-    <PodPlayer>
-      {episode && <AudioPlayer
-        autoPlay={false}
-        src={episode.enclosureUrl}
-        onPlay={e => console.log("onPlay")}
-        loop={false}
-        customAdditionalControls={[]}
-        showDownloadProgress={false}
-        showFilledProgress={false}
-      // other props here
-      />}
-    </PodPlayer>
+    <Player pod={pod} episode={episode} />
     {pod && pod.episodes && <PodEpisodes>
       <span style={{ marginBottom: 3 }}>Episodes:</span>
       <EpisodeList>
         {pod.episodes.map((e, i) => {
-          return <ListedEpisode onClick={() => selectEpisode(e)}>
+          return <ListedEpisode onClick={() => selectEpisode(e)} key={i}>
             <PlayArrowIcon style={{ marginRight: 8, color: 'white', fontSize: 13 }} /> {e.title}
           </ListedEpisode>
         })}
       </EpisodeList>
     </PodEpisodes>}
   </PodWrap>
-
 }
-
-
 
 const PodWrap = styled.div`
   display: flex;
@@ -103,41 +85,6 @@ const PodWrap = styled.div`
 const PodInfo = styled.div`
   display: flex;
 
-`
-
-const PodPlayer = styled.div`
-  display: flex;
-  flex-direction: column;
-
-& .rhap_container{
-  background-color: #141d27;
-}
-& .rhap_main-controls-button{
-  color: #809ab7;
-}
-& .rhap_progress-indicator{
-  background-color: #809ab7
-}
-& .rhap_progress-filled{
-  background-color: #809ab7
-}
-& .rhap_progress-bar{
-  background-color: #809ab7
-}
-& .rhap_current-time{
-  color: #809ab7;
-  font-size: 13px;
-}
-& .rhap_time{
-  color: #809ab7;
-  font-size: 13px;
-}
-& .rhap_volume-indicator{
-  background: #809ab7;
-}
-& .rhap_volume-button{
-  color: #809ab7;
-}
 `
 
 const PodImage = styled.img`
