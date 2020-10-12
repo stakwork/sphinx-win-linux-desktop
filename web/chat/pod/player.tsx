@@ -11,7 +11,7 @@ interface Destination {
 }
 
 export default function Player({pod,episode}){
-  const { msg } = useStores()
+  const { feed } = useStores()
   const [secs,setSecs] = useState(0)
   const interval = useRef(null);
 
@@ -19,24 +19,7 @@ export default function Player({pod,episode}){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations
     if(!dests) return
-
-    // const TOTAL = 10
-    asyncForEach(dests, async (d:Destination)=>{
-      if(d.type==='node') {
-        await msg.sendPayment({
-          contact_id: null, chat_id: null,
-          destination_key: d.address,
-          amt: 3,
-          memo: '',
-        })
-      }
-      if(d.type==='wallet'){
-        await msg.payInvoice({
-          payment_request: d.address,
-          amount: 3
-        })
-      }
-    })
+    feed.sendPayments(dests)
   }
   const NUM_SECONDS = 60
   function tick(){

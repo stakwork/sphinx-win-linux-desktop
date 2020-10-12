@@ -231,6 +231,22 @@ class MsgStore {
   }
 
   @action
+  async sendAnonPayment({amt, dest, memo}) {
+    try {
+      const v = {
+        amount: amt,
+        destination_key: dest,
+        text: memo,
+      }
+      const r = await relay.post('payment', v)
+      if(!r) return
+      if(r.amount) detailsStore.addToBalance(r.amount*-1)
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  @action
   async purchaseMedia({contact_id, amount, chat_id, media_token}) {
     try {
       const v = {

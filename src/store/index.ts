@@ -10,6 +10,7 @@ import { memeStore } from './meme'
 import { authStore } from './auth'
 import { botStore } from './bots'
 import { themeStore } from './theme'
+import { feedStore } from './feed'
 import { create } from 'mobx-persist'
 import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
@@ -56,6 +57,7 @@ const ctx = React.createContext({
   meme: memeStore,
   auth: authStore,
   bots: botStore,
+  feed: feedStore,
 })
 
 export const useStores = () => React.useContext(ctx)

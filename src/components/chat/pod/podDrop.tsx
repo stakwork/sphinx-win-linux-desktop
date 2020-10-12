@@ -4,10 +4,11 @@ import { useStores, useTheme } from '../../../store'
 import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
 import Controls from './controls'
+import useInterval from '../../utils/useInterval'
 
 export default function PodDrop({ show, host, uuid, url }) {
   const theme = useTheme()
-  const { chats } = useStores()
+  const { chats, feed } = useStores()
   const [pod, setPod] = useState(null)
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
@@ -23,7 +24,7 @@ export default function PodDrop({ show, host, uuid, url }) {
     setLoading(true)
     const params = await chats.loadFeed(host, uuid, url)
     if (params) setPod(params)
-    if (params) start(params)
+    if (params) initialSelect(params)
     setLoading(false)
   }
 
@@ -58,19 +59,17 @@ export default function PodDrop({ show, host, uuid, url }) {
     },850)
   }
 
-  const start = async (ps) => {
+  async function initialSelect(ps){
+    TrackPlayer.reset()
     const episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
     if(!episode) return
     setSelectedEpisodeID(episode.id)
     await addEpisodeToQueue(episode)
-    await TrackPlayer.play();
-    setPlaying(true)
-
     setTimeout(async ()=>{
       const dur = await TrackPlayer.getDuration()
       setDuration(dur)
     },850)
-  };
+  }
 
   async function checkState(){
     const state = await TrackPlayer.getState()
@@ -81,6 +80,31 @@ export default function PodDrop({ show, host, uuid, url }) {
       setPlaying(true)
     }
   }
+
+  function sendPayments(){
+    console.log('=> sendPayments!')
+    const dests = pod && pod.value && pod.value.destinations    
+    if(!dests) return
+    if(!pod.id || !selectedEpisodeID) return
+    const memo = JSON.stringify({
+      feedID: pod.id,
+      itemID: selectedEpisodeID,
+    })
+    feed.sendPayments(dests, memo)    
+  }
+
+  const NUM_SECONDS=60
+  const [count,setCount] = useState(0)
+  useInterval(()=>{
+    if(playing) {
+      setCount(c=>{
+        if(c%NUM_SECONDS===0) {
+          sendPayments()
+        }
+        return c+1
+      })
+    }
+  }, 1000)
 
   useEffect(() => {
     if (show){
@@ -209,3 +233,4 @@ const styles = StyleSheet.create({
     fontSize:14
   }
 })
+
