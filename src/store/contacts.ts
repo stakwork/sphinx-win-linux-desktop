@@ -258,6 +258,10 @@ class ContactStore {
       console.log(e)
     }
   }
+
+  @action reset(){
+    this.contacts = []
+  }
   
 }
 

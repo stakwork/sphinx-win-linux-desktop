@@ -45,6 +45,10 @@ class BotStore {
     }
   }
 
+  @action reset(){
+    this.bots = []
+  }
+
 }
 
 export const botStore = new BotStore()

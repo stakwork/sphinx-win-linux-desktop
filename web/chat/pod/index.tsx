@@ -10,7 +10,7 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
   const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
-  const { chats } = useStores()
+  const { chats, msg } = useStores()
   const scrollRef = useRef<HTMLDivElement>()
 
   async function loadPod() {
@@ -38,6 +38,20 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   }, [showPod])
   const episode = selectedEpisodeId && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeId)
 
+  let earned = 0
+  if(pod && pod.id){
+    const incomingPayments = msg.filterMessagesByContent(0, `"feedID":${pod.id}`)
+    if(incomingPayments) {
+      earned = incomingPayments.reduce((acc,m)=>{
+        if(m.sender!==1 && m.amount) {
+          return acc + Number(m.amount)
+        }
+        return acc
+      }, 0)
+    }
+    console.log(earned)
+  }
+
   return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
     {pod ? <PodInfo>
       <PodImage src={pod.image} alt={pod.title} />
@@ -50,8 +64,14 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
         </PodEpisode>
         }
       </PodText>
+      {earned && <Earned>
+        <div>Earned:</div>
+        <div>{`${earned} sats`}</div>
+      </Earned>}
     </PodInfo> : <Center><CircularProgress /></Center>}
+
     <Player pod={pod} episode={episode} />
+
     {pod && pod.episodes && <PodEpisodes>
       <span style={{ marginBottom: 3 }}>Episodes:</span>
       <EpisodeList>
@@ -72,7 +92,7 @@ const PodWrap = styled.div`
   box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.75);
   padding: 13px;
   display: ${p => p.show ? 'block' : 'none'};
-  width:350px;
+  width:360px;
   height:300px;
   background:black;
   position:absolute;
@@ -84,9 +104,19 @@ const PodWrap = styled.div`
 
 const PodInfo = styled.div`
   display: flex;
-
+  position:relative;
 `
-
+const Earned = styled.div`
+  position:absolute;
+  top:0px;
+  right:0px;
+  border:1px solid #809ab7;
+  background:black;
+  color:#809ab7;
+  border-radius:4px;
+  padding: 5px 8px;
+  font-size: 11px;
+`
 const PodImage = styled.img`
   display: flex;
   height: 75px;

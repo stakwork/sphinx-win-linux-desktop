@@ -76,6 +76,14 @@ class MemeStore {
     this.filenameCache[id] = name
   }
 
+  @action reset(){
+    this.lastAuthenticated = 0
+    this.cache = {}
+    this.cacheTS = {}
+    this.cacheFileName = {}
+    this.filenameCache = {}
+  }
+
 }
 
 export const memeStore = new MemeStore()

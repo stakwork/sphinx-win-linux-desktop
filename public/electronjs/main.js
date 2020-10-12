@@ -1,4 +1,5 @@
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow, Menu, shell } = require('electron')
+const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
 require('./ipc')
 
@@ -23,14 +24,14 @@ function createWindow() {
     });
 
     // We set an intercept on incoming requests to disable x-frame-options headers.
-    mainWindow.webContents.session.webRequest.onHeadersReceived({ urls: [ "*://*/*" ] },
-        (d, c)=>{
-            if(d.responseHeaders['X-Frame-Options']){
+    mainWindow.webContents.session.webRequest.onHeadersReceived({ urls: ["*://*/*"] },
+        (d, c) => {
+            if (d.responseHeaders['X-Frame-Options']) {
                 delete d.responseHeaders['X-Frame-Options'];
-            } else if(d.responseHeaders['x-frame-options']) {
+            } else if (d.responseHeaders['x-frame-options']) {
                 delete d.responseHeaders['x-frame-options'];
             }
-            c({cancel: false, responseHeaders: d.responseHeaders});
+            c({ cancel: false, responseHeaders: d.responseHeaders });
         }
     );
 
@@ -43,13 +44,25 @@ function createWindow() {
     });
     mainWindow.loadURL(startUrl);
 
-    if(process.env.ELECTRON_DEV_URL) {
+    if (process.env.ELECTRON_DEV_URL) {
         mainWindow.webContents.openDevTools();
     }
 
     mainWindow.on('closed', function () {
         mainWindow = null
     })
+
+    let menu = defaultMenu(app, shell);
+    menu[0].submenu.splice(menu[0].submenu.length-2,0,{
+        type:'separator'
+    })
+    menu[0].submenu.splice(menu[0].submenu.length-2,0,{
+        label: 'Remove account from this computer',
+        click: () => {
+            mainWindow.webContents.send('reset', '')
+        }
+    })
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 }
 
 // This method will be called when Electron has finished

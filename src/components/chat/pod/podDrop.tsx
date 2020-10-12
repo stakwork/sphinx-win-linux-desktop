@@ -98,7 +98,7 @@ export default function PodDrop({ show, host, uuid, url }) {
   useInterval(()=>{
     if(playing) {
       setCount(c=>{
-        if(c%NUM_SECONDS===0) {
+        if(c && c%NUM_SECONDS===0) {
           sendPayments()
         }
         return c+1

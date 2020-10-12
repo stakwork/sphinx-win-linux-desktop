@@ -245,6 +245,10 @@ export class ChatStore {
     }
   }
 
+  @action reset(){
+    this.chats = []
+  }
+
 }
 
 export const chatStore = new ChatStore()

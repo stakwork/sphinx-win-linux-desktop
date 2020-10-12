@@ -3,13 +3,6 @@ import styled from 'styled-components'
 import AudioPlayer from 'react-h5-audio-player';
 import { useStores } from '../../../src/store'
 
-type DestinationType = 'wallet' | 'node'
-interface Destination {
-  address: string
-  split: number
-  type: DestinationType
-}
-
 export default function Player({pod,episode}){
   const { feed } = useStores()
   const [secs,setSecs] = useState(0)
@@ -19,7 +12,12 @@ export default function Player({pod,episode}){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations
     if(!dests) return
-    feed.sendPayments(dests)
+    if(!pod.id || !episode.id) return
+    const memo = JSON.stringify({
+      feedID: pod.id,
+      itemID: episode.id,
+    })
+    feed.sendPayments(dests,memo)
   }
   const NUM_SECONDS = 60
   function tick(){
@@ -54,11 +52,9 @@ export default function Player({pod,episode}){
   </PodPlayer>
 }
 
-
 const PodPlayer = styled.div`
   display: flex;
   flex-direction: column;
-
   & .rhap_container{
     background-color: #141d27;
   }

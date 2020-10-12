@@ -38,6 +38,10 @@ class SubStore {
   setSubs(subs) {
     this.subs = subs
   }
+
+  @action reset() {
+    this.subs = []
+  }
 }
 
 export const subStore = new SubStore()

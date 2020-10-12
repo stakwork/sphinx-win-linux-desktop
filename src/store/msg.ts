@@ -70,6 +70,13 @@ class MsgStore {
     this.messages = {}
   }
 
+  @action reset(){
+    this.messages = {}
+    this.lastSeen = {}
+    this.lastFetched = 0
+    this.lastUpdated = 0
+  }
+
   @action
   async getAllMessages() {
     try {
@@ -295,6 +302,13 @@ class MsgStore {
   }
 
   @action
+  filterMessagesByContent(chatID,filterString) {
+    const list = this.messages[chatID]
+    if(!list) return []
+    return list.filter(m=> m.message_content.includes(filterString))
+  }
+
+  @action
   async payInvoice({payment_request,amount}) {
     try {
       const v = {payment_request}
@@ -375,7 +389,7 @@ class MsgStore {
   async gotNewMessageFromWS(m) {
     let newMsg = await decodeSingle(m)
     const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
-    if(chatID){
+    if(chatID || chatID===0){
       msgsBuffer.push(newMsg)
       if(msgsBuffer.length===1) {
         this.pushFirstFromBuffer()
@@ -446,6 +460,9 @@ async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
 }
 
 async function decodeSingle(m: Msg){
+  if(m.type===constants.message_types.keysend) {
+    return m // "keysend" type is not e2e
+  }
   const msg = m
   if(m.message_content) {
     const dcontent = await e2e.decryptPrivate(m.message_content)
@@ -480,8 +497,8 @@ function orgMsgs(messages: Msg[]) {
 function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
   const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(allMsgs))
   messages.forEach(msg=>{
-    if(msg.chat && msg.chat.id){
-      putIn(allms, msg, msg.chat.id) // THIS IS TOO HEAVY in a for each
+    if(msg.chat_id || msg.chat_id===0){
+      putIn(allms, msg, msg.chat_id) // THIS IS TOO HEAVY in a for each
     }
   })
   // limit to 50 each?
@@ -489,7 +506,7 @@ function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
 }
 
 function putIn(orged, msg, chatID){
-  if(!chatID) return
+  if(!(chatID||chatID===0)) return
   if(orged[chatID]){
     if(!Array.isArray(orged[chatID])) return
     const idx = orged[chatID].findIndex(m=>m.id===msg.id)

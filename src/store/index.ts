@@ -17,6 +17,8 @@ import AsyncStorage from '@react-native-community/async-storage'
 import * as hookz from './hooks'
 import * as localForage from 'localforage'
 
+export const DEBOUNCE_TIME = 280
+
 const strg = {
   ios: AsyncStorage,
   android: AsyncStorage,
@@ -25,7 +27,7 @@ const strg = {
 
 const hydrate = create({
   storage: strg[Platform.OS] || localStorage,
-  debounce: 280,
+  debounce: DEBOUNCE_TIME,
 })
 
 function init(){
@@ -36,10 +38,10 @@ function init(){
     hydrate('contacts', contactStore),
     hydrate('chats', chatStore),
     hydrate('meme', memeStore),
+    hydrate('msg', msgStore)
   ]).then(()=> {
     console.log('=> store initialized')
     uiStore.setReady(true)
-    hydrate('msg', msgStore)
   })
 
   hydrate('theme', themeStore)

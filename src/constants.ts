@@ -51,7 +51,8 @@ const constants = {
     tribe_delete: 22,
     bot_install: 23,
     bot_cmd: 24,
-    bot_res: 25
+    bot_res: 25,
+    keysend: 28,
   },
   payment_errors: {
     timeout: 'Timed Out',
