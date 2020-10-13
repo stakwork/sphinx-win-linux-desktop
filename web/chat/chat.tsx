@@ -92,7 +92,9 @@ function Chat() {
 
     return <Section style={{ background: theme.deep }}>
       <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
-      <ChatContent appMode={appMode} footHeight={footHeight} />
+      <ChatContent appMode={appMode} footHeight={footHeight} 
+        pricePerMessage={pricePerMessage}
+      />
       <Foot height={footHeight} tribeBots={tribeBots}
         pricePerMessage={pricePerMessage}
       />
@@ -101,7 +103,7 @@ function Chat() {
 }
 
 
-function ChatContent({ appMode, footHeight }) {
+function ChatContent({ appMode, footHeight, pricePerMessage }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -115,6 +117,7 @@ function ChatContent({ appMode, footHeight }) {
     const server = meme.getDefaultServer()
     setUploading(true)
     const r = await uploadFile(file, file.type, server.host, server.token, 'Image.jpg')
+    // console.log('pricePerMessage',pricePerMessage)
     await msg.sendAttachment({
       contact_id: null, chat_id: chat.id,
       muid: r.muid,
@@ -122,7 +125,7 @@ function ChatContent({ appMode, footHeight }) {
       media_type: file.type,
       text: '',
       price: 0,
-      amount: 0
+      amount: pricePerMessage||0
     })
     setUploading(false)
   }

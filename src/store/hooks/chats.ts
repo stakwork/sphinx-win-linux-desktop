@@ -34,14 +34,14 @@ function lastMessageText(msg){
   if(msg.type===constants.message_types.bot_res) {
     return msg.sender_alias ? `${msg.sender_alias} says...` : 'Bot Response'
   }
+  if(msg.message_content) {
+    if(msg.message_content.startsWith('giphy::')) return 'GIF received'
+    return msg.message_content
+  }
   if(msg.amount) {
     const kind = msg.type===constants.message_types.invoice?'Invoice':'Payment'
     if(msg.sender===1) return `${kind} Sent: ${msg.amount} sat`
     return `${kind} Received: ${msg.amount} sat`
-  }
-  if(msg.message_content) {
-    if(msg.message_content.startsWith('giphy::')) return 'GIF received'
-    return msg.message_content
   }
   if(msg.media_token && msg.media_type) {
     const mediaType = msg.media_type

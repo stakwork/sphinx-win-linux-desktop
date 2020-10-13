@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { openLink } from '../../utils/openLink'
 import { ReactTinyLink } from 'react-tiny-link-electron'
 import { useParsedGiphyMsg } from '../../../src/store/hooks/msg'
-import { message } from '../../../src/store/websocketHandlers'
 import Linkify from 'react-linkify';
 import * as ipc from '../../crypto/ipc'
 import { useHasLink } from './hooks'
@@ -33,8 +32,6 @@ export default function TextMsg(props) {
       />
     </Wrap >
   }
-
-  
 
   const isGiphy = message_content && message_content.startsWith('giphy::')
   if (isGiphy) {

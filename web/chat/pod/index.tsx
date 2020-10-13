@@ -49,7 +49,7 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
         return acc
       }, 0)
     }
-    console.log(earned)
+    // console.log(earned)
   }
 
   return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
