@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { openLink } from '../../utils/openLink'
 import { ReactTinyLink } from 'react-tiny-link-electron'
-import { useParsedGiphyMsg } from '../../../src/store/hooks/msg'
+import { useParsedGiphyMsg, useParsedClipMsg } from '../../../src/store/hooks/msg'
 import Linkify from 'react-linkify';
 import * as ipc from '../../crypto/ipc'
 import { useHasLink } from './hooks'
+import Clip from './clipMsg'
 
 export default function TextMsg(props) {
-  const { message_content } = props
+  const { message_content, sender } = props
+  const isMe = sender === 1
   const link = useHasLink(props)
   const hasLink = message_content && link
   if (hasLink) {
@@ -37,6 +38,12 @@ export default function TextMsg(props) {
   if (isGiphy) {
     const { url, aspectRatio } = useParsedGiphyMsg(message_content)
     return <GIF src={url} aspectRatio={aspectRatio} />
+  }
+
+  const isClip = message_content && message_content.startsWith('clip::')
+  if (isClip) {
+    const params = useParsedClipMsg(message_content)
+    return <Clip {...params} isMe={isMe} />
   }
 
   const emo_regex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])$/;

@@ -14,6 +14,7 @@ import Dropzone from 'react-dropzone'
 import { uploadFile } from '../utils/meme'
 import Bots from './bots'
 import MsgMenu from './msgMenu'
+import {useHasReplyContent} from '../../src/store/hooks/chat'
 const { useMsgs } = hooks
 
 var link = null
@@ -28,7 +29,6 @@ function Chat() {
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [tribeBots, setTribeBots] = useState([])
   let footHeight = 65
-  if(ui.replyUUID) footHeight=115
 
   // function joinEvanTest(){
   //   chats.joinTribe({
@@ -46,7 +46,7 @@ function Chat() {
 
   return useObserver(() => {
 
-    if (ui.replyUUID) footHeight = 115
+    if (useHasReplyContent()) footHeight = 120
     const chat = ui.selectedChat
 
     useEffect(() => {
@@ -91,7 +91,9 @@ function Chat() {
     }, [chat])
 
     return <Section style={{ background: theme.deep }}>
-      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} />
+      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
+        pricePerMessage={pricePerMessage}
+      />
       <ChatContent appMode={appMode} footHeight={footHeight} 
         pricePerMessage={pricePerMessage}
       />
@@ -129,7 +131,6 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
     })
     setUploading(false)
   }
-
 
   const handleMenuClick = (event, m) => {
     setAnchorEl(event.currentTarget);
@@ -178,7 +179,6 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
     }
 
     return (
-
       <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
           {({ getRootProps, getInputProps, isDragActive }) => (
@@ -204,7 +204,6 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
                     if (m.dateLine) {
                       return <DateLine key={'date' + i} dateString={m.dateLine} />
                     }
-
                     return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} />
                   })}
                 </MsgList>
@@ -221,9 +220,6 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
         </Dropzone>
 
       </Wrap>
-
-
-
     )
   })
 }

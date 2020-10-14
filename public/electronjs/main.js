@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell } = require('electron')
+const { app, BrowserWindow, Menu, shell, dialog } = require('electron')
 const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
 require('./ipc')
@@ -59,7 +59,13 @@ function createWindow() {
     menu[0].submenu.splice(menu[0].submenu.length-2,0,{
         label: 'Remove account from this computer',
         click: () => {
-            mainWindow.webContents.send('reset', '')
+            dialog.showMessageBox({
+                message: 'Are you sure you want to logout? All data will be deleted', buttons: ['OK','Cancel'] 
+            }).then(function(ret){
+                if(ret.response===0) {
+                    mainWindow.webContents.send('reset', '')
+                }
+            });
         }
     })
     Menu.setApplicationMenu(Menu.buildFromTemplate(menu));

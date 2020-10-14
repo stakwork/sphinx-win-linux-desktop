@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import theme from '../../theme'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CallMadeIcon from '@material-ui/icons/CallMade';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import CheckIcon from '@material-ui/icons/Check'
 import CamIcon from '@material-ui/icons/CameraAltOutlined'
 import GetAppIcon from '@material-ui/icons/GetApp';
@@ -71,7 +72,7 @@ export default function MediaMsg(props) {
       <NeedsPurchase>
         <CamIcon style={{ color: 'grey', fontSize: 30 }} />
       </NeedsPurchase> :
-      <Media type={media_type} data={data} filename={filename} onClick={() => ui.setImgViewerParams({ data })} />
+      <Media type={media_type} data={data} filename={filename} onClick={() => ui.setImgViewerParams({ data, type:media_type })} />
     }
     {message_content && <Content>
       {message_content}
@@ -112,9 +113,19 @@ function Media({ type, data, onClick, filename }) {
   if (type.startsWith('audio')) {
     return <ReactAudioPlayer src={data} controls />
   }
-  // if(type.startsWith('video')) {
-  //   <Player><source src={data} /></Player>
-  // }
+  if(type.startsWith('video')) {
+    return <VidWrap>
+      <Player><source 
+        src={data}
+        type={type==='video/mov'?'video/mp4':type}
+      /></Player>
+      <PlayArrow onClick={onClick}>
+        <PlayArrowIcon style={{fontSize:34}} />
+      </PlayArrow>
+      <VidOverlay />
+    </VidWrap>
+  }
+  
   return <>
     <Download src={data} filename={filename} onClick={() => download(data, filename)}>
       <span>Download file: {filename || "Attachment"}</span>
@@ -176,6 +187,7 @@ const BuyButton = styled.div`
   align-items:center;
   justify-content:center;
   font-size:12px;
+  position: relative;
   ${p => !p.purchased &&
     `cursor: pointer;
     &:hover{
@@ -192,4 +204,41 @@ const NeedsPurchase = styled.div`
   display:flex;
   align-items:center;
   justify-content:center;
+`
+const VidWrap = styled.div`
+  display:flex;
+  flex:1;
+  align-items:center;
+  justify-content:center;
+  position: relative;
+  & .video-react-big-play-button{
+    display:none;
+  }
+`
+const VidOverlay = styled.div`
+  position:absolute;
+  z-index:101;
+  left:0;right:0;top:0;bottom:0;
+  background-color:rgba(0,0,0,0.4);
+`
+const PlayArrow = styled.div`
+  z-index:102;
+  border:6px solid #ccc;
+  cursor:pointer;
+  border-radius:100%;
+  height:48px;
+  width:48px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    border-color:white;
+  }
+  & svg {
+    fill:#ccc;
+  }
+  &:hover svg {
+    fill:white;
+  }
 `

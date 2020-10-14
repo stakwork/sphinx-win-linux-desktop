@@ -5,10 +5,12 @@ import { useStores } from '../../../src/store'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
+import Stats from './stats'
 
 export default function Pod({ top, url, host, showPod, setShowPod }) {
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
+  const [showStats,setShowStats] = useState(false)
   const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
   const { chats, msg } = useStores()
   const scrollRef = useRef<HTMLDivElement>()
@@ -39,8 +41,9 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   const episode = selectedEpisodeId && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeId)
 
   let earned = 0
+  let incomingPayments = []
   if(pod && pod.id){
-    const incomingPayments = msg.filterMessagesByContent(0, `"feedID":${pod.id}`)
+    incomingPayments = msg.filterMessagesByContent(0, `"feedID":${pod.id}`)
     if(incomingPayments) {
       earned = incomingPayments.reduce((acc,m)=>{
         if(m.sender!==1 && m.amount) {
@@ -52,6 +55,19 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
     // console.log(earned)
   }
 
+  let pricePerMinute = 0
+  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+    pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
+  }
+
+  if(pod && showStats) {
+    return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
+      <Stats pod={pod} onClose={()=>setShowStats(false)} 
+        incomingPayments={incomingPayments} earned={earned}
+      />
+    </PodWrap>
+  }
+
   return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
     {pod ? <PodInfo>
       <PodImage src={pod.image} alt={pod.title} />
@@ -61,16 +77,18 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
         </PodTitle>
         {episode && <PodEpisode>
           {episode.title}
-        </PodEpisode>
-        }
+        </PodEpisode>}
+        {(pricePerMinute?true:false) && <Price>
+          {`Price per Minute: ${pricePerMinute} sats`}  
+        </Price>}
       </PodText>
-      {earned && <Earned>
+      {earned && <Earned onClick={()=>setShowStats(true)}>
         <div>Earned:</div>
         <div>{`${earned} sats`}</div>
       </Earned>}
     </PodInfo> : <Center><CircularProgress /></Center>}
 
-    <Player pod={pod} episode={episode} />
+    <Player pod={pod} episode={episode} pricePerMinute={pricePerMinute} />
 
     {pod && pod.episodes && <PodEpisodes>
       <span style={{ marginBottom: 3 }}>Episodes:</span>
@@ -89,7 +107,7 @@ const PodWrap = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.75);
+  box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.95);
   padding: 13px;
   display: ${p => p.show ? 'block' : 'none'};
   width:360px;
@@ -116,6 +134,11 @@ const Earned = styled.div`
   border-radius:4px;
   padding: 5px 8px;
   font-size: 11px;
+  cursor:pointer;
+  &:hover{
+    color:white;
+    border-color:white;
+  }
 `
 const PodImage = styled.img`
   display: flex;
@@ -142,13 +165,22 @@ const PodEpisode = styled.div`
   display: flex;
   margin-top: 5px;
   font-size: 13px;
+  color: #eee;
+  max-width: calc(100% - 26px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+`
+const Price = styled.div`
+  display: flex;
+  margin-top: 8px;
+  font-size: 13px;
   color: #809ab7;
   max-width: calc(100% - 26px);
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 `
-
 const PodEpisodes = styled.div`
 
 `

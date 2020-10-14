@@ -127,7 +127,7 @@ export function bot_res(data){
   msgStore.gotNewMessageFromWS(data.response)
 }
 
-const oktolog=true
+const oktolog=false
 
 function log(a,b){
   if(oktolog) {

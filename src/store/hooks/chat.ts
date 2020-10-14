@@ -1,6 +1,62 @@
+import {useStores} from '../index'
+import {useAvatarColor} from './msg'
+
 interface CalcBotPriceResponse {
   price:number,
   failureMessage:string,
+}
+
+function toHHMMSS(ts) {
+  var sec_num = parseInt(ts, 10); // don't forget the second param
+  var hours: any = Math.floor(sec_num / 3600);
+  var minutes: any = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds: any = sec_num - (hours * 3600) - (minutes * 60);
+  if (hours < 10) { hours = "0" + hours; }
+  if (minutes < 10) { minutes = "0" + minutes; }
+  if (seconds < 10) { seconds = "0" + seconds; }
+  return hours + ':' + minutes + ':' + seconds;
+}
+function extraTextContent(obj) {
+  const content = (obj.ts||obj.ts===0) ? `Share audio clip: ${toHHMMSS(obj.ts)}` : 'Content'
+  const title = obj.title || 'Title'
+  return { content, title, color: 'grey' }
+}
+
+export function useHasReplyContent(): boolean {
+  const {ui} = useStores()
+  return (ui.replyUUID || ui.extraTextContent) ? true : false
+}
+
+interface replyContent {
+  replyMessageSenderAlias: string
+  replyMessageContent: string
+  replyColor: string
+}
+export function useReplyContent(msgs): replyContent {
+  const {ui, contacts} = useStores()
+  let replyMessageSenderAlias = ''
+  let replyMessageContent = ''
+  let replyColor = ''
+  if (ui.extraTextContent) {
+    const {content, title, color} = extraTextContent(ui.extraTextContent)
+    replyMessageSenderAlias = title
+    replyMessageContent = content
+    replyColor = color
+  } else {
+    const replyMsg = msgs && ui.replyUUID && msgs.find(m => m.uuid === ui.replyUUID)
+    replyMessageSenderAlias = replyMsg && replyMsg.sender_alias
+    replyMessageContent = replyMsg && replyMsg.message_content
+    if (!replyMessageSenderAlias && replyMsg && replyMsg.sender) {
+      const sender = contacts.contacts.find(c => c.id === replyMsg.sender)
+      if (sender) replyMessageSenderAlias = sender.alias
+    }
+    replyColor = useAvatarColor(replyMessageSenderAlias)
+  }
+  return {
+    replyMessageSenderAlias,
+    replyMessageContent,
+    replyColor
+  }
 }
 
 // function calcBotPrice(bots,text){

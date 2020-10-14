@@ -16,7 +16,7 @@ import RssFeedIcon from '@material-ui/icons/RssFeed';
 import Pod from './pod'
 import Tooltip from '@material-ui/core/Tooltip';
 
-export default function Head({ height, appMode, setAppMode }) {
+export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const { contacts, ui, details } = useStores()
@@ -66,6 +66,7 @@ export default function Head({ height, appMode, setAppMode }) {
           </AvatarWrap>
           <ChatInfo>
             <Name>{chat.name}</Name>
+            {(pricePerMessage?true:false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}
           </ChatInfo>
         </Left>
       </Inner>}
@@ -106,7 +107,7 @@ export default function Head({ height, appMode, setAppMode }) {
           </IconzWrap>}
         </>}
       </Right>
-        <Pod top={height} url={feedURL} host={chat && chat.host} setShowPod={setShowPod} showPod={showPod} />
+      <Pod top={height} url={feedURL} host={chat && chat.host} setShowPod={setShowPod} showPod={showPod} />
     </Wrap>
   })
 }
@@ -159,6 +160,10 @@ const ChatInfo = styled.div`
 `
 const Name = styled.div`
   font-weight:bold;
+`
+const Price = styled.div`
+  font-size:12px;
+  margin-top:4px;
 `
 const IconzWrap = styled.div`
   display:flex;

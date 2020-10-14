@@ -205,6 +205,11 @@ export class UiStore {
     this.is24HourFormat = b
   }
 
+  @observable extraTextContent: {[k:string]:any}
+  @action async setExtraTextContent(o) {
+    this.extraTextContent = o
+  }
+
   @observable replyUUID: string
   @action async setReplyUUID(s) {
     this.replyUUID = s
