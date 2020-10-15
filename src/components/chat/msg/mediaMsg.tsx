@@ -150,7 +150,7 @@ function Media({ type, data, uri, filename }) {
     return <Image style={styles.img} resizeMode='cover' source={{ uri: uri || data }} />
   }
   if (type.startsWith('audio')) {
-    return <AudioPlayer source={uri || data} type={type} />
+    return <AudioPlayer source={uri || data} />
   }
   if (type.startsWith('video') && uri) {
     return <VideoPlayer uri={{ uri }} />

@@ -16,7 +16,7 @@ function toHHMMSS(ts) {
   if (seconds < 10) { seconds = "0" + seconds; }
   return hours + ':' + minutes + ':' + seconds;
 }
-function extraTextContent(obj) {
+function makeExtraTextContent(obj) {
   const content = (obj.ts||obj.ts===0) ? `Share audio clip: ${toHHMMSS(obj.ts)}` : 'Content'
   const title = obj.title || 'Title'
   return { content, title, color: 'grey' }
@@ -32,18 +32,18 @@ interface replyContent {
   replyMessageContent: string
   replyColor: string
 }
-export function useReplyContent(msgs): replyContent {
-  const {ui, contacts} = useStores()
+export function useReplyContent(msgs, replyUUID, extraTextContent): replyContent {
+  const {contacts} = useStores()
   let replyMessageSenderAlias = ''
   let replyMessageContent = ''
   let replyColor = ''
-  if (ui.extraTextContent) {
-    const {content, title, color} = extraTextContent(ui.extraTextContent)
+  if (extraTextContent) {
+    const {content, title, color} = makeExtraTextContent(extraTextContent)
     replyMessageSenderAlias = title
     replyMessageContent = content
     replyColor = color
   } else {
-    const replyMsg = msgs && ui.replyUUID && msgs.find(m => m.uuid === ui.replyUUID)
+    const replyMsg = msgs && replyUUID && msgs.find(m => m.uuid === replyUUID)
     replyMessageSenderAlias = replyMsg && replyMsg.sender_alias
     replyMessageContent = replyMsg && replyMsg.message_content
     if (!replyMessageSenderAlias && replyMsg && replyMsg.sender) {

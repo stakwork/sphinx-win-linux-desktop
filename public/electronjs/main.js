@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, dialog } = require('electron')
+const { app, BrowserWindow, Menu, shell, dialog, nativeImage } = require('electron')
 const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
 require('./ipc')
@@ -9,6 +9,9 @@ app.dirname = __dirname
 
 const path = require('path');
 const url = require('url');
+
+const iconPath = path.join(__dirname, "..", "static", "icon.png")
+const appIcon = nativeImage.createFromPath(iconPath);
 
 let mainWindow;
 
@@ -60,7 +63,9 @@ function createWindow() {
         label: 'Remove account from this computer',
         click: () => {
             dialog.showMessageBox({
-                message: 'Are you sure you want to logout? All data will be deleted', buttons: ['OK','Cancel'] 
+                message: 'Are you sure you want to logout? All data will be deleted', 
+                buttons: ['OK','Cancel'],
+                icon: appIcon
             }).then(function(ret){
                 if(ret.response===0) {
                     mainWindow.webContents.send('reset', '')

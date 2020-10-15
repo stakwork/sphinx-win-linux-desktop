@@ -16,7 +16,7 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   const scrollRef = useRef<HTMLDivElement>()
 
   async function loadPod() {
-    console.log("LOAD POD", host, url)
+    // console.log("LOAD POD", host, url)
     setLoading(true)
     const thepod = await chats.loadFeed(host, '', url)
     console.log("THE POD", thepod)

@@ -72,11 +72,9 @@ export default function Player({pod,episode,pricePerMinute}){
   }
 
   return <PodPlayer>
-    <MsgWrap>
-      <Message style={{fontSize:20}} 
-        onClick={clickMsg}
-      />
-    </MsgWrap>
+    {episode && <MsgWrap>
+      <Message style={{fontSize:20}} onClick={clickMsg} />
+    </MsgWrap>}
     {episode && <AudioPlayer
       autoPlay={false}
       src={episode.enclosureUrl}

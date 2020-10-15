@@ -16,10 +16,15 @@ export default class Controls extends TrackPlayer.ProgressComponent {
   }
   feedClip = () => {
     const ep = this.props.episode
-    EE.emit('feed-clip',{
-      position: this.state.position, 
-      id: ep.id,
+    const pod = this.props.pod
+    if(!ep || !pod) return
+    EE.emit('extra-text-content',{
+      ts: Math.round(this.state.position), 
+      itemID: ep.id,
+      feedID: pod.id,
       title: ep.title,
+      url: ep.enclosureUrl,
+      type: 'clip'
     })
   }
   track = (e) => {
@@ -43,10 +48,11 @@ export default class Controls extends TrackPlayer.ProgressComponent {
       <View style={styles.progressWrap}>
         <View style={styles.progressWrapTop}>
           <View style={{ height: 50, width: 100, display:'flex', justifyContent:'center' }}>
-            {/* <IconButton icon="chat"
+            <IconButton icon="chat"
               color={theme.title} size={20}
               onPress={this.feedClip}
-            /> */}
+              style={{marginTop:12}}
+            />
           </View>
           <View style={styles.controls}>
             <IconButton icon="rewind-10"

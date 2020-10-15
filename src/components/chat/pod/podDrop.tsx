@@ -81,6 +81,11 @@ export default function PodDrop({ show, host, uuid, url }) {
     }
   }
 
+  let pricePerMinute = 0
+  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+    pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
+  }
+
   function sendPayments(){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations    
@@ -90,7 +95,7 @@ export default function PodDrop({ show, host, uuid, url }) {
       feedID: pod.id,
       itemID: selectedEpisodeID,
     })
-    feed.sendPayments(dests, memo)    
+    feed.sendPayments(dests, memo, pricePerMinute)    
   }
 
   const NUM_SECONDS=60
@@ -156,11 +161,14 @@ export default function PodDrop({ show, host, uuid, url }) {
           {episode.title && <Text style={{ color: theme.title, fontSize:13 }} numberOfLines={1}>
             {episode.title}
           </Text>}
+          {pricePerMinute && <Text style={{ color: theme.subtitle, fontSize:13, marginTop:6 }} numberOfLines={1}>
+            {`Price per minute: ${pricePerMinute} sats`}  
+          </Text>}
         </View>
       </View>
       <View style={styles.track}>
         <Controls theme={theme} onToggle={onToggle} playing={playing} 
-          duration={duration} episode={episode}
+          duration={duration} episode={episode} pod={pod}
         />
       </View>
     </View>}
@@ -193,7 +201,7 @@ const styles = StyleSheet.create({
   },
   info:{
     marginLeft:15,
-    marginTop:20,
+    marginTop:0,
     display:'flex',
     flex:1,
     justifyContent:'space-around',

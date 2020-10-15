@@ -110,7 +110,7 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
     const id = open ? 'simple-popover' : undefined;
     const msgs = chat && msg.messages[chat.id]
 
-    const {replyMessageSenderAlias, replyMessageContent, replyColor} = useReplyContent(msgs)
+    const {replyMessageSenderAlias, replyMessageContent, replyColor} = useReplyContent(msgs, ui.replyUUID, ui.extraTextContent)
 
     if (ui.showBots) {
       return <></>

@@ -17,6 +17,7 @@ import Giphy from './giphy';
 import {calcBotPrice} from '../../store/hooks/chat'
 import {requestAudioPermissions, uploadAudioFile} from './audioHelpers'
 import EE from '../utils/ee'
+import {useReplyContent} from '../../store/hooks/chat'
 
 let dirs = RNFetchBlob.fs.dirs
 
@@ -24,7 +25,7 @@ const conversation = constants.chat_types.conversation
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
-export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,replyUuid}) {
+export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   const {ui,msg,contacts,meme} = useStores()
   const theme = useTheme()
   const [text,setText] = useState('')
@@ -38,6 +39,8 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
   const [gifs, setGifs] = useState([])
   const [searchGif, setSearchGif] = useState('Bitcoin')
   const [showGiphyModal, setShowGiphyModal] = useState(false)
+  const [replyUuid, setReplyUuid] = useState('')
+  const [extraTextContent, setExtraTextContent] = useState(null)
 
   const inputRef = useRef(null)
 
@@ -49,31 +52,49 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
       ToastAndroid.showWithGravityAndOffset(failureMessage, ToastAndroid.SHORT, ToastAndroid.TOP, 0, 125)
       return
     }
+
+    let txt = text
+    if(extraTextContent) {
+      const {type, ...rest} = extraTextContent
+      txt = type+'::'+JSON.stringify({...rest, text})
+    }
+
     msg.sendMessage({
-      contact_id,
-      text,
+      contact_id:contact_id||null,
+      text:txt,
       chat_id: chat.id||null,
       amount:(price+pricePerMessage)||0,
       reply_uuid:replyUuid||''
     })
     setText('')
-    setReplyUUID('')
+    if(replyUuid) {
+      setReplyUuid('')
+      EE.emit('clear-reply-uuid',null)
+    }
+    if(extraTextContent) {
+      setExtraTextContent(null)
+    }
     // inputRef.current.blur()
     // setInputFocused(false)
   }
 
-  function makeFeedClip(body){
-    console.log("make feed clip",body)
+  function gotExtraTextContent(body){
+    setExtraTextContent(body)
   }
-  function gotReplyUUID(){
-
+  function gotReplyUUID(uuid){
+    setReplyUuid(uuid)
+  }
+  function cancelReplyUUID(){
+    setReplyUuid('')
   }
   useEffect(()=>{
-    EE.on('feed-clip', makeFeedClip)
+    EE.on('extra-text-content', gotExtraTextContent)
     EE.on('reply-uuid', gotReplyUUID)
+    EE.on('cancel-reply-uuid', cancelReplyUUID)
     return ()=> {
-      EE.removeListener('feed-clip',makeFeedClip)
+      EE.removeListener('extra-text-content',gotExtraTextContent)
       EE.removeListener('reply-uuid',gotReplyUUID)
+      EE.removeListener('cancel-reply-uuid', cancelReplyUUID)
     }
   },[])
 
@@ -230,22 +251,42 @@ export default function BottomBar({chat,pricePerMessage,tribeBots,setReplyUUID,r
 
   let theID = chat&&chat.id
   const thisChatMsgs = theID && msg.messages[theID]
-  const replyMessage = replyUuid&&thisChatMsgs&&thisChatMsgs.find(m=>m.uuid===replyUuid)
-  let replyMessageSenderAlias = replyMessage&&replyMessage.sender_alias
-  if(!isTribe && !replyMessageSenderAlias && replyMessage && replyMessage.sender){
-    const sender = contacts.contacts.find(c=> c.id===replyMessage.sender)
-    if(sender) replyMessageSenderAlias = sender.alias
+
+  const {
+    replyMessageSenderAlias, 
+    replyMessageContent, 
+    replyColor
+  } = useReplyContent(thisChatMsgs, replyUuid, extraTextContent)
+  const hasReplyContent = (replyUuid || extraTextContent) ? true : false
+
+  // const replyMessage = replyUuid&&thisChatMsgs&&thisChatMsgs.find(m=>m.uuid===replyUuid)
+  // let replyMessageSenderAlias = replyMessage&&replyMessage.sender_alias
+  // if(!isTribe && !replyMessageSenderAlias && replyMessage && replyMessage.sender){
+  //   const sender = contacts.contacts.find(c=> c.id===replyMessage.sender)
+  //   if(sender) replyMessageSenderAlias = sender.alias
+  // }
+
+  function closeReplyContent(){
+    if(replyUuid) {
+      setReplyUuid('')
+      EE.emit('clear-reply-uuid',null)
+    }
+    if(extraTextContent) {
+      setExtraTextContent(null)
+    }
   }
+
   let fullHeight=textInputHeight+20
-  if(replyMessage) fullHeight+=48
+  if(hasReplyContent) fullHeight+=48
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:fullHeight}} />
     <View style={{...styles.bar,height:fullHeight,bottom:0,backgroundColor:theme.main,borderColor:theme.border}}>
-      {(replyMessage?true:false) && <ReplyContent showClose={true}
-        reply_message_content={replyMessage.message_content}
-        reply_message_sender_alias={replyMessageSenderAlias}
+      {(hasReplyContent?true:false) && <ReplyContent showClose={true}
+        color={replyColor}
+        content={replyMessageContent}
+        senderAlias={replyMessageSenderAlias}
         extraStyles={{width:'100%',marginTop:inputFocused?0:8,marginBottom:inputFocused?6:0}} 
-        onClose={()=> setReplyUUID('')}
+        onClose={closeReplyContent}
       />}
       <View style={styles.barInner}>
 
