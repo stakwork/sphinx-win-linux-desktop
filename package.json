@@ -122,6 +122,7 @@
     "react-draggable": "^4.4.3",
     "react-dropzone": "^11.0.3",
     "react-h5-audio-player": "^3.4.1",
+    "react-jutsu": "^2.3.0",
     "react-linkify": "^1.0.0-alpha",
     "react-moment": "^0.9.7",
     "react-native": "^0.63.3",

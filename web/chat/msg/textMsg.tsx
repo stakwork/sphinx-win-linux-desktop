@@ -6,6 +6,7 @@ import Linkify from 'react-linkify';
 import * as ipc from '../../crypto/ipc'
 import { useHasLink } from './hooks'
 import Clip from './clipMsg'
+import JitsiMsg from './jitsiMsg'
 
 export default function TextMsg(props) {
   const { message_content, sender } = props
@@ -44,6 +45,11 @@ export default function TextMsg(props) {
   if (isClip) {
     const params = useParsedClipMsg(message_content)
     return <Clip {...params} isMe={isMe} />
+  }
+
+  const isJitsi = message_content && message_content.startsWith('https://jitsi.sphinx.chat/')
+  if(isJitsi) {
+    return <JitsiMsg link={message_content} onCopy={props.onCopy} />
   }
 
   const emo_regex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])$/;

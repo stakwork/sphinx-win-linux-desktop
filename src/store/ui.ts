@@ -240,6 +240,11 @@ export class UiStore {
     this.showBots = b
   }
 
+  @observable startJitsiParams: {[k:string]:any} = null
+  @action setStartJitsiParams(b) {
+    this.startJitsiParams = b
+  }
+
 }
 
 export const uiStore = new UiStore()

@@ -204,7 +204,10 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
                     if (m.dateLine) {
                       return <DateLine key={'date' + i} dateString={m.dateLine} />
                     }
-                    return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} />
+                    return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} 
+                      handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
+                      onCopy={onCopy}
+                    />
                   })}
                 </MsgList>
                 {alert && <Alert style={{ position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}

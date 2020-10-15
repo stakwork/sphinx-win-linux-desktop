@@ -15,11 +15,12 @@ import { SvgIcon } from '@material-ui/core';
 import RssFeedIcon from '@material-ui/icons/RssFeed';
 import Pod from './pod'
 import Tooltip from '@material-ui/core/Tooltip';
+import PhoneIcon from '@material-ui/icons/Phone'
 
 export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
-  const { contacts, ui, details } = useStores()
+  const { contacts, ui, msg } = useStores()
   const [showPod, setShowPod] = useState(false)
 
   return useObserver(() => {
@@ -36,6 +37,9 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
     function clearURL() {
       setURL('')
       ui.setApplicationURL('')
+    }
+    function openJitsi() {
+      ui.setStartJitsiParams({pricePerMessage})
     }
 
     useEffect(() => {
@@ -84,17 +88,23 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
         </IconButton>
       </Left>}
       <Right>
+
+        {/*podcast*/}
         {feedURL &&
           <Tooltip title="Podcast" placement="left">
             <RssFeedIcon onClick={() => setShowPod(!showPod)}
               style={{ marginRight: 12, cursor: 'pointer' }}/>
           </Tooltip>
         }
+
+        {/*apps*/}
         {appURL && <> {appMode ? <ChatIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
           onClick={() => setAppMode(false)}
         /> : <OpenInBrowserIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
           onClick={() => setAppMode(true)}
           />} </>}
+
+        {/*browser/bots*/}
         {!appURL && <> {showURL ?
           <HighlightOffIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
             onClick={() => { setShowURL(false); clearURL() }}
@@ -106,6 +116,12 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
             {!chat && <Btn onClick={() => ui.toggleBots(ui.showBots ? false : true)}><BotIcon /></Btn>}
           </IconzWrap>}
         </>}
+
+        {/*jitsi*/}
+        {chat && <PhoneIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+          onClick={openJitsi}
+        />}
+
       </Right>
       <Pod top={height} url={feedURL} host={chat && chat.host} setShowPod={setShowPod} showPod={showPod} />
     </Wrap>

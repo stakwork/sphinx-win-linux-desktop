@@ -38,6 +38,7 @@ function lastMessageText(msg){
     const verb = msg.sender===1 ? 'shared' : 'received'
     if(msg.message_content.startsWith('giphy::')) return 'GIF '+verb
     if(msg.message_content.startsWith('clip::')) return 'Clip '+verb
+    if(msg.message_content.startsWith('https://jitsi.sphinx.chat/')) return 'Join Call'
     return msg.message_content
   }
   if(msg.amount) {

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Menu, shell, dialog, nativeImage } = require('electron')
 const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
+const VERSION = require('./version')
 require('./ipc')
 
 unhandled();
@@ -56,6 +57,16 @@ function createWindow() {
     })
 
     let menu = defaultMenu(app, shell);
+    menu[0].submenu[0] = { 
+        label: 'About Sphinx', 
+        click: () => {
+            dialog.showMessageBox({
+                message: 'Sphinx Chat \n\nVersion: '+VERSION, 
+                buttons: ['OK'],
+                icon: appIcon
+            })
+        }
+    },
     menu[0].submenu.splice(menu[0].submenu.length-2,0,{
         type:'separator'
     })
