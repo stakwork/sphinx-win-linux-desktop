@@ -28,9 +28,20 @@ export default function PodDrop({ show, host, uuid, url }) {
     setLoading(false)
   }
 
+  function getAndSetDuration(){
+    console.log("GET AND SET DURATION")
+    setTimeout(async ()=>{
+      const dur = await TrackPlayer.getDuration()
+      setDuration(dur)
+    },850)
+  }
+
   function onToggle(ts){
     if(playing) TrackPlayer.pause()
-    else TrackPlayer.play()
+    else {
+      TrackPlayer.play()
+      if(!duration) getAndSetDuration()
+    }
     setPlaying(!playing)
   }
 
@@ -52,11 +63,7 @@ export default function PodDrop({ show, host, uuid, url }) {
     await TrackPlayer.play();
     setPlaying(true)
     setList(false)
-
-    setTimeout(async ()=>{
-      const dur = await TrackPlayer.getDuration()
-      setDuration(dur)
-    },850)
+    getAndSetDuration()
   }
 
   async function initialSelect(ps){
@@ -65,10 +72,6 @@ export default function PodDrop({ show, host, uuid, url }) {
     if(!episode) return
     setSelectedEpisodeID(episode.id)
     await addEpisodeToQueue(episode)
-    setTimeout(async ()=>{
-      const dur = await TrackPlayer.getDuration()
-      setDuration(dur)
-    },850)
   }
 
   async function checkState(){

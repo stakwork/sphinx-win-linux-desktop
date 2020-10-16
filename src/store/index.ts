@@ -30,7 +30,23 @@ const hydrate = create({
   debounce: DEBOUNCE_TIME,
 })
 
-function init(){
+function initAndroid(){
+  console.log('=> initialize store')
+  Promise.all([
+    hydrate('user', userStore),
+    hydrate('details', detailsStore),
+    hydrate('contacts', contactStore),
+    hydrate('chats', chatStore),
+    hydrate('meme', memeStore),
+  ]).then(()=> {
+    console.log('=> store initialized')
+    uiStore.setReady(true)
+    hydrate('msg', msgStore)
+  })
+  hydrate('theme', themeStore)
+}
+
+function initWeb(){
   console.log('=> initialize store')
   Promise.all([
     hydrate('user', userStore),
@@ -43,10 +59,15 @@ function init(){
     console.log('=> store initialized')
     uiStore.setReady(true)
   })
-
   hydrate('theme', themeStore)
 }
-init()
+
+if(Platform.OS==='android') {
+  initAndroid()
+}
+if(Platform.OS==='web') {
+  initWeb()
+}
 
 const ctx = React.createContext({
   details: detailsStore,

@@ -25,6 +25,9 @@ const conversation = constants.chat_types.conversation
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
+let nonStateRecordingStartTime = 0
+let dontRecordActually = false
+
 export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   const {ui,msg,contacts,meme} = useStores()
   const theme = useTheme()
@@ -127,6 +130,11 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   }
 
   async function startRecord() {
+    if(dontRecordActually) {
+      dontRecordActually = false
+      setRecordingStartTime(null)
+      return
+    }
     setRecordSecs('0:00')
     try{
       await audioRecorderPlayer.startRecorder(dirs.CacheDir+'/sound.mp4')
@@ -137,7 +145,9 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
         const idx = str.lastIndexOf(':')
         setRecordSecs(str.substr(1,idx-1))
       })
-      setRecordingStartTime(Date.now().valueOf())
+      if(!dontRecordActually) {
+        setRecordingStartTime(Date.now().valueOf())
+      }
     } catch(e){
       console.log(e||'ERROR')
     }
@@ -146,7 +156,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   async function stopRecord(cb,time?) {
     const now = Date.now().valueOf()
     let tooShort = false
-    if(now-time<1000){
+    if(time && now-time<1000){
       tooShort = true
       await sleep(1000)
     }
@@ -174,9 +184,20 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
     onStartShouldSetPanResponder: (evt, gestureState)=> true,
     onMoveShouldSetPanResponderCapture: ()=> true,
     onPanResponderStart:()=>{
+      nonStateRecordingStartTime = Date.now().valueOf()
       requestAudioPermissions().then(startRecord)
     },
     onPanResponderEnd:async()=>{
+      const now = Date.now().valueOf()
+      if(now-nonStateRecordingStartTime<1000) {
+        dontRecordActually = true
+        stopRecord(null)
+        setRecordingStartTime(null)
+        setTimeout(()=>{
+          dontRecordActually = false
+        },2000)
+        return
+      }
       await sleep(10)
       function callback(path){
         setUploading(true)
