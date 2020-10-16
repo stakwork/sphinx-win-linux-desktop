@@ -1,5 +1,5 @@
 
 
-const VERSION = 45
+const VERSION = 47
 
 export default VERSION

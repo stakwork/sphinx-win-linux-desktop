@@ -25,6 +25,16 @@ class UserStore {
   @persist @observable
   deviceId: string = ''
 
+  @action reset(){
+    this.code = ''
+    this.invite = {}
+    this.alias = ''
+    this.publicKey = ''
+    this.currentIP = ''
+    this.authToken = ''
+    this.deviceId = ''
+  }
+
   @action
   setAlias(alias){
     this.alias = alias

@@ -13,7 +13,7 @@ const { useMsgs } = hooks
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
-export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: Chat, setReplyUUID, replyUuid }) {
+export default function MsgListWrap({ chat }: { chat: Chat }) {
   const { msg, ui, user, chats } = useStores()
   const [limit, setLimit] = useState(40)
 
@@ -39,8 +39,6 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
       msgs={msgs}
       msgsLength={(msgs && msgs.length) || 0}
       chat={chat}
-      setReplyUUID={setReplyUUID}
-      replyUuid={replyUuid}
       onDelete={onDelete}
       myPubkey={user.publicKey}
       onApproveOrDenyMember={onApproveOrDenyMember}
@@ -50,7 +48,7 @@ export default function MsgListWrap({ chat, setReplyUUID, replyUuid }: { chat: C
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, lastUpdated }) {
+function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, lastUpdated }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
   // const [viewableIds, setViewableIds] = useState({})
@@ -104,7 +102,6 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
       windowSize={10} // ?
       ref={scrollViewRef}
       data={msgs}
-      extraData={replyUuid}
       initialNumToRender={initialNumToRender}
       initialScrollIndex={0}
       onEndReached={onEndReached}
@@ -139,7 +136,6 @@ function MsgList({ msgs, msgsLength, chat, setReplyUUID, replyUuid, onDelete, my
           m={item} chat={chat}
           senderAlias={senderAlias} senderPhoto={senderPhoto}
           isGroup={isGroup} isTribe={isTribe}
-          replyUuid={replyUuid} setReplyUUID={setReplyUUID}
           onDelete={onDelete} myPubkey={myPubkey}
           onApproveOrDenyMember={onApproveOrDenyMember}
           onDeleteChat={onDeleteChat}
@@ -173,7 +169,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -185,10 +181,9 @@ function ListItem({ m, chat, isGroup, isTribe, setReplyUUID, replyUuid, onDelete
   return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
     senderAlias={senderAlias} senderPhoto={senderPhoto}
-    setReplyUUID={setReplyUUID} replyUuid={replyUuid}
     onDelete={onDelete} myPubkey={myPubkey} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
-  />, [m.id, m.type, m.media_token, replyUuid, m.status, m.sold])
+  />, [m.id, m.type, m.media_token, m.status, m.sold])
 }
 
 function DateLine({ dateString }) {

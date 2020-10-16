@@ -1,55 +1,65 @@
-import React, {useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import {useStores} from '../../src/store'
-import {useObserver} from 'mobx-react-lite'
+import { useStores } from '../../src/store'
+import { useObserver } from 'mobx-react-lite'
 import theme from '../theme'
 import Avatar from '../utils/avatar'
 import PublicIcon from '@material-ui/icons/Public';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import IconButton from '@material-ui/core/IconButton';
-import {constants} from '../../src/constants'
+import { constants } from '../../src/constants'
 import ChatIcon from '@material-ui/icons/Chat';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import { SvgIcon } from '@material-ui/core';
+import RssFeedIcon from '@material-ui/icons/RssFeed';
+import Pod from './pod'
+import Tooltip from '@material-ui/core/Tooltip';
+import PhoneIcon from '@material-ui/icons/Phone'
 
-export default function Head({height,appMode,setAppMode}){
-  const [showURL,setShowURL] = useState(false)
-  const [URL,setURL] = useState('')
-  const {contacts,ui,details} = useStores()
+export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
+  const [showURL, setShowURL] = useState(false)
+  const [URL, setURL] = useState('')
+  const { contacts, ui, msg } = useStores()
+  const [showPod, setShowPod] = useState(false)
 
-  return useObserver(()=>  {
+  return useObserver(() => {
     const chat = ui.selectedChat
-    const ownerPubkey = (chat&&chat.owner_pubkey)||''
-    const owner = contacts.contacts.find(c=>c.id===1)
-    const isTribeOwner = owner&&owner.public_key===ownerPubkey
+    const ownerPubkey = (chat && chat.owner_pubkey) || ''
+    const owner = contacts.contacts.find(c => c.id === 1)
+    const isTribeOwner = owner && owner.public_key === ownerPubkey
     const appURL = ui.applicationURL
+    const feedURL = ui.feedURL
 
-    function goToURL(){
+    function goToURL() {
       ui.setApplicationURL(URL)
     }
-    function clearURL(){
+    function clearURL() {
       setURL('')
       ui.setApplicationURL('')
     }
+    function openJitsi() {
+      ui.setStartJitsiParams({pricePerMessage})
+    }
 
-    useEffect(()=>{
-      if(chat) {
+    useEffect(() => {
+      if (chat) {
         setURL('')
         setShowURL(false)
       }
-    },[chat])
+      setShowPod(false)
+    }, [chat])
 
-    let photoURL = chat&&chat.photo_url
-    if(chat && chat.type===constants.chat_types.conversation){
-      const cid = chat.contact_ids.find(id=>id!==1)
-      const contact = contacts.contacts.find(c=> c.id===cid)
-      if(contact && contact.photo_url) {
+    let photoURL = chat && chat.photo_url
+    if (chat && chat.type === constants.chat_types.conversation) {
+      const cid = chat.contact_ids.find(id => id !== 1)
+      const contact = contacts.contacts.find(c => c.id === cid)
+      if (contact && contact.photo_url) {
         photoURL = contact.photo_url
       }
     }
 
-    return <Wrap style={{background:theme.bg,height}}>
+    return <Wrap style={{ background: theme.bg, height }}>
       {!chat && !showURL && <Placeholder>
         Open a conversation to start using Sphinx
       </Placeholder>}
@@ -60,45 +70,65 @@ export default function Head({height,appMode,setAppMode}){
           </AvatarWrap>
           <ChatInfo>
             <Name>{chat.name}</Name>
+            {(pricePerMessage?true:false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}
           </ChatInfo>
         </Left>
       </Inner>}
       {showURL && <Left>
-        <Input value={URL} onChange={e=> setURL(e.target.value)} 
-          placeholder="Application URL" 
-          style={{background:theme.extraDeep}}
-          onKeyPress={e=>{
-            if(e.key==='Enter') goToURL()
+        <Input value={URL} onChange={e => setURL(e.target.value)}
+          placeholder="Application URL"
+          style={{ background: theme.extraDeep }}
+          onKeyPress={e => {
+            if (e.key === 'Enter') goToURL()
           }}
         />
-        <IconButton style={{position:'absolute',top:5,right:15,zIndex:101,background:theme.bg,width:32,height:32}}
+        <IconButton style={{ position: 'absolute', top: 5, right: 15, zIndex: 101, background: theme.bg, width: 32, height: 32 }}
           disabled={!URL} onClick={goToURL}>
-          <NavigateNextIcon style={{color:'white',fontSize:17}} />
+          <NavigateNextIcon style={{ color: 'white', fontSize: 17 }} />
         </IconButton>
       </Left>}
       <Right>
-        {appURL && <> {appMode ? <ChatIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
-          onClick={()=> setAppMode(false)}
-        /> : <OpenInBrowserIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}}
-          onClick={()=> setAppMode(true)}
-        />} </>}
-        {!appURL && <> {showURL ? 
-          <HighlightOffIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
-            onClick={()=> {setShowURL(false); clearURL()}}
+
+        {/*podcast*/}
+        {feedURL &&
+          <Tooltip title="Podcast" placement="left">
+            <RssFeedIcon onClick={() => setShowPod(!showPod)}
+              style={{ marginRight: 12, cursor: 'pointer' }}/>
+          </Tooltip>
+        }
+
+        {/*apps*/}
+        {appURL && <> {appMode ? <ChatIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+          onClick={() => setAppMode(false)}
+        /> : <OpenInBrowserIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+          onClick={() => setAppMode(true)}
+          />} </>}
+
+        {/*browser/bots*/}
+        {!appURL && <> {showURL ?
+          <HighlightOffIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+            onClick={() => { setShowURL(false); clearURL() }}
           /> :
           <IconzWrap>
-            <PublicIcon style={{color:'white',fontSize:27,marginRight:15,cursor:'pointer'}} 
-              onClick={()=> {setShowURL(true); ui.setSelectedChat(null)}}
+            <PublicIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+              onClick={() => { setShowURL(true); ui.setSelectedChat(null) }}
             />
-            {!chat && <Btn onClick={()=> ui.toggleBots(ui.showBots?false:true)}><BotIcon /></Btn>}
+            {!chat && <Btn onClick={() => ui.toggleBots(ui.showBots ? false : true)}><BotIcon /></Btn>}
           </IconzWrap>}
         </>}
+
+        {/*jitsi*/}
+        {chat && <PhoneIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+          onClick={openJitsi}
+        />}
+
       </Right>
+      <Pod top={height} url={feedURL} host={chat && chat.host} setShowPod={setShowPod} showPod={showPod} />
     </Wrap>
   })
 }
 
-function BotIcon(){
+function BotIcon() {
   return <SvgIcon viewBox="64 64 896 896" height="21">
     <path d="M300 328a60 60 0 10120 0 60 60 0 10-120 0zM852 64H172c-17.7 0-32 14.3-32 32v660c0 17.7 14.3 32 32 32h680c17.7 0 32-14.3 32-32V96c0-17.7-14.3-32-32-32zm-32 660H204V128h616v596zM604 328a60 60 0 10120 0 60 60 0 10-120 0zm250.2 556H169.8c-16.5 0-29.8 14.3-29.8 32v36c0 4.4 3.3 8 7.4 8h729.1c4.1 0 7.4-3.6 7.4-8v-36c.1-17.7-13.2-32-29.7-32zM664 508H360c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h304c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z" />
   </SvgIcon>
@@ -112,8 +142,10 @@ const Wrap = styled.div`
   align-items:center;
   justify-content:space-between;
   box-shadow: 5px 0px 17px 0px rgba(0,0,0,0.45);
+  position:relative; 
+  z-index:100;
 `
-const Placeholder=styled.div`
+const Placeholder = styled.div`
   max-width:100%;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -144,6 +176,10 @@ const ChatInfo = styled.div`
 `
 const Name = styled.div`
   font-weight:bold;
+`
+const Price = styled.div`
+  font-size:12px;
+  margin-top:4px;
 `
 const IconzWrap = styled.div`
   display:flex;

@@ -1,6 +1,7 @@
 import React, {useState,useEffect} from 'react'
 import {useStores} from '../src/store'
 import './style.css'
+import onreset from './utils/onreset'
 import 'video-react/dist/video-react.css';
 import theme from './theme'
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -14,6 +15,7 @@ import Chat from './chat/chat'
 import * as localForage from 'localforage'
 import Modals from './modals'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import 'react-h5-audio-player/lib/styles.css';
 
 const palette = {
   primary: {
@@ -39,6 +41,13 @@ function App(){
   const [pinned,setPinned] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
   const [welcome, setWelcome] = useState(false)
+
+  useEffect(()=>{
+    onreset(function(){
+      setSignedUp(false)
+    })
+  }, [])
+
   useEffect(()=>{
     (async () => {
       const isSignedUp = (user.currentIP && user.authToken)?true:false
@@ -61,6 +70,7 @@ function App(){
       // },1000)
     })()
   },[])
+
   if(!signedUp) {
     return <Onboard welcome={welcome} onRestore={async()=>{
       await sleep(240)

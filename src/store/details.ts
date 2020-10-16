@@ -47,6 +47,11 @@ class DetailsStore {
   async clearLogs() {
     this.logs=''
   }
+
+  @action reset(){
+    this.balance = 0
+    this.logs = ''
+  }
   
 }
 

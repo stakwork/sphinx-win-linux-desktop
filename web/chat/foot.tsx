@@ -19,10 +19,11 @@ import Popover from '@material-ui/core/Popover';
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
 import { uploadFile } from '../utils/meme'
-import {calcBotPrice} from '../../src/store/hooks/chat'
+import { calcBotPrice } from '../../src/store/hooks/chat'
+import { useReplyContent } from '../../src/store/hooks/chat'
 
 export default function Foot({ height, pricePerMessage, tribeBots }) {
-  const { ui, msg, meme } = useStores()
+  const { ui, msg, meme, contacts } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
@@ -40,18 +41,26 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
     function sendMessage() {
       if (!text) return
       let contact_id = chat.contact_ids.find(cid => cid !== 1)
-      let {price, failureMessage} = calcBotPrice(tribeBots,text)
-      if(failureMessage) {
+      let { price, failureMessage } = calcBotPrice(tribeBots, text)
+      if (failureMessage) {
         return alert(failureMessage)
+      }
+
+      let txt = text
+      if(ui.extraTextContent) {
+        const {type, ...rest} = ui.extraTextContent
+        txt = type+'::'+JSON.stringify({...rest, text})
       }
       msg.sendMessage({
         contact_id,
-        text,
+        text:txt,
         chat_id: chat.id || null,
-        amount: (pricePerMessage+price) || 0, // 5, // CHANGE THIS
-        reply_uuid: ''
+        amount: (pricePerMessage + price) || 0, // 5, // CHANGE THIS
+        reply_uuid: ui.replyUUID || ''
       })
       setText('')
+      if (ui.replyUUID) ui.setReplyUUID('')
+      if (ui.extraTextContent) ui.setExtraTextContent(null)
     }
 
     let [count, setCount] = useState(0);
@@ -100,9 +109,10 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
     const msgs = chat && msg.messages[chat.id]
-    const replyMsg = msgs && ui.replyUUID && msgs.find(m => m.uuid === ui.replyUUID)
 
-    if(ui.showBots) {
+    const {replyMessageSenderAlias, replyMessageContent, replyColor} = useReplyContent(msgs, ui.replyUUID, ui.extraTextContent)
+
+    if (ui.showBots) {
       return <></>
     }
     if (recording) {
@@ -136,52 +146,60 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
       </MicWrap>
     }
 
-    return <Wrap style={{ background: theme.bg, height, display: 'flex', alignItems: 'center' }}>
-      {replyMsg &&
-        <ReplyMsg style={{ background: 'red' }}>
-          {replyMsg.message_content}
-          <CloseButton onClick={() => ui.setReplyUUID(null)} />
+    return <Wrap style={{ background: theme.bg, height }}>
+      {(replyMessageContent && replyMessageSenderAlias) &&
+        <ReplyMsg color={replyColor||'grey'}>
+          <ReplyMsgText>
+            <span style={{ color: 'white' }}>{replyMessageSenderAlias}</span>
+            <span style={{ color: '#809ab7', marginTop: 5 }}>{replyMessageContent}</span>
+          </ReplyMsgText>
+          <CloseButton style={{cursor:'pointer'}} onClick={() => {
+            ui.setReplyUUID(null)
+            ui.setExtraTextContent(null)
+          }} />
         </ReplyMsg>}
-      <IconButton style={{ pointerEvents: chat && chat.type === constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
-        onClick={() => ui.setSendRequestModal(chat)}>
-        <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
-      </IconButton>
-      <InsertEmoticonButton style={{ pointerEvents: chat ? "auto" : "none", cursor: 'pointer', marginLeft: 15, color: chat ? "#8f9ca9" : "#2a3540", fontSize: 30 }}
-        aria-describedby={id} onClick={handleClick} />
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-      >
-        <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
-      </Popover>
-      <Input value={text} onChange={e => setText(e.target.value)}
-        placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
-        disabled={!chat}
-        onKeyPress={e => {
-          if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
-        }}
-      ></Input>
-      <IconButton style={{
-        width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
-      }} disabled={!chat || !text} onClick={sendMessage}>
-        <SendIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
-      </IconButton>
-      <IconButton style={{
-        width: 39, height: 39, marginRight: 10,
-        backgroundColor: 'transparent'
-      }} disabled={!chat} onClick={() => setRecording(true)}>
-        <MicIcon style={{ color: chat ? '#8f9ca9' : '#2a3540', fontSize: 30 }} />
-      </IconButton>
+      <InnerWrap>
+        <IconButton style={{ pointerEvents: chat && chat.type === constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
+          onClick={() => ui.setSendRequestModal(chat)}>
+          <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
+        </IconButton>
+        <InsertEmoticonButton style={{ pointerEvents: chat ? "auto" : "none", cursor: 'pointer', marginLeft: 15, color: chat ? "#8f9ca9" : "#2a3540", fontSize: 30 }}
+          aria-describedby={id} onClick={handleClick} />
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+        >
+          <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
+        </Popover>
+        <Input value={text} onChange={e => setText(e.target.value)}
+          placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
+          disabled={!chat}
+          onKeyPress={e => {
+            if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
+          }}
+        ></Input>
+        <IconButton style={{
+          width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
+        }} disabled={!chat || !text} onClick={sendMessage}>
+          <SendIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
+        </IconButton>
+        <IconButton style={{
+          width: 39, height: 39, marginRight: 10,
+          backgroundColor: 'transparent'
+        }} disabled={!chat} onClick={() => setRecording(true)}>
+          <MicIcon style={{ color: chat ? '#8f9ca9' : '#2a3540', fontSize: 30 }} />
+        </IconButton>
+      </InnerWrap>
     </Wrap>
   })
 }
@@ -194,9 +212,28 @@ const Blinker = styled.div`
   50% { opacity: 0 }
 }
 `
+const InnerWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  height: 65px;
+`
 const ReplyMsg = styled.div`
-  width: 100%;
+  border-left: 5px solid ${p => p.color};
+  width: calc(100% - 30px);
   height: 50px;
+  margin: 10px 15px 5px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const ReplyMsgText = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin-left: 10px;
+  font-size: 13px;
 `
 
 const MicWrap = styled.div`
@@ -223,8 +260,7 @@ const WaveWrap = styled.div`
 const Wrap = styled.div`
   width:100%;
   display:flex;
-  flex-direction:row;
-  align-items:center;
+  flex-direction:column;
   justify-content:space-between;
   box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.45);
   position:relative;

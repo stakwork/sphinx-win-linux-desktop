@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
-import PodDrop from './podDrop'
+import PodDrop from './pod/podDrop'
 
 export default function Chat() {
   const { contacts, user, chats, ui } = useStores()
@@ -20,7 +20,6 @@ export default function Chat() {
 
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
-  const [replyUuid, setReplyUUID] = useState('')
   const [appMode, setAppMode] = useState(false)
   const [showPod, setShowPod] = useState(false)
   const [tribeBots,setTribeBots] = useState([])
@@ -116,9 +115,8 @@ export default function Chat() {
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
-      {theShow && <MsgList chat={chat} setReplyUUID={setReplyUUID} replyUuid={replyUuid} />}
+      {theShow && <MsgList chat={chat} />}
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
-        replyUuid={replyUuid} setReplyUUID={setReplyUUID}
         tribeBots={tribeBots}
       />}
     </View>

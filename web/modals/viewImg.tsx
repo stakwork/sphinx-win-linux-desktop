@@ -3,29 +3,36 @@ import Modal from '@material-ui/core/Modal';
 import styled from 'styled-components'
 import { useStores } from '../../src/store'
 import CloseButton from '@material-ui/icons/Close';
-
-
+import { Player } from 'video-react';
 
 export default function ViewImg({ params }) {
   const { ui } = useStores()
   const setImgViewerParamsHandler = () => ui.setImgViewerParams(null)
-
   return <Modal
     open={true}
     onClose={setImgViewerParamsHandler}
     className="view-img-modal-wrap"
   >
     <Content>
-      <CloseButton onClick={setImgViewerParamsHandler} style={{cursor: 'pointer', position: 'absolute'}}/>
-      <ImgWrapper>
-      <Img src={params.data} />
-      </ImgWrapper>
+      <CloseButton onClick={setImgViewerParamsHandler} style={{cursor: 'pointer', position: 'absolute', top:20, left:20, fontSize:48}}/>
+      <MediaWrapper>
+        <Media type={params.type||''} data={params.data} />
+      </MediaWrapper>
     </Content>
-
   </Modal>
 }
 
-
+function Media({data,type}){
+  if(type.startsWith('video')) {
+    return <Player autoPlay fluid={false} height="100%" width="100%">
+      <source 
+        src={data}
+        type={type==='video/mov'?'video/mp4':type}
+      />
+    </Player>
+  }
+  return <Img src={data} />
+}
 
 const Img = styled.div`
   background: url(${p => p.src});
@@ -38,7 +45,7 @@ const Img = styled.div`
   background-color: black;
 `
 
-const ImgWrapper = styled.div`
+const MediaWrapper = styled.div`
   height: 100%;
   width: 100%;
   display: flex;

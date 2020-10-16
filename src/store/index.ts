@@ -10,11 +10,14 @@ import { memeStore } from './meme'
 import { authStore } from './auth'
 import { botStore } from './bots'
 import { themeStore } from './theme'
+import { feedStore } from './feed'
 import { create } from 'mobx-persist'
 import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import * as hookz from './hooks'
 import * as localForage from 'localforage'
+
+export const DEBOUNCE_TIME = 280
 
 const strg = {
   ios: AsyncStorage,
@@ -24,10 +27,10 @@ const strg = {
 
 const hydrate = create({
   storage: strg[Platform.OS] || localStorage,
-  debounce: 280,
+  debounce: DEBOUNCE_TIME,
 })
 
-function init(){
+function initAndroid(){
   console.log('=> initialize store')
   Promise.all([
     hydrate('user', userStore),
@@ -40,10 +43,31 @@ function init(){
     uiStore.setReady(true)
     hydrate('msg', msgStore)
   })
-
   hydrate('theme', themeStore)
 }
-init()
+
+function initWeb(){
+  console.log('=> initialize store')
+  Promise.all([
+    hydrate('user', userStore),
+    hydrate('details', detailsStore),
+    hydrate('contacts', contactStore),
+    hydrate('chats', chatStore),
+    hydrate('meme', memeStore),
+    hydrate('msg', msgStore)
+  ]).then(()=> {
+    console.log('=> store initialized')
+    uiStore.setReady(true)
+  })
+  hydrate('theme', themeStore)
+}
+
+if(Platform.OS==='android') {
+  initAndroid()
+}
+if(Platform.OS==='web') {
+  initWeb()
+}
 
 const ctx = React.createContext({
   details: detailsStore,
@@ -56,6 +80,7 @@ const ctx = React.createContext({
   meme: memeStore,
   auth: authStore,
   bots: botStore,
+  feed: feedStore,
 })
 
 export const useStores = () => React.useContext(ctx)

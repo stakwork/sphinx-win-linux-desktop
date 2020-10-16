@@ -71,6 +71,11 @@ export function purchase_deny(data) {
   msgStore.gotNewMessageFromWS(data.response)
 }
 
+export function keysend(data) {
+  log("[ws] keysend", data)
+  msgStore.gotNewMessageFromWS(data.response)
+}
+
 export function group_create(data) {
   log("[ws] group_create", data)
   chatStore.gotChat(data.response.chat)

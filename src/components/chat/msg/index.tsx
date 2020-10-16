@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import React, { useState, useRef, useLayoutEffect } from 'react'
 import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
@@ -19,19 +19,27 @@ import Clipboard from "@react-native-community/clipboard";
 import BotResMsg from './botResMsg'
 import Popover from 'react-native-popover-view';
 import {useTheme} from '../../../store'
+import EE from '../../utils/ee'
 
 export default function MsgRow(props) {
   const theme = useTheme()
   const [showReply, setShowReply] = useState(false)
 
   const swipeRowRef = useRef<any>(null)
-  useEffect(() => {
-    if (!props.replyUuid && showReply) {
-      const sr = swipeRowRef.current
+
+  function clearReplyUUID(){
+    const sr = swipeRowRef.current
+    if (sr && sr.isOpen) {
       if (sr && sr.closeRow) sr.closeRow()
       setShowReply(false)
     }
-  }, [props.replyUuid])
+  }
+  useLayoutEffect(()=> {
+    EE.on('clear-reply-uuid', clearReplyUUID)
+    return ()=> {
+      EE.removeListener('clear-reply-uuid',clearReplyUUID)
+    }
+  },[swipeRowRef])
 
   const isGroupNotification = props.type === constants.message_types.group_join || props.type === constants.message_types.group_leave
   if (isGroupNotification) {
@@ -59,13 +67,13 @@ export default function MsgRow(props) {
   // console.log("RERENDER MESG",props.id)
 
   const onRowOpenHandler = () => {
-    if (props.setReplyUUID && props.message_content) {
-      props.setReplyUUID(props.uuid)
+    if (props.message_content) {
+      EE.emit('reply-uuid',props.uuid)
       setShowReply(true)
     }
   }
   const onRowCloseHandler = () => {
-    if (props.setReplyUUID) props.setReplyUUID('')
+    EE.emit('cancel-reply-uuid','')
     setShowReply(false)
   }
   return <View style={{
@@ -153,8 +161,8 @@ function MsgBubble(props) {
           }}>
             {isDeleted && <DeletedMsg />}
             {!isDeleted && (props.reply_message_content ? true : false) && <ReplyContent
-              reply_message_content={props.reply_message_content}
-              reply_message_sender_alias={props.reply_message_sender_alias}
+              content={props.reply_message_content}
+              senderAlias={props.reply_message_sender_alias}
             />}
             {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} />}
           </View>
@@ -172,7 +180,6 @@ function MsgBubble(props) {
             <Text style={{ textAlign: 'center', marginLeft: 6 }}>Delete</Text>
           </TouchableOpacity>}
       </Popover>
-
   )
 }
 

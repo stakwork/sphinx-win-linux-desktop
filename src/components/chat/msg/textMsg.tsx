@@ -2,8 +2,9 @@ import React from 'react'
 import { TouchableOpacity, Text, StyleSheet, Image, View, Linking } from 'react-native'
 import shared from './sharedStyles'
 import RNUrlPreview from 'react-native-url-preview';
-import { useParsedGiphyMsg } from '../../../store/hooks/msg'
+import { useParsedGiphyMsg, useParsedClipMsg } from '../../../store/hooks/msg'
 import {useTheme} from '../../../store'
+import AudioPlayer from './audioPlayer'
 
 export default function TextMsg(props) {
   const theme = useTheme()
@@ -24,6 +25,17 @@ export default function TextMsg(props) {
       {(text?true:false) && <Text style={{...styles.textPad,color:theme.title}}>{text}</Text>}
     </View>
   }
+
+  const isClip = message_content && message_content.startsWith('clip::')
+  if(isClip) {
+    const { url, title, text, ts } = useParsedClipMsg(message_content)
+    return <View>
+      {(title?true:false) && <Text style={{...styles.littleTitle,color:theme.title}}>{title}</Text>}
+      <AudioPlayer source={url} jumpTo={ts||0} />
+      <Text style={{...styles.textPad,color:theme.title,paddingTop:0}}>{text}</Text>
+    </View>
+  }
+
   const onLongPressHandler = () => props.onLongPress(props)
   return <TouchableOpacity style={isLink ? { width: 280, paddingLeft: 7, minHeight: 72 } : shared.innerPad}
     onLongPress={onLongPressHandler}>
@@ -86,4 +98,10 @@ const styles = StyleSheet.create({
     paddingLeft:12,
     paddingRight:12
   },
+  littleTitle:{
+    fontSize: 11,
+    paddingTop:10,
+    paddingLeft:12,
+    paddingRight:12
+  }
 })

@@ -1,36 +1,25 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { View, StyleSheet } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 // import {Player} from '@react-native-community/audio-toolkit'
+import { IconButton } from 'react-native-paper';
 
 export default function AudioPlayer(props) {
-  const { source } = props
+  const {source, jumpTo} = props
   const [percent, setPercent] = useState(0)
+  const [playing,setPlaying] = useState(false)
   // const [audioRecorderPlayer,setAudioRecorderPlayer] = useState(null)
+
+  const audioRecorderPlayer = useRef<any>()
   useEffect(() => {
-    // setAudioRecorderPlayer(new AudioRecorderPlayer())
-    // var p = new Player(source);
-    // console.log(p,source,props)
-    //   console.log(source)
-    //   RNMediaMetadataRetriever.getMetadata(source)
-    //   .then((info) => {
-    //       console.log(info)
-    //   })
-    //   .catch((error) => {
-    //       console.log(error)
-    //   })
-  }, [])
-  async function play() {
-    // console.log('PLAY',source)
+    audioRecorderPlayer.current = new AudioRecorderPlayer()
     try {
-      const audioRecorderPlayer = new AudioRecorderPlayer()
-      await audioRecorderPlayer.startPlayer(source)
-      audioRecorderPlayer.addPlayBackListener((e) => {
+      audioRecorderPlayer.current.addPlayBackListener((e) => {
         if (e.current_position === e.duration) {
-          audioRecorderPlayer.stopPlayer().catch(()=>{})
+          audioRecorderPlayer.current.stopPlayer().catch(()=>{})
           setPercent(0)
-          audioRecorderPlayer.removePlayBackListener()
+          setPlaying(false)
+          audioRecorderPlayer.current.seekToPlayer(0).catch(()=>{})
         } else {
           setPercent(Math.ceil(
             e.current_position / e.duration * 100
@@ -38,13 +27,35 @@ export default function AudioPlayer(props) {
         }
         // audioRecorderPlayer.mmssss(Math.floor(e.current_position))
       })
+      return ()=> {
+        if(audioRecorderPlayer.current) {
+          audioRecorderPlayer.current.stopPlayer().catch(()=>{})
+          audioRecorderPlayer.current.removePlayBackListener()
+        }
+      }
+    } catch(e) {}
+  }, [])
+  async function toggle() {
+    try {
+      if(playing) {
+        setPlaying(false)
+        audioRecorderPlayer.current.stopPlayer().catch(()=>{})
+      } else {
+        setPlaying(true)
+        if(jumpTo) {
+          await audioRecorderPlayer.current.startPlayer(source).catch(()=>{})
+          await audioRecorderPlayer.current.seekToPlayer(jumpTo).catch(()=>{})
+        } else {
+          audioRecorderPlayer.current.startPlayer(source).catch(()=>{})
+        }
+      }
     } catch (e) {
       console.log(e)
     }
   }
   return <View style={styles.wrap}>
-    <Icon name="play" color="grey" size={27}
-      onPress={play}
+    <IconButton icon={playing?'pause':'play'} color="#ccc" size={27}
+      onPress={toggle}
     />
     <View style={styles.barWrap}>
       <View style={styles.barEmpty}></View>

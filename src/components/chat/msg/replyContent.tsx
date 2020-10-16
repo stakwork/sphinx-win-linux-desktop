@@ -10,15 +10,15 @@ export default function ReplyContent(props) {
   const onCloseHandler = () => {
     if (props.onClose) props.onClose()
   }
-  const nameColor = useAvatarColor(props.reply_message_sender_alias || '')
+  const nameColor = props.color || useAvatarColor(props.senderAlias || '')
   return <View style={{ ...styles.replyMsg, ...extraStyles }}>
-    <View style={styles.replyMsgBar} />
+    <View style={{...styles.replyMsgBar, backgroundColor:nameColor}} />
     <View style={{ ...styles.replyMsgContent, width: props.showClose ? '85%' : '100%' }}>
       <Text style={{...styles.replyMsgSenderAlias,color:nameColor}} numberOfLines={1}>
-        {props.reply_message_sender_alias || ''}
+        {props.senderAlias || ''}
       </Text>
       <Text style={{...styles.replyMsgText,color:theme.title}} numberOfLines={1}>
-        {props.reply_message_content}
+        {props.content}
       </Text>
     </View>
     {props.showClose && <IconButton icon="close" size={18} color="#666"
@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
   replyMsgBar: {
     width: 5,
     height: '90%',
-    backgroundColor: '#999',
     marginRight: 10
   },
   replyMsgContent: {

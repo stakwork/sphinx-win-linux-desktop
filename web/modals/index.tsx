@@ -5,6 +5,7 @@ import {useStores} from '../../src/store'
 import {useObserver} from 'mobx-react-lite'
 import ConfirmInvoice from './confirmInvoice'
 import SendRequest from './sendRequest'
+import StartJitsi from './startJitsi'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -15,6 +16,7 @@ export default function Modals(){
       {ui.imgViewerParams && <ViewImg params={ui.imgViewerParams} />}
       {ui.confirmInvoiceMsg && <ConfirmInvoice params={ui.confirmInvoiceMsg} />}
       {ui.sendRequestModal && <SendRequest />}
+      {ui.startJitsiParams && <StartJitsi />}
     </Wrap>
   })
 }

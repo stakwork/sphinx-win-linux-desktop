@@ -13,7 +13,7 @@ import InvoiceMsg from './invoiceMsg'
 import MoreVertButton from '@material-ui/icons/MoreVert';
 import BotResMsg from './botRes'
 import moment from 'moment'
-import {useAvatarColor} from '../../../src/store/hooks/msg'
+import {useAvatarColor, useParsedGiphyMsg, useParsedClipMsg} from '../../../src/store/hooks/msg'
 
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
 
@@ -89,9 +89,16 @@ function ReplyContent({ reply_message_content, reply_message_sender_alias, sende
   const replyMe = reply_message_sender === 1
   const isMe = sender === 1
   const color = useAvatarColor(reply_message_sender_alias)
+
+  let txt = reply_message_content
+  if(txt.startsWith('clip::')) {
+    const params = useParsedClipMsg(reply_message_content)
+    if(params.text) txt = params.text
+  }
+
   return <ReplyWrapper color={color}>
-    <div>{replyMe ? 'You' : reply_message_sender_alias}</div>
-    <ReplyText style={{color: isMe ? "#829cba" : "#535f6e"}}>{reply_message_content}</ReplyText>
+    <div style={{color}}>{replyMe ? 'You' : reply_message_sender_alias}</div>
+    <ReplyText style={{color: isMe ? "#829cba" : "#535f6e"}}>{txt}</ReplyText>
   </ReplyWrapper>
 }
 
@@ -104,7 +111,7 @@ const ReplyText = styled.div`
 
 const ReplyWrapper = styled.div`
   margin: 5px 5px 5px 10px;
-  padding-left: 10px;
+  padding: 0 10px;
   border-left: 5px solid ${p => p.color};
   font-size: 14px;
   width: 100%;
