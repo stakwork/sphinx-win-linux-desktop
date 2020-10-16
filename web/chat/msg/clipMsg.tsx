@@ -2,15 +2,34 @@ import React, {useEffect,useLayoutEffect,useRef} from 'react'
 import AudioPlayer, { RHAP_UI } from 'react-h5-audio-player';
 import theme from '../../theme'
 import styled from 'styled-components'
+import EE from '../../utils/ee'
 
 export default function Clip(props){
-  const {feedID, itemID, ts, title, text, url, isMe} = props
+  const {feedID, itemID, ts, title, text, url, pubkey, isMe} = props
   const ref = useRef<any>()
   useLayoutEffect(()=>{
     if(ref&&ref.current&&ref.current.audio&&ref.current.audio.current) {
       ref.current.audio.current.currentTime = ts||0
     }
   },[])
+
+  const NUM_SECONDS = 60
+  const timestamp = useRef(0)
+  const secs = useRef(0)
+  function tick(){
+    const s = secs.current
+    if(s && s%NUM_SECONDS===0) {
+      EE.emit('clip-payment',{
+        feedID, itemID, pubkey, ts:Math.round(timestamp.current)
+      })
+    }
+    secs.current = secs.current + 1
+  }
+  function onListen(e){
+    tick()
+    timestamp.current = e.target.currentTime
+  }
+
   if(!url) {
     return <Pad>{text}</Pad>
   }
@@ -21,6 +40,7 @@ export default function Clip(props){
       layout="horizontal-reverse"
       src={url}
       customControlsSection={[RHAP_UI.MAIN_CONTROLS]}
+      onListen={onListen}
     />
     <Text>{text}</Text>
   </PodPlayer>

@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from 'react'
+import React, { useRef, useLayoutEffect, useState } from 'react'
 import styled from 'styled-components'
 import Close from '@material-ui/icons/Close'
 import Chart from 'chart.js'
@@ -7,11 +7,25 @@ import moment from 'moment'
 export default function Stats({ pod, onClose, incomingPayments, earned }) {
   const l = incomingPayments && incomingPayments.length
   const chartRef = useRef()
+  const littleChartRef = useRef()
+  const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
+
   useLayoutEffect(() => {
     if (!(chartRef && chartRef.current)) return
     makeChart(chartRef.current, incomingPayments)
   })
   const episodes = processEpisodeEarning(pod,incomingPayments)
+
+  function selectEpisode(e){
+    return
+    setSelectedEpisodeID(e.id)
+    setTimeout(()=>{
+      if(littleChartRef.current) {
+        makeChart(littleChartRef.current, incomingPayments)
+      }
+    },10)
+  }
+
   return <Wrap>
     <Close onClick={onClose} style={{ color: 'white', position: 'absolute', right: 0, top: 0, cursor: 'pointer' }} />
     <PodTitle>
@@ -27,16 +41,24 @@ export default function Stats({ pod, onClose, incomingPayments, earned }) {
     {l && <>
       <ByEpisode>By Episode:</ByEpisode>
       {episodes.map((e,i)=>{
-        return <EpisodeEarning key={i}>
-          <span>{e.title}</span>
-          <span>{`${e.total} sats`}</span>
-        </EpisodeEarning>
+        const selected = selectedEpisodeID===e.id
+        console.log("SELECTED",selected,e)
+        return <EpisodeWrap key={i} onClick={()=>selectEpisode(e)}>
+          <EpisodeEarning>
+            <span>{e.title}</span>
+            <span>{`${e.total} sats`}</span>
+          </EpisodeEarning>
+          {selected && <LittleChartWrap>
+            <canvas ref={littleChartRef} width="100%" height="100%"></canvas>
+          </LittleChartWrap>}
+        </EpisodeWrap>
       })}
     </>}
   </Wrap>
 }
 
 interface Episode {
+  id: number;
   title: string
   total: number
 }
@@ -53,7 +75,7 @@ function processEpisodeEarning(pod, incomingPayments){
           if(idx>-1) {
             res[idx].total = res[idx].total + p.amount
           } else {
-            res.push({ title:ep.title, total:p.amount })
+            res.push({ title:ep.title, total:p.amount, id:ep.id })
           }
         }
       }
@@ -76,7 +98,7 @@ function makeChart(ref, payments) {
     labels.unshift(day)
     data.unshift(amount)
   })
-  var myChart = new Chart(ctx, {
+  new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
@@ -145,6 +167,11 @@ const ChartWrap = styled.div`
   max-height:200px;
   position:relative;
 `
+const EpisodeWrap = styled.div`
+  display:flex;
+  flex-direction:column;
+  cursor:pointer;
+`
 const EpisodeEarning = styled.div`
   height:18px;
   display:flex;
@@ -152,4 +179,10 @@ const EpisodeEarning = styled.div`
   color:#809ab7;
   font-size:12px;
   justify-content:space-between;
+`
+const LittleChartWrap = styled.div`
+  width:100%;
+  height:100px;
+  max-height:100px;
+  position:relative;
 `

@@ -4,56 +4,26 @@ import AudioPlayer from 'react-h5-audio-player';
 import { useStores } from '../../../src/store'
 import Message from '@material-ui/icons/Message'
 
-export default function Player({pod,episode,pricePerMinute}){
-  const { feed, ui } = useStores()
-  const [secs,setSecs] = useState(0)
-  const interval = useRef(null);
+export default function Player({pod,episode,sendPayments}){
+  const { ui } = useStores()
+  const ts = useRef(0)
+  const secs = useRef(0)
 
-  function tsToSeconds(hms){
-    var a = hms.split(':')
-    if(a.length!==3) return 0
-    return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2])
-  }
-  function getTS(){
-    let ts = 0
-    const el = document.getElementById('rhap_current-time')
-    if(el) ts = tsToSeconds(el.innerHTML)
-    return ts
-  }
-
-  function sendPayments(){
-    console.log('=> sendPayments!')
-    const dests = pod && pod.value && pod.value.destinations
-    if(!dests) return
-    if(!pod.id || !episode.id) return
-    if(!pod.value.model) return
-    const ts = getTS()
-    const memo = JSON.stringify({
-      feedID: pod.id,
-      itemID: episode.id,
-      ...ts && {ts},
-    })
-    feed.sendPayments(dests,memo,pricePerMinute)
-  }
   const NUM_SECONDS = 60
   function tick(){
-    setSecs(s=>{
-      if(s && s%NUM_SECONDS===0) {
-        sendPayments()
-      }
-      return s+1
-    })
+    const s = secs.current
+    if(s && s%NUM_SECONDS===0) {
+      sendPayments(ts.current)
+    }
+    secs.current = secs.current + 1
   }
   function onPlay(){
     const dests = pod.value && pod.value.destinations
     if(!dests) return
-    interval.current = setInterval(tick, 1000)
-  }
-  function onPause(){
-    clearInterval(interval.current);
   }
   function onListen(e){
-    //console.log(e)
+    tick()
+    ts.current = Math.round(e.target.currentTime)
   }
   function clickMsg(){
     if(ui.extraTextContent) {
@@ -66,7 +36,7 @@ export default function Player({pod,episode,pricePerMinute}){
       itemID: episode.id,
       title: episode.title,
       url: episode.enclosureUrl,
-      ts: getTS(),
+      ts: ts.current,
       type:'clip'
     })
   }
@@ -79,7 +49,6 @@ export default function Player({pod,episode,pricePerMinute}){
       autoPlay={false}
       src={episode.enclosureUrl}
       onPlay={onPlay}
-      onPause={onPause}
       onListen={onListen}
       loop={false}
       customAdditionalControls={[]}

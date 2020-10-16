@@ -6,13 +6,15 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
 import Stats from './stats'
+import {Destination} from '../../../src/store/feed'
+import EE from '../../utils/ee'
 
 export default function Pod({ top, url, host, showPod, setShowPod }) {
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
   const [showStats,setShowStats] = useState(false)
   const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
-  const { chats, msg } = useStores()
+  const { chats, msg, feed } = useStores()
   const scrollRef = useRef<HTMLDivElement>()
 
   async function loadPod() {
@@ -34,6 +36,45 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   }
 
   const previousFeedUrl = usePrevious(url)
+
+  function sendPayments(ts:number, extraDest?:Destination){
+    console.log('=> sendPayments!')
+    const dests = pod && pod.value && pod.value.destinations
+    if(!dests) return
+    if(!pod.id || !episode.id) return
+    if(!pod.value.model) return
+    const memo = JSON.stringify({
+      feedID: pod.id,
+      itemID: episode.id,
+      ...ts && {ts},
+    })
+    const finalDests:Destination[] = extraDest ? dests.concat(extraDest) : dests
+    feed.sendPayments(finalDests,memo,pricePerMinute)
+  }
+
+  function onClipPayment(d){
+    if(d.pubkey && d.ts) {
+      const extraDest:Destination = {
+        address: d.pubkey,
+        split: 1,
+        type: 'node'
+      }
+      sendPayments(d.ts, extraDest)
+    }
+  }
+
+  useEffect(()=>{
+    EE.on('clip-payment',onClipPayment)
+    return ()=> {
+      EE.removeListener('clip-payment',onClipPayment)
+    }
+  },[])
+
+  useEffect(()=>{
+    if(url && !pod) {
+      loadPod()
+    }
+  },[url])
 
   useEffect(() => {
     if (showPod && !selectedEpisodeId) loadPod()
@@ -82,13 +123,15 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
           {`Price per Minute: ${pricePerMinute} sats`}  
         </Price>}
       </PodText>
-      {earned && <Earned onClick={()=>setShowStats(true)}>
+      {(earned?true:false) && <Earned onClick={()=>setShowStats(true)}>
         <div>Earned:</div>
         <div>{`${earned} sats`}</div>
       </Earned>}
     </PodInfo> : <Center><CircularProgress /></Center>}
 
-    <Player pod={pod} episode={episode} pricePerMinute={pricePerMinute} />
+    <Player pod={pod} episode={episode}
+      sendPayments={sendPayments}
+    />
 
     {pod && pod.episodes && <PodEpisodes>
       <span style={{ marginBottom: 3 }}>Episodes:</span>

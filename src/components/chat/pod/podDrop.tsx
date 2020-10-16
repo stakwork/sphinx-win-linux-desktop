@@ -118,9 +118,6 @@ export default function PodDrop({ show, host, uuid, url }) {
 
   useEffect(() => {
     if (show) checkState()
-    // if (!show) {
-    //   TrackPlayer.stop()
-    // }
   }, [show])
 
   useEffect(()=>{
