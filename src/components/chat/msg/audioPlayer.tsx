@@ -1,53 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, StyleSheet } from 'react-native'
-import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 // import {Player} from '@react-native-community/audio-toolkit'
 import { IconButton } from 'react-native-paper';
+import ARP from './audioRecorderPlayer'
+
+let nonStateSeconds = 0
 
 export default function AudioPlayer(props) {
   const {source, jumpTo} = props
   const [percent, setPercent] = useState(0)
   const [playing,setPlaying] = useState(false)
-  // const [audioRecorderPlayer,setAudioRecorderPlayer] = useState(null)
 
-  const audioRecorderPlayer = useRef<any>()
   useEffect(() => {
-    audioRecorderPlayer.current = new AudioRecorderPlayer()
-    try {
-      audioRecorderPlayer.current.addPlayBackListener((e) => {
-        if (e.current_position === e.duration) {
-          audioRecorderPlayer.current.stopPlayer().catch(()=>{})
-          setPercent(0)
-          setPlaying(false)
-          audioRecorderPlayer.current.seekToPlayer(0).catch(()=>{})
-        } else {
-          setPercent(Math.ceil(
-            e.current_position / e.duration * 100
-          ))
-        }
-        // audioRecorderPlayer.mmssss(Math.floor(e.current_position))
-      })
-      return ()=> {
-        if(audioRecorderPlayer.current) {
-          audioRecorderPlayer.current.stopPlayer().catch(()=>{})
-          audioRecorderPlayer.current.removePlayBackListener()
-        }
-      }
-    } catch(e) {}
-  }, [])
+    return ()=>{
+      if(playing) ARP.stop()
+    }
+  }, [playing])
+  
   async function toggle() {
     try {
       if(playing) {
         setPlaying(false)
-        audioRecorderPlayer.current.stopPlayer().catch(()=>{})
+        ARP.stop()
       } else {
         setPlaying(true)
-        if(jumpTo) {
-          await audioRecorderPlayer.current.startPlayer(source).catch(()=>{})
-          await audioRecorderPlayer.current.seekToPlayer(jumpTo).catch(()=>{})
-        } else {
-          audioRecorderPlayer.current.startPlayer(source).catch(()=>{})
-        }
+        ARP.play(source, jumpTo, e=>{
+          if (e.current_position === e.duration) {
+            ARP.stop()
+            setPercent(0)
+            setPlaying(false)
+            ARP.seekTo(0)
+          } else {
+            const secs = Math.round(e.current_position/1000)
+            if(secs!==nonStateSeconds) {
+              if(props.onListenOneSecond) props.onListenOneSecond(source)
+              nonStateSeconds = secs
+            }
+            setPercent(Math.ceil(
+              e.current_position / e.duration * 100
+            ))
+          }
+        })
       }
     } catch (e) {
       console.log(e)

@@ -18,14 +18,16 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     const ep = this.props.episode
     const pod = this.props.pod
     if(!ep || !pod) return
-    EE.emit('extra-text-content',{
+    const obj:{[k:string]:any} = {
       ts: Math.round(this.state.position), 
       itemID: ep.id,
       feedID: pod.id,
       title: ep.title,
       url: ep.enclosureUrl,
       type: 'clip'
-    })
+    }
+    if(this.props.myPubkey) obj.pubkey = this.props.myPubkey
+    EE.emit('extra-text-content',obj)
   }
   track = (e) => {
     const { duration } = this.props

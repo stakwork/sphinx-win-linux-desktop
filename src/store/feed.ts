@@ -3,7 +3,7 @@ import {msgStore} from './msg'
 import {userStore} from './user'
 
 type DestinationType = 'wallet' | 'node'
-interface Destination {
+export interface Destination {
   address: string
   split: number
   type: DestinationType

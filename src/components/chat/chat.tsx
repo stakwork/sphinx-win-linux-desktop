@@ -58,6 +58,7 @@ export default function Chat() {
 
     return () => {
       ui.setApplicationURL('')
+      ui.setFeedURL('')
     }
 
   }, [])
@@ -66,6 +67,7 @@ export default function Chat() {
     const isTribe = chat && chat.type === constants.chat_types.tribe
     const isTribeAdmin = isTribe && chat.owner_pubkey === user.publicKey
     let isAppURL = false
+    let isFeedURL = false
     if (isTribe) { //&& !isTribeAdmin) {
       setAppMode(true)
       // setLoadingChat(true)
@@ -85,6 +87,7 @@ export default function Chat() {
           ui.setApplicationURL(params.app_url)
         }
         if(params.feed_url) {
+          isFeedURL = true
           ui.setFeedURL(params.feed_url)
         }
         if(params.bots && Array.isArray(params.bots)) {
@@ -95,7 +98,8 @@ export default function Chat() {
     } else {
       setAppMode(false)
     }
-    if (!isAppURL) ui.setApplicationURL('') // remove the app_url
+    if (!isAppURL && ui.applicationURL) ui.setApplicationURL('') // remove the app_url
+    if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
   }
 
   const appURL = ui.applicationURL

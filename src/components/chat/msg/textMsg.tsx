@@ -2,9 +2,9 @@ import React from 'react'
 import { TouchableOpacity, Text, StyleSheet, Image, View, Linking } from 'react-native'
 import shared from './sharedStyles'
 import RNUrlPreview from 'react-native-url-preview';
-import { useParsedGiphyMsg, useParsedClipMsg } from '../../../store/hooks/msg'
+import { useParsedGiphyMsg } from '../../../store/hooks/msg'
 import {useTheme} from '../../../store'
-import AudioPlayer from './audioPlayer'
+import ClipMessage from './clipMsg'
 
 export default function TextMsg(props) {
   const theme = useTheme()
@@ -28,12 +28,7 @@ export default function TextMsg(props) {
 
   const isClip = message_content && message_content.startsWith('clip::')
   if(isClip) {
-    const { url, title, text, ts } = useParsedClipMsg(message_content)
-    return <View>
-      {(title?true:false) && <Text style={{...styles.littleTitle,color:theme.title}}>{title}</Text>}
-      <AudioPlayer source={url} jumpTo={ts||0} />
-      <Text style={{...styles.textPad,color:theme.title,paddingTop:0}}>{text}</Text>
-    </View>
+    return <ClipMessage {...props} />
   }
 
   const onLongPressHandler = () => props.onLongPress(props)

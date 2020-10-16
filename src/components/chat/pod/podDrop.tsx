@@ -5,10 +5,12 @@ import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
 import Controls from './controls'
 import useInterval from '../../utils/useInterval'
+import EE from '../../utils/ee'
+import {Destination} from '../../../store/feed'
 
 export default function PodDrop({ show, host, uuid, url }) {
   const theme = useTheme()
-  const { chats, feed } = useStores()
+  const { chats, feed, user } = useStores()
   const [pod, setPod] = useState(null)
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
@@ -29,7 +31,6 @@ export default function PodDrop({ show, host, uuid, url }) {
   }
 
   function getAndSetDuration(){
-    console.log("GET AND SET DURATION")
     setTimeout(async ()=>{
       const dur = await TrackPlayer.getDuration()
       setDuration(dur)
@@ -89,7 +90,7 @@ export default function PodDrop({ show, host, uuid, url }) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
-  function sendPayments(){
+  function sendPayments(extraDest?:Destination){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations    
     if(!dests) return
@@ -98,7 +99,8 @@ export default function PodDrop({ show, host, uuid, url }) {
       feedID: pod.id,
       itemID: selectedEpisodeID,
     })
-    feed.sendPayments(dests, memo, pricePerMinute)    
+    const finalDests = extraDest ? dests.concat(extraDest) : dests
+    feed.sendPayments(finalDests, memo, pricePerMinute)    
   }
 
   const NUM_SECONDS=60
@@ -115,14 +117,33 @@ export default function PodDrop({ show, host, uuid, url }) {
   }, 1000)
 
   useEffect(() => {
-    if (show){
-      checkState()
-      if(!pod) loadPod()
-    }
+    if (show) checkState()
     // if (!show) {
     //   TrackPlayer.stop()
     // }
   }, [show])
+
+  useEffect(()=>{
+    if(url && !pod) loadPod()
+  },[url])
+
+  function onClipPayment(d){
+    if(d.pubkey) {
+      const extraDest:Destination = {
+        address: d.pubkey,
+        split: 1,
+        type: 'node'
+      }
+      sendPayments(extraDest)
+    }
+  }
+
+  useEffect(()=>{
+    EE.on('clip-payment',onClipPayment)
+    return ()=> {
+      EE.removeListener('clip-payment',onClipPayment)
+    }
+  },[])
 
   if (!show) {
     return <></>
@@ -149,6 +170,7 @@ export default function PodDrop({ show, host, uuid, url }) {
     {!loading && list && pod && pod.episodes && <View style={styles.listWrap}>
       <FlatList style={styles.list} data={pod.episodes} 
         renderItem={renderListItem}
+        keyExtractor={item=> item.id+''}
       />
     </View>}
 
@@ -172,6 +194,7 @@ export default function PodDrop({ show, host, uuid, url }) {
       <View style={styles.track}>
         <Controls theme={theme} onToggle={onToggle} playing={playing} 
           duration={duration} episode={episode} pod={pod}
+          myPubkey={user.publicKey}
         />
       </View>
     </View>}
