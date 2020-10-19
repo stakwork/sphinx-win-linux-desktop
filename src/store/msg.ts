@@ -110,10 +110,8 @@ class MsgStore {
       console.log("=> NEW MSGS LENGTH", r.new_messages.length)
       if(r.new_messages && r.new_messages.length) {
         await this.batchDecodeMessages(r.new_messages)
-        // const msgs = await decodeMessages(r.new_messages) // this takes a longass time
-        // msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
-        // this.messages = orgMsgsFromExisting(this.messages, msgs)
-        // this.lastFetched = new Date().getTime()
+      } else {
+        this.sortAllMsgs(null)
       }
     } catch(e) {
       console.log(e)
@@ -151,8 +149,20 @@ class MsgStore {
         }
       }
     })
-    this.messages = allms
+    this.sortAllMsgs(allms)
     console.log("NOW ALL ARE DONE!")
+  }
+
+  sortAllMsgs(allms:{[k:number]:Msg[]}){
+    const final = {}
+    let toSort:{[k:number]:Msg[]} = allms || JSON.parse(JSON.stringify(this.messages))
+    Object.entries(toSort).forEach((entries)=>{
+      const k = entries[0]
+      const v: Msg[] = entries[1]
+      v.sort((a,b)=> moment(b.date).unix() - moment(a.date).unix())
+      final[k] = v
+    })
+    this.messages = final
   }
 
   async messagePosted(m) {
