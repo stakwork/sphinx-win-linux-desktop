@@ -31,12 +31,16 @@ export default function Invite({onFinish}) {
     setStep(step-1)
   }
   
-  return <View style={styles.wrap}>
-    {steps.map((C,i)=> <C key={i} z={i} 
-      show={step>i} 
-      onDone={stepForward} onBack={stepBack} 
-      onRestore={onFinish}
-    />)}
+  return <View style={styles.wrap} accessibilityLabel="onboard-wrap">
+    {steps.map((C,i)=> {
+      const render = i===step-2 || i===step-1 || i===step
+      if(!render) return <View key={i} />
+      return <C key={i} z={i} 
+        show={step>i} 
+        onDone={stepForward} onBack={stepBack} 
+        onRestore={onFinish}
+      />
+    })}
   </View>
 }
 

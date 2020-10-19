@@ -11,7 +11,7 @@ export default function Dashboard() {
   const {ui} = useStores()
   const theme = useTheme()
   return useObserver(()=>
-    <View style={{...styles.main,backgroundColor:theme.bg}}>
+    <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="dashboard">
       <Header />
       <View style={{
         ...styles.searchWrap,

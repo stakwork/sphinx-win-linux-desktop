@@ -131,7 +131,7 @@ export default function Code(props) {
       }}
     />
   }
-  return <View style={{...styles.wrap,zIndex:z}}>
+  return <View style={{...styles.wrap,zIndex:z}} accessibilityLabel="onboard-code">
     <RadialGradient style={styles.gradient}
       colors={['#A68CFF','#6A8FFF']}
       stops={[0.1,1]}
@@ -144,7 +144,7 @@ export default function Code(props) {
       <Text style={styles.msg}>
         Paste the invitation text or scan the QR code
       </Text>
-      <View style={styles.inputWrap}>
+      <View style={styles.inputWrap} accessibilityLabel="onboard-code-input">
         <TextInput value={code}
           placeholder="Enter Code ..."
           style={styles.input}

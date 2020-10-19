@@ -27,7 +27,7 @@ export default function Header() {
       <Appbar.Action icon="menu" onPress={()=>{
         navigation.dispatch(DrawerActions.openDrawer())
       }} />
-      <View style={styles.topWrap}>
+      <View style={styles.topWrap} accessibilityLabel="appbar-top">
         <Text style={styles.amt}>{details.balance}</Text>
         <Text style={styles.sat}>sat</Text>
       </View>

@@ -74,17 +74,17 @@ export default function ProfilePic({z,show,onDone,onBack}) {
   }
 
   return useObserver(()=> {
-    return <Slider z={z} show={show} style={{backgroundColor:'#F5F6F8'}}>
+    return <Slider z={z} show={show} style={{backgroundColor:'#F5F6F8'}} accessibilityLabel="onboard-profile">
       <IconButton icon="arrow-left"
         style={styles.backArrow}
         color="#AAA" onPress={onBack}
       />
-      <View style={styles.nicknameWrap}>
+      <View style={styles.nicknameWrap} accessibilityLabel="onboard-profile-nickname-wrap">
         <Text style={styles.nickname}>
           {user.alias}
         </Text>
       </View>
-      <View style={styles.mid}>
+      <View style={styles.mid} accessibilityLabel="onboard-profile-middle">
         {img && <Image source={{uri: img.uri}} 
           style={{width:180,height:180,borderRadius:90}} resizeMode={'cover'}
         />}
@@ -97,7 +97,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
           Select Image
         </Button>
       </View>
-      <View style={styles.buttonWrap}>
+      <View style={styles.buttonWrap} accessibilityLabel="onboard-profile-button-wrap">
         <Button mode="contained" dark={true}
           loading={uploading}
           onPress={finish}

@@ -105,17 +105,17 @@ export default function Chat() {
   const appURL = ui.applicationURL
   const theShow = show
 
-  return <View style={{...styles.main,backgroundColor:theme.bg}}>
+  return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
     <Header chat={chat} appMode={appMode} setAppMode={setAppMode} setShowPod={setShowPod} showPod={showPod} />
 
-    {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }}>
+    {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
       <Frame url={appURL} />
     </View>}
 
     <PodDrop show={showPod&&ui.feedURL} host={chat.host} uuid={chat.uuid} url={ui.feedURL} />
 
-    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }}>
+    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}

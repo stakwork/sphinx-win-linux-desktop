@@ -13,7 +13,7 @@ export default function BottomTabs() {
   const [scanning, setScanning] = useState(false)
   const theme = useTheme()
   return useObserver(()=>
-    <View style={{...styles.bar,
+    <View accessibilityLabel="bottombar" style={{...styles.bar,
       backgroundColor:theme.main,
       borderColor:theme.bg
     }}>

@@ -98,6 +98,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
   return (<>
     <Refresher />
     <VirtualizedList
+      accessibilityLabel="message-list"
       inverted
       windowSize={10} // ?
       ref={scrollViewRef}

@@ -16,11 +16,11 @@ export default function Welcome(props) {
 
   // const hasInvite = user&&user.invite&&Object.keys(user.invite)&&Object.keys(user.invite).length>0
   return useObserver(()=> {
-    return <Slider z={z} show={show}>
+    return <Slider z={z} show={show} accessibilityLabel="onboard-welcome">
       <Text style={styles.top}>
         A message from your friend...
       </Text>
-      <View style={styles.center}>
+      <View style={styles.center} accessibilityLabel="onboard-welcome-center">
         <Image source={require('../../../android_assets/avatar.png')} 
           style={{width:120,height:120}} resizeMode={'cover'}
         />

@@ -59,7 +59,7 @@ function addMethod(m: string, rootUrl: string): Function {
 
       const r = await fetch(rootUrl + url, opts)
       if (!r.ok) {
-        console.log('Not OK!',r)
+        console.log('Not OK!',r.status)
         return
       }
       let res

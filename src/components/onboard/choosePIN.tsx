@@ -5,7 +5,7 @@ import PIN from '../utils/pin'
 
 export default function ChoosePIN(props) {
   const {onDone,z,show}=props
-  return useObserver(()=> <Slider z={z} show={show}>
+  return useObserver(()=> <Slider z={z} show={show} accessibilityLabel="onboard-PIN">
     <PIN mode="choose" onFinish={onDone} />
   </Slider>)
 }

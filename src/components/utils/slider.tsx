@@ -23,7 +23,7 @@ export default function Slider(props){
   },[props.show])
   
   const addedStyles = props.style || {}
-  return <Animated.View style={{
+  return <Animated.View accessibilityLabel={props.accessibilityLabel||'slider'} style={{
     ...styles.wrap,
     zIndex: props.z||1,
     transform: [{translateX: x}],

@@ -24,13 +24,13 @@ export default function Ready(props) {
     setLoading(false)
     onDone()
   }
-  return <Slider z={z} show={show}>
+  return <Slider z={z} show={show} accessibilityLabel="onboard-ready">
     <RadialGradient style={styles.gradient}
       colors={['#A68CFF','#6A8FFF']}
       stops={[0.1,1]}
       center={[80,40]}
       radius={400}>
-      <View style={styles.titleWrap}>
+      <View style={styles.titleWrap} accessibilityLabel="onboard-ready-title">
         <View style={styles.titleRow}>
           <Text style={styles.title}>You're</Text>
           <Text style={styles.boldTitle}>ready</Text>
@@ -39,7 +39,7 @@ export default function Ready(props) {
           <Text style={styles.title}>to use Sphinx</Text>
         </View>
       </View>
-      <View style={styles.msgWrap}>
+      <View style={styles.msgWrap} accessibilityLabel="onboard-ready-message">
         <View style={styles.msgRow}>
           <Text style={styles.msg}>You can send messages</Text>
         </View>
@@ -53,7 +53,7 @@ export default function Ready(props) {
           <Text style={styles.msgBold}>10000 sats</Text>
         </View>
       </View>
-      <View style={styles.buttonWrap}>
+      <View style={styles.buttonWrap} accessibilityLabel="onboard-ready-button-wrap">
         <Button mode="contained"
           loading={loading}
           onPress={finish}

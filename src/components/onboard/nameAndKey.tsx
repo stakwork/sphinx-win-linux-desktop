@@ -27,14 +27,14 @@ export default function NameAndKey(props) {
       setUpdating(false)
     },500)
   }
-  return <Slider z={z} show={show} style={{backgroundColor:'#F5F6F8'}}>
+  return <Slider z={z} show={show} style={{backgroundColor:'#F5F6F8'}} accessibilityLabel="onboard-name">
     <TextInput value={text}
       ref={inputRef}
       placeholder="Set Nickname"
       style={styles.input}
       onChangeText={text => setText(text)}
     />
-    <View style={styles.buttonWrap}>
+    <View style={styles.buttonWrap} accessibilityLabel="onboard-name-button-wrap">
       <Button mode="contained" dark={true}
         loading={updating}
         onPress={ok}

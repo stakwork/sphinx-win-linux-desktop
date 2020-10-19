@@ -301,7 +301,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   if(hasReplyContent) fullHeight+=48
   return useObserver(()=> <>
     <View style={{...styles.spacer,height:fullHeight}} />
-    <View style={{...styles.bar,height:fullHeight,bottom:0,backgroundColor:theme.main,borderColor:theme.border}}>
+    <View style={{...styles.bar,height:fullHeight,bottom:0,backgroundColor:theme.main,borderColor:theme.border}} accessibilityLabel="chat-bottombar">
       {(hasReplyContent?true:false) && <ReplyContent showClose={true}
         color={replyColor}
         content={replyMessageContent}
@@ -309,7 +309,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
         extraStyles={{width:'100%',marginTop:inputFocused?0:8,marginBottom:inputFocused?6:0}} 
         onClose={closeReplyContent}
       />}
-      <View style={styles.barInner}>
+      <View style={styles.barInner} accessibilityLabel="chat-bottombar-inner">
 
         {!recordingStartTime && <TouchableOpacity style={{...styles.img, backgroundColor:theme.bg, borderColor:theme.border}}
           onPress={()=> setDialogOpen(true)}>

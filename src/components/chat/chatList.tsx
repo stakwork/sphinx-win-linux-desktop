@@ -60,7 +60,7 @@ export default function ChatList() {
   return useObserver(() => {
     const chatsToShow = useChats()
     // console.log("=> chatsToShow.length",chatsToShow.length)
-    return <View style={{ width: '100%', flex: 1 }}>
+    return <View style={{ width: '100%', flex: 1 }} accessibilityLabel="chatlist">
       <FlatList<any>
         data={chatsToShow}
         renderItem={renderItem}
