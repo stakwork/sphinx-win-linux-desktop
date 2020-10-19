@@ -55,6 +55,7 @@ export default function Ready(props) {
       </View>
       <View style={styles.buttonWrap} accessibilityLabel="onboard-ready-button-wrap">
         <Button mode="contained"
+          accessibilityLabel="onboard-ready-button"
           loading={loading}
           onPress={finish}
           style={styles.button}>

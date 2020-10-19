@@ -53,7 +53,7 @@ export default function People(props) {
   const flatListHeader: any = () => (
     <View style={styles.topBar}>
       <Text style={styles.title}>CONTACTS</Text>
-      {!noInitials && <TouchableOpacity style={styles.all} onPress={selectAll}>
+      {!noInitials && <TouchableOpacity style={styles.all} onPress={selectAll} accessibilityLabel="people-select-all">
         <Text style={styles.allText}>SELECT ALL</Text>
       </TouchableOpacity>}
     </View>

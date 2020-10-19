@@ -23,6 +23,7 @@ export default function Form(props) {
             {props.schema.map(item=>{
               const readOnly = props.readOnlyFields && props.readOnlyFields.includes(item.name)
               return <Input key={item.name} {...item} 
+                accessibilityLabel={`form-input-${item.name}`}
                 value={values[item.name]}
                 displayOnly={props.displayOnly||readOnly}
                 handleChange={handleChange} 
@@ -35,6 +36,7 @@ export default function Form(props) {
           {/* <View style={{height:1,backgroundColor:'#ddd'}}></View> */}
           {!props.displayOnly && <View style={styles.buttonWrap}>
             <Button mode="contained"
+              accessibilityLabel={props.buttonAccessibilityLabel||'form-button'}
               onPress={handleSubmit} 
               disabled={!props.forceEnable && (!dirty || !isValid)}
               dark={true} style={styles.button} loading={props.loading}>

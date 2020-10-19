@@ -32,6 +32,7 @@ export default function InviteNewUser({done}){
     </View>
     <View style={styles.inviteRow}>
       <TextInput value={text}
+        accessibilityLabel="add-friend-alias-input"
         onChangeText={t=> setText(t)}
         style={styles.inviteNicknameInput}
       />
@@ -41,6 +42,7 @@ export default function InviteNewUser({done}){
     </View>
     <View style={styles.inviteRow}>
       <TextInput value={msg}
+        accessibilityLabel="add-friend-message-input"
         placeholder="Welcome to Sphinx!"
         multiline={true} blurOnSubmit={true}
         numberOfLines={3}
@@ -59,7 +61,8 @@ export default function InviteNewUser({done}){
           <Text style={styles.estimatedCostSat}>sat</Text>
         </View>
       </View> : <View></View>}
-      <Button style={{backgroundColor:'#55D1A9',borderRadius:30,width:200,height:58,display:'flex',justifyContent:'center'}}
+      <Button accessibilityLabel="add-friend-button"
+        style={{backgroundColor:'#55D1A9',borderRadius:30,width:200,height:58,display:'flex',justifyContent:'center'}}
         mode="contained" dark={true} loading={loading}
         // disabled={!hasPrice}
         onPress={()=> invite()}>

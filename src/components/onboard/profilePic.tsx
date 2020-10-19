@@ -78,6 +78,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
       <IconButton icon="arrow-left"
         style={styles.backArrow}
         color="#AAA" onPress={onBack}
+        accessibilityLabel="onboard-profile-back"
       />
       <View style={styles.nicknameWrap} accessibilityLabel="onboard-profile-nickname-wrap">
         <Text style={styles.nickname}>
@@ -92,6 +93,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
           style={{width:180,height:180}} resizeMode={'cover'}
         />}
         <Button mode="contained" icon="refresh"
+          accessibilityLabel="onboard-profile-choose-image"
           onPress={pickImage}
           style={styles.selectButton}>
           Select Image
@@ -99,6 +101,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
       </View>
       <View style={styles.buttonWrap} accessibilityLabel="onboard-profile-button-wrap">
         <Button mode="contained" dark={true}
+          accessibilityLabel="onboard-profile-button"
           loading={uploading}
           onPress={finish}
           style={styles.button}>

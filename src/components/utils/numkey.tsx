@@ -23,10 +23,13 @@ export default function NumKey(props) {
               onPress={()=>{
                 if(props.onBackspace) props.onBackspace()
               }}>
-              <IconButton icon="backspace" color={(props.dark||theme.dark)?'white':'#AAA'} />
+              <IconButton icon="backspace" color={(props.dark||theme.dark)?'white':'#AAA'} 
+                accessibilityLabel={`pin-number-backspace`}
+              />
             </TouchableOpacity>
           }
-          return <TouchableOpacity key={key} style={styles.key}
+          return <TouchableOpacity accessibilityLabel={`pin-number-key-${key}`} 
+            key={key} style={styles.key}
             onPress={()=>{
               if(props.onKeyPress) props.onKeyPress(key)
             }}>

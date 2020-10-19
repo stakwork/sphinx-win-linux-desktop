@@ -39,6 +39,7 @@ export default function Final({ onFinish, contactIds }) {
         />}
       </TouchableOpacity>
       <TextInput value={text}
+        accessibilityLabel="group-name-input"
         placeholder="Group Name"
         style={styles.input}
         onChangeText={text => setText(text)}
@@ -46,6 +47,7 @@ export default function Final({ onFinish, contactIds }) {
     </View>
     <View style={styles.buttonWrap}>
       {showDone && <Button mode="contained" dark={true}
+        accessibilityLabel="new-group-done"
         onPress={finish} loading={loading}
         style={styles.button}>
         Done

@@ -24,7 +24,7 @@ export default function Header() {
 
   return useObserver(()=> {
     return <Appbar.Header dark={true} style={{width:'100%',backgroundColor:'#6289FD',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-      <Appbar.Action icon="menu" onPress={()=>{
+      <Appbar.Action icon="menu" accessibilityLabel="menu-button" onPress={()=>{
         navigation.dispatch(DrawerActions.openDrawer())
       }} />
       <View style={styles.topWrap} accessibilityLabel="appbar-top">

@@ -45,11 +45,13 @@ export default function ChatList() {
   const footerComponent: any = () => (
     <View style={moreStyles.buttonsWrap}>
       <Button mode="contained" dark={true} icon="plus"
+        accessibilityLabel="add-friend-button"
         onPress={setAddFriendModalHandler}
         style={{ ...moreStyles.button, backgroundColor: '#55D1A9' }}>
         Friend
       </Button>
       <Button mode="contained" dark={true} icon="plus"
+        accessibilityLabel="new-group-button" 
         style={moreStyles.button}
         onPress={setNewGroupModalHandler}>
         Group

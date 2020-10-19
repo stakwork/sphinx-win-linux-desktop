@@ -30,12 +30,14 @@ export default function NameAndKey(props) {
   return <Slider z={z} show={show} style={{backgroundColor:'#F5F6F8'}} accessibilityLabel="onboard-name">
     <TextInput value={text}
       ref={inputRef}
+      accessibilityLabel="onboard-name-input"
       placeholder="Set Nickname"
       style={styles.input}
       onChangeText={text => setText(text)}
     />
     <View style={styles.buttonWrap} accessibilityLabel="onboard-name-button-wrap">
       <Button mode="contained" dark={true}
+        accessibilityLabel="onboard-name-button"
         loading={updating}
         onPress={ok}
         disabled={!text}

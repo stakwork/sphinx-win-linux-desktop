@@ -49,6 +49,7 @@ export default function NewTribe({ onFinish }) {
         />}
       </TouchableOpacity> */}
       <Form schema={tribe} loading={loading}
+        buttonAccessibilityLabel="tribe-form-button"
         buttonText={(ui.editTribeParams ? 'Edit' : 'Create') + ' Group'}
         onSubmit={finish}
         initialValues={ui.editTribeParams ? theEditTribeParams : {

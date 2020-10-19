@@ -38,11 +38,13 @@ export default function AddFriend({visible}) {
 
       <FadeView opacity={hideButtons?0:1} style={styles.content}>
         <Button mode="contained" dark={true}
+          accessibilityLabel="new-to-sphinx-button"
           onPress={onNewToSphinxHandler}
           style={{backgroundColor:'#55D1A9',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center'}}>
           New to Sphinx
         </Button>
         <Button mode="contained" dark={true}
+          accessibilityLabel="already-on-sphinx-button"
           onPress={onAlreadyOnSphinxHandler}
           style={{backgroundColor:'#6289FD',borderRadius:30,width:'75%',height:60,display:'flex',justifyContent:'center',marginTop:28}}>
           Already on Sphinx
@@ -50,8 +52,9 @@ export default function AddFriend({visible}) {
       </FadeView>
 
       <FadeView opacity={addContact?1:0} style={styles.content}>
-        <View style={styles.former}>
+        <View style={styles.former} accessibilityLabel="add-friend-form-wrap">
           <Form schema={contact} loading={loading} 
+            buttonAccessibilityLabel="add-friend-form-button"
             buttonText="Save to Contacts"
             onSubmit={async (values)=> {
               setLoading(true)

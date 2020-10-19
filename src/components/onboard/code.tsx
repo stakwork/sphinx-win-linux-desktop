@@ -144,8 +144,9 @@ export default function Code(props) {
       <Text style={styles.msg}>
         Paste the invitation text or scan the QR code
       </Text>
-      <View style={styles.inputWrap} accessibilityLabel="onboard-code-input">
+      <View style={styles.inputWrap} accessibilityLabel="onboard-code-input-wrap">
         <TextInput value={code}
+          accessibilityLabel="onboard-code-input"
           placeholder="Enter Code ..."
           style={styles.input}
           onChangeText={text => setCode(text)}
@@ -155,6 +156,7 @@ export default function Code(props) {
           }}
         />
         <IconButton
+          accessibilityLabel="onboard-code-qr-button"
           icon="qrcode-scan"
           color="#888"
           size={28}

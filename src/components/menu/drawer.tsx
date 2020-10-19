@@ -71,6 +71,7 @@ export default function TheDrawer(props) {
           />
         </Drawer.Section>
         <Button icon="plus" mode="contained" dark={true}
+          accessibilityLabel="menu-add-friend"
           onPress={openAddFriendModalHandler}
           style={{backgroundColor:'#55D1A9',borderRadius:25,width:'60%',height:50,display:'flex',justifyContent:'center',marginLeft:20,marginTop:15}}>
           Add Friend
@@ -82,6 +83,7 @@ export default function TheDrawer(props) {
         </View>
         <View style={styles.supportWrap}>
           <Button style={styles.supportButton} icon="email"
+            accessibilityLabel="menu-support"
             onPress={openSupportModalHandler}>
             Support
           </Button>

@@ -32,6 +32,7 @@ export default function Welcome(props) {
         </Text>
       </View>
       <Button mode="contained" dark={true}
+        accessibilityLabel="onboard-welcome-button"
         onPress={go}
         style={styles.button}>
         <Text>Get Started</Text>
