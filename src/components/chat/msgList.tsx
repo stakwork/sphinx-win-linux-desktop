@@ -67,12 +67,12 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
 
   useEffect(() => {
     const ref = setTimeout(() => {
-      if (scrollViewRef && scrollViewRef.current && msgs.length) {
+      if (scrollViewRef && scrollViewRef.current && msgs && msgs.length) {
         scrollViewRef.current.scrollToOffset({ offset: 0 })
       }
     }, 500)
     Keyboard.addListener('keyboardDidShow', e => {
-      if (scrollViewRef && scrollViewRef.current && msgs.length) {
+      if (scrollViewRef && scrollViewRef.current && msgs && msgs.length) {
         scrollViewRef.current.scrollToOffset({ offset: 0 })
       }
     })

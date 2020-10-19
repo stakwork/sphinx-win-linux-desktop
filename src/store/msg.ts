@@ -52,6 +52,8 @@ export interface Msg {
   temp_uid: string // tempory unique id to mark the sent msg, so once returned it we can fill will all values
 }
 
+const MAX_MSGS_PER_CHAT = 100
+
 class MsgStore {
   @persist('object')
   @observable // chat id: message array
@@ -98,22 +100,59 @@ class MsgStore {
       const dateq = moment.utc(this.lastFetched-1000*mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else { // else just get last week
-      const start = moment().subtract(7, 'days').format('YYYY-MM-DD%20HH:mm:ss')
+      const days = 7
+      const start = moment().subtract(days, 'days').format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }
     try {
       const r = await relay.get(route)
       if(!r) return
       console.log("=> NEW MSGS LENGTH", r.new_messages.length)
-      if(r.new_messages.length) {
-        const msgs = await decodeMessages(r.new_messages) // this takes a longass time
-        msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
-        this.messages = orgMsgsFromExisting(this.messages, msgs)
-        this.lastFetched = new Date().getTime()
+      if(r.new_messages && r.new_messages.length) {
+        await this.batchDecodeMessages(r.new_messages)
+        // const msgs = await decodeMessages(r.new_messages) // this takes a longass time
+        // msgs.sort((a,b)=> moment(a.date).unix() - moment(b.date).unix())
+        // this.messages = orgMsgsFromExisting(this.messages, msgs)
+        // this.lastFetched = new Date().getTime()
       }
     } catch(e) {
       console.log(e)
     }
+  }
+
+  async batchDecodeMessages(msgs: Msg[]){
+    this.lastFetched = new Date().getTime()
+    const first10 = msgs.slice(msgs.length-10)
+    const rest = msgs.slice(0,msgs.length-10)
+    const decodedMsgs = await decodeMessages(first10)
+    this.messages = orgMsgsFromExisting(this.messages, decodedMsgs)
+    console.log("OK! FIRST 10!")
+
+    this.reverseDecodeMessages(rest.reverse())
+  }
+
+  // push it in reverse, to show latest at first, then put in older ones
+  async reverseDecodeMessages(msgs: Msg[]){
+    const decoded = await decodeMessages(msgs)
+    const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(this.messages))
+    decoded.forEach(msg=>{
+      if(msg.chat_id || msg.chat_id===0){
+        const chatID = msg.chat_id
+        if(allms[chatID]){
+          if(!Array.isArray(allms[chatID])) return
+          const idx = allms[chatID].findIndex(m=>m.id===msg.id)
+          if(idx===-1 && allms[chatID].length<MAX_MSGS_PER_CHAT) {
+            allms[chatID].push(msg)
+          } else {
+            allms[chatID][idx] = msg
+          }
+        } else {
+          allms[chatID] = [msg]
+        }
+      }
+    })
+    this.messages = allms
+    console.log("NOW ALL ARE DONE!")
   }
 
   async messagePosted(m) {
@@ -512,6 +551,9 @@ function putIn(orged, msg, chatID){
     const idx = orged[chatID].findIndex(m=>m.id===msg.id)
     if(idx===-1) {
       orged[chatID].unshift(msg)
+      if(orged[chatID].length>MAX_MSGS_PER_CHAT) {
+        orged[chatID].pop() // remove the oldest msg if too many
+      }
     } else {
       orged[chatID][idx] = msg
     }
@@ -535,3 +577,19 @@ function debounce(func, delay) {
 }
 
 let msgsBuffer = []
+
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+function chunkArray(arr, len) {
+  var chunks = [],
+      i = 0,
+      n = arr.length;
+  while (i < n) {
+    chunks.push(arr.slice(i, i += len));
+  }
+  return chunks;
+}

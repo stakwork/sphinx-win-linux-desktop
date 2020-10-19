@@ -30,6 +30,13 @@ const hydrate = create({
   debounce: DEBOUNCE_TIME,
 })
 
+async function testAsyncStorage(){
+  // const keys = await AsyncStorage.getAllKeys()
+  // console.log("KEYS",keys)
+  // const msgs = await AsyncStorage.getItem('msg')
+  // console.log(msgs&&msgs.length, typeof msgs)
+}
+
 function initAndroid(){
   console.log('=> initialize store')
   Promise.all([
@@ -42,6 +49,7 @@ function initAndroid(){
     console.log('=> store initialized')
     uiStore.setReady(true)
     hydrate('msg', msgStore)
+    testAsyncStorage()
   })
   hydrate('theme', themeStore)
 }
