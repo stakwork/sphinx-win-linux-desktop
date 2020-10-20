@@ -3,7 +3,7 @@ package com.sphinx;
 import androidx.annotation.Nullable;
 import android.app.Application;
 import android.webkit.WebView;
-import com.oney.WebRTCModule.WebRTCModulePackage;
+// import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.facebook.react.ReactApplication;
 import me.jhen.react.BadgePackage;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
@@ -56,7 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new WebRTCModulePackage(),
+          // new WebRTCModulePackage(),
           // new RNJitsiMeetPackage(),
           new MainReactPackage(),
           new TrackPlayer(),

@@ -8,8 +8,6 @@ import ImageViewer from './imgViewer'
 import {useObserver} from 'mobx-react-lite'
 import {useStores} from '../../store'
 import NewGroupModal from './newGroupModal'
-import Peer from './peer'
-import Ion from './ion'
 import EditContactModal from './editContact'
 import GroupModal from './newGroupModal/groupInfo'
 import PaymentHistory from './paymentHistory'
@@ -29,7 +27,6 @@ export default function Modals(){
     const showNewGroupModal = ui.newGroupModal||ui.editTribeParams?true:false
     const showRawInvoiceModal = ui.rawInvoiceModal
     const showImageViewer = ui.imgViewerParams&&(ui.imgViewerParams.data||ui.imgViewerParams.uri||ui.imgViewerParams.msg)?true:false
-    const showPeer = ui.rtcParams?true:false
     const showJoinTribe = ui.joinTribeParams?true:false
     const showOauth = ui.oauthParams?true:false
     const showSubModal = ui.subModalParams?true:false
@@ -44,7 +41,6 @@ export default function Modals(){
       {showRawInvoiceModal && <RawInvoiceModal visible={true} />}
       {showNewGroupModal && <NewGroupModal visible={true} />}
       {showImageViewer && <ImageViewer params={ui.imgViewerParams} />}
-      {showPeer && <Ion />}
       {ui.editContactModal && <EditContactModal visible={true} />}
       {ui.groupModal && <GroupModal visible={true} />}
       {ui.paymentHistory && <PaymentHistory visible={true} />}

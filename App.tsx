@@ -10,7 +10,7 @@ import StatusBar from './src/components/utils/statusBar'
 import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
-import * as RNWebRTC from 'react-native-webrtc'
+// import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
 // import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
@@ -42,7 +42,7 @@ export default function Wrap(){
       })
       .catch(()=> setWrapReady(true)) // this should not happen?
     Linking.addEventListener('url', gotLink)
-    RNWebRTC.registerGlobals()
+    // RNWebRTC.registerGlobals()
   },[])
 
   return useObserver(()=>{

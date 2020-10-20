@@ -44,27 +44,27 @@ export default function AttachmentDialog({
       onDismiss={onCloseHandler}>
       <Dialog.Title>Message Options</Dialog.Title>
       <Dialog.Actions style={{
-        height: isConversation ? 260 : 160,
+        height: isConversation ? 280 : 180,
         display: 'flex', flexDirection: 'column',
         justifyContent: 'space-between', alignItems: 'flex-start'
       }}>
-        <Button icon="camera" onPress={onChooseCamHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="camera" onPress={onChooseCamHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-camera-button">
           Camera
         </Button>
-        <Button icon="image" onPress={pickImageHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="image" onPress={pickImageHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-photo-button">
           Photo Library
         </Button>
-        <Button icon="gif" onPress={pickGif} style={{ width: '100%', alignItems: 'flex-start' }}
+        <Button icon="gif" onPress={pickGif} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-gif-button"
           loading={fetchingGifs}>
           Gif
         </Button>
-        <Button icon="message" onPress={doPaidMessageHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
+        <Button icon="message" onPress={doPaidMessageHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-paid-msg-button">
           Paid Message
         </Button>
-        {isConversation && <Button icon="arrow-bottom-left" onPress={requestHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
+        {isConversation && <Button icon="arrow-bottom-left" onPress={requestHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-request-button">
           Request
         </Button>}
-        {isConversation && <Button icon="arrow-top-right" onPress={sendHandler} style={{ width: '100%', alignItems: 'flex-start' }}>
+        {isConversation && <Button icon="arrow-top-right" onPress={sendHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-send-button">
           Send
         </Button>}
       </Dialog.Actions>
