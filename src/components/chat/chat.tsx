@@ -81,7 +81,9 @@ export default function Chat() {
           ToastAndroid.TOP,
           0, 125
         );
-        chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
+        if(!isTribeAdmin) {
+          chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
+        }
         if(params.app_url) {
           isAppURL = true
           ui.setApplicationURL(params.app_url)

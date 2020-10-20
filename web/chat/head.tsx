@@ -16,8 +16,9 @@ import RssFeedIcon from '@material-ui/icons/RssFeed';
 import Pod from './pod'
 import Tooltip from '@material-ui/core/Tooltip';
 import PhoneIcon from '@material-ui/icons/Phone'
+import LockIcon from '@material-ui/icons/Lock';
 
-export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
+export default function Head({ height, appMode, setAppMode, pricePerMessage, routeConfirmed }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const { contacts, ui, msg } = useStores()
@@ -69,7 +70,12 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage }) {
             <Avatar big photo={photoURL} alias={chat.name} />
           </AvatarWrap>
           <ChatInfo>
-            <Name>{chat.name}</Name>
+            <NameWrap>
+              <Name>{chat.name}</Name>
+              {chat.type!==constants.chat_types.group && <Tooltip title={routeConfirmed ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
+                <LockIcon style={{color:routeConfirmed?'#49ca97':'#febd59',fontSize:12,marginLeft:8,marginBottom:2}} />
+              </Tooltip>}
+            </NameWrap>
             {(pricePerMessage?true:false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}
           </ChatInfo>
         </Left>
@@ -176,6 +182,10 @@ const ChatInfo = styled.div`
 `
 const Name = styled.div`
   font-weight:bold;
+`
+const NameWrap = styled.div`
+  display:flex;
+  align-items:center;
 `
 const Price = styled.div`
   font-size:12px;

@@ -1,7 +1,8 @@
 import { observable, action } from 'mobx'
 import { persist } from 'mobx-persist'
-import {Invite} from './contacts'
+import {Invite, contactStore} from './contacts'
 import {relay} from '../api'
+import { constants } from '../constants'
 
 /*
 disconneted - socket?
@@ -231,6 +232,25 @@ export class ChatStore {
     } catch(e){
       console.log(e)
     }
+  }
+
+  @action
+  async checkRoute(cid){
+    const chat = this.chats.find(ch=>ch.id===cid)
+    if(!chat) return
+    let pubkey
+    if(chat.type===constants.chat_types.tribe) {
+      pubkey = chat.owner_pubkey
+    } else if(chat.type===constants.chat_types.conversation) {
+      const contactid = chat.contact_ids.find(contid=>contid!=1)
+      const contact = contactStore.contacts.find(con=>con.id===contactid)
+      if(contact) {
+        pubkey = contact.public_key
+      }
+    }
+    if(!pubkey) return
+    const r = await relay.get(`route?pubkey=${pubkey}`)
+    if(r) return r
   }
 
   @action 

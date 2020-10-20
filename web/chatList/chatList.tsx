@@ -31,6 +31,7 @@ function ChatList(){
                 msg.seeChat(c.id)
                 ui.setSelectedChat(c)
                 ui.toggleBots(false)
+                chats.checkRoute(c.id)
               }}
             />
           })}

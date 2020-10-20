@@ -28,6 +28,7 @@ function Chat() {
   const [appMode, setAppMode] = useState(true)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [tribeBots, setTribeBots] = useState([])
+  const [routeConfirmed,setRouteConfirmed] = useState(false)
   let footHeight = 65
 
   // function joinEvanTest(){
@@ -51,6 +52,7 @@ function Chat() {
 
     useEffect(() => {
       setPricePerMessage(0)
+      setRouteConfirmed(false)
       setTribeBots([])
       // console.log('user.currentIP',user.currentIP)
       if (!chat) {
@@ -87,12 +89,16 @@ function Chat() {
         if (!isAppURL) {
           ui.setApplicationURL('')
         }
+        const r = await chats.checkRoute(chat.id)
+        if(r && r.success_prob && r.success_prob>0.01) {
+          setRouteConfirmed(true)
+        }
       })()
     }, [chat])
 
     return <Section style={{ background: theme.deep }}>
       <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
-        pricePerMessage={pricePerMessage}
+        pricePerMessage={pricePerMessage} routeConfirmed={routeConfirmed}
       />
       <ChatContent appMode={appMode} footHeight={footHeight} 
         pricePerMessage={pricePerMessage}
