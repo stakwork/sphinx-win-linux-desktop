@@ -31,6 +31,8 @@ export class ThemeStore {
 
   primary: string = '#6289FD'
   accent: string = '#55D1A9'
+  active: string = '#49ca97'
+  inactive: string = '#febd59'
 
 }
 

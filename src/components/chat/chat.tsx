@@ -14,6 +14,8 @@ import { constants } from '../../constants'
 import Frame from './frame'
 import PodDrop from './pod/podDrop'
 
+export type RouteStatus = 'active' | 'inactive' | null
+
 export default function Chat() {
   const { contacts, user, chats, ui } = useStores()
   const theme = useTheme()
@@ -23,6 +25,7 @@ export default function Chat() {
   const [appMode, setAppMode] = useState(false)
   const [showPod, setShowPod] = useState(false)
   const [tribeBots,setTribeBots] = useState([])
+  const [status, setStatus] = useState<RouteStatus>(null)
   
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -102,6 +105,13 @@ export default function Chat() {
     }
     if (!isAppURL && ui.applicationURL) ui.setApplicationURL('') // remove the app_url
     if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
+
+    const r = await chats.checkRoute(chat.id)
+    if(r && r.success_prob && r.success_prob>0.01) {
+      setStatus('active')
+    } else {
+      setStatus('inactive')
+    }
   }
 
   const appURL = ui.applicationURL
@@ -109,7 +119,7 @@ export default function Chat() {
 
   return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} setShowPod={setShowPod} showPod={showPod} />
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} setShowPod={setShowPod} showPod={showPod} status={status} />
 
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
       <Frame url={appURL} />
