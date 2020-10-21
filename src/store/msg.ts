@@ -1,12 +1,11 @@
 import { observable, action } from 'mobx'
 import {relay} from '../api'
-import {contactStore} from './contacts'
 import {chatStore,Chat} from './chats'
 import {detailsStore} from './details'
-import * as e2e from '../crypto/e2e'
 import {constants} from '../constants'
 import {persist} from 'mobx-persist'
 import moment from 'moment'
+import {encryptText, makeRemoteTextMap, decodeSingle, decodeMessages, orgMsgsFromExisting, orgMsgs, putIn, putInReverse} from './msgHelpers'
 
 export interface Msg {
   id: number
@@ -52,7 +51,7 @@ export interface Msg {
   temp_uid: string // tempory unique id to mark the sent msg, so once returned it we can fill will all values
 }
 
-const MAX_MSGS_PER_CHAT = 100
+export const MAX_MSGS_PER_CHAT = 100
 
 class MsgStore {
   @persist('object')
@@ -133,22 +132,7 @@ class MsgStore {
   async reverseDecodeMessages(msgs: Msg[]){
     const decoded = await decodeMessages(msgs)
     const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(this.messages))
-    decoded.forEach(msg=>{
-      if(msg.chat_id || msg.chat_id===0){
-        const chatID = msg.chat_id
-        if(allms[chatID]){
-          if(!Array.isArray(allms[chatID])) return
-          const idx = allms[chatID].findIndex(m=>m.id===msg.id)
-          if(idx===-1 && allms[chatID].length<MAX_MSGS_PER_CHAT) {
-            allms[chatID].push(msg)
-          } else {
-            allms[chatID][idx] = msg
-          }
-        } else {
-          allms[chatID] = [msg]
-        }
-      }
-    })
+    putInReverse(allms, decoded)
     this.sortAllMsgs(allms)
     console.log("NOW ALL ARE DONE!")
   }
@@ -167,12 +151,12 @@ class MsgStore {
 
   async messagePosted(m) {
     let newMsg = await decodeSingle(m)
-    if(newMsg.chat && newMsg.chat.id){
-      const idx = this.messages[newMsg.chat.id].findIndex(m=>m.id===-1)
+    if(newMsg.chat_id){
+      const idx = this.messages[newMsg.chat_id].findIndex(m=>m.id===-1)
       if(idx>-1){
-        this.messages[newMsg.chat.id][idx] = {
+        this.messages[newMsg.chat_id][idx] = {
           ...m,
-          status: this.messages[newMsg.chat.id][idx].status
+          status: this.messages[newMsg.chat_id][idx].status
         }
       }
     }
@@ -180,8 +164,8 @@ class MsgStore {
 
   @action
   async invoicePaid(m) {
-    if(m.chat && m.chat.id){
-      const msgs = this.messages[m.chat.id]
+    if(m.chat_id){
+      const msgs = this.messages[m.chat_id]
       if(msgs) {
         const invoice = msgs.find(c=>c.payment_hash===m.payment_hash)
         if(invoice){
@@ -254,8 +238,8 @@ class MsgStore {
 
   @action
   async setMessageAsReceived(m) {
-    if(!(m.chat)) return
-    const msgsForChat = this.messages[m.chat.id]
+    if(!(m.chat_id)) return
+    const msgsForChat = this.messages[m.chat_id]
     const ogMessage = msgsForChat && msgsForChat.find(msg=> msg.id===m.id || msg.id===-1)
     if(ogMessage) {
       ogMessage.status = constants.statuses.received
@@ -374,8 +358,8 @@ class MsgStore {
     if(!id) return console.log("NO ID!")
     const r = await relay.del(`message/${id}`)
     if(!r) return
-    if(r.chat && r.chat.id) {
-      putIn(this.messages, r, r.chat.id)
+    if(r.chat_id) {
+      putIn(this.messages, r, r.chat_id)
     }
   }
 
@@ -427,7 +411,7 @@ class MsgStore {
   @action // only if it contains a "chat"
   async gotNewMessage(m) {
     let newMsg = await decodeSingle(m)
-    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    const chatID = newMsg.chat_id
     if(chatID){
       putIn(this.messages, newMsg, chatID)
       if(newMsg.chat) chatStore.gotChat(newMsg.chat)
@@ -437,7 +421,7 @@ class MsgStore {
   @action // only if it contains a "chat"
   async gotNewMessageFromWS(m) {
     let newMsg = await decodeSingle(m)
-    const chatID = (newMsg.chat && newMsg.chat.id) || newMsg.chat_id
+    const chatID = newMsg.chat_id
     if(chatID || chatID===0){
       msgsBuffer.push(newMsg)
       if(msgsBuffer.length===1) {
@@ -466,111 +450,6 @@ class MsgStore {
 
 }
 
-async function encryptText({contact_id, text}) {
-  if(!text) return ''
-  const contact = contactStore.contacts.find(c=> c.id===contact_id)
-  if(!contact) return ''
-  const encText = await e2e.encryptPublic(text, contact.contact_key)
-  return encText
-}
-
-async function makeRemoteTextMap({contact_id, text, chat_id}, includeSelf?){
-  const idToKeyMap = {}
-  const remoteTextMap = {}
-  const chat = chat_id && chatStore.chats.find(c=> c.id===chat_id)
-  if(chat){
-    // TRIBE
-    if(chat.type===constants.chat_types.tribe && chat.group_key) {
-      idToKeyMap['chat'] = chat.group_key // "chat" is the key for tribes
-      if(includeSelf) {
-        const me = contactStore.contacts.find(c=> c.id===1) // add in my own self (for media_key_map)
-        if(me) idToKeyMap[1] = me.contact_key
-      }
-    } else { // NON TRIBE
-      const contactsInChat = contactStore.contacts.filter(c=>{
-        if(includeSelf){
-          return chat.contact_ids.includes(c.id)
-        } else {
-          return chat.contact_ids.includes(c.id) && c.id!==1
-        }
-      })
-      contactsInChat.forEach(c=> idToKeyMap[c.id]=c.contact_key)
-    }
-  } else {
-    // console.log(contactStore.contacts, contact_id)
-    const contact = contactStore.contacts.find(c=> c.id===contact_id)
-    if(contact) idToKeyMap[contact_id] = contact.contact_key
-  }
-  for (let [id, key] of Object.entries(idToKeyMap)) {
-    const encText = await e2e.encryptPublic(text, String(key))
-    remoteTextMap[id] = encText
-  }
-  return remoteTextMap
-}
-
-async function decodeSingle(m: Msg){
-  if(m.type===constants.message_types.keysend) {
-    return m // "keysend" type is not e2e
-  }
-  const msg = m
-  if(m.message_content) {
-    const dcontent = await e2e.decryptPrivate(m.message_content)
-    msg.message_content = dcontent
-  }
-  if(m.media_key){
-    const dmediakey = await e2e.decryptPrivate(m.media_key)
-    msg.media_key = dmediakey
-  }
-  return msg
-}
-
-async function decodeMessages(messages: Msg[]){
-  const msgs = []
-  for (const m of messages) {
-    const msg = await decodeSingle(m)
-    msgs.push(msg)
-  }
-  return msgs
-}
-
-function orgMsgs(messages: Msg[]) {
-  const orged: {[k:number]:Msg[]} = {}
-  messages.forEach(msg=>{
-    if(msg.chat && msg.chat.id){
-      putIn(orged, msg, msg.chat.id)
-    }
-  })
-  return orged
-}
-
-function orgMsgsFromExisting(allMsgs: {[k:number]:Msg[]}, messages: Msg[]) {
-  const allms: {[k:number]:Msg[]} = JSON.parse(JSON.stringify(allMsgs))
-  messages.forEach(msg=>{
-    if(msg.chat_id || msg.chat_id===0){
-      putIn(allms, msg, msg.chat_id) // THIS IS TOO HEAVY in a for each
-    }
-  })
-  // limit to 50 each?
-  return allms
-}
-
-function putIn(orged, msg, chatID){
-  if(!(chatID||chatID===0)) return
-  if(orged[chatID]){
-    if(!Array.isArray(orged[chatID])) return
-    const idx = orged[chatID].findIndex(m=>m.id===msg.id)
-    if(idx===-1) {
-      orged[chatID].unshift(msg)
-      if(orged[chatID].length>MAX_MSGS_PER_CHAT) {
-        orged[chatID].pop() // remove the oldest msg if too many
-      }
-    } else {
-      orged[chatID][idx] = msg
-    }
-  } else {
-    orged[chatID] = [msg]
-  }
-}
 
 export const msgStore = new MsgStore()
 
@@ -588,18 +467,3 @@ function debounce(func, delay) {
 
 let msgsBuffer = []
 
-
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
-  }
-}
-function chunkArray(arr, len) {
-  var chunks = [],
-      i = 0,
-      n = arr.length;
-  while (i < n) {
-    chunks.push(arr.slice(i, i += len));
-  }
-  return chunks;
-}
