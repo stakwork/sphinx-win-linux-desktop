@@ -60,7 +60,9 @@ function Header() {
   const theme = useTheme()
   return (
     <Appbar.Header style={{width:'100%',elevation:0,backgroundColor:theme.main}}>
-      <Appbar.BackAction onPress={onGoBackHandler} color="#666" />
+      <Appbar.BackAction onPress={onGoBackHandler} color="#666" 
+        accessibilityLabel="menu-close-contacts"
+      />
       <Appbar.Content title="Address Book" />
     </Appbar.Header>
   )

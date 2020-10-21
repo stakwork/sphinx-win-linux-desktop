@@ -3,7 +3,7 @@ import {TextInput} from 'react-native-paper'
 import {inputStyles} from './shared'
 import { useTheme } from '../../../store'
 
-export default function TheTextInput({name,label,required,error,handleChange,handleBlur,value,displayOnly}) {
+export default function TheTextInput({name,label,required,error,handleChange,handleBlur,value,displayOnly,accessibilityLabel}) {
   const theme = useTheme()
   let lab = `${label.en}${required?' *':''}`
   if(error){
@@ -11,6 +11,7 @@ export default function TheTextInput({name,label,required,error,handleChange,han
   }
   if(displayOnly) lab = label.en
   return <TextInput
+    accessibilityLabel={accessibilityLabel}
     error={error}
     label={lab}
     style={{...inputStyles,backgroundColor:theme.bg}}

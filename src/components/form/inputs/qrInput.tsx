@@ -6,7 +6,7 @@ import QR from '../../utils/qr'
 import PubKey from '../../modals/pubkey'
 import { useTheme } from '../../../store'
 
-export default function QrInput({name,label,required,handleChange,handleBlur,setValue,value,displayOnly}) {
+export default function QrInput({name,label,required,handleChange,handleBlur,setValue,value,displayOnly,accessibilityLabel}) {
   const theme = useTheme()
   
   const [scanning,setScanning] = useState(false)
@@ -19,6 +19,7 @@ export default function QrInput({name,label,required,handleChange,handleBlur,set
   if(displayOnly) lab = label.en
   return <View style={{...inputStyles, ...styles.wrap}}>
     <TextInput
+      accessibilityLabel={accessibilityLabel}
       disabled={displayOnly}
       label={lab}
       onChangeText={handleChange(name)}

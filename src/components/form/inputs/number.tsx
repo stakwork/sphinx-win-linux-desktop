@@ -4,7 +4,7 @@ import {TextInput} from 'react-native-paper'
 import {inputStyles} from './shared'
 import QDialog from './qDialog'
 
-export default function NumberInput({name,label,required,error,handleBlur,setValue,value,displayOnly,description}) {
+export default function NumberInput({name,label,required,error,handleBlur,setValue,value,displayOnly,description,accessibilityLabel}) {
   let lab = `${label.en}${required?' *':''}`
   if(error){
     lab = `${label.en} - ${error}`
@@ -12,6 +12,7 @@ export default function NumberInput({name,label,required,error,handleBlur,setVal
   if(displayOnly) lab = label.en
   return <View style={{position:'relative'}}>
     <TextInput
+      accessibilityLabel={accessibilityLabel}
       keyboardType="numeric"
       error={error}
       label={lab}

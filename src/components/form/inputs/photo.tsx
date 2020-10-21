@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import Cam from '../../utils/cam'
 import ImgSrcDialog from '../../utils/imgSrcDialog'
 
-export default function PhotoInput({name,label,required,setValue,value}) {
+export default function PhotoInput({name,label,required,setValue,value,accessibilityLabel}) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [takingPhoto, setTakingPhoto] = useState(false)
 

@@ -193,9 +193,9 @@ dependencies {
     compile project(':react-native-track-player')
     
     // fixes memory leak related crash
-    compile "com.squareup.okhttp3:okhttp:4.2.1"
-    compile "com.squareup.okhttp3:logging-interceptor:4.2.1"
-    compile "com.squareup.okhttp3:okhttp-urlconnection:4.2.1"
+    compile "com.squareup.okhttp3:okhttp:4.4.1"
+    compile "com.squareup.okhttp3:logging-interceptor:4.4.1"
+    compile "com.squareup.okhttp3:okhttp-urlconnection:4.4.1"
 
     // compile project(':WebRTCModule')
     // implementation(project(':react-native-jitsi-meet')) {

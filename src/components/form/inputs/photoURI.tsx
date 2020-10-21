@@ -8,7 +8,7 @@ import ImgSrcDialog from '../../utils/imgSrcDialog'
 import RNFetchBlob from 'rn-fetch-blob'
 import { useStores } from '../../../store'
 
-export default function PhotoURIInput({name,error,label,required,setValue,value,handleChange,handleBlur}) {
+export default function PhotoURIInput({name,error,label,required,setValue,value,handleChange,handleBlur,accessibilityLabel}) {
   const { ui,meme,msg } = useStores()
   
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -68,6 +68,7 @@ export default function PhotoURIInput({name,error,label,required,setValue,value,
   }
   return <View style={styles.wrap}>
     <TextInput
+      accessibilityLabel={accessibilityLabel}
       spellCheck={false}
       autoCorrect={false}
       error={error}

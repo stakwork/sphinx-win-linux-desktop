@@ -240,7 +240,9 @@ function Header() {
   const theme = useTheme()
   return (
     <Appbar.Header style={{width:'100%',backgroundColor:theme.main}}>
-      <Appbar.Action icon="menu" onPress={()=>navigation.dispatch(DrawerActions.openDrawer())} />
+      <Appbar.Action icon="menu" onPress={()=>navigation.dispatch(DrawerActions.openDrawer())} 
+        accessibilityLabel="menu-close-profile"
+      />
       <Appbar.Content title="Profile" />
     </Appbar.Header>
   )
