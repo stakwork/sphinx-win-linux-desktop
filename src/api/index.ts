@@ -3,7 +3,7 @@ import API from './api'
 import {connectWebSocket, registerWsHandlers} from './ws'
 import * as wsHandlers from '../store/websocketHandlers'
 
-const invite = new API('http://hub.sphinx.chat/api/v1/','','')
+const invite = new API('https://hub.sphinx.chat/api/v1/','','')
 
 let relay = null
 

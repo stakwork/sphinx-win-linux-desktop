@@ -8,6 +8,7 @@ import * as rsa from '../crypto/rsa'
 import {constants} from '../../src/constants'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
+import actions from './actions'
 
 function Onboard(props){
   const {user,contacts} = useStores()
@@ -32,7 +33,12 @@ function Onboard(props){
       }
     } catch(e) {}
 
-    const {ip,password} = await user.signupWithCode(text)
+    const r = await user.signupWithCode(text)
+    if(!r) {
+      setChecking(false)
+      return
+    }
+    const {ip,password} = r
     await sleep(200)
     if (ip) {
       const token = await user.generateToken(password||'')
@@ -69,6 +75,7 @@ function Onboard(props){
       public_key: user.invite.inviterPubkey,
       status: constants.contact_statuses.confirmed,
     })
+    await actions(user.invite.action)
     setChecking(false)
     props.onRestore()
   }

@@ -91,6 +91,7 @@ class UserStore {
   async signupWithCode(code:string): Promise<{[k:string]:string}> {
     try {
       this.code = code
+      console.log("THE CODDE",code)
       const r = await api.invite.post('signup',{
         invite_string:code
       })
@@ -102,11 +103,13 @@ class UserStore {
         console.log('no invite data')
         return 
       }
+      console.log("RETURND INVITE",r)
       this.currentIP = r.ip
       this.invite={
         inviterNickname: r.invite.nickname,
         inviterPubkey: r.invite.pubkey,
-        welcomeMessage: r.invite.message
+        welcomeMessage: r.invite.message,
+        action: r.invite.action,
       }
       api.instantiateRelay(r.ip) // no token
       return {ip: r.ip, password: r.password}
