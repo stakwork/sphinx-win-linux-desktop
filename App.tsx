@@ -83,7 +83,7 @@ function App() {
 
     (async () => {
       console.log("=> USER",user)
-      const isSignedUp = (user.currentIP && user.authToken)?true:false
+      const isSignedUp = (user.currentIP && user.authToken && !user.onboardStep)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){
         instantiateRelay(user.currentIP, user.authToken, connectedHandler, disconnectedHandler)
@@ -128,6 +128,7 @@ function App() {
           {/* <StatusBar /> */}
           {signedUp && <Main />}
           {!signedUp && <Onboard onFinish={()=>{
+            user.finishOnboard() // clear out things
             setSignedUp(true) // signed up w key export
             setPinned(true)   // also PIN has been set 
           }} />}

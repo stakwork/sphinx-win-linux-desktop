@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../../store'
+import { useStores, useTheme } from '../../../store'
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native'
 import { Portal, IconButton, Button, Dialog } from 'react-native-paper'
 import ModalWrap from '../modalWrap'
@@ -16,6 +16,7 @@ import { constants } from '../../../constants'
 
 export default function GroupInfo({ visible }) {
   const { ui, contacts, chats, user, msg } = useStores()
+  const theme = useTheme()
   const [selected, setSelected] = useState([])
   const [addPeople, setAddPeople] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -129,7 +130,7 @@ export default function GroupInfo({ visible }) {
     return <ModalWrap onClose={close} visible={visible}
       propagateSwipe={true}>
       <Portal.Host>
-        <Header title={addPeople ? 'Add Contacts' : 'New Group'}
+        <Header title={addPeople ? 'Add Contacts' : 'Group'}
           showNext={addPeople && showSelectedContacts}
           onClose={close} nextButtonText="Add"
           next={addGroupMembers} loading={loading}
@@ -145,12 +146,12 @@ export default function GroupInfo({ visible }) {
                 />
               </TouchableOpacity>
               <View style={styles.groupInfoText}>
-                <Text style={styles.groupInfoName}>{group.name}</Text>
+                <Text style={{...styles.groupInfoName,color:theme.title}}>{group.name}</Text>
                 <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>
               </View>
             </View>
             <IconButton icon="dots-vertical" size={32} color="#666"
-              style={{ marginLeft: 0, marginRight: 0 }}
+              style={{ marginLeft: 0, marginRight: 0, position:'absolute', right:4 }}
               onPress={dotsVerticalHandler}
             />
           </View>}
@@ -261,10 +262,11 @@ const styles = StyleSheet.create({
     height: 54,
     justifyContent: 'center',
     marginLeft: 14,
+    maxWidth:'77%',
   },
   groupInfoName: {
     color: 'black',
-    fontSize: 16
+    fontSize: 16,
   },
   groupInfoCreated: {
     color: '#888',

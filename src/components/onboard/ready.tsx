@@ -5,6 +5,7 @@ import { useStores } from '../../store'
 import RadialGradient from 'react-native-radial-gradient'
 import Slider from '../utils/slider'
 import { constants } from '../../constants'
+import actions from '../../store/actions'
 
 export default function Ready(props) {
   const {z,show,onDone} = props
@@ -19,6 +20,7 @@ export default function Ready(props) {
         public_key: user.invite.inviterPubkey,
         status: constants.contact_statuses.confirmed,
       }),
+      actions(user.invite.action),
       chats.joinDefaultTribe()
     ])
     setLoading(false)

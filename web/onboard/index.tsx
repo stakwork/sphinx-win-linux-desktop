@@ -8,7 +8,7 @@ import * as rsa from '../crypto/rsa'
 import {constants} from '../../src/constants'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
-import actions from './actions'
+import actions from '../../src/store/actions'
 
 function Onboard(props){
   const {user,contacts} = useStores()

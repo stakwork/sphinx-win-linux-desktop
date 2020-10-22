@@ -101,7 +101,7 @@ export class ChatStore {
   }
 
   @action 
-  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private}){
+  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url}){
     const r = await relay.post('group', {
       name, description, tags:tags||[],
       is_tribe: true, is_listed:true,
@@ -112,6 +112,8 @@ export class ChatStore {
       img: img||'',
       unlisted: unlisted||false,
       private: is_private||false,
+      app_url: app_url||'',
+      feed_url: feed_url||''
     })
     if(!r) return
     this.gotChat(r)
@@ -119,7 +121,7 @@ export class ChatStore {
   }
 
   @action 
-  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private}){
+  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url}){
     const r = await relay.put(`group/${id}`, {
       name, description, tags:tags||[],
       is_listed:true,
@@ -130,6 +132,8 @@ export class ChatStore {
       img: img||'',
       unlisted: unlisted||false,
       private: is_private||false,
+      app_url: app_url||'',
+      feed_url: feed_url||''
     })
     if(!r) return
     this.gotChat(r)

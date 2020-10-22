@@ -1,8 +1,10 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { IconButton } from 'react-native-paper'
+import { useTheme } from '../../../store'
 
 export default function Header(props) {
+  const theme = useTheme()
   const { title, onClose, showNext, nextButtonText, loading } = props
   return <View style={{ ...moreStyles.header, ...props.background && { backgroundColor: props.background } }}>
     <IconButton
@@ -12,7 +14,7 @@ export default function Header(props) {
       style={{ marginLeft: 14, marginTop: 8 }}
       onPress={() => onClose()}
     />
-    <Text style={moreStyles.headerTitle}>{title}</Text>
+    <Text style={{...moreStyles.headerTitle,color:theme.title}}>{title}</Text>
     <View style={moreStyles.headerRighty}>
       {showNext && <TouchableOpacity style={moreStyles.button}
         onPress={() => props.next()} disabled={loading}>

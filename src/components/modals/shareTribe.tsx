@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {View, Text, StyleSheet, ToastAndroid} from 'react-native'
 import Modal from "./modalWrap"
 import { Button } from 'react-native-paper'
@@ -11,7 +11,7 @@ import Clipboard from "@react-native-community/clipboard";
 
 export default function ShareTribe({visible}) {
   const { ui, chats } = useStores()
-
+  const theme = useTheme()
   function copy(){
     Clipboard.setString(uuid)
     ToastAndroid.showWithGravityAndOffset(
@@ -40,7 +40,7 @@ export default function ShareTribe({visible}) {
       <View style={styles.qrWrap}>
         <QRCode value={qr} size={250} />
       </View>
-      <Text style={styles.pubkeyText}>{qr}</Text>
+      <Text style={{...styles.pubkeyText,color:theme.subtitle}}>{qr}</Text>
       <View style={styles.buttonsWrap}>
         <Button mode="contained" dark={true} 
           onPress={()=> share()}

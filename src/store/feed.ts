@@ -31,6 +31,17 @@ export class FeedStore {
     })
   }
 
+  @action 
+  async loadFeedById(id:string){
+    if(!id) return
+    try{
+      const r = await fetch(`https://tribes.sphinx.chat/podcast?id=${id}`)
+      return r.json()
+    } catch(e){
+      console.log(e)
+    }
+  }
+
 }
 
 export const feedStore = new FeedStore()

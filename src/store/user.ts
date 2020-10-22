@@ -4,11 +4,26 @@ import {randString} from '../crypto/rand'
 import { persist } from 'mobx-persist'
 import {uiStore} from './ui'
 
+interface Invite {
+  inviterNickname: string,
+  inviterPubkey: string,
+  welcomeMessage: string,
+  action: string,
+}
+
 class UserStore {
 
   @observable code: string = ''
 
-  @observable invite: {[k:string]:string} = {}
+  @observable invite: Invite = {
+    inviterNickname:'',
+    inviterPubkey:'',
+    welcomeMessage:'',
+    action:'',
+  }
+
+  @persist @observable 
+  onboardStep: number = 0
 
   @persist @observable 
   alias: string = ''
@@ -27,12 +42,23 @@ class UserStore {
 
   @action reset(){
     this.code = ''
-    this.invite = {}
     this.alias = ''
     this.publicKey = ''
     this.currentIP = ''
     this.authToken = ''
     this.deviceId = ''
+    this.onboardStep = 0
+    this.invite = {
+      inviterNickname:'',
+      inviterPubkey:'',
+      welcomeMessage:'',
+      action:'',
+    }
+  }
+
+  @action
+  setOnboardStep(s){
+    this.onboardStep = s
   }
 
   @action
@@ -53,6 +79,17 @@ class UserStore {
   @action
   setAuthToken(t){
     this.authToken = t
+  }
+
+  @action
+  finishOnboard(){
+    this.onboardStep = 0
+    this.invite = {
+      inviterNickname:'',
+      inviterPubkey:'',
+      welcomeMessage:'',
+      action:'',
+    }
   }
 
   @action
@@ -109,7 +146,7 @@ class UserStore {
         inviterNickname: r.invite.nickname,
         inviterPubkey: r.invite.pubkey,
         welcomeMessage: r.invite.message,
-        action: r.invite.action,
+        action: r.invite.action||'',
       }
       api.instantiateRelay(r.ip) // no token
       return {ip: r.ip, password: r.password}
@@ -171,5 +208,6 @@ async function sleep(ms) {
 const supportContact={
   inviterNickname: 'Sphinx Support',
   inviterPubkey: '023d70f2f76d283c6c4e58109ee3a2816eb9d8feb40b23d62469060a2b2867b77f',
-  welcomeMessage: 'Welcome to Sphinx!'
+  welcomeMessage: 'Welcome to Sphinx!',
+  action:''
 }

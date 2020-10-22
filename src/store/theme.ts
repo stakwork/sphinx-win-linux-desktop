@@ -21,6 +21,7 @@ export class ThemeStore {
     this.title = d?'#ddd':'#666'
     this.subtitle = d?'#8b98b4':'#7e7e7e'
     this.border = d?'#111':'#ccc'
+    this.selected = d?'#3b4681':'#ddddff'
   }
 
   @observable bg: string = '#FFF'
@@ -28,6 +29,7 @@ export class ThemeStore {
   @observable title: string = '#666'
   @observable subtitle: string = '#7e7e7e'
   @observable border: string = '#ccc'
+  @observable selected: string = '#ddddff'
 
   primary: string = '#6289FD'
   accent: string = '#55D1A9'
