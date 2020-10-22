@@ -47,8 +47,6 @@ export interface Msg {
   reply_message_content: string
   reply_message_sender_alias: string
   reply_message_sender: number
-
-  temp_uid: string // tempory unique id to mark the sent msg, so once returned it we can fill will all values
 }
 
 export const MAX_MSGS_PER_CHAT = 100
@@ -444,8 +442,7 @@ class MsgStore {
   @action pushFirstFromBuffer() {
     const msg = msgsBuffer[0]
     const msgs = [msg]
-    const orged = orgMsgsFromExisting(this.messages, msgs)
-    this.messages = orged
+    this.messages = orgMsgsFromExisting(this.messages, msgs)
   }
 
 }
