@@ -7,7 +7,7 @@ import { ChatRouteProp } from '../../types'
 import { useRoute } from '@react-navigation/native'
 import { useStores, useTheme } from '../../store'
 import { contactForConversation } from './utils'
-import EE from '../utils/ee'
+import EE, {LEFT_GROUP,LEFT_IMAGE_VIEWER} from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
@@ -45,10 +45,10 @@ export default function Chat() {
     if (contact && !contact.contact_key) {
       contacts.exchangeKeys(contact.id)
     }
-    EE.on('left-group', () => {
+    EE.on(LEFT_GROUP, () => {
       navigation.navigate('Home', { params: { rnd: Math.random() } })
     })
-    EE.on('left-image-viewer', () => {
+    EE.on(LEFT_IMAGE_VIEWER, () => {
       handleBack()
     })
     InteractionManager.runAfterInteractions(() => {

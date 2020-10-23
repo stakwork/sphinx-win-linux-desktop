@@ -3,13 +3,13 @@ import styled from 'styled-components'
 import AudioPlayer from 'react-h5-audio-player';
 import { useStores } from '../../../src/store'
 import Message from '@material-ui/icons/Message'
+import { StreamPayment,NUM_SECONDS } from '../../../src/store/feed'
 
 export default function Player({pod,episode,sendPayments}){
-  const { ui } = useStores()
+  const { ui, user } = useStores()
   const ts = useRef(0)
   const secs = useRef(0)
 
-  const NUM_SECONDS = 60
   function tick(){
     const s = secs.current
     if(s && s%NUM_SECONDS===0) {
@@ -31,14 +31,16 @@ export default function Player({pod,episode,sendPayments}){
       return
     }
     if(!pod.id || !episode.id) return
-    ui.setExtraTextContent({
+    const sp:StreamPayment = {
       feedID: pod.id,
       itemID: episode.id,
       title: episode.title,
       url: episode.enclosureUrl,
+      pubkey: user.publicKey,
       ts: ts.current,
       type:'clip'
-    })
+    }
+    ui.setExtraTextContent(sp)
   }
 
   return <PodPlayer>

@@ -263,7 +263,8 @@ export class ChatStore {
     const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
     try{
       const r = await fetch(`https://${theHost}/podcast?url=${url}`)
-      return r.json()
+      const j = await r.json()
+      return j
     } catch(e){
       console.log(e)
     }

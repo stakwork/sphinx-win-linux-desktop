@@ -6,6 +6,10 @@ import {constants} from '../constants'
 import {persist} from 'mobx-persist'
 import moment from 'moment'
 import {encryptText, makeRemoteTextMap, decodeSingle, decodeMessages, orgMsgsFromExisting, orgMsgs, putIn, putInReverse} from './msgHelpers'
+import { Platform } from 'react-native'
+
+const DAYS = Platform.OS==='android' ? 7 : 30
+export const MAX_MSGS_PER_CHAT = Platform.OS==='android' ? 100 : 1000
 
 export interface Msg {
   id: number
@@ -48,8 +52,6 @@ export interface Msg {
   reply_message_sender_alias: string
   reply_message_sender: number
 }
-
-export const MAX_MSGS_PER_CHAT = 100
 
 class MsgStore {
   @persist('object')
@@ -97,8 +99,7 @@ class MsgStore {
       const dateq = moment.utc(this.lastFetched-1000*mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else { // else just get last week
-      const days = 7
-      const start = moment().subtract(days, 'days').format('YYYY-MM-DD%20HH:mm:ss')
+      const start = moment().subtract(DAYS, 'days').format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }
     try {

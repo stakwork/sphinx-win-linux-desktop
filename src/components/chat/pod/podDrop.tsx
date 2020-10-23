@@ -5,8 +5,8 @@ import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
 import Controls from './controls'
 import useInterval from '../../utils/useInterval'
-import EE from '../../utils/ee'
-import {Destination} from '../../../store/feed'
+import EE, {CLIP_PAYMENT} from '../../utils/ee'
+import {Destination,StreamPayment,NUM_SECONDS} from '../../../store/feed'
 
 export default function PodDrop({ show, host, uuid, url }) {
   const theme = useTheme()
@@ -24,6 +24,7 @@ export default function PodDrop({ show, host, uuid, url }) {
 
   async function loadPod() {
     setLoading(true)
+    console.log("LOAD FEEED NOW")
     const params = await chats.loadFeed(host, uuid, url)
     if (params) setPod(params)
     if (params) initialSelect(params)
@@ -90,26 +91,26 @@ export default function PodDrop({ show, host, uuid, url }) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
-  function sendPayments(extraDest?:Destination){
+  function sendPayments(ts:number){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations    
     if(!dests) return
     if(!pod.id || !selectedEpisodeID) return
-    const memo = JSON.stringify({
+    const sp:StreamPayment = {
       feedID: pod.id,
       itemID: selectedEpisodeID,
-    })
-    const finalDests = extraDest ? dests.concat(extraDest) : dests
-    feed.sendPayments(finalDests, memo, pricePerMinute)    
+      ts: ts||0
+    }
+    const memo = JSON.stringify(sp)
+    feed.sendPayments(dests, memo, pricePerMinute)    
   }
 
-  const NUM_SECONDS=60
   const [count,setCount] = useState(0)
   useInterval(()=>{
     if(playing) {
       setCount(c=>{
         if(c && c%NUM_SECONDS===0) {
-          sendPayments()
+          sendPayments(c)
         }
         return c+1
       })
@@ -125,22 +126,32 @@ export default function PodDrop({ show, host, uuid, url }) {
   },[url])
 
   function onClipPayment(d){
-    if(d.pubkey) {
+    if(d.pubkey && d.ts) {
+      const dests = pod && pod.value && pod.value.destinations    
+      if(!dests) return
       const extraDest:Destination = {
         address: d.pubkey,
         split: 1,
         type: 'node'
       }
-      sendPayments(extraDest)
+      const finalDests = dests.concat(extraDest)
+      const sp:StreamPayment = {
+        feedID: pod.id,
+        itemID: selectedEpisodeID,
+        ts: d.ts||0
+      }
+      if(d.uuid) sp.uuid = d.uuid
+      const memo = JSON.stringify(sp)
+      feed.sendPayments(finalDests, memo, pricePerMinute)
     }
   }
 
   useEffect(()=>{
-    EE.on('clip-payment',onClipPayment)
+    EE.on(CLIP_PAYMENT,onClipPayment)
     return ()=> {
-      EE.removeListener('clip-payment',onClipPayment)
+      EE.removeListener(CLIP_PAYMENT,onClipPayment)
     }
-  },[])
+  },[pod])
 
   if (!show) {
     return <></>

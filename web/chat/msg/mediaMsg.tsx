@@ -33,7 +33,7 @@ export default function MediaMsg(props) {
 
   let showPayToUnlockMessage = false
   let isPaidMsg = false
-  if (media_type === 'text/plain') {
+  if (media_type === 'sphinx/text') {
     isPaidMsg = true
     if (!isMe && !loading && !paidMessageText) showPayToUnlockMessage = true
   }
@@ -68,7 +68,7 @@ export default function MediaMsg(props) {
       <CircularProgress size={17} style={{color:'white'}} />
     } */}
 
-    {needsPurchase ?
+    {needsPurchase && !isPaidMsg ?
       <NeedsPurchase>
         <CamIcon style={{ color: 'grey', fontSize: 30 }} />
       </NeedsPurchase> :
@@ -106,7 +106,7 @@ function BuyIcon({ purchased, loading }) {
 
 function Media({ type, data, onClick, filename }) {
   // console.log(type,data)
-  if (type === 'text/plain') return <></>
+  if (type === 'sphinx/text') return <></>
   if (type.startsWith('image')) {
     return <Image src={data} onClick={onClick} />
   }

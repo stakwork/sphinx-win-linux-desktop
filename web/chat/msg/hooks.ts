@@ -9,7 +9,7 @@ export function useCachedEncryptedFile(props, ldat){
   const [data, setData] = useState('')
   const [loading, setLoading] = useState(false)
   const [paidMessageText, setPaidMessageText] = useState(null)
-  const isPaidMessage = media_type==='text/plain'
+  const isPaidMessage = media_type==='sphinx/text'
 
   async function trigger(){
     if(loading||data||paidMessageText) return // already done

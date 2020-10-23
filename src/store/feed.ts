@@ -2,11 +2,25 @@ import { action } from 'mobx'
 import {msgStore} from './msg'
 import {userStore} from './user'
 
+export const NUM_SECONDS = 60
+
 type DestinationType = 'wallet' | 'node'
 export interface Destination {
   address: string
   split: number
   type: DestinationType
+}
+
+export interface StreamPayment {
+  feedID: number
+  itemID: number
+  ts: number
+  title?: string
+  text?: string
+  url?: string
+  pubkey?: string
+  type?: string
+  uuid?: string
 }
 
 export class FeedStore {
@@ -36,7 +50,8 @@ export class FeedStore {
     if(!id) return
     try{
       const r = await fetch(`https://tribes.sphinx.chat/podcast?id=${id}`)
-      return r.json()
+      const j = await r.json()
+      return j
     } catch(e){
       console.log(e)
     }

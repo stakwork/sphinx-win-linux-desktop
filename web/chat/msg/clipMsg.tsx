@@ -2,10 +2,11 @@ import React, {useEffect,useLayoutEffect,useRef} from 'react'
 import AudioPlayer, { RHAP_UI } from 'react-h5-audio-player';
 import theme from '../../theme'
 import styled from 'styled-components'
-import EE from '../../utils/ee'
+import EE, {CLIP_PAYMENT} from '../../utils/ee'
+import {StreamPayment,NUM_SECONDS} from '../../../src/store/feed'
 
 export default function Clip(props){
-  const {feedID, itemID, ts, title, text, url, pubkey, isMe} = props
+  const {feedID, itemID, ts, title, text, url, pubkey, isMe, uuid} = props
   const ref = useRef<any>()
   useLayoutEffect(()=>{
     if(ref&&ref.current&&ref.current.audio&&ref.current.audio.current) {
@@ -13,15 +14,16 @@ export default function Clip(props){
     }
   },[])
 
-  const NUM_SECONDS = 60
   const timestamp = useRef(0)
   const secs = useRef(0)
   function tick(){
     const s = secs.current
     if(s && s%NUM_SECONDS===0) {
-      EE.emit('clip-payment',{
-        feedID, itemID, pubkey, ts:Math.round(timestamp.current)
-      })
+      const sp:StreamPayment = {
+        feedID, itemID, pubkey, ts:Math.round(timestamp.current), uuid
+      }
+      console.log(sp)
+      EE.emit(CLIP_PAYMENT,sp)
     }
     secs.current = secs.current + 1
   }

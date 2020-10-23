@@ -19,7 +19,7 @@ import Clipboard from "@react-native-community/clipboard";
 import BotResMsg from './botResMsg'
 import Popover from 'react-native-popover-view';
 import {useTheme} from '../../../store'
-import EE from '../../utils/ee'
+import EE, {CANCEL_REPLY_UUID, CLEAR_REPLY_UUID, REPLY_UUID} from '../../utils/ee'
 
 export default function MsgRow(props) {
   const theme = useTheme()
@@ -35,9 +35,9 @@ export default function MsgRow(props) {
     }
   }
   useLayoutEffect(()=> {
-    EE.on('clear-reply-uuid', clearReplyUUID)
+    EE.on(CLEAR_REPLY_UUID, clearReplyUUID)
     return ()=> {
-      EE.removeListener('clear-reply-uuid',clearReplyUUID)
+      EE.removeListener(CLEAR_REPLY_UUID,clearReplyUUID)
     }
   },[swipeRowRef])
 
@@ -68,12 +68,12 @@ export default function MsgRow(props) {
 
   const onRowOpenHandler = () => {
     if (props.message_content) {
-      EE.emit('reply-uuid',props.uuid)
+      EE.emit(REPLY_UUID,props.uuid)
       setShowReply(true)
     }
   }
   const onRowCloseHandler = () => {
-    EE.emit('cancel-reply-uuid','')
+    EE.emit(CANCEL_REPLY_UUID,'')
     setShowReply(false)
   }
   return <View style={{

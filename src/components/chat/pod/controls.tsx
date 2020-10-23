@@ -2,9 +2,10 @@ import React from 'react'
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment'
-import EE from '../../utils/ee'
+import EE, { EXTRA_TEXT_CONTENT } from '../../utils/ee'
 import { ProgressBar, IconButton } from 'react-native-paper';
 import momentDurationFormatSetup from "moment-duration-format";
+import { StreamPayment } from '../../../store/feed';
 momentDurationFormatSetup(moment);
 
 export default class Controls extends TrackPlayer.ProgressComponent {
@@ -15,10 +16,12 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     TrackPlayer.seekTo(this.state.position < 10 ? 0 : this.state.position - 10)
   }
   feedClip = () => {
+    // @ts-ignore
     const ep = this.props.episode
+    // @ts-ignore
     const pod = this.props.pod
     if(!ep || !pod) return
-    const obj:{[k:string]:any} = {
+    const obj:StreamPayment = {
       ts: Math.round(this.state.position), 
       itemID: ep.id,
       feedID: pod.id,
@@ -26,13 +29,16 @@ export default class Controls extends TrackPlayer.ProgressComponent {
       url: ep.enclosureUrl,
       type: 'clip'
     }
+    // @ts-ignore
     if(this.props.myPubkey) obj.pubkey = this.props.myPubkey
-    EE.emit('extra-text-content',obj)
+    EE.emit(EXTRA_TEXT_CONTENT,obj)
   }
   track = (e) => {
+    // @ts-ignore
     const { duration } = this.props
     if (duration) {
       const x = e.nativeEvent.locationX
+      // @ts-ignore
       this.bar.measure((fx, fy, width, height, px, py) => {
         const ratio = x / width
         const secs = duration * ratio
@@ -41,9 +47,12 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     }
   }
   render() {
+    // @ts-ignore
     const { theme, onToggle, playing, duration } = this.props
+    // @ts-ignore
     let time = moment.duration(this.state.position, 'seconds').format('hh:mm:ss')
     if (duration) {
+      // @ts-ignore
       time += ` / ${moment.duration(duration, 'seconds').format('hh:mm:ss')}`
     }
     return (

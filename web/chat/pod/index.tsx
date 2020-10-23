@@ -6,8 +6,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
 import Stats from './stats'
-import {Destination} from '../../../src/store/feed'
-import EE from '../../utils/ee'
+import EE, {CLIP_PAYMENT} from '../../utils/ee'
+import {StreamPayment,Destination} from '../../../src/store/feed'
 
 export default function Pod({ top, url, host, showPod, setShowPod }) {
   const [loading, setLoading] = useState(false)
@@ -37,19 +37,21 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
 
   const previousFeedUrl = usePrevious(url)
 
-  function sendPayments(ts:number, extraDest?:Destination){
+  function sendPayments(ts:number){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations
+    console.log(dests,pod)
     if(!dests) return
+    if(!pod || !episode)
     if(!pod.id || !episode.id) return
     if(!pod.value.model) return
-    const memo = JSON.stringify({
+    const sp:StreamPayment = {
       feedID: pod.id,
       itemID: episode.id,
-      ...ts && {ts},
-    })
-    const finalDests:Destination[] = extraDest ? dests.concat(extraDest) : dests
-    feed.sendPayments(finalDests,memo,pricePerMinute)
+      ts: ts||0,
+    }
+    const memo = JSON.stringify(sp)
+    feed.sendPayments(dests,memo,pricePerMinute)
   }
 
   function onClipPayment(d){
@@ -59,16 +61,25 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
         split: 1,
         type: 'node'
       }
-      sendPayments(d.ts, extraDest)
+      const dests = pod && pod.value && pod.value.destinations
+      const sp:StreamPayment = {
+        feedID: d.feedID,
+        itemID: d.itemID,
+        ts: d.ts||0,
+      }
+      if(d.uuid) sp.uuid=d.uuid
+      const memo = JSON.stringify(sp)
+      const finalDests:Destination[] = dests.concat(extraDest)
+      feed.sendPayments(finalDests,memo,pricePerMinute)
     }
   }
 
   useEffect(()=>{
-    EE.on('clip-payment',onClipPayment)
+    EE.on(CLIP_PAYMENT,onClipPayment)
     return ()=> {
-      EE.removeListener('clip-payment',onClipPayment)
+      EE.removeListener(CLIP_PAYMENT,onClipPayment)
     }
-  },[])
+  },[pod]) // reset listener on pod change
 
   useEffect(()=>{
     if(url && !pod) {

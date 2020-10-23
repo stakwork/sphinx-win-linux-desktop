@@ -44,7 +44,7 @@ export default function TextMsg(props) {
   const isClip = message_content && message_content.startsWith('clip::')
   if (isClip) {
     const params = useParsedClipMsg(message_content)
-    return <Clip {...params} isMe={isMe} />
+    return <Clip {...params} isMe={isMe} uuid={props.uuid} />
   }
 
   const isJitsi = message_content && message_content.startsWith('https://jitsi.sphinx.chat/')

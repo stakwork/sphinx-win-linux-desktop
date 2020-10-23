@@ -10,7 +10,7 @@ import People from './people'
 import { useChatPicSrc, createChatPic } from '../../utils/picSrc'
 import moment from 'moment'
 import { Contact, DeletableContact, PendingContact } from './items'
-import EE from '../../utils/ee'
+import EE, { LEFT_GROUP } from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
 import { constants } from '../../../constants'
 
@@ -53,7 +53,7 @@ export default function GroupInfo({ visible }) {
     await chats.exitGroup(group.id)
     setLoading(false)
     close()
-    EE.emit('left-group')
+    EE.emit(LEFT_GROUP)
   }
 
   async function onApproveOrDenyMember(contactId, status) {

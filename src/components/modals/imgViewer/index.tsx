@@ -9,7 +9,7 @@ import RNFetchBlob from 'rn-fetch-blob'
 import * as e2e from '../../../crypto/e2e'
 import {ActivityIndicator} from 'react-native-paper'
 import SetPrice from './setPrice'
-import EE from '../../utils/ee'
+import EE, { LEFT_IMAGE_VIEWER } from '../../utils/ee'
 import { constants } from '../../../constants'
 import {fileUpload} from '../../chat/fileUpload'
 import * as base64 from 'base-64'
@@ -124,7 +124,7 @@ export default function ImgViewer(props) {
       return true
     })
     return () => {
-      EE.emit('left-image-viewer')
+      EE.emit(LEFT_IMAGE_VIEWER)
       BackHandler.removeEventListener('hardwareBackPress', ()=>{})
     }
   },[])

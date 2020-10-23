@@ -18,7 +18,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import PhoneIcon from '@material-ui/icons/Phone'
 import LockIcon from '@material-ui/icons/Lock';
 
-export default function Head({ height, appMode, setAppMode, pricePerMessage, routeConfirmed }) {
+export default function Head({ height, appMode, setAppMode, pricePerMessage, status }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const { contacts, ui, msg } = useStores()
@@ -72,8 +72,8 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, rou
           <ChatInfo>
             <NameWrap>
               <Name>{chat.name}</Name>
-              {chat.type!==constants.chat_types.group && <Tooltip title={routeConfirmed ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
-                <LockIcon style={{color:routeConfirmed?'#49ca97':'#febd59',fontSize:12,marginLeft:8,marginBottom:2}} />
+              {status && chat.type!==constants.chat_types.group && <Tooltip title={status==='active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
+                <LockIcon style={{color:status==='active'?'#49ca97':'#febd59',fontSize:12,marginLeft:8,marginBottom:2}} />
               </Tooltip>}
             </NameWrap>
             {(pricePerMessage?true:false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}

@@ -15,20 +15,19 @@ import { uploadFile } from '../utils/meme'
 import Bots from './bots'
 import MsgMenu from './msgMenu'
 import {useHasReplyContent} from '../../src/store/hooks/chat'
+import { allChats, filterChats } from '../../src/store/hooks/chats'
 const { useMsgs } = hooks
 
-var link = null
-
-var link = null
-
 const headHeight = 65
+
+export type RouteStatus = 'active' | 'inactive' | null
 
 function Chat() {
   const { chats, ui } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [tribeBots, setTribeBots] = useState([])
-  const [routeConfirmed,setRouteConfirmed] = useState(false)
+  const [status,setStatus] = useState<RouteStatus>(null)
   let footHeight = 65
 
   // function joinEvanTest(){
@@ -52,7 +51,7 @@ function Chat() {
 
     useEffect(() => {
       setPricePerMessage(0)
-      setRouteConfirmed(false)
+      setStatus(null)
       setTribeBots([])
       // console.log('user.currentIP',user.currentIP)
       if (!chat) {
@@ -91,17 +90,19 @@ function Chat() {
         }
         const r = await chats.checkRoute(chat.id)
         if(r && r.success_prob && r.success_prob>0.01) {
-          setRouteConfirmed(true)
+          setStatus('active')
+        } else {
+          setStatus('inactive')
         }
       })()
     }, [chat])
 
     return <Section style={{ background: theme.deep }}>
       <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
-        pricePerMessage={pricePerMessage} routeConfirmed={routeConfirmed}
+        pricePerMessage={pricePerMessage} status={status}
       />
       <ChatContent appMode={appMode} footHeight={footHeight} 
-        pricePerMessage={pricePerMessage}
+        pricePerMessage={pricePerMessage} 
       />
       <Foot height={footHeight} tribeBots={tribeBots}
         pricePerMessage={pricePerMessage}
@@ -210,6 +211,7 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
                     if (m.dateLine) {
                       return <DateLine key={'date' + i} dateString={m.dateLine} />
                     }
+                    if(!m.chat) m.chat = chat
                     return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} 
                       handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
                       onCopy={onCopy}

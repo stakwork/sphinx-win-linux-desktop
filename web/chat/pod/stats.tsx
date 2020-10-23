@@ -1,8 +1,7 @@
 import React, { useRef, useLayoutEffect, useState } from 'react'
 import styled from 'styled-components'
 import Close from '@material-ui/icons/Close'
-import Chart from 'chart.js'
-import moment from 'moment'
+import {makeChart, makeEpisodeChart} from './charts'
 
 export default function Stats({ pod, onClose, incomingPayments, earned }) {
   const l = incomingPayments && incomingPayments.length
@@ -13,15 +12,16 @@ export default function Stats({ pod, onClose, incomingPayments, earned }) {
   useLayoutEffect(() => {
     if (!(chartRef && chartRef.current)) return
     makeChart(chartRef.current, incomingPayments)
-  })
+  }, [])
   const episodes = processEpisodeEarning(pod,incomingPayments)
 
   function selectEpisode(e){
-    return
+    const filtered = incomingPayments.filter(p=>p.message_content.includes(`"itemID":${e.id}`))
+    if(filtered.length===0) return
     setSelectedEpisodeID(e.id)
     setTimeout(()=>{
       if(littleChartRef.current) {
-        makeChart(littleChartRef.current, incomingPayments)
+        makeEpisodeChart(littleChartRef.current, filtered)
       }
     },10)
   }
@@ -42,9 +42,8 @@ export default function Stats({ pod, onClose, incomingPayments, earned }) {
       <ByEpisode>By Episode:</ByEpisode>
       {episodes.map((e,i)=>{
         const selected = selectedEpisodeID===e.id
-        console.log("SELECTED",selected,e)
         return <EpisodeWrap key={i} onClick={()=>selectEpisode(e)}>
-          <EpisodeEarning>
+          <EpisodeEarning selected={selected}>
             <span>{e.title}</span>
             <span>{`${e.total} sats`}</span>
           </EpisodeEarning>
@@ -82,45 +81,6 @@ function processEpisodeEarning(pod, incomingPayments){
     } catch(e) {}
   })
   return res
-}
-
-function makeChart(ref, payments) {
-  var ctx = ref.getContext('2d');
-  const labels = []
-  const data = []
-  const days:{[k:string]:number} = {}
-  payments && payments.forEach(p=>{
-    const day = moment(p.date).format('MM/DD')
-    if(days[day]) days[day] += p.amount
-    else days[day] = p.amount
-  })
-  Object.entries(days).forEach(([day,amount])=>{
-    labels.unshift(day)
-    data.unshift(amount)
-  })
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Sats earned',
-        data,
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      maintainAspectRatio:false,
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-      }
-    }
-  });
 }
 
 const Wrap = styled.div`
@@ -173,16 +133,17 @@ const EpisodeWrap = styled.div`
   cursor:pointer;
 `
 const EpisodeEarning = styled.div`
-  height:18px;
+  height:${p=>p.selected?21:18}px;
   display:flex;
   align-items:center;
   color:#809ab7;
-  font-size:12px;
+  font-size:${p=>p.selected?14:12}px;
   justify-content:space-between;
+  font-weight:${p=>p.selected?'bold':'normal'};
 `
 const LittleChartWrap = styled.div`
   width:100%;
-  height:100px;
-  max-height:100px;
+  height:200px;
+  max-height:200px;
   position:relative;
 `
