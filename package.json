@@ -7,7 +7,7 @@
   "homepage": "./",
   "scripts": {
     "start": "react-native start",
-    "android": "react-native run-android",
+    "android": "BABEL_ENV=dev react-native run-android && adb logcat *:S ReactNative:V ReactNativeJS:V",
     "ios": "react-native run-ios",
     "web": "react-app-rewired start",
     "build": "react-app-rewired build",
@@ -201,6 +201,7 @@
     "@types/lodash": "^4.14.149",
     "@types/react": "^16.9.23",
     "@types/react-native": "^0.63.20",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "customize-cra": "^1.0.0",
     "electron": "^9.2.0",
     "electron-builder": "^22.7.0",

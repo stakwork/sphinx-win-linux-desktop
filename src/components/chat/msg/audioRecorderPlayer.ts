@@ -7,7 +7,7 @@ const ARP = new AudioRecorderPlayer()
 let currentlyPlayingSource = ''
 
 export default {
-  play: async function(source:string, jumpTo:number, callback:Function){
+  play: async function(source:string, jumpTo:any, callback:Function){
     if(source!==currentlyPlayingSource) {
       await ARP.removePlayBackListener();
       await ARP.resumePlayer().catch(()=>{})
@@ -16,7 +16,7 @@ export default {
     }
     if(jumpTo) {
       await ARP.startPlayer(source).catch(()=>{})
-      await ARP.seekToPlayer(jumpTo).catch(()=>{})
+      await ARP.seekToPlayer(parseInt(jumpTo)).catch(()=>{})
     } else {
       await ARP.startPlayer(source).catch(()=>{})
     }
