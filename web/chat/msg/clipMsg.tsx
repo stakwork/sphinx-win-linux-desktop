@@ -20,7 +20,10 @@ export default function Clip(props){
     const s = secs.current
     if(s && s%NUM_SECONDS===0) {
       const sp:StreamPayment = {
-        feedID, itemID, pubkey, ts:Math.round(timestamp.current), uuid
+        feedID: parseInt(feedID), 
+        itemID: parseInt(itemID), 
+        pubkey, 
+        ts:Math.round(timestamp.current), uuid
       }
       console.log(sp)
       EE.emit(CLIP_PAYMENT,sp)
