@@ -217,7 +217,7 @@ export default function Pod({ show, chat, url, onBoost }) {
         onPress={()=>setFull(false)}
       />
 
-      <Boost onPress={boost} style={{position:'absolute',right:32,top:width-90,zIndex:200}} />
+      <Boost onPress={boost} style={{position:'absolute',right:15,top:width-108,zIndex:200}} />
 
       {pod.image && <View style={{...styles.imgWrap,width,height:width-34}}>
         <FastImage source={{ uri: episode.image }}

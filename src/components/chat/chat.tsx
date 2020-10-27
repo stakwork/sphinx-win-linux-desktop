@@ -108,7 +108,7 @@ export default function Chat() {
     if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
 
     const r = await chats.checkRoute(chat.id)
-    if(r && r.success_prob && r.success_prob>0.001) {
+    if(r && r.success_prob && r.success_prob>0) {
       setStatus('active')
     } else {
       setStatus('inactive')
