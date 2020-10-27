@@ -13,7 +13,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
 import Boost from './boost'
 
-export default function Pod({ show, host, uuid, url }) {
+export default function Pod({ show, chat, url, onBoost }) {
+  const {host,uuid} = chat
   const theme = useTheme()
   const { chats, feed, user } = useStores()
   const [pod, setPod] = useState(null)
@@ -161,10 +162,30 @@ export default function Pod({ show, host, uuid, url }) {
     return <></>
   }
 
+  function boost(){
+    const amount = 100
+    requestAnimationFrame(async ()=>{
+      const pos = await TrackPlayer.getPosition()
+      const sp:StreamPayment = {
+        feedID: pod.id,
+        itemID: selectedEpisodeID,
+        ts: Math.round(pos)||0,
+        amount,
+      }
+      onBoost(sp)
+      const dests = pod && pod.value && pod.value.destinations    
+      if(!dests) return
+      if(!pod.id || !selectedEpisodeID) return
+      const memo = JSON.stringify(sp)
+      feed.sendPayments(dests, memo, amount)
+    })
+  }
+
   if(!full) {
     return <PodBar pod={pod} episode={episode} 
       onToggle={onToggle} playing={playing}
       onShowFull={()=>setFull(true)}
+      boost={boost}
     />
   }
 
@@ -172,7 +193,7 @@ export default function Pod({ show, host, uuid, url }) {
     return <TouchableOpacity key={index} style={{...styles.episode,borderBottomColor:theme.border,backgroundColor:selected?theme.deep:theme.bg}}
       onPress={()=>selectEpisode(item)}>
       {/* <IconButton icon="play" onPress={()=>selectEpisode(item)} /> */}
-      <Icon name="play" color={theme.subtitle} size={16} style={{opacity:playing&&selected?1:0}} />
+      <Icon name="play" color={theme.subtitle} size={16} style={{opacity:selected?1:0}} />
       <FastImage source={{ uri: item.image }}
         style={{ width: 42, height: 42, marginLeft:8, marginRight:12 }} resizeMode={'cover'}
       />
@@ -196,7 +217,7 @@ export default function Pod({ show, host, uuid, url }) {
         onPress={()=>setFull(false)}
       />
 
-      <Boost onPress={()=>{}} style={{position:'absolute',right:32,top:width-91,zIndex:200}} />
+      <Boost onPress={boost} style={{position:'absolute',right:32,top:width-90,zIndex:200}} />
 
       {pod.image && <View style={{...styles.imgWrap,width,height:width-34}}>
         <FastImage source={{ uri: episode.image }}

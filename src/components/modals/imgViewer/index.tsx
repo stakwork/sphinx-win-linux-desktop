@@ -140,7 +140,6 @@ export default function ImgViewer(props) {
       inputRef.current.blur()
     }
   }
-
   return useObserver(() =>
     <View style={styles.wrap}>
       <IconButton

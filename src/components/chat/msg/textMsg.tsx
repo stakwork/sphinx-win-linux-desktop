@@ -5,6 +5,7 @@ import RNUrlPreview from 'react-native-url-preview';
 import { useParsedGiphyMsg } from '../../../store/hooks/msg'
 import {useTheme} from '../../../store'
 import ClipMessage from './clipMsg'
+import BoostMessage from './boostMsg'
 
 export default function TextMsg(props) {
   const theme = useTheme()
@@ -29,6 +30,10 @@ export default function TextMsg(props) {
   const isClip = message_content && message_content.startsWith('clip::')
   if(isClip) {
     return <ClipMessage {...props} />
+  }
+  const isBoost = message_content && message_content.startsWith('boost::')
+  if(isBoost) {
+    return <BoostMessage {...props} />
   }
 
   const onLongPressHandler = () => props.onLongPress(props)

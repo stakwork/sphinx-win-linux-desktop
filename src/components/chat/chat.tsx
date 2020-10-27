@@ -13,11 +13,12 @@ import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
 import Pod from './pod'
+import {StreamPayment} from '../../store/feed'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
 export default function Chat() {
-  const { contacts, user, chats, ui } = useStores()
+  const { contacts, user, chats, ui, msg } = useStores()
   const theme = useTheme()
 
   const [show, setShow] = useState(false)
@@ -107,7 +108,7 @@ export default function Chat() {
     if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
 
     const r = await chats.checkRoute(chat.id)
-    if(r && r.success_prob && r.success_prob>0.01) {
+    if(r && r.success_prob && r.success_prob>0.001) {
       setStatus('active')
     } else {
       setStatus('inactive')
@@ -116,6 +117,17 @@ export default function Chat() {
 
   const appURL = ui.applicationURL
   const theShow = show
+
+  function onBoost(sp:StreamPayment){
+    if(!(chat && chat.id)) return
+    msg.sendMessage({
+      contact_id:null,
+      text:`boost::${JSON.stringify(sp)}`,
+      chat_id: chat.id||null,
+      amount: pricePerMessage,
+      reply_uuid:''
+    })
+  }
 
   return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
@@ -131,7 +143,7 @@ export default function Chat() {
       </View>}
       {theShow && <MsgList chat={chat} />}
 
-      <Pod show={ui.feedURL} host={chat.host} uuid={chat.uuid} url={ui.feedURL} />
+      <Pod chat={chat} show={ui.feedURL} url={ui.feedURL} onBoost={onBoost} />
 
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         tribeBots={tribeBots}

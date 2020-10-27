@@ -4,7 +4,7 @@ import {IconButton} from 'react-native-paper'
 import { useTheme } from '../../../store'
 import TrackPlayer from 'react-native-track-player';
 
-export default function PodBar({ pod, episode, onToggle, playing, onShowFull }) {
+export default function PodBar({ pod, episode, onToggle, playing, onShowFull, boost }) {
   const theme = useTheme()
   
   async function fastForward() {
@@ -28,6 +28,10 @@ export default function PodBar({ pod, episode, onToggle, playing, onShowFull }) 
         <IconButton icon="fast-forward-30"
           color={theme.title} size={20}
           onPress={fastForward}
+        />
+        <IconButton icon="rocket-launch" size={20} 
+          color="white" style={{backgroundColor:theme.accent, marginRight:12}}
+          onPress={boost}
         />
       </View>
     </TouchableOpacity>
