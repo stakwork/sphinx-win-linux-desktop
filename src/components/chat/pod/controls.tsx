@@ -10,7 +10,7 @@ momentDurationFormatSetup(moment);
 
 export default class Controls extends TrackPlayer.ProgressComponent {
   fastForward = () => {
-    TrackPlayer.seekTo(this.state.position + 10);
+    TrackPlayer.seekTo(this.state.position + 30);
   }
   rewind = () => {
     TrackPlayer.seekTo(this.state.position < 10 ? 0 : this.state.position - 10)
@@ -20,9 +20,9 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     const ep = this.props.episode
     // @ts-ignore
     const pod = this.props.pod
-    if(!ep || !pod) return
-    const obj:StreamPayment = {
-      ts: Math.round(this.state.position), 
+    if (!ep || !pod) return
+    const obj: StreamPayment = {
+      ts: Math.round(this.state.position),
       itemID: ep.id,
       feedID: pod.id,
       title: ep.title,
@@ -30,8 +30,8 @@ export default class Controls extends TrackPlayer.ProgressComponent {
       type: 'clip'
     }
     // @ts-ignore
-    if(this.props.myPubkey) obj.pubkey = this.props.myPubkey
-    EE.emit(EXTRA_TEXT_CONTENT,obj)
+    if (this.props.myPubkey) obj.pubkey = this.props.myPubkey
+    EE.emit(EXTRA_TEXT_CONTENT, obj)
   }
   track = (e) => {
     // @ts-ignore
@@ -50,72 +50,93 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     // @ts-ignore
     const { theme, onToggle, playing, duration } = this.props
     // @ts-ignore
-    let time = moment.duration(this.state.position, 'seconds').format('hh:mm:ss')
-    if (duration) {
-      // @ts-ignore
-      time += ` / ${moment.duration(duration, 'seconds').format('hh:mm:ss')}`
-    }
+    const progressText = moment.duration(this.state.position, 'seconds').format('hh:mm:ss')
+    // @ts-ignore
+    const durationText = moment.duration(duration, 'seconds').format('hh:mm:ss')
     return (
       <View style={styles.progressWrap}>
-        <View style={styles.progressWrapTop}>
-          <View style={{ height: 50, width: 100, display:'flex', justifyContent:'center' }}>
-            <IconButton icon="chat"
-              color={theme.title} size={20}
-              onPress={this.feedClip}
-              style={{marginTop:12}}
+
+        <View style={styles.barWrap}>
+          <TouchableOpacity onPress={this.track} style={styles.progressTouch}
+            ref={r => this.bar = r}>
+            <ProgressBar color="#6289FD"
+              progress={this.getProgress()}
+            // buffered={this.getBufferedProgress()}
             />
-          </View>
+          </TouchableOpacity>
+          <Text style={{...styles.progressText,color:theme.title}}>{progressText}</Text>
+          <Text style={{...styles.durationText,color:theme.title}}>{durationText}</Text>
+        </View>
+
+        <View style={styles.progressWrapBottom}>
+          
+          <View style={{height:50,width:50}}></View>
           <View style={styles.controls}>
             <IconButton icon="rewind-10"
-              color={theme.title} size={20}
+              color={theme.title} size={24}
               onPress={this.rewind}
             />
-            <IconButton icon={playing ? 'pause' : 'play'}
-              color={theme.title} size={26}
-              onPress={() => onToggle(this.state.position)}
+            <IconButton icon={playing ? 'pause-circle' : 'play-circle'}
+              color={theme.primary} size={42}
+              onPress={onToggle}
             />
-            <IconButton icon="fast-forward-10"
-              color={theme.title} size={20}
+            <IconButton icon="fast-forward-30"
+              color={theme.title} size={24}
               onPress={this.fastForward}
             />
           </View>
-          <Text style={{ color: theme.title, width: 110, textAlign: 'right', fontSize: 11 }}>
-            {time}
-          </Text>
+          <View style={{ height: 60, width: 50, display: 'flex', justifyContent: 'flex-end' }}>
+            <IconButton icon="comment-quote"
+              color={theme.title} size={27}
+              onPress={this.feedClip}
+            />
+          </View>
+          
         </View>
-        <TouchableOpacity onPress={this.track} style={styles.progressTouch}
-          ref={r => this.bar = r}>
-          <ProgressBar color="#6289FD"
-            progress={this.getProgress()}
-          // buffered={this.getBufferedProgress()}
-          />
-        </TouchableOpacity>
+        
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  controls:{
-    display:'flex',
-    alignItems:'center',
-    flexDirection:'row'
+  controls: {
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'row'
   },
-  progressWrap:{
-    marginTop:5,
-    display:'flex',
+  progressWrap: {
+    marginTop: 5,
+    display: 'flex',
+    width: '100%',
+  },
+  barWrap:{
     width:'100%',
+    position:'relative'
   },
-  progressTouch:{
-    height:45,
-    display:'flex',
-    justifyContent:'center'
+  progressTouch: {
+    height: 32,
+    marginTop:10,
+    display: 'flex',
+    justifyContent: 'center'
   },
-  progressWrapTop:{
-    display:'flex',
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'center',
-    width:'100%',
+  progressWrapBottom: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    maxWidth: '100%',
   },
+  progressText:{
+    position:'absolute',
+    top:36,
+    left:0,
+    fontSize:10
+  },
+  durationText:{
+    position:'absolute',
+    top:37,
+    right:0,
+    fontSize:10
+  }
 })

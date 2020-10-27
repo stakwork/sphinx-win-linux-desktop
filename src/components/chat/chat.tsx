@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
-import PodDrop from './pod/podDrop'
+import Pod from './pod'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
@@ -23,7 +23,7 @@ export default function Chat() {
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [appMode, setAppMode] = useState(false)
-  const [showPod, setShowPod] = useState(false)
+  // const [showPod, setShowPod] = useState(false)
   const [tribeBots,setTribeBots] = useState([])
   const [status, setStatus] = useState<RouteStatus>(null)
   
@@ -119,19 +119,20 @@ export default function Chat() {
 
   return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} setShowPod={setShowPod} showPod={showPod} status={status} />
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} />
 
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
       <Frame url={appURL} />
     </View>}
-
-    <PodDrop show={showPod&&ui.feedURL} host={chat.host} uuid={chat.uuid} url={ui.feedURL} />
 
     <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
       {theShow && <MsgList chat={chat} />}
+
+      <Pod show={ui.feedURL} host={chat.host} uuid={chat.uuid} url={ui.feedURL} />
+
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         tribeBots={tribeBots}
       />}

@@ -1,5 +1,5 @@
 import React from 'react'
-import {TouchableOpacity, Text} from 'react-native'
+import {TouchableOpacity, Text, View} from 'react-native'
 import { useObserver } from 'mobx-react-lite'
 import { Appbar } from 'react-native-paper'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -10,6 +10,8 @@ import { constants } from '../../constants'
 import { randAscii } from '../../crypto/rand'
 import {RouteStatus} from './chat'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useChatPicSrc } from '../utils/picSrc'
+import Avatar from './msg/avatar'
 
 const conversation = constants.chat_types.conversation
 const tribe = constants.chat_types.tribe
@@ -49,11 +51,11 @@ export default function Header(
     const name = (chat && chat.name) || (contact && contact.alias)
 
     function onBackHandler() {
-      setTimeout(()=>{
+      requestAnimationFrame(()=>{
         // msg.seeChat(chat.id)
         details.getBalance()
         navigation.navigate('Home', { params: { rnd: Math.random() } })
-      },1)
+      })
     }
 
     function setAppModeHandler() {
@@ -63,9 +65,13 @@ export default function Header(
       setShowPod(!showPod)
     }
 
+    let uri = useChatPicSrc(chat)
     return (
       <Appbar.Header style={{ width: '100%', backgroundColor: theme.main, elevation: 5, zIndex: 102, position: 'relative', display:'flex', flexDirection:'row', alignItems:'center' }}>
         <Appbar.BackAction onPress={onBackHandler} />
+        <View style={{marginRight:5}}>
+          <Avatar big={false} alias={name} photo={uri || ''} />
+        </View>
         <TouchableOpacity onPress={clickTitle} style={{display:'flex',flexDirection:'row',flex:1,alignItems:'center'}}>
           <Text style={{fontSize:18,color:theme.title,marginLeft:8}}>{name}</Text>
           {status!==null && <Icon name="lock" style={{marginLeft:16}} size={13} 
@@ -76,7 +82,7 @@ export default function Header(
         {theChat && <Appbar.Action icon={isMuted ? 'bell-off' : 'bell'}
           onPress={muteChat} color="grey"
         />}
-        {theChat && theChat.type === tribe && (ui.feedURL?true:false) && <Appbar.Action 
+        {false && theChat && theChat.type === tribe && (ui.feedURL?true:false) && <Appbar.Action 
           icon="rss" color={showPod?'#bbb':'grey'}
           onPress={setShowPodHandler}
         />}
