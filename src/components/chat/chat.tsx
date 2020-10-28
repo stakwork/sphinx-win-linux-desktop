@@ -12,18 +12,19 @@ import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
-import PodDrop from './pod/podDrop'
+import Pod from './pod'
+import {StreamPayment} from '../../store/feed'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
 export default function Chat() {
-  const { contacts, user, chats, ui } = useStores()
+  const { contacts, user, chats, ui, msg } = useStores()
   const theme = useTheme()
 
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [appMode, setAppMode] = useState(false)
-  const [showPod, setShowPod] = useState(false)
+  // const [showPod, setShowPod] = useState(false)
   const [tribeBots,setTribeBots] = useState([])
   const [status, setStatus] = useState<RouteStatus>(null)
   
@@ -107,7 +108,7 @@ export default function Chat() {
     if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
 
     const r = await chats.checkRoute(chat.id)
-    if(r && r.success_prob && r.success_prob>0.01) {
+    if(r && r.success_prob && r.success_prob>0) {
       setStatus('active')
     } else {
       setStatus('inactive')
@@ -117,21 +118,33 @@ export default function Chat() {
   const appURL = ui.applicationURL
   const theShow = show
 
+  function onBoost(sp:StreamPayment){
+    if(!(chat && chat.id)) return
+    msg.sendMessage({
+      contact_id:null,
+      text:`boost::${JSON.stringify(sp)}`,
+      chat_id: chat.id||null,
+      amount: pricePerMessage,
+      reply_uuid:''
+    })
+  }
+
   return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} setShowPod={setShowPod} showPod={showPod} status={status} />
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} />
 
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
       <Frame url={appURL} />
     </View>}
-
-    <PodDrop show={showPod&&ui.feedURL} host={chat.host} uuid={chat.uuid} url={ui.feedURL} />
 
     <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
       {theShow && <MsgList chat={chat} />}
+
+      <Pod chat={chat} show={ui.feedURL} url={ui.feedURL} onBoost={onBoost} />
+
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         tribeBots={tribeBots}
       />}

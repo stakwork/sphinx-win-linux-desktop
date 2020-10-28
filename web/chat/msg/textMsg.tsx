@@ -7,6 +7,7 @@ import * as ipc from '../../crypto/ipc'
 import { useHasLink } from './hooks'
 import Clip from './clipMsg'
 import JitsiMsg from './jitsiMsg'
+import Boost from './boostMsg'
 
 export default function TextMsg(props) {
   const { message_content, sender } = props
@@ -45,6 +46,11 @@ export default function TextMsg(props) {
   if (isClip) {
     const params = useParsedClipMsg(message_content)
     return <Clip {...params} isMe={isMe} uuid={props.uuid} />
+  }
+  const isBoost = message_content && message_content.startsWith('boost::')
+  if (isBoost) {
+    const params = useParsedClipMsg(message_content)
+    return <Boost {...params} isMe={isMe} />
   }
 
   const isJitsi = message_content && message_content.startsWith('https://jitsi.sphinx.chat/')

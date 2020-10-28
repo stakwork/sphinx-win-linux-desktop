@@ -21,6 +21,7 @@ export interface StreamPayment {
   pubkey?: string
   type?: string
   uuid?: string
+  amount?: number
 }
 
 export class FeedStore {
