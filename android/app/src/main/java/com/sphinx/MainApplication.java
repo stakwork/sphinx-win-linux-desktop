@@ -41,6 +41,7 @@ import com.swmansion.rnscreens.RNScreensPackage;
 import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import com.guichaguri.trackplayer.TrackPlayer;
+import com.airbnb.android.react.lottie.LottiePackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +60,7 @@ public class MainApplication extends Application implements ReactApplication {
           // new WebRTCModulePackage(),
           // new RNJitsiMeetPackage(),
           new MainReactPackage(),
+          new LottiePackage(),
           new TrackPlayer(),
           new BadgePackage(),
           new ClipboardPackage(),
