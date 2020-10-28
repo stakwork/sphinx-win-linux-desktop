@@ -60,6 +60,15 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
       }
     }
 
+    function viewContact(){
+      if(chat && chat.type === constants.chat_types.conversation) {
+        const cid = chat.contact_ids.find(id => id !== 1)
+      const contact = contacts.contacts.find(c => c.id === cid)
+      ui.setViewContact(contact)
+      }
+
+    }
+
     return <Wrap style={{ background: theme.bg, height }}>
       {!chat && !showURL && <Placeholder>
         Open a conversation to start using Sphinx
@@ -71,7 +80,7 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
           </AvatarWrap>
           <ChatInfo>
             <NameWrap>
-              <Name>{chat.name}</Name>
+              <Name onClick={viewContact} style={{cursor:'pointer'}}>{chat.name}</Name>
               {status && chat.type!==constants.chat_types.group && <Tooltip title={status==='active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
                 <LockIcon style={{color:status==='active'?'#49ca97':'#febd59',fontSize:12,marginLeft:8,marginBottom:2}} />
               </Tooltip>}

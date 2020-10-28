@@ -149,6 +149,11 @@ export class UiStore {
     this.sendRequestModal = c
   }
 
+  @observable viewContact: Contact
+  @action setViewContact(c: Contact) {
+    this.viewContact = c
+  }
+
   @observable paymentHistory: boolean
   @action setPaymentHistory(b: boolean){
     this.paymentHistory = b
