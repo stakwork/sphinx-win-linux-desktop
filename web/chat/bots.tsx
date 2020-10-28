@@ -105,6 +105,7 @@ function BotIcon({style}){
   </SvgIcon>
 }
 
+
 function NewContent({createBot,creating}){
   const [name,setName] = useState('')
   const [webhook,setWebhook] = useState('')
