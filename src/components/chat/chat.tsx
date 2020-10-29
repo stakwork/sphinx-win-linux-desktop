@@ -14,6 +14,7 @@ import { constants } from '../../constants'
 import Frame from './frame'
 import Pod from './pod'
 import {StreamPayment} from '../../store/feed'
+import Anim from './pod/anim'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
@@ -144,6 +145,8 @@ export default function Chat() {
       {theShow && <MsgList chat={chat} />}
 
       <Pod chat={chat} show={ui.feedURL} url={ui.feedURL} onBoost={onBoost} />
+
+      <Anim />
 
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         tribeBots={tribeBots}

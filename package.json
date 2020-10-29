@@ -70,6 +70,7 @@
     "@react-native-community/clipboard": "^1.2.3",
     "@react-native-community/datetimepicker": "^2.5.0",
     "@react-native-community/masked-view": "^0.1.6",
+    "@react-native-community/slider": "^3.0.3",
     "@react-navigation/drawer": "^5.1.0",
     "@react-navigation/native": "^5.0.8",
     "@react-navigation/stack": "^5.0.8",

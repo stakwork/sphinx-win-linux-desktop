@@ -15,11 +15,11 @@ export default function BoostMessage(props) {
     <View style={{...styles.rocketWrap, backgroundColor:theme.accent}}>
       <Icon color="white" size={20} name="rocket-launch" />
     </View>
-    <Text style={{ color: theme.title }}>
-      Boost!
-    </Text>
-    <Text style={{ color: theme.title, fontWeight:'bold', marginLeft:5 }}>
+    <Text style={{ color: theme.title, fontWeight:'bold' }}>
       {amount}
+    </Text>
+    <Text style={{ color: theme.title, opacity:0.5, marginLeft:6 }}>
+      sat
     </Text>
   </View>
 }

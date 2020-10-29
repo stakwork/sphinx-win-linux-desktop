@@ -169,6 +169,7 @@ dependencies {
     implementation project(':@react-native-community_audio-toolkit')
     implementation project(':@react-native-community_datetimepicker')
     implementation project(':@react-native-community_clipboard')
+    implementation project(':@react-native-community_slider')
     implementation project(':react-native-webview')
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-share')
@@ -189,6 +190,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.0.0"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
+    implementation project(':lottie-react-native')
 
     compile project(':react-native-track-player')
     

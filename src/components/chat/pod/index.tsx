@@ -5,13 +5,12 @@ import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
 import Controls from './controls'
 import useInterval from '../../utils/useInterval'
-import EE, {CLIP_PAYMENT} from '../../utils/ee'
+import EE, {CLIP_PAYMENT, PLAY_ANIMATION} from '../../utils/ee'
 import {Destination,StreamPayment,NUM_SECONDS} from '../../../store/feed'
 import PodBar from './podBar'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
-import Boost from './boost'
 
 export default function Pod({ show, chat, url, onBoost }) {
   const {host,uuid} = chat
@@ -163,6 +162,8 @@ export default function Pod({ show, chat, url, onBoost }) {
   }
 
   function boost(){
+    EE.emit(PLAY_ANIMATION)
+    return
     const amount = 100
     requestAnimationFrame(async ()=>{
       const pos = await TrackPlayer.getPosition()
@@ -217,7 +218,7 @@ export default function Pod({ show, chat, url, onBoost }) {
         onPress={()=>setFull(false)}
       />
 
-      <Boost onPress={boost} style={{position:'absolute',right:15,top:width-108,zIndex:200}} />
+      {/* <Boost onPress={boost} style={{position:'absolute',right:15,top:width-108,zIndex:200}} inert={false} /> */}
 
       {pod.image && <View style={{...styles.imgWrap,width,height:width-34}}>
         <FastImage source={{ uri: episode.image }}
@@ -244,7 +245,7 @@ export default function Pod({ show, chat, url, onBoost }) {
       <View style={styles.track}>
         <Controls theme={theme} onToggle={onToggle} playing={playing} 
           duration={duration} episode={episode} pod={pod}
-          myPubkey={user.publicKey}
+          myPubkey={user.publicKey} boost={boost}
         />
       </View>
       {(pod.episodes?true:false) && <View style={styles.listWrap}>
