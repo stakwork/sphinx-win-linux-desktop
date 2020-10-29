@@ -1,8 +1,8 @@
 import React, {useRef} from 'react'
 import {Animated, Easing, StyleSheet, View, Text} from 'react-native'
 import {useTheme} from '../../../store'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {TouchableRipple} from 'react-native-paper'
+import CustomIcon from '../../utils/customIcons'
 
 export default function Boost({style,onPress,inert}){
   const theme = useTheme()
@@ -31,7 +31,7 @@ export default function Boost({style,onPress,inert}){
         ...styles.rocketWrap,
         transform:[{scale:size}]
       }}>
-        <Icon color={theme.accent} size={20} name="rocket-launch" /> 
+        <CustomIcon color={theme.accent} size={20} name="fireworks" /> 
       </Animated.View>
     </View>
   </TouchableRipple>

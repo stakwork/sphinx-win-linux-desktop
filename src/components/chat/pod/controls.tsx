@@ -11,13 +11,14 @@ import TouchableIcon from '../../utils/touchableIcon'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {IconButton} from 'react-native-paper'
 import Rocket from './rocket'
+import CustomIcon from '../../utils/customIcons'
 
 export default class Controls extends TrackPlayer.ProgressComponent {
   fastForward = () => {
     TrackPlayer.seekTo(this.state.position + 30);
   }
   rewind = () => {
-    TrackPlayer.seekTo(this.state.position < 10 ? 0 : this.state.position - 10)
+    TrackPlayer.seekTo(this.state.position < 15 ? 0 : this.state.position - 15)
   }
   feedClip = () => {
     // @ts-ignore
@@ -75,30 +76,29 @@ export default class Controls extends TrackPlayer.ProgressComponent {
 
         <View style={styles.progressWrapBottom}>
           
-          <View style={{ height: 55, width: 50, display: 'flex', justifyContent: 'flex-end' }}>
-            <IconButton icon="comment-quote"
-              color={theme.title} size={27}
-              onPress={this.feedClip}
-            />
+          <View style={{ height: 48, width: 50 }}>
+            <TouchableIcon
+              rippleColor={theme.title} size={48}
+              onPress={this.feedClip}>
+              <CustomIcon name="chat-quote" color={theme.title} size={24} />
+            </TouchableIcon>
           </View>
 
           <View style={styles.controls}>
             <TouchableIcon
               rippleColor={theme.title} size={48}
-              onPress={this.rewind}
-            >
-              <Icon name="replay-10" color={theme.title} size={38} />
+              onPress={this.rewind}>
+              <CustomIcon name="back-15" color={theme.title} size={28} />
             </TouchableIcon>
             <IconButton icon={playing ? 'pause-circle' : 'play-circle'}
-              color={theme.primary} size={42}
+              color={theme.primary} size={52}
               onPress={onToggle}
               style={{marginLeft:18,marginRight:18}}
             />
             <TouchableIcon
               rippleColor={theme.title} size={48}
-              onPress={this.fastForward}
-            >
-              <Icon name="forward-30" color={theme.title} size={38} />
+              onPress={this.fastForward}>
+              <CustomIcon name="forward-30" color={theme.title} size={28} />
             </TouchableIcon>
           </View>
           

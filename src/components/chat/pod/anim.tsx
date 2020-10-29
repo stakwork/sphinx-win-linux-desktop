@@ -13,7 +13,7 @@ const lens = { // min 1000
   }
 }
 
-export default function Anim() {
+export default function Anim({dark}) {
   const {contacts} = useStores()
   const [show,setShow] = useState(false)
 
@@ -62,7 +62,10 @@ export default function Anim() {
   return <Animated.View style={{
       ...styles.wrap, zIndex, opacity
     }}>
-    <View style={styles.backdrop} />
+    <View style={{
+      ...styles.backdrop,
+      backgroundColor:dark?'rgba(0,0,0,0.5)':'rgba(255,255,255,0.5)',
+    }} />
 
     <View style={styles.content}>
       {(meIMG?true:false) && <FastImage resizeMode="cover" 
@@ -83,7 +86,6 @@ export default function Anim() {
 const styles = StyleSheet.create({
   wrap:{
     display:'flex',flex:1,
-    backgroundColor:'rgba(0,0,0,0.5)',
     position:'absolute',
     top:0,left:0,bottom:0,right:0,
     alignItems:'center',
@@ -91,7 +93,6 @@ const styles = StyleSheet.create({
   },
   backdrop:{
     display:'flex',flex:1,
-    backgroundColor:'rgba(0,0,0,0.5)',
     position:'absolute',
     top:0,left:0,bottom:0,right:0,
   },

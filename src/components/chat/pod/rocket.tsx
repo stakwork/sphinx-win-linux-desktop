@@ -2,7 +2,7 @@ import React, {useRef} from 'react'
 import {Animated, View, StyleSheet} from 'react-native'
 import {useTheme} from '../../../store'
 import {TouchableRipple} from 'react-native-paper'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import CustomIcon from '../../utils/customIcons'
 
 export default function Rocket({onPress}){
   const theme = useTheme()
@@ -27,7 +27,7 @@ export default function Rocket({onPress}){
       <Animated.View style={{  
           transform:[{scale:size}]
         }}>
-        <Icon color="white" size={20} name="rocket-launch" /> 
+        <CustomIcon name="fireworks" color="white" size={20} />
       </Animated.View>
     </View>
   </TouchableRipple>

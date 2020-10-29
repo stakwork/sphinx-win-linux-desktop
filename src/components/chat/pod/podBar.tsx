@@ -4,6 +4,8 @@ import {IconButton} from 'react-native-paper'
 import { useTheme } from '../../../store'
 import TrackPlayer from 'react-native-track-player';
 import Rocket from './rocket'
+import CustomIcon from '../../utils/customIcons'
+import TouchableIcon from '../../utils/touchableIcon'
 
 export default function PodBar({ pod, episode, onToggle, playing, onShowFull, boost }) {
   const theme = useTheme()
@@ -14,7 +16,7 @@ export default function PodBar({ pod, episode, onToggle, playing, onShowFull, bo
   }
 
   const height=58
-  return <View style={{...styles.wrap, backgroundColor: theme.border, borderBottomColor: theme.border, height}}>
+  return <View style={{...styles.wrap, backgroundColor: theme.dark?theme.deep:theme.bg, borderTopColor: theme.border, height}}>
     <TouchableOpacity onPress={onShowFull} style={styles.touchable}>
       <View style={styles.title}>
         <Text style={{color:theme.title,marginLeft:14,maxWidth:'100%'}} numberOfLines={1}>
@@ -26,10 +28,12 @@ export default function PodBar({ pod, episode, onToggle, playing, onShowFull, bo
           color={theme.title} size={26}
           onPress={onToggle} style={{marginRight:15}}
         />
-        <IconButton icon="fast-forward-30"
-          color={theme.title} size={20}
+        <TouchableIcon
+          rippleColor={theme.title} size={42}
           onPress={fastForward}
-        />
+        >
+          <CustomIcon size={26} name="forward-30" color={theme.title} />
+        </TouchableIcon>
         <Rocket onPress={boost} />
       </View>
     </TouchableOpacity>

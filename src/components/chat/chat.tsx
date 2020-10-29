@@ -146,7 +146,7 @@ export default function Chat() {
 
       <Pod chat={chat} show={ui.feedURL} url={ui.feedURL} onBoost={onBoost} />
 
-      <Anim />
+      <Anim dark={theme.dark} />
 
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         tribeBots={tribeBots}

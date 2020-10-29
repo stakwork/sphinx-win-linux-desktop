@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Text, ActivityIndicator, Image, Dimensions, ScrollView } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { View, StyleSheet, Text, ActivityIndicator, AppState, Dimensions, ScrollView } from 'react-native'
 import { useStores, useTheme } from '../../../store'
 import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
@@ -15,7 +15,7 @@ import FastImage from 'react-native-fast-image'
 export default function Pod({ show, chat, url, onBoost }) {
   const {host,uuid} = chat
   const theme = useTheme()
-  const { chats, feed, user } = useStores()
+  const { chats, feed, user, msg } = useStores()
   const [pod, setPod] = useState(null)
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
@@ -93,31 +93,56 @@ export default function Pod({ show, chat, url, onBoost }) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
-  function sendPayments(ts:number){
+  async function sendPayments(mult:number){
     console.log('=> sendPayments!')
+    const pos = await TrackPlayer.getPosition()
     const dests = pod && pod.value && pod.value.destinations    
     if(!dests) return
     if(!pod.id || !selectedEpisodeID) return
     const sp:StreamPayment = {
       feedID: pod.id,
       itemID: selectedEpisodeID,
-      ts: ts||0
+      ts: Math.round(pos)||0,
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, pricePerMinute)    
+    feed.sendPayments(dests, memo, (pricePerMinute*mult||1))    
   }
 
-  const [count,setCount] = useState(0)
+  const count = useRef(0)
+  const storedTime = useRef(0)
   useInterval(()=>{
     if(playing) {
-      setCount(c=>{
-        if(c && c%NUM_SECONDS===0) {
-          sendPayments(c)
-        }
-        return c+1
-      })
+      const c = count.current
+      if(c && c%NUM_SECONDS===0) {
+        sendPayments(1)
+      }
+      count.current += 1
     }
   }, 1000)
+
+  const appState = useRef(AppState.currentState);
+  function handleAppStateChange(nextAppState){
+    console.log("NEXT APP STATE",nextAppState)
+    if (appState.current.match(/inactive|background/) && nextAppState === "active") {
+      const now = Math.round(Date.now().valueOf()/1000)
+      console.log("NOW",now, "THEN",storedTime.current)
+      const gap = now-storedTime.current
+      if(gap > 0) {
+        const n = Math.floor(gap/NUM_SECONDS)
+        if(n) sendPayments(n)
+      }
+    }
+    if (appState.current.match(/active/) && nextAppState === "background") {
+      storedTime.current = Math.round(Date.now().valueOf()/1000)
+    }
+    appState.current = nextAppState;
+  }
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
+    return () => {
+      AppState.removeEventListener("change", handleAppStateChange);
+    }
+  }, [])
 
   useEffect(() => {
     if (show) checkState()
@@ -157,13 +182,35 @@ export default function Pod({ show, chat, url, onBoost }) {
 
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e=>e.id===selectedEpisodeID)
 
+  const replayMsgs = useRef([])
+  function closeFull(){
+    replayMsgs.current=[] // close out
+    setFull(false)
+  }
+  function openFull(){
+    const theID = chat&&chat.id
+    if(!theID) return
+    const msgs = msg.messages[theID] || []
+    const msgsForEpisode = msgs.filter(m=>m.message_content&&m.message_content.includes('::')&&m.message_content.includes(episode.id))
+    const msgsforReplay = []
+    msgsForEpisode.forEach(m=>{
+      const arr = m.message_content.split('::')
+      if(arr.length<2) return
+      try {
+        const dat = JSON.parse(arr[1])
+        if(dat) msgsforReplay.push(dat)
+      } catch(e){}
+    })
+    replayMsgs.current = msgsforReplay
+    setFull(true)
+  }
+
   if (!show || !episode) {
     return <></>
   }
 
   function boost(){
     EE.emit(PLAY_ANIMATION)
-    return
     const amount = 100
     requestAnimationFrame(async ()=>{
       const pos = await TrackPlayer.getPosition()
@@ -185,17 +232,17 @@ export default function Pod({ show, chat, url, onBoost }) {
   if(!full) {
     return <PodBar pod={pod} episode={episode} 
       onToggle={onToggle} playing={playing}
-      onShowFull={()=>setFull(true)}
+      onShowFull={openFull}
       boost={boost}
     />
   }
 
-  const renderListItem: any = ({ item, index, selected }) => {
+  const renderListItem: any = ({ item, index, selected, fallbackImage }) => {
     return <TouchableOpacity key={index} style={{...styles.episode,borderBottomColor:theme.border,backgroundColor:selected?theme.deep:theme.bg}}
       onPress={()=>selectEpisode(item)}>
       {/* <IconButton icon="play" onPress={()=>selectEpisode(item)} /> */}
       <Icon name="play" color={theme.subtitle} size={16} style={{opacity:selected?1:0}} />
-      <FastImage source={{ uri: item.image }}
+      <FastImage source={{ uri: item.image||fallbackImage }}
         style={{ width: 42, height: 42, marginLeft:8, marginRight:12 }} resizeMode={'cover'}
       />
       <Text style={{...styles.episodeTitle,color:theme.title}}>{item.title}</Text>
@@ -215,13 +262,13 @@ export default function Pod({ show, chat, url, onBoost }) {
     {!loading && episode && <ScrollView style={styles.scroll} contentContainerStyle={styles.inner}>
       
       <IconButton size={32} icon="chevron-down" color={theme.title} style={styles.closeFull}
-        onPress={()=>setFull(false)}
+        onPress={closeFull}
       />
 
       {/* <Boost onPress={boost} style={{position:'absolute',right:15,top:width-108,zIndex:200}} inert={false} /> */}
 
       {pod.image && <View style={{...styles.imgWrap,width,height:width-34}}>
-        <FastImage source={{ uri: episode.image }}
+        <FastImage source={{ uri: episode.image||pod.image }}
           style={{ width: width-78, height: width-78, marginLeft:39, marginTop:25, borderRadius:19 }} resizeMode={'cover'}
         />
       </View>}
@@ -253,7 +300,7 @@ export default function Pod({ show, chat, url, onBoost }) {
           <Text style={{color:theme.subtitle,fontSize:12,fontWeight:'bold'}}>EPISODES</Text>
           <Text style={{color:theme.subtitle,opacity:0.85,fontSize:12,marginLeft:10}}>{pod.episodes.length}</Text>
         </View>
-        <ItemList style={styles.list} data={pod.episodes} 
+        <ItemList style={styles.list} data={pod.episodes} fallbackImage={pod.image}
           renderItem={renderListItem} selectedEpisodeID={selectedEpisodeID}
         />
       </View>}
@@ -261,11 +308,11 @@ export default function Pod({ show, chat, url, onBoost }) {
   </View>
 }
 
-function ItemList({data, renderItem, style, selectedEpisodeID}){
+function ItemList({data, renderItem, style, selectedEpisodeID, fallbackImage}){
   return <View style={style}>
     {data&&data.map((item,index)=>{
       const selected = selectedEpisodeID===item.id
-      return renderItem({item,index,selected})
+      return renderItem({item,index,selected,fallbackImage})
     })}
   </View>
 }

@@ -26,7 +26,7 @@ export default function Header() {
     return <Appbar.Header dark={true} style={{width:'100%',backgroundColor:'#6289FD',display:'flex',position:'relative'}}>
       <IconButton icon="menu" accessibilityLabel="menu-button" onPress={()=>{
         navigation.dispatch(DrawerActions.openDrawer())
-      }} style={styles.menuButton} />
+      }} style={styles.menuButton} color="white" />
       <View style={styles.topWrap} accessibilityLabel="appbar-top">
         <Text style={styles.amt}>{details.balance}</Text>
         <Text style={styles.sat}>sat</Text>

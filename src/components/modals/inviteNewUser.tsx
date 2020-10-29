@@ -1,9 +1,10 @@
 import React, {useState,useEffect} from 'react'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import {View, Text, StyleSheet, TextInput} from 'react-native'
 import {Button} from 'react-native-paper'
 
 export default function InviteNewUser({done}){
+  const theme = useTheme()
   const {contacts} = useStores()
   const [text, setText] = useState('')
   const [msg, setMsg] = useState('')
@@ -28,7 +29,7 @@ export default function InviteNewUser({done}){
   const hasPrice = price||price===0 
   return <View style={styles.former}>
     <View style={{...styles.inviteRow,marginTop:25}}>
-      <Text style={styles.inviteLabel}>NICKNAME</Text>
+      <Text style={{...styles.inviteLabel,color:theme.title}}>NICKNAME</Text>
     </View>
     <View style={styles.inviteRow}>
       <TextInput value={text}
@@ -38,7 +39,7 @@ export default function InviteNewUser({done}){
       />
     </View>
     <View style={{...styles.inviteRow,marginTop:25}}>
-      <Text style={styles.inviteLabel}>INCLUDE A MESSAGE ...</Text>
+      <Text style={{...styles.inviteLabel,color:theme.title}}>INCLUDE A MESSAGE ...</Text>
     </View>
     <View style={styles.inviteRow}>
       <TextInput value={msg}
@@ -53,9 +54,9 @@ export default function InviteNewUser({done}){
     </View>
     <View style={styles.inviteFinalRow}>
       {hasPrice ? <View style={styles.estimatedCost}>
-        <Text style={styles.estimatedCostText}>ESTIMATED COST</Text>
+        <Text style={{...styles.estimatedCostText,color:theme.title}}>ESTIMATED COST</Text>
         <View style={styles.estimatedCostBottom}>
-          <Text style={styles.estimatedCostNum}>
+          <Text style={{...styles.estimatedCostNum,color:theme.title}}>
             {price}
           </Text>
           <Text style={styles.estimatedCostSat}>sat</Text>

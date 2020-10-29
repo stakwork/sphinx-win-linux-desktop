@@ -22,7 +22,7 @@ export class ThemeStore {
     this.subtitle = d?'#8b98b4':'#7e7e7e'
     this.border = d?'#111':'#ccc'
     this.selected = d?'#3b4681':'#ddddff'
-    this.deep = d?'#292c33':'#bbb'
+    this.deep = d?'#292c33':'#ccc'
   }
 
   @observable bg: string = '#FFF'
@@ -31,7 +31,7 @@ export class ThemeStore {
   @observable subtitle: string = '#7e7e7e'
   @observable border: string = '#ccc'
   @observable selected: string = '#ddddff'
-  @observable deep: string = '#bbb'
+  @observable deep: string = '#ccc'
 
   primary: string = '#6289FD'
   accent: string = '#48c998'

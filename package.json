@@ -19,6 +19,9 @@
     "dist:win": "./node_modules/.bin/electron-builder --win",
     "postinstall": "jetify"
   },
+  "rnpm": {
+    "assets": ["./android_assets/fonts"]
+  },
   "build": {
     "appId": "com.stakwork.sphinx",
     "productName": "Sphinx Chat",
