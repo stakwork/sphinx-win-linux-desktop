@@ -130,6 +130,16 @@ export function putIn(orged, msg, chatID) {
   }
 }
 
+export function orgMsgsFromRealm(messages: Msg[]) {
+  const orged: {[k:number]:Msg[]} = {}
+  const uniqueChatId = Array.from(new Set(messages.map((m) => m.chat_id)));
+
+  uniqueChatId.forEach((key: any) => {
+    orged[key] = messages.filter((message: any) => message.chat_id === key);
+  });
+  return orged
+}
+
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {

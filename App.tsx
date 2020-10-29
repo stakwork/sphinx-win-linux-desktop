@@ -15,8 +15,10 @@ import {qrActions} from './src/qrActions'
 // import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 import { useDarkMode } from 'react-native-dynamic'
+import { initialLoad, hasData } from './src/realm/api'
 import { is24HourFormat } from 'react-native-device-time-format'
 import TrackPlayer from 'react-native-track-player';
+import {useNetInfo} from "@react-native-community/netinfo"
 
 declare var global: {HermesInternal: null | {}}
 
@@ -52,17 +54,30 @@ export default function Wrap(){
 }
 
 function App() {
-  const {user,ui} = useStores()
+  const {user,ui, contacts, msg, chats} = useStores()
   const theme = useTheme()
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false) // <=
   const [pinned, setPinned] = useState(false)
+  const { isConnected, type } = useNetInfo();
 
   function connectedHandler() {
     ui.setConnected(true)
+    const netInfo = {
+      type,
+      isConnected: true,
+    }
+    msg.updateNetInfo(netInfo)
+    chats.updateNetInfo(netInfo)
   }
   function disconnectedHandler() {
     ui.setConnected(false)
+    const netInfo = {
+      type,
+      isConnected: false,
+    }
+    msg.updateNetInfo(netInfo)
+    chats.updateNetInfo(netInfo)
   }
   async function check24Hour(){
     const is24Hour = await is24HourFormat()
@@ -94,6 +109,47 @@ function App() {
       setLoading(false)
     })()
   },[])
+
+  useEffect(() => {
+    if (isConnected && type) {
+      const netInfo = {
+        type: type || 'unknown',
+        isConnected: isConnected || false,
+      };
+
+      msg.updateNetInfo(netInfo)
+      chats.updateNetInfo(netInfo)
+    }
+  }, [isConnected, type])
+
+  useEffect(() => {
+    if (signedUp) {
+      setLoading(true);
+      (async () => {
+        const contactsAndChats = await contacts.getContacts();
+        await msg.getAllMessages();
+        initialLoad({
+          contacts: contactsAndChats.contacts,
+          chats: contactsAndChats.chats,
+          msg,
+        })
+        setLoading(false)
+      })()
+    }
+  }, [signedUp])
+
+  useEffect(() => {
+    if (signedUp) {
+      const hasRealmData = hasData();
+      setLoading(true);
+      (async () => {
+        if (hasRealmData.msg) {
+          setLoading(true);
+          await msg.getAllMessages();
+        }
+      })()
+    }
+  }, [signedUp])
 
   return useObserver(()=>{
 

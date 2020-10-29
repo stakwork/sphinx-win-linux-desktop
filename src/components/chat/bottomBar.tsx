@@ -16,7 +16,7 @@ import { fetchGifs } from './helpers'
 import Giphy from './giphy';
 import {calcBotPrice} from '../../store/hooks/chat'
 import {requestAudioPermissions, uploadAudioFile} from './audioHelpers'
-import EE, {EXTRA_TEXT_CONTENT,REPLY_UUID,CANCEL_REPLY_UUID,CLEAR_REPLY_UUID} from '../utils/ee'
+import EE from '../utils/ee'
 import {useReplyContent} from '../../store/hooks/chat'
 
 let dirs = RNFetchBlob.fs.dirs
@@ -72,7 +72,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
     setText('')
     if(replyUuid) {
       setReplyUuid('')
-      EE.emit(CLEAR_REPLY_UUID,null)
+      EE.emit('clear-reply-uuid',null)
     }
     if(extraTextContent) {
       setExtraTextContent(null)
@@ -91,13 +91,13 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
     setReplyUuid('')
   }
   useEffect(()=>{
-    EE.on(EXTRA_TEXT_CONTENT, gotExtraTextContent)
-    EE.on(REPLY_UUID, gotReplyUUID)
-    EE.on(CANCEL_REPLY_UUID, cancelReplyUUID)
+    EE.on('extra-text-content', gotExtraTextContent)
+    EE.on('reply-uuid', gotReplyUUID)
+    EE.on('cancel-reply-uuid', cancelReplyUUID)
     return ()=> {
-      EE.removeListener(EXTRA_TEXT_CONTENT,gotExtraTextContent)
-      EE.removeListener(REPLY_UUID,gotReplyUUID)
-      EE.removeListener(CANCEL_REPLY_UUID, cancelReplyUUID)
+      EE.removeListener('extra-text-content',gotExtraTextContent)
+      EE.removeListener('reply-uuid',gotReplyUUID)
+      EE.removeListener('cancel-reply-uuid', cancelReplyUUID)
     }
   },[])
 
@@ -290,7 +290,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   function closeReplyContent(){
     if(replyUuid) {
       setReplyUuid('')
-      EE.emit(CLEAR_REPLY_UUID,null)
+      EE.emit('clear-reply-uuid',null)
     }
     if(extraTextContent) {
       setExtraTextContent(null)

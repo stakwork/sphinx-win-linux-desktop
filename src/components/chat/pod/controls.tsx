@@ -4,7 +4,6 @@ import TrackPlayer from 'react-native-track-player';
 import moment from 'moment'
 import EE, { EXTRA_TEXT_CONTENT } from '../../utils/ee'
 import momentDurationFormatSetup from "moment-duration-format";
-import { StreamPayment } from '../../../store/feed';
 momentDurationFormatSetup(moment);
 import Slider from '@react-native-community/slider';
 import TouchableIcon from '../../utils/touchableIcon'
@@ -20,9 +19,7 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     TrackPlayer.seekTo(this.state.position < 10 ? 0 : this.state.position - 10)
   }
   feedClip = () => {
-    // @ts-ignore
     const ep = this.props.episode
-    // @ts-ignore
     const pod = this.props.pod
     if (!ep || !pod) return
     const obj: StreamPayment = {
@@ -46,7 +43,6 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     }
   }
   render() {
-    // @ts-ignore
     const { theme, onToggle, playing, duration } = this.props
     // @ts-ignore
     const progressText = moment.duration(this.state.position, 'seconds').format('hh:mm:ss')

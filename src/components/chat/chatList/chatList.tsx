@@ -1,29 +1,61 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
-import { useStores, hooks, useTheme } from '../../store'
-import { TouchableOpacity, FlatList, View, Text, StyleSheet, Dimensions } from 'react-native'
+import { useStores, hooks } from '../../../store'
+import { FlatList, View, StyleSheet } from 'react-native'
 import { Button } from 'react-native-paper'
-import InviteRow, { styles } from './inviteRow'
-import { useNavigation } from '@react-navigation/native'
+import InviteRow from '../inviteRow'
+import styles from '../inviteRow/styles'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
-import { useChatPicSrc } from '../utils/picSrc'
-import Avatar from './msg/avatar'
+import {useNetInfo} from "@react-native-community/netinfo"
+
 const { useChats, useChatRow } = hooks
+import { ChatRow } from './components'
 
 export default function ChatList() {
-  const { ui, contacts, msg, details } = useStores()
-  
+  const { ui, contacts, msg, details, chats } = useStores()
+  const { type } = useNetInfo();
+
+
+  useEffect(() => {
+    const netInfo = {
+      type: type || 'unknown',
+      isConnected: ui.connected ,
+    };
+
+    msg.updateNetInfo(netInfo)
+    chats.updateNetInfo(netInfo)
+  }, [ui.connected])
+
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async () => {
     ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
       ignoreAndroidSystemSettings: false
     })
-    setRefreshing(true)
-    await contacts.getContacts()
-    await msg.getMessages()
-    await details.getBalance()
-    setRefreshing(false)
+    if (msg.netInfo.isConnected && ui.connected) {
+      setRefreshing(true)
+
+      if (
+        msg.pendingPayInvoice.length ||
+        msg.pendingSendMessage.length ||
+        msg.pendingAttachments.length ||
+        msg.pendingSendPayment.length ||
+        msg.pendingSendAnonPayment.length ||
+        msg.pendingPurchaseMedia.length ||
+        msg.pendingDeleteMessage.length ||
+        msg.pendingSeeChat.length ||
+        msg.pendingSendInvoice.length ||
+        msg.pendingCreateRawInvoice.length
+      ) {
+        await msg.resolvePendings()
+      }
+
+      await contacts.getContacts()
+      await msg.getMessages()
+      await details.getBalance()
+      msg.getRealmMessages()
+      setRefreshing(false)
+    }
   }, [refreshing])
 
   /**
@@ -36,7 +68,7 @@ export default function ChatList() {
     let showInvite = false
     if (item.invite && item.invite.status !== 4) showInvite = true
     if (showInvite) return <InviteRow key={`invite_${index}`} {...item} />
-    return <ChatRow key={chatID} {...item} />
+    return <ChatRow key={chatID} styles={styles} msg={msg} {...item} />
   }
 
   const setAddFriendModalHandler = () => ui.setAddFriendModal(true)
@@ -78,59 +110,6 @@ export default function ChatList() {
         ListFooterComponent={footerComponent}
       />
     </View>
-  })
-}
-
-function ChatRow(props) {
-  const { id, name, contact_ids } = props
-  const navigation = useNavigation()
-  const { msg, user } = useStores()
-
-  const onSeeChatHandler = () => {
-    requestAnimationFrame(() => {
-      msg.seeChat(props.id)
-      // msg.getMessages()
-      navigation.navigate('Dashboard', {
-        screen: 'Chat', params: props
-      })
-    })
-  }
-
-  const theme = useTheme()
-  return useObserver(() => {
-    let uri = useChatPicSrc(props)
-    const hasImg = uri ? true : false
-
-    const { lastMsgText, hasLastMsg, unseenCount, hasUnseen } = useChatRow(props.id)
-
-    const w = Math.round(Dimensions.get('window').width)
-    return <TouchableOpacity style={{
-      ...styles.chatRow,
-      backgroundColor:theme.main,
-      borderBottomColor: theme.dark?'#0d1319':'#e5e5e5',
-    }} activeOpacity={0.5}
-      onPress={onSeeChatHandler}>
-      <View style={styles.avatarWrap}>
-        <Avatar big alias={name} photo={uri || ''} />
-        {hasUnseen && <View style={moreStyles.badgeWrap}>
-          <View style={moreStyles.badge}>
-            <Text style={moreStyles.badgeText}>{unseenCount}</Text>
-          </View>
-        </View>}
-      </View>
-      <View style={styles.chatContent}>
-        <Text style={{...styles.chatName,color:theme.dark?'#ddd':'#666'}}>{name}</Text>
-        {hasLastMsg && <Text numberOfLines={1}
-          style={{
-            ...styles.chatMsg,
-            fontWeight: hasUnseen ? 'bold' : 'normal',
-            maxWidth: w - 105,
-            color: theme.dark?'#8b98b4':'#7e7e7e',
-          }}>
-          {lastMsgText}
-        </Text>}
-      </View>
-    </TouchableOpacity>
   })
 }
 

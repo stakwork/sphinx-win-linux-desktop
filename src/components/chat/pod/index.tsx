@@ -26,7 +26,6 @@ export default function Pod({ show, chat, url, onBoost }) {
 
   async function loadPod() {
     setLoading(true)
-    console.log("LOAD FEEED NOW")
     const params = await chats.loadFeed(host, uuid, url)
     if (params) setPod(params)
     if (params) initialSelect(params)
@@ -93,26 +92,26 @@ export default function Pod({ show, chat, url, onBoost }) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
-  function sendPayments(ts:number){
+  function sendPayments(extraDest?:Destination){
     console.log('=> sendPayments!')
     const dests = pod && pod.value && pod.value.destinations    
     if(!dests) return
     if(!pod.id || !selectedEpisodeID) return
-    const sp:StreamPayment = {
+    const memo = JSON.stringify({
       feedID: pod.id,
       itemID: selectedEpisodeID,
-      ts: ts||0
-    }
-    const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, pricePerMinute)    
+    })
+    const finalDests = extraDest ? dests.concat(extraDest) : dests
+    feed.sendPayments(finalDests, memo, pricePerMinute)    
   }
 
+  const NUM_SECONDS=60
   const [count,setCount] = useState(0)
   useInterval(()=>{
     if(playing) {
       setCount(c=>{
         if(c && c%NUM_SECONDS===0) {
-          sendPayments(c)
+          sendPayments()
         }
         return c+1
       })
@@ -128,32 +127,22 @@ export default function Pod({ show, chat, url, onBoost }) {
   },[url])
 
   function onClipPayment(d){
-    if(d.pubkey && d.ts) {
-      const dests = pod && pod.value && pod.value.destinations    
-      if(!dests) return
+    if(d.pubkey) {
       const extraDest:Destination = {
         address: d.pubkey,
         split: 1,
         type: 'node'
       }
-      const finalDests = dests.concat(extraDest)
-      const sp:StreamPayment = {
-        feedID: pod.id,
-        itemID: selectedEpisodeID,
-        ts: d.ts||0
-      }
-      if(d.uuid) sp.uuid = d.uuid
-      const memo = JSON.stringify(sp)
-      feed.sendPayments(finalDests, memo, pricePerMinute)
+      sendPayments(extraDest)
     }
   }
 
   useEffect(()=>{
-    EE.on(CLIP_PAYMENT,onClipPayment)
+    EE.on('clip-payment',onClipPayment)
     return ()=> {
-      EE.removeListener(CLIP_PAYMENT,onClipPayment)
+      EE.removeListener('clip-payment',onClipPayment)
     }
-  },[pod])
+  },[])
 
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e=>e.id===selectedEpisodeID)
 

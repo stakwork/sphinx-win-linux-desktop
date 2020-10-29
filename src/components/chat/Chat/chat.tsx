@@ -1,34 +1,44 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { View, StyleSheet, InteractionManager, BackHandler, ToastAndroid } from 'react-native'
-import Header from './header'
-import MsgList from './msgList'
-import BottomBar from './bottomBar'
-import { ChatRouteProp } from '../../types'
+import Header from '../header'
+import MsgList from '../msgList/index'
+import BottomBar from '../bottomBar'
+import { ChatRouteProp } from '../../../types'
 import { useRoute } from '@react-navigation/native'
-import { useStores, useTheme } from '../../store'
-import { contactForConversation } from './utils'
-import EE, {LEFT_GROUP,LEFT_IMAGE_VIEWER} from '../utils/ee'
+import { useStores, useTheme } from '../../../store'
+import { contactForConversation } from '../utils'
+import EE from '../../utils/ee'
 import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
-import { constants } from '../../constants'
-import Frame from './frame'
-import Pod from './pod'
-import {StreamPayment} from '../../store/feed'
-import Anim from './pod/anim'
-
+import { constants } from '../../../constants'
+import Frame from '../frame'
+import { reducer, initialState } from './reducer'
+import Pod from '../pod'
+import {StreamPayment} from '../../../store/feed'
+import Anim from '../pod/anim'
 export type RouteStatus = 'active' | 'inactive' | null
 
 export default function Chat() {
   const { contacts, user, chats, ui, msg } = useStores()
+  const [state, dispatch] = useReducer(reducer, initialState)
   const theme = useTheme()
 
-  const [show, setShow] = useState(false)
-  const [pricePerMessage, setPricePerMessage] = useState(0)
-  const [appMode, setAppMode] = useState(false)
-  // const [showPod, setShowPod] = useState(false)
-  const [tribeBots,setTribeBots] = useState([])
-  const [status, setStatus] = useState<RouteStatus>(null)
-  
+  const setReplyUUIDHandler = (payload: string | any) => {
+    dispatch({ type: 'setReplyUUID', payload })
+  }
+
+  const setAppModeHandler = (payload: boolean) => {
+    dispatch({ type: 'setAppMode', payload })
+  }
+
+  const setShowPodHandler = (payload: boolean) => {
+    dispatch({ type: 'setShowPod', payload })
+  }
+
+  const setStatusHandler = (payload: any) => {
+    dispatch({ type: 'setStatus', payload })
+  }
+
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
   const chat = chats.chats.find(c => c.id === chatID) || route.params
@@ -47,14 +57,14 @@ export default function Chat() {
     if (contact && !contact.contact_key) {
       contacts.exchangeKeys(contact.id)
     }
-    EE.on(LEFT_GROUP, () => {
+    EE.on('left-group', () => {
       navigation.navigate('Home', { params: { rnd: Math.random() } })
     })
-    EE.on(LEFT_IMAGE_VIEWER, () => {
+    EE.on('left-image-viewer', () => {
       handleBack()
     })
     InteractionManager.runAfterInteractions(() => {
-      setShow(true)
+      dispatch({ type: 'setShow', payload: true })
     })
 
     handleBack()
@@ -74,12 +84,13 @@ export default function Chat() {
     let isAppURL = false
     let isFeedURL = false
     if (isTribe) { //&& !isTribeAdmin) {
-      setAppMode(true)
-      // setLoadingChat(true)
+      setAppModeHandler(true)
+      dispatch({ type: 'setLoadingChat', payload: true })
       const params = await chats.getTribeDetails(chat.host, chat.uuid)
       if (params) {
         const price = params.price_per_message + params.escrow_amount
-        setPricePerMessage(price)
+        dispatch({ type: 'setPricePerMessage', payload: price })
+        dispatch({ type: 'setShowPricePerMessage', payload: true })
         ToastAndroid.showWithGravityAndOffset(
           'Price Per Message: '+price+' sat',
           ToastAndroid.SHORT,
@@ -98,26 +109,26 @@ export default function Chat() {
           ui.setFeedURL(params.feed_url)
         }
         if(params.bots && Array.isArray(params.bots)) {
-          setTribeBots(params.bots)
+          dispatch({ type: 'setTribeBots', payload: params.bots })
         }
       }
-      // setLoadingChat(false)
+      dispatch({ type: 'setLoadingChat', payload: false })
     } else {
-      setAppMode(false)
+      setAppModeHandler(false)
     }
     if (!isAppURL && ui.applicationURL) ui.setApplicationURL('') // remove the app_url
     if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
 
     const r = await chats.checkRoute(chat.id)
     if(r && r.success_prob && r.success_prob>0) {
-      setStatus('active')
+      setStatusHandler('active')
     } else {
-      setStatus('inactive')
+      setStatusHandler('inactive')
     }
   }
 
   const appURL = ui.applicationURL
-  const theShow = show
+  const theShow = state.show
 
   function onBoost(sp:StreamPayment){
     if(!(chat && chat.id)) return
@@ -125,20 +136,19 @@ export default function Chat() {
       contact_id:null,
       text:`boost::${JSON.stringify(sp)}`,
       chat_id: chat.id||null,
-      amount: pricePerMessage,
+      amount: state.pricePerMessage,
       reply_uuid:''
     })
   }
 
-  return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
-
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} />
-
-    {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
+  return <View style={{...styles.main,backgroundColor:theme.bg}}>
+    <Header chat={chat} appMode={state.appMode} setAppMode={setAppModeHandler} status={state.status} />
+    {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: state.appMode ? 100 : 99 }}>
       <Frame url={appURL} />
     </View>}
 
-    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
+
+    <View style={{ ...styles.layer, zIndex: state.appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
@@ -148,8 +158,8 @@ export default function Chat() {
 
       <Anim />
 
-      {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
-        tribeBots={tribeBots}
+      {theShow && <BottomBar chat={chat} pricePerMessage={state.pricePerMessage}
+        tribeBots={state.tribeBots}
       />}
     </View>
 

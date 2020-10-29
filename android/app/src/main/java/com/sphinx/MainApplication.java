@@ -3,14 +3,15 @@ package com.sphinx;
 import androidx.annotation.Nullable;
 import android.app.Application;
 import android.webkit.WebView;
-// import com.oney.WebRTCModule.WebRTCModulePackage;
+import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.facebook.react.ReactApplication;
+import com.oney.WebRTCModule.WebRTCModulePackage;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import me.jhen.react.BadgePackage;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
-import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
 import com.dylanvann.fastimage.FastImageViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import io.sua.RNDeviceTimeFormatPackage;
@@ -41,6 +42,7 @@ import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
+import io.realm.react.RealmReactPackage;
 import com.guichaguri.trackplayer.TrackPlayer;
 import com.airbnb.android.react.lottie.LottiePackage;
 
@@ -55,44 +57,47 @@ public class MainApplication extends Application implements ReactApplication {
       return BuildConfig.DEBUG;
     }
 
+
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          // new WebRTCModulePackage(),
-          // new RNJitsiMeetPackage(),
-          new MainReactPackage(),
-          new ReactSliderPackage(),
-          new LottiePackage(),
-          new TrackPlayer(),
-          new BadgePackage(),
-          new ClipboardPackage(),
-          new RNDateTimePickerPackage(),
-          new AudioPackage(),
-          new FastImageViewPackage(),
-          new ReactVideoPackage(),
-          new RNDeviceTimeFormatPackage(),
-          new ReactNativePushNotificationPackage(),
-          new RNGetRandomValuesPackage(),
-          new RNGestureHandlerPackage(),
-          new VectorIconsPackage(),
-          new RNReactNativeHapticFeedbackPackage(),
-          new ImagePickerPackage(),
-          new RNCameraPackage(),
-          new RNAudioRecorderPlayerPackage(),
-          new RNCWebViewPackage(),
-          new RNFetchBlobPackage(),
-          new RNSharePackage(),
-          new RNRadialGradientPackage(),
-          new RNRncryptorPackage(),
-          new RandomBytesPackage(),
-          new KeychainPackage(),
-          new FingerprintAuthPackage(),
-          new AsyncStoragePackage(),
-          new RNRSAPackage(),
-          new SafeAreaContextPackage(),
-          new ReanimatedPackage(),
-          new RNScreensPackage(),
-          new RNSecureStoragePackage()
+              new WebRTCModulePackage(),
+              // new RNJitsiMeetPackage(),
+              new MainReactPackage(),
+              new ReactSliderPackage(),
+              new LottiePackage(),
+              new NetInfoPackage(),
+              new TrackPlayer(),
+              new BadgePackage(),
+              new ClipboardPackage(),
+              new RNDateTimePickerPackage(),
+              new AudioPackage(),
+              new FastImageViewPackage(),
+              new ReactVideoPackage(),
+              new RNDeviceTimeFormatPackage(),
+              new ReactNativePushNotificationPackage(),
+              new RNGetRandomValuesPackage(),
+              new RNGestureHandlerPackage(),
+              new VectorIconsPackage(),
+              new RNReactNativeHapticFeedbackPackage(),
+              new ImagePickerPackage(),
+              new RNCameraPackage(),
+              new RNAudioRecorderPlayerPackage(),
+              new RNCWebViewPackage(),
+              new RNFetchBlobPackage(),
+              new RNSharePackage(),
+              new RNRadialGradientPackage(),
+              new RNRncryptorPackage(),
+              new RandomBytesPackage(),
+              new KeychainPackage(),
+              new FingerprintAuthPackage(),
+              new AsyncStoragePackage(),
+              new RNRSAPackage(),
+              new SafeAreaContextPackage(),
+              new ReanimatedPackage(),
+              new RNScreensPackage(),
+              new RNSecureStoragePackage(),
+              new RealmReactPackage()
       );
     }
 

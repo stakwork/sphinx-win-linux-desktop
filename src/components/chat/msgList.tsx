@@ -6,7 +6,7 @@ import { Chat } from '../../store/chats'
 import Message from './msg'
 import { useNavigation } from '@react-navigation/native'
 import { constants } from '../../constants'
-import EE, {SHOW_REFRESHER} from '../utils/ee'
+import EE from '../utils/ee'
 
 const { useMsgs } = hooks
 
@@ -61,7 +61,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
   // }, [refreshing])
 
   async function onEndReached() {
-    EE.emit(SHOW_REFRESHER)
+    EE.emit('show-refresher')
     wait(10).then(onLoadMoreMsgs)
   }
 
@@ -160,8 +160,8 @@ function Refresher(){
         setShow(false)
       }, 1000)
     }
-    EE.on(SHOW_REFRESHER, doShow)
-    return ()=> EE.removeListener(SHOW_REFRESHER,doShow)
+    EE.on('show-refresher', doShow)
+    return ()=> EE.removeListener('show-refresher',doShow)
   },[])
   if(!show) return <></>
   return <View style={{...styles.refreshingWrap,height:show?60:0}}>
