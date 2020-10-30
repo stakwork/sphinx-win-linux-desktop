@@ -6,12 +6,17 @@ import CloseButton from '@material-ui/icons/Close';
 import { Player } from 'video-react';
 
 export default function ViewImg({ params }) {
+  console.log(params)
   const { ui } = useStores()
   const setImgViewerParamsHandler = () => ui.setImgViewerParams(null)
+  const chatContent = document.getElementById('chat-content')
   return <Modal
+    style={{position: 'absolute'}}
     open={true}
     onClose={setImgViewerParamsHandler}
     className="view-img-modal-wrap"
+    disableEnforceFocus
+    container={chatContent}
   >
     <Content>
       <CloseButton onClick={setImgViewerParamsHandler} style={{cursor: 'pointer', position: 'absolute', top:20, left:20, fontSize:48}}/>

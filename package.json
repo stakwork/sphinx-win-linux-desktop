@@ -122,6 +122,7 @@
     "react-dom": "^16.9.0",
     "react-draggable": "^4.4.3",
     "react-dropzone": "^11.0.3",
+    "react-giphy-searchbox": "^1.4.0",
     "react-h5-audio-player": "^3.4.1",
     "react-jutsu": "^2.3.0",
     "react-linkify": "^1.0.0-alpha",

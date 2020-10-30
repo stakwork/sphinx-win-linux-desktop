@@ -186,7 +186,7 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
     }
 
     return (
-      <Wrap h={h}>
+      <Wrap h={h} >
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
           {({ getRootProps, getInputProps, isDragActive }) => (
             <div style={{ flex: 1 }} {...getRootProps()}>
@@ -196,9 +196,9 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
                   {uploading ? 'File Uploading...' : 'Drag Image or Video here'}
                 </DropZoneInner>
               </DropZoneContainer>}
-              <Layer show={!appMode} style={{ background: theme.deep }}>
+              <Layer show={!appMode} style={{ background: theme.deep }} >
 
-                <MsgList className="msg-list" onScroll={handleScroll}>
+                <MsgList className="msg-list" onScroll={handleScroll} id='chat-content'>
                   {shownMsgs.map((m, i) => {
                     let senderAlias = ''
                     const sender = contacts.contacts.find(c => c.id === m.sender)
