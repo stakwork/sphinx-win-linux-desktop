@@ -3,17 +3,22 @@ import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment'
 import EE, { EXTRA_TEXT_CONTENT } from '../../utils/ee'
-import { ProgressBar, IconButton } from 'react-native-paper';
 import momentDurationFormatSetup from "moment-duration-format";
 import { StreamPayment } from '../../../store/feed';
 momentDurationFormatSetup(moment);
+import Slider from '@react-native-community/slider';
+import TouchableIcon from '../../utils/touchableIcon'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import {IconButton} from 'react-native-paper'
+import Rocket from './rocket'
+import CustomIcon from '../../utils/customIcons'
 
 export default class Controls extends TrackPlayer.ProgressComponent {
   fastForward = () => {
     TrackPlayer.seekTo(this.state.position + 30);
   }
   rewind = () => {
-    TrackPlayer.seekTo(this.state.position < 10 ? 0 : this.state.position - 10)
+    TrackPlayer.seekTo(this.state.position < 15 ? 0 : this.state.position - 15)
   }
   feedClip = () => {
     // @ts-ignore
@@ -33,17 +38,12 @@ export default class Controls extends TrackPlayer.ProgressComponent {
     if (this.props.myPubkey) obj.pubkey = this.props.myPubkey
     EE.emit(EXTRA_TEXT_CONTENT, obj)
   }
-  track = (e) => {
+  track = (ratio) => {
     // @ts-ignore
     const { duration } = this.props
     if (duration) {
-      const x = e.nativeEvent.locationX
-      // @ts-ignore
-      this.bar.measure((fx, fy, width, height, px, py) => {
-        const ratio = x / width
-        const secs = duration * ratio
-        TrackPlayer.seekTo(secs);
-      })
+      const secs = duration * (ratio/100)
+      TrackPlayer.seekTo(secs);
     }
   }
   render() {
@@ -57,43 +57,57 @@ export default class Controls extends TrackPlayer.ProgressComponent {
       <View style={styles.progressWrap}>
 
         <View style={styles.barWrap}>
-          <TouchableOpacity onPress={this.track} style={styles.progressTouch}
-            ref={r => this.bar = r}>
-            <ProgressBar color="#6289FD"
+          <View style={styles.progressBarWrap}>
+            {/* <ProgressBar color="#6289FD"
               progress={this.getProgress()}
             // buffered={this.getBufferedProgress()}
+            /> */}
+            <Slider minimumValue={0} maximumValue={100}
+              value={this.getProgress()*100}
+              minimumTrackTintColor={theme.primary}
+              maximumTrackTintColor={theme.primary}
+              thumbTintColor={theme.primary}
+              onSlidingComplete={this.track}
             />
-          </TouchableOpacity>
-          <Text style={{...styles.progressText,color:theme.title}}>{progressText}</Text>
-          <Text style={{...styles.durationText,color:theme.title}}>{durationText}</Text>
+          </View>
+          <Text style={{ ...styles.progressText, color: theme.title }}>{progressText}</Text>
+          <Text style={{ ...styles.durationText, color: theme.title }}>{durationText}</Text>
         </View>
 
         <View style={styles.progressWrapBottom}>
           
-          <View style={{height:50,width:50}}></View>
-          <View style={styles.controls}>
-            <IconButton icon="rewind-10"
-              color={theme.title} size={24}
-              onPress={this.rewind}
-            />
-            <IconButton icon={playing ? 'pause-circle' : 'play-circle'}
-              color={theme.primary} size={42}
-              onPress={onToggle}
-            />
-            <IconButton icon="fast-forward-30"
-              color={theme.title} size={24}
-              onPress={this.fastForward}
-            />
+          <View style={{ height: 48, width: 50 }}>
+            <TouchableIcon
+              rippleColor={theme.title} size={48}
+              onPress={this.feedClip}>
+              <CustomIcon name="chat-quote" color={theme.title} size={24} />
+            </TouchableIcon>
           </View>
-          <View style={{ height: 60, width: 50, display: 'flex', justifyContent: 'flex-end' }}>
-            <IconButton icon="comment-quote"
-              color={theme.title} size={27}
-              onPress={this.feedClip}
+
+          <View style={styles.controls}>
+            <TouchableIcon
+              rippleColor={theme.title} size={48}
+              onPress={this.rewind}>
+              <CustomIcon name="back-15" color={theme.title} size={28} />
+            </TouchableIcon>
+            <IconButton icon={playing ? 'pause-circle' : 'play-circle'}
+              color={theme.primary} size={52}
+              onPress={onToggle}
+              style={{marginLeft:18,marginRight:18}}
             />
+            <TouchableIcon
+              rippleColor={theme.title} size={48}
+              onPress={this.fastForward}>
+              <CustomIcon name="forward-30" color={theme.title} size={28} />
+            </TouchableIcon>
           </View>
           
+          <View style={{ height: 55, width: 50, display: 'flex', justifyContent: 'flex-end' }}>
+            <Rocket onPress={this.props.boost} />
+          </View>
+
         </View>
-        
+
       </View>
     );
   }
@@ -110,13 +124,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     width: '100%',
   },
-  barWrap:{
-    width:'100%',
-    position:'relative'
+  barWrap: {
+    width: '100%',
+    position: 'relative'
   },
-  progressTouch: {
+  progressBarWrap: {
     height: 32,
-    marginTop:10,
+    marginTop: 10,
     display: 'flex',
     justifyContent: 'center'
   },
@@ -127,16 +141,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     maxWidth: '100%',
   },
-  progressText:{
-    position:'absolute',
-    top:36,
-    left:0,
-    fontSize:10
+  progressText: {
+    position: 'absolute',
+    top: 36,
+    left: 0,
+    fontSize: 10
   },
-  durationText:{
-    position:'absolute',
-    top:37,
-    right:0,
-    fontSize:10
+  durationText: {
+    position: 'absolute',
+    top: 37,
+    right: 0,
+    fontSize: 10
   }
 })

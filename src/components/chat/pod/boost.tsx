@@ -1,13 +1,14 @@
 import React, {useRef} from 'react'
 import {Animated, Easing, StyleSheet, View, Text} from 'react-native'
 import {useTheme} from '../../../store'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import {TouchableRipple} from 'react-native-paper'
+import CustomIcon from '../../utils/customIcons'
 
-export default function Boost({style,onPress}){
+export default function Boost({style,onPress,inert}){
   const theme = useTheme()
   const size = useRef(new Animated.Value(1)).current;
   function go(){
+    if(inert) return
     Animated.sequence([
       Animated.timing(size, {
         toValue: 2.5,
@@ -23,14 +24,14 @@ export default function Boost({style,onPress}){
     onPress()
   }
   return <TouchableRipple borderless style={{...styles.ripple,...style}} 
-    onPress={go} rippleColor={theme.accent} underlayColor="black">
+    onPress={inert?null:go} rippleColor={theme.accent} underlayColor="black">
     <View style={{...styles.wrap,backgroundColor:theme.accent}}>
       <Text style={styles.hundred}>100</Text>
       <Animated.View style={{
         ...styles.rocketWrap,
         transform:[{scale:size}]
       }}>
-        <Icon color={theme.accent} size={20} name="rocket-launch" /> 
+        <CustomIcon color={theme.accent} size={20} name="fireworks" /> 
       </Animated.View>
     </View>
   </TouchableRipple>

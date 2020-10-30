@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import { useParsedClipMsg } from '../../../store/hooks/msg'
 import { useTheme } from '../../../store'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import CustomIcon from '../../utils/customIcons'
 
 export default function BoostMessage(props) {
   const theme = useTheme()
@@ -13,13 +14,13 @@ export default function BoostMessage(props) {
 
   return <View style={{ ...styles.pad }}>
     <View style={{...styles.rocketWrap, backgroundColor:theme.accent}}>
-      <Icon color="white" size={20} name="rocket-launch" />
+      <CustomIcon color="white" size={20} name="fireworks" />
     </View>
-    <Text style={{ color: theme.title }}>
-      Boost!
-    </Text>
-    <Text style={{ color: theme.title, fontWeight:'bold', marginLeft:5 }}>
+    <Text style={{ color: theme.title, fontWeight:'bold' }}>
       {amount}
+    </Text>
+    <Text style={{ color: theme.title, opacity:0.5, marginLeft:6 }}>
+      sat
     </Text>
   </View>
 }

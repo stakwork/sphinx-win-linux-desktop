@@ -1,12 +1,16 @@
 
 
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
+import {AppState} from 'react-native'
 
 const ARP = new AudioRecorderPlayer()
 
 let currentlyPlayingSource = ''
 
 export default {
+  isPlaying: function(source){
+    return source===currentlyPlayingSource
+  },
   play: async function(source:string, jumpTo:any, callback:Function){
     if(source!==currentlyPlayingSource) {
       await ARP.removePlayBackListener();
@@ -28,5 +32,13 @@ export default {
   stop: function(){
     ARP.stopPlayer().catch(()=>{})
     ARP.removePlayBackListener()
+  }
+}
+
+AppState.addEventListener("change", handleAppStateChange);
+function handleAppStateChange(nextAppState) {
+  if(nextAppState==='background') {
+    ARP.stopPlayer().catch(()=>{})
+    ARP.removePlayBackListener();
   }
 }

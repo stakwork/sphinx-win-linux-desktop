@@ -3,10 +3,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity, View, Text, StyleSheet, Image, ToastAndroid } from 'react-native'
 import { Dialog, Portal, Button } from 'react-native-paper'
 import { constantCodes } from '../../constants'
-import { useStores } from '../../store'
+import { useStores, useTheme } from '../../store'
 import moment from 'moment'
 
 export default function InviteRow(props) {
+  const theme = useTheme()
   const { contacts, ui, details } = useStores()
   const { name, invite } = props
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -20,7 +21,9 @@ export default function InviteRow(props) {
   if (isExpired || expiredStatus) return <></>
 
   const actions = {
-    'payment_pending': () => setDialogOpen(true),
+    'payment_pending': () => {
+      if(!confirmed) setDialogOpen(true)
+    },
     'ready': () => ui.setShareInviteModal(invite.invite_string),
     'delivered': () => ui.setShareInviteModal(invite.invite_string)
   }
@@ -49,19 +52,19 @@ export default function InviteRow(props) {
     }
   }
 
-  return <TouchableOpacity style={styles.chatRow} activeOpacity={0.5}
+  return <TouchableOpacity style={{...styles.chatRow,backgroundColor:theme.main}} activeOpacity={0.5}
     onPress={doAction}>
     <View style={styles.inviteQR}>
       <Image style={{ height: 40, width: 40 }} source={require('../../../android_assets/invite_qr.png')} />
     </View>
     <View style={styles.chatContent}>
       <View style={styles.chatContentTop}>
-        <Text style={styles.chatName}>{`Invite: ${name}`}</Text>
+        <Text style={{...styles.chatName,color:theme.title}}>{`Invite: ${name}`}</Text>
         {invite.price && <Text style={styles.invitePrice}>{invite.price}</Text>}
       </View>
       <View style={styles.chatMsgWrap}>
         {inviteIcon(statusString)}
-        <Text style={styles.chatMsg}>{inviteMsg(statusString, name, confirmed)}</Text>
+        <Text style={{...styles.chatMsg,color:theme.subtitle}}>{inviteMsg(statusString, name, confirmed)}</Text>
       </View>
     </View>
 
@@ -159,7 +162,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     borderBottomWidth: 1,
-    backgroundColor: 'white',
   },
   chatContent: {
     display: 'flex',

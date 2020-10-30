@@ -5,6 +5,7 @@ import android.app.Application;
 import android.webkit.WebView;
 // import com.oney.WebRTCModule.WebRTCModulePackage;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.slider.ReactSliderPackage;
 import me.jhen.react.BadgePackage;
 import com.reactnativecommunity.rctaudiotoolkit.AudioPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
@@ -41,6 +42,7 @@ import com.swmansion.rnscreens.RNScreensPackage;
 import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import com.guichaguri.trackplayer.TrackPlayer;
+import com.airbnb.android.react.lottie.LottiePackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +61,8 @@ public class MainApplication extends Application implements ReactApplication {
           // new WebRTCModulePackage(),
           // new RNJitsiMeetPackage(),
           new MainReactPackage(),
+          new ReactSliderPackage(),
+          new LottiePackage(),
           new TrackPlayer(),
           new BadgePackage(),
           new ClipboardPackage(),

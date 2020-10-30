@@ -11,6 +11,12 @@ export default function AudioPlayer(props) {
   const [percent, setPercent] = useState(0)
   const [playing,setPlaying] = useState(false)
 
+  // useEffect(()=>{ // set back if come in from background
+  //   if(playing && !ARP.isPlaying(source)) {
+  //     setPlaying(false)
+  //   }
+  // },[])
+
   useEffect(() => {
     return ()=>{
       if(playing) ARP.stop()
