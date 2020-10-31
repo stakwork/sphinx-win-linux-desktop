@@ -155,6 +155,7 @@ class MsgStore {
       if(idx>-1){
         this.messages[newMsg.chat_id][idx] = {
           ...m,
+          // add alias?
           status: this.messages[newMsg.chat_id][idx].status
         }
       }

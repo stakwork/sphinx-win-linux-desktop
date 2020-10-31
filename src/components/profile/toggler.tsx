@@ -2,12 +2,12 @@ import React from 'react'
 import {StyleSheet,View,TouchableOpacity,Text} from 'react-native'
 import {useTheme} from '../../store'
 
-export default function Toggler({items,onSelect,selectedItem}){
+export default function Toggler({items,onSelect,selectedItem,width,extraStyles}){
   const theme = useTheme()
-  const WIDTH = 300
+  const WIDTH = width
   const w = WIDTH/items.length
   return <View style={styles.wrap}>
-    <View style={{...styles.border, 
+    <View style={{...styles.border, ...extraStyles,
       borderColor:theme.dark?'#555':'#ddd',
       minWidth:WIDTH, maxWidth:WIDTH
     }}>

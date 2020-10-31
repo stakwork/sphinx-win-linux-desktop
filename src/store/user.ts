@@ -140,7 +140,6 @@ class UserStore {
         console.log('no invite data')
         return 
       }
-      console.log("RETURND INVITE",r)
       this.currentIP = r.ip
       this.invite={
         inviterNickname: r.invite.nickname,

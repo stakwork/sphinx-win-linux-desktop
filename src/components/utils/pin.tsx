@@ -130,15 +130,29 @@ export async function setPinCode(pin): Promise<any> {
   return await SecureStorage.setItem('pin', pin, ssConfig)
 }
 
-const MINUTES = 720 // 12 hours
+export async function updatePinTimeout(v){
+  await AsyncStorage.setItem('pin_timeout', v)
+}
+
+export async function getPinTimeout(){
+  let hours = 12
+  let hoursString = await AsyncStorage.getItem('pin_timeout')
+  if(hoursString) {
+    const hoursInt = parseInt(hoursString)
+    if(hoursInt||hoursInt===0) hours = hoursInt
+  }
+  return hours
+}
+
 export async function wasEnteredRecently(): Promise<boolean> {
   const now = moment().unix()
+  const hours = await getPinTimeout()
   const enteredAtStr = await AsyncStorage.getItem('pin_entered')
   const enteredAt = parseInt(enteredAtStr)
   if(!enteredAt){
     return false
   }
-  if(now < enteredAt+(60*MINUTES)) { // five minutes
+  if(now < enteredAt+(60*60*hours)) { // five minutes
     return true
   }
   return false

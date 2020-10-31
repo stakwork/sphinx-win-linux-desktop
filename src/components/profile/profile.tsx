@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, useTheme } from '../../store'
-import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid, ScrollView} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Image, ToastAndroid, ScrollView, Dimensions} from 'react-native'
 import { useNavigation, DrawerActions } from '@react-navigation/native'
-import { Appbar, Portal, ActivityIndicator } from 'react-native-paper'
+import { Appbar, Portal, ActivityIndicator,TextInput } from 'react-native-paper'
 import { Title } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/AntDesign'
 import {me} from '../form/schemas'
@@ -19,6 +19,8 @@ import PIN, {userPinCode} from '../utils/pin'
 import Clipboard from "@react-native-community/clipboard";
 import Toggler from './toggler'
 import { useDarkMode } from 'react-native-dynamic'
+import {getPinTimeout,updatePinTimeout} from '../utils/pin'
+import Slider from '@react-native-community/slider';
 
 export default function Profile() {
   const { details, user, contacts, meme } = useStores()
@@ -32,6 +34,33 @@ export default function Profile() {
   const [sharing,setSharing] = useState(false)
   const [showPIN,setShowPIN] = useState(false)
   const [exporting,setExporting] = useState(false)
+  const [advanced,setAdvanced] = useState(false)
+  const [pinTimeout, setPinTimeout] = useState(12)
+  const [initialPinTimeout, setInitialPinTimeout] = useState(12)
+  const [serverURL, setServerURL] = useState('')
+
+  async function loadPinTimeout(){
+    const pt = await getPinTimeout()
+    setInitialPinTimeout(pt)
+    setPinTimeout(pt)
+  }
+  useEffect(()=>{
+    loadPinTimeout()
+    setServerURL(user.currentIP)
+  },[])
+  function pinTimeoutValueUpdated(v){
+    console.log("UPDATE NOW")
+    updatePinTimeout(String(v))
+  }
+  function pinTimeoutValueChange(v){
+    setPinTimeout(v)
+  }
+  function serverURLchange(URL){
+    setServerURL(URL)
+  }
+  function serverURLDoneChanging(){
+    user.setCurrentIP(serverURL)
+  }
 
   const isDark = useDarkMode()
   function selectAppearance(a){
@@ -136,6 +165,7 @@ export default function Profile() {
       borderBottomColor:theme.dark?'#181818':'#ddd',
       borderTopColor:theme.dark?'#181818':'#ddd'
     }
+    const width = Math.round(Dimensions.get('window').width)
     return <View style={{...styles.wrap,backgroundColor:theme.bg}}>
       <Header />
 
@@ -175,7 +205,14 @@ export default function Profile() {
         </View>
       </View>
 
-      <ScrollView style={styles.scroller}>
+      <Toggler width={width} 
+        extraStyles={{borderRadius:0,borderRightWidth:0,borderLeftWidth:0}}
+        onSelect={e=>setAdvanced(e==='Advanced')}
+        selectedItem={advanced?'Advanced':'Basic'}
+        items={['Basic','Advanced']}
+      />
+
+      {!advanced && <ScrollView style={styles.scroller}>
 
         <View style={{...styles.formWrap,...cardStyles}}>
           <Form schema={me} loading={saving}
@@ -201,7 +238,7 @@ export default function Profile() {
 
         <View style={{...styles.options,...cardStyles}}>
           <Text style={{...styles.label,color:theme.subtitle}}>Appearance</Text>
-          <Toggler 
+          <Toggler width={300} extraStyles={{}}
             onSelect={selectAppearance}
             selectedItem={theme.mode}
             items={['System','Dark','Light']}
@@ -217,7 +254,41 @@ export default function Profile() {
           </Text>
         </TouchableOpacity>
 
-      </ScrollView>
+      </ScrollView>}
+
+      {advanced && <ScrollView style={styles.scroller}>
+        
+        <View style={{...cardStyles,padding:20,marginBottom:12}}>
+        <View style={styles.pinTimeoutTextWrap}>
+            <Text style={{color:theme.subtitle}}>Server URL</Text>
+            </View>
+            <TextInput
+              placeholder="Server URL"
+              value={serverURL}
+              onChangeText={serverURLchange}
+              onBlur={serverURLDoneChanging}
+            />
+        
+        </View>
+        
+        <View style={{...cardStyles,padding:20}}>
+          <View style={styles.pinTimeoutTextWrap}>
+            <Text style={{color:theme.subtitle}}>PIN Timeout</Text>
+            <Text style={{color:theme.title}}>
+              {pinTimeout?pinTimeout:'Always Require PIN'}
+            </Text>
+          </View>
+          <Slider minimumValue={0} maximumValue={24}
+            value={initialPinTimeout} step={1}
+            minimumTrackTintColor={theme.primary}
+            maximumTrackTintColor={theme.primary}
+            thumbTintColor={theme.primary}
+            onSlidingComplete={pinTimeoutValueUpdated}
+            onValueChange={pinTimeoutValueChange}
+          />
+        </View>
+
+      </ScrollView>}
 
       <ImgSrcDialog 
         open={dialogOpen} onClose={()=>setDialogOpen(false)}
@@ -343,5 +414,14 @@ const styles = StyleSheet.create({
     marginTop:15,
     marginLeft:20,
     marginBottom:10,
+  },
+  pinTimeoutTextWrap:{
+    width:'100%',
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+    paddingLeft:16,paddingRight:16,
+    marginBottom:15,
   }
 })

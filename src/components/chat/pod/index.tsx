@@ -11,6 +11,7 @@ import PodBar from './podBar'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
+import Replay from './replay'
 
 export default function Pod({ show, chat, url, onBoost }) {
   const {host,uuid} = chat
@@ -122,10 +123,8 @@ export default function Pod({ show, chat, url, onBoost }) {
 
   const appState = useRef(AppState.currentState);
   function handleAppStateChange(nextAppState){
-    console.log("NEXT APP STATE",nextAppState)
     if (appState.current.match(/inactive|background/) && nextAppState === "active") {
       const now = Math.round(Date.now().valueOf()/1000)
-      console.log("NOW",now, "THEN",storedTime.current)
       const gap = now-storedTime.current
       if(gap > 0) {
         const n = Math.floor(gap/NUM_SECONDS)
@@ -198,7 +197,11 @@ export default function Pod({ show, chat, url, onBoost }) {
       if(arr.length<2) return
       try {
         const dat = JSON.parse(arr[1])
-        if(dat) msgsforReplay.push(dat)
+        if(dat) msgsforReplay.push({
+          ...dat,
+          type:arr[0],
+          alias:m.sender_alias||(m.sender===1?user.alias:''),
+        })
       } catch(e){}
     })
     replayMsgs.current = msgsforReplay
@@ -211,6 +214,7 @@ export default function Pod({ show, chat, url, onBoost }) {
 
   function boost(){
     EE.emit(PLAY_ANIMATION)
+    return
     const amount = 100
     requestAnimationFrame(async ()=>{
       const pos = await TrackPlayer.getPosition()
@@ -271,6 +275,7 @@ export default function Pod({ show, chat, url, onBoost }) {
         <FastImage source={{ uri: episode.image||pod.image }}
           style={{ width: width-78, height: width-78, marginLeft:39, marginTop:25, borderRadius:19 }} resizeMode={'cover'}
         />
+        {/* <Replay msgs={replayMsgs.current} playing={playing} /> */}
       </View>}
       <View style={styles.top}>
         {episode.title && <Text style={{ color: theme.title, fontSize:18 }} numberOfLines={1}>
@@ -330,7 +335,8 @@ const styles = StyleSheet.create({
     height:'100%'
   },
   imgWrap:{
-    width:'100%'
+    width:'100%',
+    position:'relative'
   },
   spinWrap:{
     display:'flex',
