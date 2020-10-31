@@ -38,8 +38,11 @@ export default function TextMsg(props) {
 
   const isGiphy = message_content && message_content.startsWith('giphy::')
   if (isGiphy) {
-    const { url, aspectRatio } = useParsedGiphyMsg(message_content)
-    return <GIF src={url} aspectRatio={aspectRatio} />
+    const { url, aspectRatio, text } = useParsedGiphyMsg(message_content)
+    return <div>
+          <GIF src={url} aspectRatio={aspectRatio} />
+          <TextWrap>{text}</TextWrap>
+    </div>
   }
 
   const isClip = message_content && message_content.startsWith('clip::')
@@ -100,4 +103,7 @@ const GIF = styled.div`
   background-size:cover;
   height:220px;
   width:${p => 220 * (p.aspectRatio || 1)}px;
+`
+const TextWrap = styled.div`
+  padding: 15px;
 `

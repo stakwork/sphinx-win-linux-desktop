@@ -21,6 +21,7 @@ import "emoji-mart/css/emoji-mart.css";
 import { uploadFile } from '../utils/meme'
 import { calcBotPrice } from '../../src/store/hooks/chat'
 import { useReplyContent } from '../../src/store/hooks/chat'
+import ReactGiphySearchbox from 'react-giphy-searchbox'
 
 export default function Foot({ height, pricePerMessage, tribeBots }) {
   const { ui, msg, meme, contacts } = useStores()
@@ -38,6 +39,26 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
       }
     }, [recording])
 
+    async function sendGif(amount: number){
+      const params = ui.imgViewerParams
+      const gifJSON = JSON.stringify({
+        id: params.id,
+        url: params.data,
+        aspect_ratio: params.aspect_ratio,
+        text: text,
+      })
+      const b64 = btoa(gifJSON)
+      let contact_id = chat.contact_ids.find(cid => cid !== 1)
+      await msg.sendMessage({
+        contact_id, chat_id: chat.id,
+        text: 'giphy::'+b64,
+        reply_uuid: '',
+        amount: amount || 0,
+      })
+      ui.setImgViewerParams(null)
+      setText('')
+    }
+
     function sendMessage() {
       if (!text) return
       let contact_id = chat.contact_ids.find(cid => cid !== 1)
@@ -45,15 +66,18 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
       if (failureMessage) {
         return alert(failureMessage)
       }
+      if(ui.imgViewerParams && ui.imgViewerParams.type === 'image/gif'){
+        return sendGif(pricePerMessage + price)
+      }
 
       let txt = text
-      if(ui.extraTextContent) {
-        const {type, ...rest} = ui.extraTextContent
-        txt = type+'::'+JSON.stringify({...rest, text})
+      if (ui.extraTextContent) {
+        const { type, ...rest } = ui.extraTextContent
+        txt = type + '::' + JSON.stringify({ ...rest, text })
       }
       msg.sendMessage({
         contact_id,
-        text:txt,
+        text: txt,
         chat_id: chat.id || null,
         amount: (pricePerMessage + price) || 0, // 5, // CHANGE THIS
         reply_uuid: ui.replyUUID || ''
@@ -110,7 +134,12 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
     const id = open ? 'simple-popover' : undefined;
     const msgs = chat && msg.messages[chat.id]
 
-    const {replyMessageSenderAlias, replyMessageContent, replyColor} = useReplyContent(msgs, ui.replyUUID, ui.extraTextContent)
+    const { replyMessageSenderAlias, replyMessageContent, replyColor } = useReplyContent(msgs, ui.replyUUID, ui.extraTextContent)
+
+    const [showGiphy, setShowGiphy] = useState(false)
+    function handleGiphy() {
+      setShowGiphy(true)
+    }
 
     if (ui.showBots) {
       return <></>
@@ -148,61 +177,104 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
 
     return <Wrap style={{ background: theme.bg, height }}>
       {(replyMessageContent && replyMessageSenderAlias) &&
-        <ReplyMsg color={replyColor||'grey'}>
+        <ReplyMsg color={replyColor || 'grey'}>
           <ReplyMsgText>
             <span style={{ color: 'white' }}>{replyMessageSenderAlias}</span>
             <span style={{ color: '#809ab7', marginTop: 5 }}>{replyMessageContent}</span>
           </ReplyMsgText>
-          <CloseButton style={{cursor:'pointer'}} onClick={() => {
+          <CloseButton style={{ cursor: 'pointer' }} onClick={() => {
             ui.setReplyUUID(null)
             ui.setExtraTextContent(null)
           }} />
         </ReplyMsg>}
-      <InnerWrap>
-        <IconButton style={{ pointerEvents: chat && chat.type === constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
-          onClick={() => ui.setSendRequestModal(chat)}>
-          <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
-        </IconButton>
-        <InsertEmoticonButton style={{ pointerEvents: chat ? "auto" : "none", cursor: 'pointer', marginLeft: 15, color: chat ? "#8f9ca9" : "#2a3540", fontSize: 30 }}
-          aria-describedby={id} onClick={handleClick} />
-        <Popover
-          id={id}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-        >
-          <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
-        </Popover>
-        <Input value={text} onChange={e => setText(e.target.value)}
-          placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
-          disabled={!chat}
-          onKeyPress={e => {
-            if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
-          }}
-        ></Input>
-        <IconButton style={{
-          width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
-        }} disabled={!chat || !text} onClick={sendMessage}>
-          <SendIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
-        </IconButton>
-        <IconButton style={{
-          width: 39, height: 39, marginRight: 10,
-          backgroundColor: 'transparent'
-        }} disabled={!chat} onClick={() => setRecording(true)}>
-          <MicIcon style={{ color: chat ? '#8f9ca9' : '#2a3540', fontSize: 30 }} />
-        </IconButton>
-      </InnerWrap>
+      {showGiphy &&
+        <GiphyWrap>
+          <ReactGiphySearchbox
+            style={{ position: 'absolute' }}
+            apiKey="cnc84wQZqQn2vsWeg4sYK3RQJSrYPAl7"
+            onSelect={item => {
+              const data = item.images.original.url
+              const height = parseInt(item.images.original.height) || 200
+              const width = parseInt(item.images.original.width) || 200
+              ui.setImgViewerParams({ 
+                data,
+                aspect_ratio: width/height,
+                id: item.id,
+                type: 'image/gif' })
+              setShowGiphy(false)}
+
+            }
+          />
+          <CloseWrap onClick={()=>setShowGiphy(false)}>
+            CLOSE <CloseButton />
+          </CloseWrap>
+          </GiphyWrap>}
+        <InnerWrap>
+          <IconButton style={{ pointerEvents: chat && chat.type === constants.chat_types.conversation ? "auto" : "none", cursor: 'pointer', height: 30, width: 30, marginLeft: 10, backgroundColor: '#618af8' }}
+            onClick={() => ui.setSendRequestModal(chat)}>
+            <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
+          </IconButton>
+          <img src="/static/GIPHY Icon DarkBackgrounds 27.png" onClick={chat && handleGiphy} style={{cursor: chat ? 'pointer' : 'auto', marginLeft: '15px', filter: chat ? 'grayscale(0%)' : 'grayscale(75%)'}} />
+          <InsertEmoticonButton style={{ pointerEvents: chat ? "auto" : "none", cursor: 'pointer', marginLeft: 10, color: chat ? "#8f9ca9" : "#2a3540", fontSize: 30 }}
+            aria-describedby={id} onClick={handleClick} />
+          <Popover
+            id={id}
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+          >
+            <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
+          </Popover>
+          <Input value={text} onChange={e => setText(e.target.value)}
+            placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
+            disabled={!chat}
+            onKeyPress={e => {
+              if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
+            }}
+          ></Input>
+          <IconButton style={{
+            width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
+          }} disabled={!chat || !text} onClick={sendMessage}>
+            <SendIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
+          </IconButton>
+          <IconButton style={{
+            width: 39, height: 39, marginRight: 10,
+            backgroundColor: 'transparent'
+          }} disabled={!chat} onClick={() => setRecording(true)}>
+            <MicIcon style={{ color: chat ? '#8f9ca9' : '#2a3540', fontSize: 30 }} />
+          </IconButton>
+        </InnerWrap>
     </Wrap>
   })
 }
+
+const CloseWrap = styled.div`
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e3145;
+    cursor: pointer;
+    font-weight: bold;
+`
+
+const GiphyWrap = styled.div`
+    position: absolute;
+    transform: translateY(-385px) translateX(50px);
+    padding: 10px;
+    background-color: #3d6189;
+    border-radius: 8px;
+`
 
 const Blinker = styled.div`
   animation:blink 1.2s infinite;
