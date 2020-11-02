@@ -6,6 +6,7 @@ import {initPicSrc} from './utils/picSrc'
 import * as push from './push'
 import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
+import EE, {RESET_IP,RESET_IP_FINISHED} from './utils/ee'
 
 async function createPrivateKeyIfNotExists(contacts){
   const priv = await rsa.getPrivateKey()
@@ -48,6 +49,7 @@ export default function Main() {
   }
 
   async function loadHistory(){
+    console.log("============> LOAD HISTORY",user.currentIP)
     ui.setLoadingHistory(true)
     await Promise.all([
       contacts.getContacts(),
@@ -74,6 +76,11 @@ export default function Main() {
 
       createPrivateKeyIfNotExists(contacts)
     })()
+
+    EE.on(RESET_IP_FINISHED, loadHistory)
+    return ()=>{
+      EE.removeListener(RESET_IP_FINISHED, loadHistory)
+    }
   },[])
 
   return <MainNav />

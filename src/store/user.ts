@@ -106,6 +106,7 @@ class UserStore {
     api.instantiateRelay(ip, token, 
       ()=>uiStore.setConnected(true),
       ()=>uiStore.setConnected(false),
+      this.resetIP
     )
     await sleep(650)
     return priv
@@ -194,6 +195,26 @@ class UserStore {
     } catch(e) {
       console.log('could not finish invite', e)
     }
+  }
+
+  @action
+  async resetIP() {
+    console.log("user.RESET_IP")
+    const pubkey = this.publicKey
+    if(!(pubkey && pubkey.length===66)) return
+    try {
+      const r = await api.invite.get(`nodes/${pubkey}`)
+      if(!(r && r.node_ip)) return
+      console.log("NEW IP",r.node_ip)
+      this.currentIP = r.node_ip
+      return r.node_ip
+    } catch(e) {
+      console.log("Error:",e)
+    }
+  }
+
+  @action
+  async testinit() {
   }
 
 }
