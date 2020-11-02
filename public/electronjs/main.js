@@ -71,6 +71,12 @@ function createWindow() {
         type:'separator'
     })
     menu[0].submenu.splice(menu[0].submenu.length-2,0,{
+        label: 'Profile',
+        click: () => {
+            mainWindow.webContents.send('profile', '')
+        }
+    })
+    menu[0].submenu.splice(menu[0].submenu.length-2,0,{
         label: 'Remove account from this computer',
         click: () => {
             dialog.showMessageBox({

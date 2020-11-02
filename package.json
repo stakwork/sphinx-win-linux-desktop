@@ -20,7 +20,9 @@
     "postinstall": "jetify"
   },
   "rnpm": {
-    "assets": ["./android_assets/fonts"]
+    "assets": [
+      "./android_assets/fonts"
+    ]
   },
   "build": {
     "appId": "com.stakwork.sphinx",

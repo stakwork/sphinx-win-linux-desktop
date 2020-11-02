@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import styled from 'styled-components'
 import ViewImg from './viewImg'
 import {useStores} from '../../src/store'
@@ -7,6 +7,16 @@ import ConfirmInvoice from './confirmInvoice'
 import SendRequest from './sendRequest'
 import StartJitsi from './startJitsi'
 import ViewContact from './viewContact'
+import Profile from './profile'
+import {uiStore} from '../../src/store/ui'
+
+const electron = window.require ? window.require("electron") : {}
+if(electron.ipcRenderer) {
+  electron.ipcRenderer.on('profile', (event, message) => {
+    // open modal
+    uiStore.setShowProfile(true)
+  })
+}
 
 export default function Modals(){
   const {ui} = useStores()
@@ -19,6 +29,7 @@ export default function Modals(){
       {ui.sendRequestModal && <SendRequest />}
       {ui.startJitsiParams && <StartJitsi />}
       {ui.viewContact && <ViewContact />}
+      {ui.showProfile && <Profile/>}
     </Wrap>
   })
 }
@@ -27,3 +38,4 @@ const Wrap = styled.div`
   position:fixed;
   top:0;left:0;bottom:0;right:0;
 `
+

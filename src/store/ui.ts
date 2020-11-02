@@ -250,6 +250,11 @@ export class UiStore {
     this.startJitsiParams = b
   }
 
+  @observable showProfile: boolean = false
+  @action setShowProfile(b) {
+    this.showProfile = b
+  }
+
 }
 
 export const uiStore = new UiStore()
