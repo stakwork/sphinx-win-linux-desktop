@@ -201,6 +201,7 @@ export default function Pod({ show, chat, url, onBoost }) {
           ...dat,
           type:arr[0],
           alias:m.sender_alias||(m.sender===1?user.alias:''),
+          date:m.date,
         })
       } catch(e){}
     })
@@ -214,7 +215,6 @@ export default function Pod({ show, chat, url, onBoost }) {
 
   function boost(){
     EE.emit(PLAY_ANIMATION)
-    return
     const amount = 100
     requestAnimationFrame(async ()=>{
       const pos = await TrackPlayer.getPosition()
@@ -275,7 +275,7 @@ export default function Pod({ show, chat, url, onBoost }) {
         <FastImage source={{ uri: episode.image||pod.image }}
           style={{ width: width-78, height: width-78, marginLeft:39, marginTop:25, borderRadius:19 }} resizeMode={'cover'}
         />
-        {/* <Replay msgs={replayMsgs.current} playing={playing} /> */}
+        <Replay msgs={replayMsgs.current} playing={playing} />
       </View>}
       <View style={styles.top}>
         {episode.title && <Text style={{ color: theme.title, fontSize:18 }} numberOfLines={1}>
