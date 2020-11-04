@@ -43,36 +43,50 @@ export function makeChart(ref, payments) {
   });
 }
 
-interface StreamEarning {
+interface Earning {
   ts: number,
-  amount: number
+  streaming: number,
+  boosts: number,
+  clips: number,
 }
 export function makeEpisodeChart(ref, payments) {
   var ctx = ref.getContext('2d');
-  const labels = []
-  const data = []
-  const stream: StreamEarning[] = [];// { [k: number]: number } = {}
-  const clip: { [k: string]: number } = {}
-  const boost: { [k: string]: number } = {}
+  const payz: Earning[] = [];// { [k: number]: number } = {}
   payments && payments.forEach(p => {
     let j:StreamPayment
     try {
       j = JSON.parse(p.message_content)
     } catch(e){}
     if(!(j&&(j.ts||j.ts===0))) return
-    const exists = stream.find(s=>s.ts===j.ts)
+    const isBoost = j.amount?true:false
+    const isClip = j.uuid?true:false
+    const isStream = !isBoost && !isClip
+    const exists = payz.find(s=>s.ts===j.ts)
     if(exists) {
-      exists.amount += p.amount
+      if(isBoost) exists.boosts += p.amount
+      if(isClip) exists.clips += p.amount
+      if(isStream) exists.streaming += p.amount
     } else {
-      stream.push({ts:j.ts,amount:p.amount})
+      payz.push({
+        ts:j.ts,
+        streaming:isStream?p.amount:0,
+        boosts:isBoost?p.amount:0,
+        clips:isClip?p.amount:0,
+      })
     }
   })
-  stream.sort((a,b)=>b.ts-a.ts)
-  stream.forEach(({ts,amount}) => {
+  payz.sort((a,b)=>b.ts-a.ts)
+  const labels = []
+  const streamData = []
+  const boostData = []
+  const clipData = []
+  payz.forEach(({ts,streaming,boosts,clips}) => {
     // @ts-ignore
     const dur = moment.duration(ts, 'seconds').format('hh:mm:ss')
     labels.unshift(dur)
-    data.unshift(amount)
+    streamData.unshift(streaming)
+    boostData.unshift(boosts)
+    clipData.unshift(clips)
   })
   new Chart(ctx, {
     type: 'bar',
@@ -80,15 +94,28 @@ export function makeEpisodeChart(ref, payments) {
       labels,
       datasets: [{
         label: 'Streaming',
-        data,
+        data: streamData,
         backgroundColor: 'rgba(96, 137, 255, 0.2)',
         borderColor: 'rgba(96, 137, 255, 1)',
+        borderWidth: 1
+      },{
+        label: 'Boosts',
+        data: boostData,
+        backgroundColor: 'rgba(96, 237, 255, 0.2)',
+        borderColor: 'rgba(96, 237, 255, 1)',
+        borderWidth: 1
+      },{
+        label: 'Clips',
+        data: clipData,
+        backgroundColor: 'rgba(176, 137, 255, 0.2)',
+        borderColor: 'rgba(176, 137, 255, 1)',
         borderWidth: 1
       }]
     },
     options: {
       maintainAspectRatio: false,
       scales: {
+        xAxes: [{stacked: true}],
         yAxes: [{
           ticks: {
             beginAtZero: true
