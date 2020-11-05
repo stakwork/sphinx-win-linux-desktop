@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import {relay} from '../api'
+import { relay } from '../api'
 
 export interface Bot {
   id: string
@@ -16,36 +16,36 @@ class BotStore {
 
   @action async getBots() {
     const r = await relay.get('bots')
-    if(r&&r.bots) {
+    if (r && r.bots) {
       this.bots = r.bots
     }
   }
 
-  @action async getBotsForTribe(chat_id:number) {
+  @action async getBotsForTribe(chat_id: number) {
     const r = await relay.get(`bots/${chat_id}`)
-    if(r&&r.bots) {
+    if (r && r.bots) {
       this.bots = r.bots
     }
   }
 
-  @action async createBot(name: string, webhook:string){
+  @action async createBot(name: string, webhook: string) {
     const r = await relay.post('bot', {
       name, webhook
     })
-    if(r){
+    if (r) {
       console.log(r)
       this.bots.push(r)
     }
   }
 
-  @action async deleteBot(id: string){
+  @action async deleteBot(id: string) {
     const r = await relay.del(`bot/${id}`)
-    if(r){
-      this.bots = this.bots.filter(b=> b.id!==id)
+    if (r) {
+      this.bots = this.bots.filter(b => b.id !== id)
     }
   }
 
-  @action reset(){
+  @action reset() {
     this.bots = []
   }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import {TouchableOpacity, Text, View} from 'react-native'
+import {TouchableOpacity, Text, View, StyleSheet} from 'react-native'
 import { useObserver } from 'mobx-react-lite'
 import { Appbar } from 'react-native-paper'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -17,10 +17,12 @@ const conversation = constants.chat_types.conversation
 const tribe = constants.chat_types.tribe
 
 export default function Header(
-  { chat, appMode, setAppMode, setShowPod, showPod, status }: 
-  { chat: Chat, appMode: boolean, setAppMode: Function, setShowPod: Function, showPod: boolean, status:RouteStatus }
+  { chat, appMode, setAppMode, status, tribeParams, earned, spent }: 
+  { chat: Chat, appMode: boolean, setAppMode: Function, status:RouteStatus, tribeParams:{[k:string]:any}, earned:number, spent:number }
 ) {
-  const { contacts, ui, msg, details, chats } = useStores()
+  const { contacts, ui, user, details, chats } = useStores()
+  const isTribeAdmin = tribeParams&&tribeParams.owner_pubkey===user.publicKey
+  const isPodcast = (tribeParams&&tribeParams.feed_url)?true:false
   const theme = useTheme()
   const navigation = useNavigation()
   return useObserver(() => {
@@ -61,32 +63,30 @@ export default function Header(
     function setAppModeHandler() {
       setAppMode(!appMode)
     }
-    function setShowPodHandler() {
-      setShowPod(!showPod)
-    }
-
     let uri = useChatPicSrc(chat)
+    const appURL = tribeParams&&tribeParams.app_url
     return (
       <Appbar.Header style={{ width: '100%', backgroundColor: theme.main, elevation: 5, zIndex: 102, position: 'relative', display:'flex', flexDirection:'row', alignItems:'center' }}>
         <Appbar.BackAction onPress={onBackHandler} />
-        <View style={{marginRight:5}}>
+        <View>
           <Avatar big={false} alias={name} photo={uri || ''} />
         </View>
-        <TouchableOpacity onPress={clickTitle} style={{display:'flex',flexDirection:'row',flex:1,alignItems:'center'}}>
-          <Text style={{fontSize:18,color:theme.title,marginLeft:8}}>{name}</Text>
-          {status!==null && <Icon name="lock" style={{marginLeft:16}} size={13} 
-            color={status==='active'?theme.active:theme.inactive}
-          />}
-        </TouchableOpacity>
+        <View style={styles.textWrap}>
+          <TouchableOpacity onPress={clickTitle} style={styles.title}>
+            <Text style={{fontSize:18,color:theme.title}}>{name}</Text>
+            {status!==null && <Icon name="lock" style={{marginLeft:16}} size={13} 
+              color={status==='active'?theme.active:theme.inactive}
+            />}
+          </TouchableOpacity>
+          {isPodcast && <Text style={{...styles.stats,color:theme.title}}>
+            {isTribeAdmin?`Earned: ${earned} sats`:`Contributed: ${spent} sats`}  
+          </Text>}
+        </View>
         {/* <Appbar.Action icon="video" onPress={launchVideo} color="grey" /> */}
         {theChat && <Appbar.Action icon={isMuted ? 'bell-off' : 'bell'}
-          onPress={muteChat} color="grey"
+          onPress={muteChat} color="grey" style={{position:'absolute',right:10}}
         />}
-        {false && theChat && theChat.type === tribe && (ui.feedURL?true:false) && <Appbar.Action 
-          icon="rss" color={showPod?'#bbb':'grey'}
-          onPress={setShowPodHandler}
-        />}
-        {theChat && theChat.type === tribe && (ui.applicationURL?true:false) && <Appbar.Action color="grey"
+        {theChat && theChat.type === tribe && (appURL?true:false) && <Appbar.Action color="grey"
           icon={appMode ? 'android-messages' : 'open-in-app'}
           onPress={setAppModeHandler}
         />}
@@ -95,3 +95,20 @@ export default function Header(
   })
 }
 
+const styles = StyleSheet.create({
+  title:{
+    display:'flex',
+    flexDirection:'row',
+    flex:1,
+    alignItems:'center'
+  },
+  textWrap:{
+    display:'flex',
+    marginLeft:13,
+  },
+  stats:{
+    color:'white',
+    fontSize:10,
+    marginBottom:7
+  }
+})

@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import {relay} from '../api'
+import { relay } from '../api'
 import { persist } from 'mobx-persist'
 
 class DetailsStore {
@@ -10,17 +10,17 @@ class DetailsStore {
   async getBalance() {
     try {
       const r = await relay.get('balance')
-      if(!r) return
+      if (!r) return
       const b = r.balance && parseInt(r.balance)
-      this.balance = b||0
-    } catch(e) {
+      this.balance = b || 0
+    } catch (e) {
       console.log(e)
     }
   }
 
   @action
   async addToBalance(x: number) {
-    this.balance = this.balance+x
+    this.balance = this.balance + x
   }
 
   @action
@@ -28,7 +28,7 @@ class DetailsStore {
     try {
       const r = await relay.get('payments')
       return r
-    } catch(e) {
+    } catch (e) {
       console.log(e)
     }
   }
@@ -38,21 +38,21 @@ class DetailsStore {
   async getLogs() {
     try {
       const r = await relay.get('logs')
-      if(r) this.logs = r
-    } catch(e) {
+      if (r) this.logs = r
+    } catch (e) {
       console.log(e)
     }
   }
   @action
   async clearLogs() {
-    this.logs=''
+    this.logs = ''
   }
 
-  @action reset(){
+  @action reset() {
     this.balance = 0
     this.logs = ''
   }
-  
+
 }
 
 export const detailsStore = new DetailsStore()

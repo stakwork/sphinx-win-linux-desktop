@@ -1,33 +1,33 @@
-import {msgStore} from './msg'
-import {contactStore} from './contacts'
-import {uiStore} from './ui'
-import {chatStore} from './chats'
+import { msgStore } from './msg'
+import { contactStore } from './contacts'
+import { uiStore } from './ui'
+import { chatStore } from './chats'
 
-export function contact(data){ // on contact_key msg
+export function contact(data) { // on contact_key msg
   log('[ws] contact', data)
   contactStore.contactUpdated(data.response)
 }
 
-export function invite(data){
+export function invite(data) {
   log('[ws] invite', data)
   contactStore.updateInvite(data.response)
 }
 
-export function invoice_payment(data){
+export function invoice_payment(data) {
   log('[ws] invoice_payment', data.response)
-  if(data.response&&data.response.invoice){
+  if (data.response && data.response.invoice) {
     uiStore.setLastPaidInvoice(data.response.invoice)
   }
 }
 
 /* sphinx types */
 
-export function message(data){
+export function message(data) {
   log('[ws] message', data)
   msgStore.gotNewMessageFromWS(data.response)
 }
 
-export function confirmation(data){
+export function confirmation(data) {
   log("[ws] confirmation", data)
   msgStore.setMessageAsReceived(data.response)
 }
@@ -84,7 +84,7 @@ export function group_create(data) {
 export function group_join(data) {
   log("[ws] group_join", data)
   const msg = data.response && data.response.message
-  if(msg && data.response.chat) {
+  if (msg && data.response.chat) {
     msg.chat = data.response.chat
     msgStore.gotNewMessageFromWS(msg)
   }
@@ -93,44 +93,44 @@ export function group_join(data) {
 export function group_leave(data) {
   log("[ws] group_leave", data)
   const msg = data.response && data.response.message
-  if(msg && data.response.chat) {
+  if (msg && data.response.chat) {
     msg.chat = data.response.chat
     msgStore.gotNewMessageFromWS(msg)
   }
 }
 
-export function deleteMessage(data){
+export function deleteMessage(data) {
   log('[ws] delete message', data)
   msgStore.gotNewMessageFromWS(data.response)
 }
 
-export function member_request(data){
+export function member_request(data) {
   log('[ws] member_request message', data)
-  if(!data.response.message) return
+  if (!data.response.message) return
   msgStore.gotNewMessageFromWS(data.response.message)
 }
 
-export function member_approve(data){
+export function member_approve(data) {
   log('[ws] member_approve message', data)
-  if(!data.response.message) return
+  if (!data.response.message) return
   msgStore.gotNewMessageFromWS(data.response.message)
 }
 
-export function member_reject(data){
+export function member_reject(data) {
   log('[ws] member_reject message', data)
-  if(!data.response.message) return
+  if (!data.response.message) return
   msgStore.gotNewMessageFromWS(data.response.message)
 }
 
-export function bot_res(data){
+export function bot_res(data) {
   log('[ws] bot_res', data)
   msgStore.gotNewMessageFromWS(data.response)
 }
 
-const oktolog=false
+const oktolog = false
 
-function log(a,b){
-  if(oktolog) {
-    console.log(a,b)
+function log(a, b) {
+  if (oktolog) {
+    console.log(a, b)
   }
 }

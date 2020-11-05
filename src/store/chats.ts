@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx'
 import { persist } from 'mobx-persist'
-import {Invite, contactStore} from './contacts'
-import {relay} from '../api'
+import { Invite, contactStore } from './contacts'
+import { relay } from '../api'
 import { constants } from '../constants'
 
 /*
@@ -60,20 +60,20 @@ export class ChatStore {
 
   @persist('list') @observable
   servers: TribeServer[] = [
-    {host:DEFAULT_TRIBE_SERVER}
+    { host: DEFAULT_TRIBE_SERVER }
   ]
 
   @action getDefaultTribeServer(): TribeServer {
-    const server = this.servers.find(s=> s.host===DEFAULT_TRIBE_SERVER)
+    const server = this.servers.find(s => s.host === DEFAULT_TRIBE_SERVER)
     return server
   }
 
   @action
-  async muteChat(chatID:number, muted: boolean) {
-    relay.post(`chats/${chatID}/${muted?'mute':'unmute'}`)
-    const chats = this.chats.map(c=>{
-      if(c.id===chatID) {
-        return {...c, is_muted:muted}
+  async muteChat(chatID: number, muted: boolean) {
+    relay.post(`chats/${chatID}/${muted ? 'mute' : 'unmute'}`)
+    const chats = this.chats.map(c => {
+      if (c.id === chatID) {
+        return { ...c, is_muted: muted }
       }
       return c
     })
@@ -83,70 +83,70 @@ export class ChatStore {
   @action
   gotChat(chat: Chat) {
     console.log("====> GOT CHAT", chat)
-    const existingIndex = this.chats.findIndex(ch=>ch.id===chat.id)
-    if(existingIndex>-1){
+    const existingIndex = this.chats.findIndex(ch => ch.id === chat.id)
+    if (existingIndex > -1) {
       this.chats[existingIndex] = chat
     } else {
       this.chats.unshift(chat)
     }
   }
 
-  @action 
-  async createGroup(contact_ids: number[], name: string){
+  @action
+  async createGroup(contact_ids: number[], name: string) {
     const r = await relay.post('group', {
       name, contact_ids
     })
-    if(!r) return
+    if (!r) return
     this.gotChat(r)
     return r
   }
 
-  @action 
-  async createTribe({name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url}){
+  @action
+  async createTribe({ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url }) {
     const r = await relay.post('group', {
-      name, description, tags:tags||[],
-      is_tribe: true, is_listed:true,
-      price_per_message: price_per_message||0,
-      price_to_join: price_to_join||0,
-      escrow_amount: escrow_amount||0,
-      escrow_millis: escrow_time?escrow_time*60*60*1000:0,
-      img: img||'',
-      unlisted: unlisted||false,
-      private: is_private||false,
-      app_url: app_url||'',
-      feed_url: feed_url||''
+      name, description, tags: tags || [],
+      is_tribe: true, is_listed: true,
+      price_per_message: price_per_message || 0,
+      price_to_join: price_to_join || 0,
+      escrow_amount: escrow_amount || 0,
+      escrow_millis: escrow_time ? escrow_time * 60 * 60 * 1000 : 0,
+      img: img || '',
+      unlisted: unlisted || false,
+      private: is_private || false,
+      app_url: app_url || '',
+      feed_url: feed_url || ''
     })
-    if(!r) return
+    if (!r) return
     this.gotChat(r)
     return r
   }
 
-  @action 
-  async editTribe({id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url}){
+  @action
+  async editTribe({ id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url }) {
     const r = await relay.put(`group/${id}`, {
-      name, description, tags:tags||[],
-      is_listed:true,
-      price_per_message: price_per_message||0,
-      price_to_join: price_to_join||0,
-      escrow_amount: escrow_amount||0,
-      escrow_millis: escrow_time?escrow_time*60*60*1000:0,
-      img: img||'',
-      unlisted: unlisted||false,
-      private: is_private||false,
-      app_url: app_url||'',
-      feed_url: feed_url||''
+      name, description, tags: tags || [],
+      is_listed: true,
+      price_per_message: price_per_message || 0,
+      price_to_join: price_to_join || 0,
+      escrow_amount: escrow_amount || 0,
+      escrow_millis: escrow_time ? escrow_time * 60 * 60 * 1000 : 0,
+      img: img || '',
+      unlisted: unlisted || false,
+      private: is_private || false,
+      app_url: app_url || '',
+      feed_url: feed_url || ''
     })
-    if(!r) return
+    if (!r) return
     this.gotChat(r)
     return r
   }
 
-  @action 
-  async joinTribe({name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private}){
+  @action
+  async joinTribe({ name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private }) {
     const r = await relay.post('tribe', {
-      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private:is_private,
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private,
     })
-    if(!r) return
+    if (!r) return
     this.gotChat(r)
     return r
   }
@@ -165,8 +165,8 @@ export class ChatStore {
       host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
       img: params.img,
-      amount:params.price_to_join||0,
-      is_private:params.private
+      amount: params.price_to_join || 0,
+      is_private: params.private
     })
   }
 
@@ -178,29 +178,29 @@ export class ChatStore {
   }
 
   @action
-  async exitGroup(chatID: number){
+  async exitGroup(chatID: number) {
     await relay.del(`chat/${chatID}`)
     const chats = [...this.chats]
-    this.chats = chats.filter(c=> c.id!==chatID)
+    this.chats = chats.filter(c => c.id !== chatID)
   }
 
-  @action 
-  async kick(chatID, contactID){
+  @action
+  async kick(chatID, contactID) {
     const r = await relay.put(`kick/${chatID}/${contactID}`)
-    if(r===true){ // success
-      const chat = this.chats.find(c=>c.id===chatID)
-      if(chat) chat.contact_ids = chat.contact_ids.filter(cid=>cid!==contactID)
+    if (r === true) { // success
+      const chat = this.chats.find(c => c.id === chatID)
+      if (chat) chat.contact_ids = chat.contact_ids.filter(cid => cid !== contactID)
     }
   }
 
   @action
-  async updateTribeAsNonAdmin(tribeID:number, name:string, img:string) {
-    const r = await relay.put(`group/${tribeID}`, {name,img})
-    if(r) {
+  async updateTribeAsNonAdmin(tribeID: number, name: string, img: string) {
+    const r = await relay.put(`group/${tribeID}`, { name, img })
+    if (r) {
       const cs = [...this.chats]
-      this.chats = cs.map(c=>{
-        if(c.id===tribeID){
-          return {...c, name, photo_url:img}
+      this.chats = cs.map(c => {
+        if (c.id === tribeID) {
+          return { ...c, name, photo_url: img }
         }
         return c
       })
@@ -208,70 +208,70 @@ export class ChatStore {
   }
 
   @action
-  updateChatPhotoURI(id,photo_uri){
+  updateChatPhotoURI(id, photo_uri) {
     const cs = [...this.chats]
-    this.chats = cs.map(c=>{
-      if(c.id===id){
-        return {...c, photo_uri}
+    this.chats = cs.map(c => {
+      if (c.id === id) {
+        return { ...c, photo_uri }
       }
       return c
     })
   }
 
-  @action 
-  async getTribeDetails(host:string,uuid:string){
-    if(!host || !uuid) return
-    const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
-    try{
+  @action
+  async getTribeDetails(host: string, uuid: string) {
+    if (!host || !uuid) return
+    const theHost = host.includes('localhost') ? 'tribes.sphinx.chat' : host
+    try {
       const r = await fetch(`https://${theHost}/tribes/${uuid}`)
       const j = await r.json()
-      if(j.bots) {
+      if (j.bots) {
         try {
           const bots = JSON.parse(j.bots)
           j.bots = bots
-        } catch(e) {
+        } catch (e) {
           j.bots = []
         }
       }
       return j
-    } catch(e){
+    } catch (e) {
       console.log(e)
     }
   }
 
   @action
-  async checkRoute(cid){
-    const chat = this.chats.find(ch=>ch.id===cid)
-    if(!chat) return
+  async checkRoute(cid) {
+    const chat = this.chats.find(ch => ch.id === cid)
+    if (!chat) return
     let pubkey
-    if(chat.type===constants.chat_types.tribe) {
+    if (chat.type === constants.chat_types.tribe) {
       pubkey = chat.owner_pubkey
-    } else if(chat.type===constants.chat_types.conversation) {
-      const contactid = chat.contact_ids.find(contid=>contid!=1)
-      const contact = contactStore.contacts.find(con=>con.id===contactid)
-      if(contact) {
+    } else if (chat.type === constants.chat_types.conversation) {
+      const contactid = chat.contact_ids.find(contid => contid != 1)
+      const contact = contactStore.contacts.find(con => con.id === contactid)
+      if (contact) {
         pubkey = contact.public_key
       }
     }
-    if(!pubkey) return
+    if (!pubkey) return
     const r = await relay.get(`route?pubkey=${pubkey}`)
-    if(r) return r
+    if (r) return r
   }
 
-  @action 
-  async loadFeed(host:string,uuid:string,url:string){
-    if(!host || !url) return
-    const theHost = host.includes('localhost')?'tribes.sphinx.chat':host
-    try{
+  @action
+  async loadFeed(host: string, uuid: string, url: string) {
+    if (!host || !url) return
+    const theHost = host.includes('localhost') ? 'tribes.sphinx.chat' : host
+    try {
       const r = await fetch(`https://${theHost}/podcast?url=${url}`)
       const j = await r.json()
       return j
-    } catch(e){
+    } catch (e) {
       console.log(e)
     }
   }
 
-  @action reset(){
+  @action reset() {
     this.chats = []
   }
 

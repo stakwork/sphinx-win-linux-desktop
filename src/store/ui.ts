@@ -1,31 +1,31 @@
 import { observable, action } from 'mobx'
-import {Chat} from './chats'
-import {Msg} from './msg'
-import {Contact} from './contacts'
+import { Chat } from './chats'
+import { Msg } from './msg'
+import { Contact } from './contacts'
 
 export class UiStore {
   @observable ready: boolean = false
-  @action setReady(ready){
+  @action setReady(ready) {
     this.ready = ready
   }
 
   @observable selectedChat: Chat
-  @action setSelectedChat(c){
+  @action setSelectedChat(c) {
     this.selectedChat = c
   }
 
   @observable loadingChat: boolean
-  @action setLoadingChat(b:boolean){
+  @action setLoadingChat(b: boolean) {
     this.loadingChat = b
   }
 
   @observable applicationURL: string
-  @action setApplicationURL(s){
+  @action setApplicationURL(s) {
     this.applicationURL = s
   }
 
   @observable feedURL: string
-  @action setFeedURL(s){
+  @action setFeedURL(s) {
     this.feedURL = s
   }
 
@@ -49,12 +49,12 @@ export class UiStore {
     this.addFriendModal = b
   }
 
-  @observable subModalParams: {[k:string]:any} = null
+  @observable subModalParams: { [k: string]: any } = null
   @action setSubModalParams(o) {
     this.subModalParams = o
   }
 
-  @observable redeemModalParams: {[k:string]:any} = null
+  @observable redeemModalParams: { [k: string]: any } = null
   @action setRedeemModalParams(o) {
     this.redeemModalParams = o
   }
@@ -67,9 +67,9 @@ export class UiStore {
   }
   @action closeEditContactModal() {
     this.editContactModal = false
-    setTimeout(()=>{
+    setTimeout(() => {
       this.editContactParams = null
-    },500)
+    }, 500)
   }
 
   @observable newGroupModal: boolean = false
@@ -77,11 +77,11 @@ export class UiStore {
     this.newGroupModal = b
   }
 
-  @observable editTribeParams: {[k:string]:any} = null
+  @observable editTribeParams: { [k: string]: any } = null
   @action setEditTribeParams(o) {
     this.editTribeParams = o ? {
       ...o,
-      escrow_time: o.escrow_millis?Math.floor(o.escrow_millis/(60*60*1000)):0
+      escrow_time: o.escrow_millis ? Math.floor(o.escrow_millis / (60 * 60 * 1000)) : 0
     } : null
   }
 
@@ -98,9 +98,9 @@ export class UiStore {
   }
   @action closeGroupModal() {
     this.groupModal = false
-    setTimeout(()=>{
+    setTimeout(() => {
       this.groupModalParams = null
-    },500)
+    }, 500)
   }
 
   @observable pubkeyModal: boolean = false
@@ -117,15 +117,15 @@ export class UiStore {
 
   @action clearShareInviteModal() {
     this.shareInviteModal = false
-    setTimeout(()=>{
+    setTimeout(() => {
       this.shareInviteString = ''
-    },500)
+    }, 500)
   }
 
   @observable showPayModal: boolean = false
   @observable payMode: string = ''
   @observable chatForPayModal: Chat | null
-  @action setPayMode(m,c) {
+  @action setPayMode(m, c) {
     this.payMode = m
     this.chatForPayModal = c
     this.showPayModal = true
@@ -133,8 +133,8 @@ export class UiStore {
 
   @action clearPayModal() {
     this.showPayModal = false
-    setTimeout(()=>{
-      this.payMode=''
+    setTimeout(() => {
+      this.payMode = ''
       this.chatForPayModal = null
     }, 500) // delay 
   }
@@ -155,12 +155,12 @@ export class UiStore {
   }
 
   @observable paymentHistory: boolean
-  @action setPaymentHistory(b: boolean){
+  @action setPaymentHistory(b: boolean) {
     this.paymentHistory = b
   }
 
   @observable rawInvoiceModal: boolean = false
-  @observable rawInvoiceModalParams: {[k:string]:string} = null
+  @observable rawInvoiceModalParams: { [k: string]: string } = null
   @action setRawInvoiceModal(params) {
     this.rawInvoiceModal = true
     this.rawInvoiceModalParams = params
@@ -169,39 +169,39 @@ export class UiStore {
 
   @action clearRawInvoiceModal() {
     this.rawInvoiceModal = false
-    setTimeout(()=>{
-      this.rawInvoiceModalParams=null
+    setTimeout(() => {
+      this.rawInvoiceModalParams = null
       this.lastPaidInvoice = ''
     }, 500) // delay 
   }
 
-  @observable lastPaidInvoice:string = ''
-  @action setLastPaidInvoice(s:string){
+  @observable lastPaidInvoice: string = ''
+  @action setLastPaidInvoice(s: string) {
     this.lastPaidInvoice = s
   }
 
-  @observable joinTribeParams: {[k:string]:any} = null
-  @action setJoinTribeParams(obj:{[k:string]:any}) {
+  @observable joinTribeParams: { [k: string]: any } = null
+  @action setJoinTribeParams(obj: { [k: string]: any }) {
     this.joinTribeParams = obj
   }
 
-  @observable imgViewerParams: {[k:string]:any} = null
-  @action setImgViewerParams(obj:{[k:string]:any}) {
+  @observable imgViewerParams: { [k: string]: any } = null
+  @action setImgViewerParams(obj: { [k: string]: any }) {
     this.imgViewerParams = obj
   }
 
-  @observable vidViewerParams: {[k:string]:any} = null
-  @action setVidViewerParams(obj:{[k:string]:any}) {
+  @observable vidViewerParams: { [k: string]: any } = null
+  @action setVidViewerParams(obj: { [k: string]: any }) {
     this.vidViewerParams = obj
   }
 
-  @observable rtcParams: {[k:string]:any} = null
-  @action setRtcParams(obj:{[k:string]:any}) {
+  @observable rtcParams: { [k: string]: any } = null
+  @action setRtcParams(obj: { [k: string]: any }) {
     this.rtcParams = obj
   }
 
   @observable jitsiMeet: boolean = false
-  @action setJitsiMeet(b:boolean) {
+  @action setJitsiMeet(b: boolean) {
     this.jitsiMeet = b
   }
 
@@ -210,7 +210,7 @@ export class UiStore {
     this.is24HourFormat = b
   }
 
-  @observable extraTextContent: {[k:string]:any}
+  @observable extraTextContent: { [k: string]: any }
   @action async setExtraTextContent(o) {
     this.extraTextContent = o
   }
@@ -220,23 +220,23 @@ export class UiStore {
     this.replyUUID = s
   }
 
-  @observable oauthParams: {[k:string]:any} = null
-  @action setOauthParams(obj:{[k:string]:any}) {
+  @observable oauthParams: { [k: string]: any } = null
+  @action setOauthParams(obj: { [k: string]: any }) {
     this.oauthParams = obj
   }
 
   @observable supportModal: boolean = false
-  @action setSupportModal(b:boolean) {
+  @action setSupportModal(b: boolean) {
     this.supportModal = b
   }
 
   @observable connected: boolean = false
-  @action setConnected(b:boolean) {
+  @action setConnected(b: boolean) {
     this.connected = b
   }
 
   @observable loadingHistory: boolean = false
-  @action setLoadingHistory(b:boolean) {
+  @action setLoadingHistory(b: boolean) {
     this.loadingHistory = b
   }
 
@@ -245,7 +245,7 @@ export class UiStore {
     this.showBots = b
   }
 
-  @observable startJitsiParams: {[k:string]:any} = null
+  @observable startJitsiParams: { [k: string]: any } = null
   @action setStartJitsiParams(b) {
     this.startJitsiParams = b
   }

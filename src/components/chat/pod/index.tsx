@@ -13,26 +13,16 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
 import Replay from './replay'
 
-export default function Pod({ show, chat, url, onBoost }) {
-  const {host,uuid} = chat
+export default function Pod({ pod, show, chatID, onBoost }) {
   const theme = useTheme()
-  const { chats, feed, user, msg } = useStores()
-  const [pod, setPod] = useState(null)
+  const { feed, user, msg } = useStores()
+ 
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
   // const [list,setList] = useState(false)
   const [duration,setDuration] = useState(0)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
   const [full, setFull] = useState(false)
-
-  async function loadPod() {
-    setLoading(true)
-    console.log("LOAD FEEED NOW")
-    const params = await chats.loadFeed(host, uuid, url)
-    if (params) setPod(params)
-    if (params) initialSelect(params)
-    setLoading(false)
-  }
 
   function getAndSetDuration(){
     setTimeout(async ()=>{
@@ -148,8 +138,8 @@ export default function Pod({ show, chat, url, onBoost }) {
   }, [show])
 
   useEffect(()=>{
-    if(url && !pod) loadPod()
-  },[url])
+    if(pod) initialSelect(pod)
+  },[pod])
 
   function onClipPayment(d){
     if(d.pubkey && d.ts) {
@@ -187,9 +177,8 @@ export default function Pod({ show, chat, url, onBoost }) {
     setFull(false)
   }
   function openFull(){
-    const theID = chat&&chat.id
-    if(!theID) return
-    const msgs = msg.messages[theID] || []
+    if(!chatID) return
+    const msgs = msg.messages[chatID] || []
     const msgsForEpisode = msgs.filter(m=>m.message_content&&m.message_content.includes('::')&&m.message_content.includes(episode.id))
     const msgsforReplay = []
     msgsForEpisode.forEach(m=>{

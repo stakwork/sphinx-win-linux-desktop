@@ -1,6 +1,6 @@
 import { action } from 'mobx'
-import {msgStore} from './msg'
-import {userStore} from './user'
+import { msgStore } from './msg'
+import { userStore } from './user'
 
 export const NUM_SECONDS = 60
 
@@ -26,18 +26,18 @@ export interface StreamPayment {
 
 export class FeedStore {
 
-  @action sendPayments(dests:Destination[], memo:string, price:number) {
-    asyncForEach(dests, async (d:Destination)=>{
-      const amt = Math.max(Math.round((d.split/100)*price), 1)
-      if(d.type==='node') {
-        if(!d.address) return
-        if(d.address===userStore.publicKey) return
-        if(d.address.length!==66) return
+  @action sendPayments(dests: Destination[], memo: string, price: number) {
+    asyncForEach(dests, async (d: Destination) => {
+      const amt = Math.max(Math.round((d.split / 100) * price), 1)
+      if (d.type === 'node') {
+        if (!d.address) return
+        if (d.address === userStore.publicKey) return
+        if (d.address.length !== 66) return
         await msgStore.sendAnonPayment({
           dest: d.address, amt, memo,
         })
       }
-      if(d.type==='wallet'){
+      if (d.type === 'wallet') {
         await msgStore.payInvoice({
           payment_request: d.address,
           amount: amt
@@ -46,14 +46,14 @@ export class FeedStore {
     })
   }
 
-  @action 
-  async loadFeedById(id:string){
-    if(!id) return
-    try{
+  @action
+  async loadFeedById(id: string) {
+    if (!id) return
+    try {
       const r = await fetch(`https://tribes.sphinx.chat/podcast?id=${id}`)
       const j = await r.json()
       return j
-    } catch(e){
+    } catch (e) {
       console.log(e)
     }
   }

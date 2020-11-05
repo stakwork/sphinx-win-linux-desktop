@@ -15,6 +15,7 @@ import Frame from './frame'
 import Pod from './pod'
 import {StreamPayment} from '../../store/feed'
 import Anim from './pod/anim'
+import {useIncomingPayments} from '../../store/hooks/pod'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
@@ -26,9 +27,10 @@ export default function Chat() {
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [appMode, setAppMode] = useState(false)
   // const [showPod, setShowPod] = useState(false)
-  const [tribeBots,setTribeBots] = useState([])
   const [status, setStatus] = useState<RouteStatus>(null)
-  
+  const [tribeParams, setTribeParams] = useState(null)
+  const [pod, setPod] = useState(null)
+
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
   const chat = chats.chats.find(c => c.id === chatID) || route.params
@@ -62,8 +64,7 @@ export default function Chat() {
     fetchTribeParams()
 
     return () => {
-      ui.setApplicationURL('')
-      ui.setFeedURL('')
+      setTribeParams(null)
     }
 
   }, [])
@@ -71,8 +72,8 @@ export default function Chat() {
   async function fetchTribeParams() {
     const isTribe = chat && chat.type === constants.chat_types.tribe
     const isTribeAdmin = isTribe && chat.owner_pubkey === user.publicKey
-    let isAppURL = false
-    let isFeedURL = false
+    // let isAppURL = false
+    // let isFeedURL = false
     if (isTribe) { //&& !isTribeAdmin) {
       setAppMode(true)
       // setLoadingChat(true)
@@ -87,26 +88,20 @@ export default function Chat() {
           0, 125
         );
         if(!isTribeAdmin) {
-          chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
+          if(chat.name!==params.name || chat.photo_url!==params.img) {
+            chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
+          }
         }
-        if(params.app_url) {
-          isAppURL = true
-          ui.setApplicationURL(params.app_url)
-        }
+        setTribeParams(params)
         if(params.feed_url) {
-          isFeedURL = true
-          ui.setFeedURL(params.feed_url)
-        }
-        if(params.bots && Array.isArray(params.bots)) {
-          setTribeBots(params.bots)
+          loadPod(params)
         }
       }
       // setLoadingChat(false)
     } else {
       setAppMode(false)
+      setTribeParams(null)
     }
-    if (!isAppURL && ui.applicationURL) ui.setApplicationURL('') // remove the app_url
-    if (!isFeedURL && ui.feedURL) ui.setFeedURL('')
 
     const r = await chats.checkRoute(chat.id)
     if(r && r.success_prob && r.success_prob>0) {
@@ -116,7 +111,15 @@ export default function Chat() {
     }
   }
 
-  const appURL = ui.applicationURL
+  async function loadPod(tr) {
+    const params = await chats.loadFeed(chat.host, chat.uuid, tr.feed_url)
+    if (params) setPod(params)
+    // if (params) initialSelect(params)
+  }
+
+  const appURL = tribeParams && tribeParams.app_url
+  const feedURL = tribeParams && tribeParams.feed_url
+  const tribeBots = tribeParams && tribeParams.bots
   const theShow = show
 
   function onBoost(sp:StreamPayment){
@@ -130,9 +133,14 @@ export default function Chat() {
     })
   }
 
+  const podID = pod&&pod.id
+  const {earned,spent} = useIncomingPayments(podID)
+
   return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} />
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} tribeParams={tribeParams} 
+      earned={earned} spent={spent}
+    />
 
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
       <Frame url={appURL} />
@@ -144,7 +152,7 @@ export default function Chat() {
       </View>}
       {theShow && <MsgList chat={chat} />}
 
-      <Pod chat={chat} show={ui.feedURL} url={ui.feedURL} onBoost={onBoost} />
+      <Pod pod={pod} show={feedURL} chatID={chat.id} onBoost={onBoost} />
 
       <Anim dark={theme.dark} />
 
