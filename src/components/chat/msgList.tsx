@@ -61,7 +61,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
   // }, [refreshing])
 
   async function onEndReached() {
-    EE.emit(SHOW_REFRESHER)
+    // EE.emit(SHOW_REFRESHER)
     wait(10).then(onLoadMoreMsgs)
   }
 

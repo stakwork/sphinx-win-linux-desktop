@@ -15,7 +15,10 @@ export default function Replay({ msgs, playing }) {
     const pos = Math.floor(posf)
     const newms = msgs ? msgs.filter(m => m.ts <= pos && m.ts > pos - 4) : []
     const msgsToShow = newms.map(m => ({ ...m, fading: m.ts === pos - 3 }))
-    setMessages(msgsToShow.slice(Math.max(0, msgsToShow.length - 4)))
+    setMessages(
+      msgsToShow.slice(Math.max(0, msgsToShow.length - 4))
+        .reverse()
+    )
   }
   useInterval(() => {
     if (playing) {
@@ -52,21 +55,28 @@ export default function Replay({ msgs, playing }) {
   const showBackdrop = messages && messages.length ? true : false
   return <>
     <View style={{ ...styles.backdrop, backgroundColor: theme.main, opacity: showBackdrop ? 0.5 : 0 }} />
-    <FlatList
-      inverted
+    <ItemList
       style={{ ...styles.scroller }}
-      nestedScrollEnabled
       data={messages}
       renderItem={renderItem}
-      keyExtractor={(_, i) => String(i)}
     />
   </>
+}
+
+function ItemList({data, renderItem, style}){
+  return <View style={style}>
+    {data&&data.map((item,index)=>{
+      return renderItem({item,index})
+    })}
+  </View>
 }
 
 const styles = StyleSheet.create({
   scroller: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 18,
+    display:'flex',
+    flexDirection:'column-reverse'
   },
   backdrop: {
     position: 'absolute',

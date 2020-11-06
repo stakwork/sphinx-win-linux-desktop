@@ -30,6 +30,7 @@ export default function Chat() {
   const [status, setStatus] = useState<RouteStatus>(null)
   const [tribeParams, setTribeParams] = useState(null)
   const [pod, setPod] = useState(null)
+  const [podError, setPodError] = useState(null)
 
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -114,6 +115,7 @@ export default function Chat() {
   async function loadPod(tr) {
     const params = await chats.loadFeed(chat.host, chat.uuid, tr.feed_url)
     if (params) setPod(params)
+    if(!params) setPodError('no podcast found')
     // if (params) initialSelect(params)
   }
 
@@ -136,10 +138,14 @@ export default function Chat() {
   const podID = pod&&pod.id
   const {earned,spent} = useIncomingPayments(podID)
 
+  let pricePerMinute = 0
+  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+    pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
+  }
   return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
 
     <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} tribeParams={tribeParams} 
-      earned={earned} spent={spent}
+      earned={earned} spent={spent} pricePerMinute={pricePerMinute}
     />
 
     {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
@@ -152,7 +158,7 @@ export default function Chat() {
       </View>}
       {theShow && <MsgList chat={chat} />}
 
-      <Pod pod={pod} show={feedURL} chatID={chat.id} onBoost={onBoost} />
+      <Pod pod={pod} show={feedURL?true:false} chatID={chat.id} onBoost={onBoost} podError={podError} />
 
       <Anim dark={theme.dark} />
 

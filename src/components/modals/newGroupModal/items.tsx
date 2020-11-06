@@ -6,8 +6,10 @@ import { usePicSrc } from '../../utils/picSrc'
 import { SwipeRow } from 'react-native-swipe-list-view'
 import { IconButton } from 'react-native-paper'
 import { ApproveButton, RejectButton } from '../../chat/msg/memberRequest'
+import { useTheme } from '../../../store'
 
 export function DeletableContact(props) {
+  const theme = useTheme()
   const { contact, onDelete } = props
   const uri = usePicSrc(contact)
   const hasImg = uri ? true : false
@@ -22,32 +24,33 @@ export function DeletableContact(props) {
         style={{ marginRight: 20 }}
       />
     </View>
-    <View style={styles.frontSwipeRow}>
-      <View style={styles.avatar}>
+    <View style={{...styles.frontSwipeRow,backgroundColor:theme.bg}}>
+      <View style={{...styles.avatar,borderColor:theme.border}}>
         <Image source={hasImg ? { uri } : require('../../../../android_assets/avatar.png')}
           style={{ width: 44, height: 44 }} resizeMode={'cover'}
         />
       </View>
       <View style={styles.contactContent}>
-        <Text style={styles.contactName}>{contact.alias}</Text>
+        <Text style={{...styles.contactName,color:theme.title}}>{contact.alias}</Text>
       </View>
     </View>
   </SwipeRow>
 }
 
 export function Contact(props) {
+  const theme = useTheme()
   const { contact, onPress, selected, unselectable } = props
   const uri = usePicSrc(contact)
   const hasImg = uri ? true : false
-  return <TouchableOpacity style={styles.contactTouch} activeOpacity={1}
+  return <TouchableOpacity style={{...styles.contactTouch,backgroundColor:theme.bg}} activeOpacity={1}
     onPress={onPress}>
-    <View style={styles.avatar}>
+    <View style={{...styles.avatar,borderColor:theme.border}}>
       <Image source={hasImg ? { uri } : require('../../../../android_assets/avatar.png')}
         style={{ width: 44, height: 44 }} resizeMode={'cover'}
       />
     </View>
     <View style={styles.contactContent}>
-      <Text style={styles.contactName}>{contact.alias}</Text>
+      <Text style={{...styles.contactName,color:theme.title}}>{contact.alias}</Text>
     </View>
     <View style={styles.checker}>
       {!unselectable && <RadioButton status={selected ? 'checked' : 'unchecked'}
@@ -59,6 +62,7 @@ export function Contact(props) {
 }
 
 export function PendingContact(props) {
+  const theme = useTheme()
   const [loadingStatus, setLoadingStatus] = useState('')
   const { contact, onPress, selected, unselectable } = props
   const uri = usePicSrc(contact)
@@ -69,15 +73,15 @@ export function PendingContact(props) {
     await props.onApproveOrDenyMember(contact.id, status)
     setLoadingStatus('')
   }
-  return <TouchableOpacity style={styles.contactTouch} activeOpacity={1}
+  return <TouchableOpacity style={{...styles.contactTouch,backgroundColor:theme.bg}} activeOpacity={1}
     onPress={onPress}>
-    <View style={styles.avatar}>
+    <View style={{...styles.avatar,borderColor:theme.border}}>
       <Image source={hasImg ? { uri } : require('../../../../android_assets/avatar.png')}
         style={{ width: 44, height: 44 }} resizeMode={'cover'}
       />
     </View>
     <View style={styles.contactContent}>
-      <Text style={styles.contactName}>{contact.alias}</Text>
+      <Text style={{...styles.contactName,color:theme.title}}>{contact.alias}</Text>
     </View>
     <View style={styles.buttonz}>
       <ApproveButton disabled={loadingStatus}
@@ -91,10 +95,11 @@ export function PendingContact(props) {
 }
 
 export function SelectedContact({ contact, onPress, removable }) {
+  const theme = useTheme()
   const uri = usePicSrc(contact)
   const hasImg = uri ? true : false
-  return <View style={styles.selectedContact}>
-    <View style={styles.selAvatar}>
+  return <View style={{...styles.selectedContact,backgroundColor:theme.bg}}>
+    <View style={{...styles.selAvatar,borderColor:theme.border}}>
       <Image source={hasImg ? { uri } : require('../../../../android_assets/avatar.png')}
         style={{ width: 54, height: 54, borderRadius: 27 }} resizeMode={'cover'}
       />
@@ -102,7 +107,7 @@ export function SelectedContact({ contact, onPress, removable }) {
         <Icon name="close" color="white" size={14} />
       </TouchableOpacity>}
     </View>
-    <Text style={styles.selName}>{contact.alias}</Text>
+    <Text style={{...styles.selName,color:theme.title}}>{contact.alias}</Text>
   </View>
 }
 

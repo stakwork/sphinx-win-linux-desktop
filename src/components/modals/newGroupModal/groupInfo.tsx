@@ -13,6 +13,8 @@ import { Contact, DeletableContact, PendingContact } from './items'
 import EE, { LEFT_GROUP } from '../../utils/ee'
 import ImagePicker from 'react-native-image-picker';
 import { constants } from '../../../constants'
+import Avatar from '../../chat/msg/avatar'
+import Slider from '@react-native-community/slider';
 
 export default function GroupInfo({ visible }) {
   const { ui, contacts, chats, user, msg } = useStores()
@@ -23,8 +25,12 @@ export default function GroupInfo({ visible }) {
   const [leaveDialog, setLeaveDialog] = useState(false)
   const [editDialog, setEditDialog] = useState(false)
   const [loadingTribe, setLoadingTribe] = useState(false)
-
+  
   const group = ui.groupModalParams
+
+  let initppm = chats.pricesPerMinute[group.id]
+  if(!(initppm||initppm===0)) initppm = group.pricePerMinute||5
+  const [ppm,setPpm] = useState(initppm)
 
   async function onKickContact(cid) {
     await chats.kick(group.id, cid)
@@ -71,6 +77,7 @@ export default function GroupInfo({ visible }) {
   const hasImg = uri ? true : false
 
   function changePic() {
+    return
     ImagePicker.launchImageLibrary({}, async img => {
       if (!img.didCancel) {
         if (group && group.id && img && img.uri) {
@@ -118,6 +125,18 @@ export default function GroupInfo({ visible }) {
   }
   const setEditDialogToFalseHandler = () => setEditDialog(false)
 
+  const ppms = [0,3,5,10,20,50,100]
+  function chooseSatsPerMinute(n){
+    if(!group.id) return
+    const price = ppms[n] || 0
+    chats.setPricePerMinute(group.id,price)
+  }
+  function satsPerMinuteChanged(n){
+    setPpm(ppms[n]||0)
+  }
+  let sliderValue = ppms.indexOf(ppm)
+  if(sliderValue<0) sliderValue=2
+
   return useObserver(() => {
     const contactsToShow = contacts.contacts.filter(c => {
       return c.id > 1 && group && group.contact_ids.includes(c.id)
@@ -141,9 +160,7 @@ export default function GroupInfo({ visible }) {
           {hasGroup && <View style={styles.groupInfo}>
             <View style={styles.groupInfoLeft}>
               <TouchableOpacity onPress={changePic}>
-                <Image source={hasImg ? { uri } : require('../../../../android_assets/avatar.png')}
-                  style={{ width: 54, height: 54, borderRadius: 27 }} resizeMode={'cover'}
-                />
+                {group && <Avatar big alias={group.name} photo={uri || ''} />}
               </TouchableOpacity>
               <View style={styles.groupInfoText}>
                 <Text style={{...styles.groupInfoName,color:theme.title}}>{group.name}</Text>
@@ -153,6 +170,21 @@ export default function GroupInfo({ visible }) {
             <IconButton icon="dots-vertical" size={32} color="#666"
               style={{ marginLeft: 0, marginRight: 0, position:'absolute', right:4 }}
               onPress={dotsVerticalHandler}
+            />
+          </View>}
+
+          {isTribe && !isTribeAdmin && (group&&group.feed_url) && <View style={styles.slideWrap}>
+            <View style={styles.slideText}>
+              <Text style={{...styles.slideLabel,color:theme.subtitle}}>Podcast: sats per minute</Text>
+              <Text style={{...styles.slideValue,color:theme.subtitle}}>{ppm}</Text>
+            </View>
+            <Slider minimumValue={0} maximumValue={6} value={sliderValue} step={1}
+              minimumTrackTintColor={theme.primary}
+              maximumTrackTintColor={theme.primary}
+              thumbTintColor={theme.primary}
+              onSlidingComplete={chooseSatsPerMinute}
+              onValueChange={satsPerMinuteChanged}
+              style={{width:'90%'}}
             />
           </View>}
 
@@ -301,6 +333,30 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginTop: 16,
     zIndex: 8
+  },
+  slideWrap:{
+    width:'100%',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    height:62,
+    marginTop:20
+  },
+  slideText:{
+    width:'90%',
+    display:'flex',
+    flexDirection:'row',
+    alignItems:'center',
+    justifyContent:'space-between',
+    paddingLeft:15,paddingRight:15,
+    marginBottom:10
+  },
+  slideLabel:{
+    fontSize:13
+  },
+  slideValue:{
+    fontSize:15,
+    fontWeight:'bold'
   }
 })
 

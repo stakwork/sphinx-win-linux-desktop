@@ -17,8 +17,8 @@ const conversation = constants.chat_types.conversation
 const tribe = constants.chat_types.tribe
 
 export default function Header(
-  { chat, appMode, setAppMode, status, tribeParams, earned, spent }: 
-  { chat: Chat, appMode: boolean, setAppMode: Function, status:RouteStatus, tribeParams:{[k:string]:any}, earned:number, spent:number }
+  { chat, appMode, setAppMode, status, tribeParams, earned, spent, pricePerMinute }: 
+  { chat: Chat, appMode: boolean, setAppMode: Function, status:RouteStatus, tribeParams:{[k:string]:any}, earned:number, spent:number, pricePerMinute:number }
 ) {
   const { contacts, ui, user, details, chats } = useStores()
   const isTribeAdmin = tribeParams&&tribeParams.owner_pubkey===user.publicKey
@@ -36,7 +36,7 @@ export default function Header(
       if (chat.type === conversation) {
         if (contact) ui.setEditContactModal(contact)
       } else {
-        ui.setGroupModal(chat)
+        ui.setGroupModal({...tribeParams, ...chat, pricePerMinute})
       }
     }
 

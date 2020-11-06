@@ -28,6 +28,9 @@ export interface Chat {
   updated_at: string
   deleted: boolean
 
+  feed_url: string
+  app_url: string
+
   group_key: string
   host: string
   price_to_join: number
@@ -43,6 +46,8 @@ export interface Chat {
   invite: Invite
 
   photo_uri: string
+
+  pricePerMinute: number // for setting in group modal
 }
 
 export interface TribeServer {
@@ -53,9 +58,17 @@ export class ChatStore {
   @persist('list') @observable
   chats: Chat[] = []
 
+  @persist('object') @observable
+  pricesPerMinute: {[k:number]:number} = {}
+
   @action
   setChats(chats: Chat[]) {
     this.chats = chats
+  }
+
+  @action
+  setPricePerMinute(chatID: number, ppm: number) {
+    this.pricesPerMinute[chatID] = ppm
   }
 
   @persist('list') @observable
@@ -268,6 +281,7 @@ export class ChatStore {
       return j
     } catch (e) {
       console.log(e)
+      return null
     }
   }
 

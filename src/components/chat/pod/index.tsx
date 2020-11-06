@@ -12,10 +12,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
 import Replay from './replay'
+import {getPosition,setPosition} from './position'
 
-export default function Pod({ pod, show, chatID, onBoost }) {
+export default function Pod({ pod, show, chatID, onBoost, podError }) {
   const theme = useTheme()
-  const { feed, user, msg } = useStores()
+  const { feed, user, msg, chats } = useStores()
  
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
@@ -80,11 +81,14 @@ export default function Pod({ pod, show, chatID, onBoost }) {
   }
 
   let pricePerMinute = 0
-  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+  if(chats.pricesPerMinute[chatID] || chats.pricesPerMinute[chatID]===0) {
+    pricePerMinute = chats.pricesPerMinute[chatID]
+  } else if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
   async function sendPayments(mult:number){
+    if(!pricePerMinute) return
     console.log('=> sendPayments!')
     const pos = await TrackPlayer.getPosition()
     const dests = pod && pod.value && pod.value.destinations    
@@ -103,6 +107,7 @@ export default function Pod({ pod, show, chatID, onBoost }) {
   const storedTime = useRef(0)
   useInterval(()=>{
     if(playing) {
+      setPosition()
       const c = count.current
       if(c && c%NUM_SECONDS===0) {
         sendPayments(1)
@@ -142,7 +147,7 @@ export default function Pod({ pod, show, chatID, onBoost }) {
   },[pod])
 
   function onClipPayment(d){
-    if(d.pubkey && d.ts) {
+    if(pricePerMinute && d.pubkey && d.ts) {
       const dests = pod && pod.value && pod.value.destinations    
       if(!dests) return
       const extraDest:Destination = {
@@ -198,15 +203,24 @@ export default function Pod({ pod, show, chatID, onBoost }) {
     setFull(true)
   }
 
-  if (!show || !episode) {
+  if (!show) {
     return <></>
+  }
+
+  if (!episode) {
+    return <PodBar episode={episode} 
+      onToggle={onToggle} playing={playing}
+      onShowFull={openFull} boost={boost}
+      duration={duration} loading={true}
+      podError={podError}
+    />
   }
 
   function boost(){
     EE.emit(PLAY_ANIMATION)
     const amount = 100
     requestAnimationFrame(async ()=>{
-      const pos = await TrackPlayer.getPosition()
+      const pos = getPosition()
       const sp:StreamPayment = {
         feedID: pod.id,
         itemID: selectedEpisodeID,
@@ -223,10 +237,10 @@ export default function Pod({ pod, show, chatID, onBoost }) {
   }
 
   if(!full) {
-    return <PodBar pod={pod} episode={episode} 
+    return <PodBar episode={episode} 
       onToggle={onToggle} playing={playing}
-      onShowFull={openFull}
-      boost={boost}
+      onShowFull={openFull} boost={boost}
+      duration={duration}
     />
   }
 
