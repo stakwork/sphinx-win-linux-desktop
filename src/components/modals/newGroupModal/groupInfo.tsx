@@ -165,6 +165,9 @@ export default function GroupInfo({ visible }) {
               <View style={styles.groupInfoText}>
                 <Text style={{...styles.groupInfoName,color:theme.title}}>{group.name}</Text>
                 <Text style={styles.groupInfoCreated}>{`Created on ${moment(group.created_at).format('ll')}`}</Text>
+                <Text style={{...styles.groupInfoPrices,color:theme.subtitle}}>
+                  {`Price per message: ${group.price_per_message}, Amount to stake: ${group.escrow_amount}`}
+                </Text>
               </View>
             </View>
             <IconButton icon="dots-vertical" size={32} color="#666"
@@ -302,7 +305,10 @@ const styles = StyleSheet.create({
   },
   groupInfoCreated: {
     color: '#888',
-    fontSize: 12,
+    fontSize: 10,
+  },
+  groupInfoPrices:{
+    fontSize: 10,
   },
   members: {
     marginTop: 19,

@@ -147,5 +147,5 @@ function chunkArray(arr, len) {
 }
 
 export function skinny(m: Msg): Msg {
-  return { ...m, chat: null }
+  return { ...m, chat: null, remote_message_content:null }
 }

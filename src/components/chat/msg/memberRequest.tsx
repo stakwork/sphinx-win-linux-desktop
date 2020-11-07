@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { Text, View, StyleSheet } from 'react-native'
 import { IconButton, Button } from 'react-native-paper'
 import { constantCodes } from '../../../constants'
+import { useTheme } from '../../../store'
 
 export default function MemberRequest(props) {
+  const theme = useTheme()
   const [loadingStatus, setLoadingStatus] = useState('')
   const typ = constantCodes['message_types'][props.type]
 
@@ -24,8 +26,8 @@ export default function MemberRequest(props) {
     setLoadingStatus('')
   }
   return <View style={styles.row}>
-    <View style={{ ...styles.wrap, width: props.isTribeOwner ? 280 : 'auto' }}>
-      <Text style={styles.text} numberOfLines={2}>{msg}</Text>
+    <View style={{ ...styles.wrap, backgroundColor:theme.deep, borderColor:theme.border, width: props.isTribeOwner ? 280 : 'auto' }}>
+      <Text style={{...styles.text,color:theme.title}} numberOfLines={2}>{msg}</Text>
       {props.isTribeOwner && <View style={styles.right}>
         <ApproveButton disabled={typ === 'member_reject'}
           onPress={() => press('approved')} loading={loadingStatus === 'approved'}

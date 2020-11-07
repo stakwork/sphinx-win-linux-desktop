@@ -3,6 +3,8 @@ import { Chat } from './chats'
 import { Msg } from './msg'
 import { Contact } from './contacts'
 
+type PayMode = '' | 'invoice' | 'payment' | 'loopout'
+
 export class UiStore {
   @observable ready: boolean = false
   @action setReady(ready) {
@@ -123,9 +125,9 @@ export class UiStore {
   }
 
   @observable showPayModal: boolean = false
-  @observable payMode: string = ''
+  @observable payMode: PayMode = ''
   @observable chatForPayModal: Chat | null
-  @action setPayMode(m, c) {
+  @action setPayMode(m:PayMode, c) {
     this.payMode = m
     this.chatForPayModal = c
     this.showPayModal = true

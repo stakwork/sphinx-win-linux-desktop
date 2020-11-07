@@ -36,7 +36,7 @@ export default function Header(
       if (chat.type === conversation) {
         if (contact) ui.setEditContactModal(contact)
       } else {
-        ui.setGroupModal({...tribeParams, ...chat, pricePerMinute})
+        ui.setGroupModal({...chat, ...tribeParams, pricePerMinute})
       }
     }
 

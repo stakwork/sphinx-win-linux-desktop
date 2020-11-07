@@ -23,7 +23,7 @@ export interface Msg {
   payment_hash: string
   payment_request: string
   date: string
-  expiration_data: string
+  expiration_date: string
   message_content: string
   remote_message_content: string
   status: number

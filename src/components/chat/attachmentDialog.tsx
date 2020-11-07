@@ -11,8 +11,10 @@ export default function AttachmentDialog({
     doPaidMessage,
     request,
     send,
+    loopout,
     isConversation,
     onGiphyHandler,
+    hasLoopout,
   }) {
 
   const [fetchingGifs,setFetchingGifs] = useState(false)
@@ -33,18 +35,21 @@ export default function AttachmentDialog({
   const doPaidMessageHandler = () => doPaidMessage()
   const requestHandler = () => request()
   const sendHandler = () => send()
+  const loopoutHandler = () => loopout()
   const pickGif = async () => {
     setFetchingGifs(true)
     await onGiphyHandler()
     setFetchingGifs(false)
   }
 
+  let height = isConversation ? 280 : 180
+  if(hasLoopout) height+=80
   return <Portal>
     <Dialog visible={open} style={{ bottom: 10 }}
       onDismiss={onCloseHandler}>
       <Dialog.Title>Message Options</Dialog.Title>
       <Dialog.Actions style={{
-        height: isConversation ? 280 : 180,
+        height,
         display: 'flex', flexDirection: 'column',
         justifyContent: 'space-between', alignItems: 'flex-start'
       }}>
@@ -66,6 +71,9 @@ export default function AttachmentDialog({
         </Button>}
         {isConversation && <Button icon="arrow-top-right" onPress={sendHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-send-button">
           Send
+        </Button>}
+        {hasLoopout && <Button icon="arrow-top-right" onPress={loopoutHandler} style={{ width: '100%', alignItems: 'flex-start' }} accessibilityLabel="dialog-loopout-button">
+          Send OnChain  
         </Button>}
       </Dialog.Actions>
     </Dialog>

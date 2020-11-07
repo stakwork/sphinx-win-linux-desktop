@@ -9,6 +9,9 @@ import FadeView from '../../utils/fadeView'
 import ShowRawInvoice from '../rawInvoiceModal/showRawInvoice'
 import Scan from './scan'
 import {setTint} from '../../utils/statusBar'
+const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const basex = require('bs58-rn');
+const base58 = basex(ALPHABET);
 
 export default function SendPayment({visible}) {
   const {ui,msg,contacts} = useStores()
@@ -18,6 +21,7 @@ export default function SendPayment({visible}) {
   const [loading, setLoading] = useState(false)
   const [rawInvoice, setRawInvoice] = useState(null)
   const [amtToPay, setAmtToPay] = useState(null)
+  const [err,setErr] = useState('')
 
   useEffect(()=>{
     if(visible) setMain(true)
@@ -68,9 +72,43 @@ export default function SendPayment({visible}) {
     } else if(ui.payMode==='payment') {
       setNext(ui.payMode)
       setAmtToPay(amt)
+    } else if(ui.payMode==='loopout') {
+      setNext(ui.payMode)
+      setAmtToPay(amt)
     }
   }
+  async function payLoopout(addy) {
+    // gen msg?
+    setErr('')
+    console.log("PAY LOOPOUT")
+    if(amtToPay<250000) {
+      return setErr('Minimum 250000 required')
+    }
+    if(amtToPay>16777215) {
+      return setErr('Amount too big')
+    }
+    try {
+      const decodedAddy = base58.decode(addy)
+      if(!decodedAddy) return setErr('Wrong address format')
+      if(decodedAddy.length!==25) return setErr('Wrong address format')
+    } catch(e) {
+      return setErr('Wrong address format')
+    }
+    const text = `/loopout ${addy} ${amtToPay}`
+    setLoading(true)
+    await msg.sendMessage({
+      contact_id:null, chat_id:chat.id,
+      text, amount:amtToPay,
+      reply_uuid:'',
+    })
+    setLoading(false)
+    close()
+  }
   async function payContactless(addy){
+    if(ui.payMode==='loopout') {
+      payLoopout(addy)
+      return
+    }
     setLoading(true)
     await msg.sendPayment({
       contact_id:null, chat_id:null,
@@ -94,6 +132,11 @@ export default function SendPayment({visible}) {
       setTimeout(()=> setTint('dark'), 150)
       return
     }
+    if(ui.payMode==='loopout') {
+      sendContactless(amt,text)
+      setTimeout(()=> setTint('dark'), 150)
+      return
+    } 
     if(ui.payMode==='payment') await sendPayment(amt, text)
     if(ui.payMode==='invoice') await sendInvoice(amt, text)
     setTimeout(()=> setTint('light'), 150)
@@ -106,16 +149,18 @@ export default function SendPayment({visible}) {
     }
   }
   
+  const isLoopout=ui.payMode==='loopout'
   const hasRawInvoice=rawInvoice?true:false
   return useObserver(() =>{
-    const label = ui.payMode==='payment'?'Send Payment':'Request Payment'
+    const label = ui.payMode==='payment'?'Send Payment':
+      isLoopout?'Send Bitcoin':'Request Payment'
     return <ModalWrap visible={visible} onClose={close}>
       <Header title={label} onClose={()=>close()} />
 
       <FadeView opacity={next===''?1:0} style={styles.content}>
         {main && <Main
           contactless={!chat?true:false}
-          contact={contact}
+          contact={isLoopout?null:contact}
           loading={loading}
           confirmOrContinue={confirmOrContinue}
         />}
@@ -129,8 +174,10 @@ export default function SendPayment({visible}) {
         />}
       </FadeView>
 
-      <FadeView opacity={next==='payment'?1:0} style={styles.content}>
-        <Scan pay={payContactless} loading={loading} />
+      <FadeView opacity={next==='payment'||next==='loopout'?1:0} style={styles.content}>
+        <Scan pay={payContactless} loading={loading} isLoopout={isLoopout} 
+          error={err}
+        />
       </FadeView>
 
     </ModalWrap>

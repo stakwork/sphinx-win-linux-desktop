@@ -37,6 +37,7 @@ export class ThemeStore {
   accent: string = '#48c998'
   active: string = '#49ca97'
   inactive: string = '#febd59'
+  error: string = '#DB5554'
 
 }
 
