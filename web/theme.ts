@@ -6,6 +6,7 @@ const theme = {
     deep: '#141d27',
     extraDeep: '#222e3a',
     highlight: '#3d6189',
+    disabledPrimary: '#4c6bc0'
 }
 
 export default theme
