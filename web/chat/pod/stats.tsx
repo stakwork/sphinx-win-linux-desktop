@@ -42,8 +42,8 @@ export default function Stats({ pod, onClose, incomingPayments, earned }) {
       <ByEpisode>By Episode:</ByEpisode>
       {episodes.map((e,i)=>{
         const selected = selectedEpisodeID===e.id
-        return <EpisodeWrap key={i} onClick={()=>selectEpisode(e)}>
-          <EpisodeEarning selected={selected}>
+        return <EpisodeWrap key={i}>
+          <EpisodeEarning selected={selected} onClick={()=>selectEpisode(e)}>
             <span>{e.title}</span>
             <span>{`${e.total} sats`}</span>
           </EpisodeEarning>

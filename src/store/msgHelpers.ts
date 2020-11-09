@@ -1,8 +1,8 @@
-import {contactStore} from './contacts'
+import { contactStore } from './contacts'
 import * as e2e from '../crypto/e2e'
-import {chatStore} from './chats'
-import {constants} from '../constants'
-import {Msg, MAX_MSGS_PER_CHAT} from './msg'
+import { chatStore } from './chats'
+import { constants } from '../constants'
+import { Msg, MAX_MSGS_PER_CHAT } from './msg'
 
 export async function encryptText({ contact_id, text }) {
   if (!text) return ''
@@ -92,14 +92,14 @@ export function orgMsgsFromExisting(allMsgs: { [k: number]: Msg[] }, messages: M
   return allms
 }
 
-export function putInReverse(allms, decoded){
-  decoded.forEach(msg=>{
-    if(msg.chat_id || msg.chat_id===0){
+export function putInReverse(allms, decoded) {
+  decoded.forEach(msg => {
+    if (msg.chat_id || msg.chat_id === 0) {
       const chatID = msg.chat_id
-      if(allms[chatID]){
-        if(!Array.isArray(allms[chatID])) return
-        const idx = allms[chatID].findIndex(m=>m.id===msg.id)
-        if(idx===-1 && allms[chatID].length<MAX_MSGS_PER_CHAT) {
+      if (allms[chatID]) {
+        if (!Array.isArray(allms[chatID])) return
+        const idx = allms[chatID].findIndex(m => m.id === msg.id)
+        if (idx === -1 && allms[chatID].length < MAX_MSGS_PER_CHAT) {
           allms[chatID].push(skinny(msg))
         } else {
           allms[chatID][idx] = skinny(msg)
@@ -138,14 +138,14 @@ async function asyncForEach(array, callback) {
 }
 function chunkArray(arr, len) {
   var chunks = [],
-      i = 0,
-      n = arr.length;
+    i = 0,
+    n = arr.length;
   while (i < n) {
     chunks.push(arr.slice(i, i += len));
   }
   return chunks;
 }
 
-export function skinny(m:Msg): Msg {
-  return {...m,chat:null}
+export function skinny(m: Msg): Msg {
+  return { ...m, chat: null, remote_message_content:null }
 }

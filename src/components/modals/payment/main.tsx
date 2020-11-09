@@ -37,6 +37,7 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
     }
   }
 
+  const isLoopout = ui.payMode==='loopout'
   const nameColor = contact && useAvatarColor(contact.alias)
   return <View style={{...styles.wrap,maxHeight:height,minHeight:height,
     justifyContent:contact?'space-around':'center'
@@ -66,7 +67,7 @@ export default function Main({contact,loading,confirmOrContinue,contactless}){
           loading={loading}
           onPress={()=> confirmOrContinue(parseInt(amt),text)}
           mode="contained" dark={true}>
-          {contactless?'CONTINUE':'CONFIRM'}
+          {contactless||isLoopout?'CONTINUE':'CONFIRM'}
         </Button>}
       </View>
 

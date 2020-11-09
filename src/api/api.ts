@@ -1,5 +1,5 @@
 export default class API {
-  constructor(url:string, tokenKey?:string, tokenValue?:string) {
+  constructor(url:string, tokenKey?:string, tokenValue?:string, resetIPCallback?:Function) {
     this.get = addMethod('GET',url)
     this.post = addMethod('POST',url)
     this.put = addMethod('PUT',url)
@@ -7,6 +7,7 @@ export default class API {
     this.upload = addMethod('UPLOAD',url)
     if(tokenKey) this.tokenKey = tokenKey
     if(tokenValue) this.tokenValue = tokenValue
+    if(resetIPCallback) this.resetIPCallback = resetIPCallback
   }
   tokenKey: string
   tokenValue: string
@@ -15,7 +16,10 @@ export default class API {
   put: Function
   del: Function
   upload: Function
+  resetIPCallback: Function
 }
+
+const TIMEOUT = 20000
 
 function addMethod(m: string, rootUrl: string): Function {
   return async function (url: string, data: any, encoding?: string) {
@@ -57,7 +61,7 @@ function addMethod(m: string, rootUrl: string): Function {
 
       // console.log('=>',opts.method,rootUrl + url)
 
-      const r = await fetch(rootUrl + url, opts)
+      const r = await fetchTimeout(rootUrl + url, TIMEOUT, opts)
       if (!r.ok) {
         console.log('Not OK!',r.status,url)
         return
@@ -81,9 +85,20 @@ function addMethod(m: string, rootUrl: string): Function {
         }
         return res
       }
-    } catch (e) {
+    } catch (e) { // 20 is an "abort" i guess
       console.warn(e)
+      const isWebAbort = e.code===20
+      const isRNAbort = e.message==='Aborted'
+      if(isWebAbort || isRNAbort) reportTimeout(this.resetIPCallback)
     }
+  }
+}
+
+let timeoutCount = 0
+function reportTimeout(resetIPCallback:Function){
+  timeoutCount += 1
+  if(timeoutCount===3) {
+    if(resetIPCallback) resetIPCallback()
   }
 }
 
@@ -101,3 +116,10 @@ function makeSearchParams(params){
     return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
   }).join('&')
 }
+
+const fetchTimeout = (url, ms, options = {}) => {
+  const controller = new AbortController();
+  const promise = fetch(url, { signal: controller.signal, ...options });
+  const timeout = setTimeout(() => controller.abort(), ms);
+  return promise.finally(() => clearTimeout(timeout));
+};

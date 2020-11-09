@@ -17,6 +17,7 @@ import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 import { useDarkMode } from 'react-native-dynamic'
 import { is24HourFormat } from 'react-native-device-time-format'
 import TrackPlayer from 'react-native-track-player';
+import EE, {RESET_IP_FINISHED} from './src/components/utils/ee'
 
 declare var global: {HermesInternal: null | {}}
 
@@ -86,14 +87,23 @@ function App() {
       const isSignedUp = (user.currentIP && user.authToken && !user.onboardStep)?true:false
       setSignedUp(isSignedUp)
       if(isSignedUp){
-        instantiateRelay(user.currentIP, user.authToken, connectedHandler, disconnectedHandler)
+        instantiateRelay(user.currentIP, user.authToken, connectedHandler, disconnectedHandler, resetIP)
       }
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
 
       setLoading(false)
+
+      user.testinit()
     })()
   },[])
+
+  async function resetIP(){
+    ui.setLoadingHistory(true)
+    const newIP = await user.resetIP()
+    instantiateRelay(newIP, user.authToken, connectedHandler, disconnectedHandler)
+    EE.emit(RESET_IP_FINISHED)
+  }
 
   return useObserver(()=>{
 

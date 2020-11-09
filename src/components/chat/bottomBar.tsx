@@ -29,7 +29,7 @@ let nonStateRecordingStartTime = 0
 let dontRecordActually = false
 
 export default function BottomBar({chat,pricePerMessage,tribeBots}) {
-  const {ui,msg,contacts,meme} = useStores()
+  const {ui,msg,meme} = useStores()
   const theme = useTheme()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
@@ -47,8 +47,12 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
 
   const inputRef = useRef(null)
 
+  const hasLoopout = tribeBots&&tribeBots.length&&tribeBots.find(tb=>tb.prefix==='/loopout'&&tb.commands&&tb.commands.find(c=>c.command==='*'))?true:false
+
+  const waitingForAdminApproval = chat.status === constants.chat_statuses.pending
   function sendMessage(){
     if(!text) return
+    if(waitingForAdminApproval) return
     let contact_id=chat.contact_ids.find(cid=>cid!==1)
     let {price, failureMessage} = calcBotPrice(tribeBots,text)
     if(failureMessage) {
@@ -370,6 +374,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
         </View>}
 
         <AttachmentDialog
+          hasLoopout={hasLoopout}
           isConversation={isConversation}
           open={dialogOpen} onClose={()=>setDialogOpen(false)}
           onPick={res=> tookPic(res)}
@@ -382,6 +387,10 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
           send={()=>{
             setDialogOpen(false)
             ui.setPayMode('payment',chat)
+          }}
+          loopout={()=>{
+            setDialogOpen(false)
+            ui.setPayMode('loopout',chat)
           }}
           onGiphyHandler={onGiphyHandler}
         />

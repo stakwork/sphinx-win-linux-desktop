@@ -7,22 +7,22 @@ type Mode = 'System' | 'Dark' | 'Light'
 export class ThemeStore {
 
   @persist @observable
-  mode:Mode = 'System'
+  mode: Mode = 'System'
 
-  @action setMode(m:Mode) {
+  @action setMode(m: Mode) {
     this.mode = m
   }
 
   @observable dark: boolean = false
-  @action setDark(d:boolean) {
+  @action setDark(d: boolean) {
     this.dark = d
-    this.main = d?'#1c252e':'#FFF'
-    this.bg = d?'#141d26':'#f3f3f3'
-    this.title = d?'#ddd':'#666'
-    this.subtitle = d?'#8b98b4':'#7e7e7e'
-    this.border = d?'#111':'#ccc'
-    this.selected = d?'#3b4681':'#ddddff'
-    this.deep = d?'#292c33':'#ccc'
+    this.main = d ? '#1c252e' : '#FFF'
+    this.bg = d ? '#141d26' : '#f3f3f3'
+    this.title = d ? '#ddd' : '#666'
+    this.subtitle = d ? '#8b98b4' : '#7e7e7e'
+    this.border = d ? '#111' : '#ccc'
+    this.selected = d ? '#3b4681' : '#ddddff'
+    this.deep = d ? '#292c33' : '#ccc'
   }
 
   @observable bg: string = '#FFF'
@@ -37,6 +37,7 @@ export class ThemeStore {
   accent: string = '#48c998'
   active: string = '#49ca97'
   inactive: string = '#febd59'
+  error: string = '#DB5554'
 
 }
 

@@ -10,5 +10,8 @@ export const CLEAR_REPLY_UUID = 'clear-reply-uuid'
 export const LEFT_GROUP = 'left-group'
 export const LEFT_IMAGE_VIEWER = 'left-image-viewer'
 export const SHOW_REFRESHER = 'show-refresher'
+export const RESET_IP = 'reset-ip'
+export const RESET_IP_FINISHED = 'reset-ip-finished'
+
 
 export default EE

@@ -7,7 +7,7 @@ const invite = new API('https://hub.sphinx.chat/api/v1/','','')
 
 let relay = null
 
-export function instantiateRelay(ip:string, authToken?:string, connectedCallback?:Function, disconnectCallback?:Function){
+export function instantiateRelay(ip:string, authToken?:string, connectedCallback?:Function, disconnectCallback?:Function, resetIPCallback?: Function){
   if(!ip) return console.log("cant instantiate Relay, no IP")
 
   if(relay) relay = null
@@ -25,7 +25,7 @@ export function instantiateRelay(ip:string, authToken?:string, connectedCallback
   }
   
   if(authToken){
-    relay = new API(`${protocol}${ip}/`, 'x-user-token', authToken)
+    relay = new API(`${protocol}${ip}/`, 'x-user-token', authToken, resetIPCallback)
   } else {
     relay = new API(`${protocol}${ip}/`)
   }

@@ -10,6 +10,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import CachedButton from '@material-ui/icons/Cached';
 import ArrowBackIosButton from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosButton from '@material-ui/icons/ArrowForwardIos';
+import EE, {RESET_IP, RESET_IP_FINISHED} from '../utils/ee'
 
 export default function Head({ setWidth, width }) {
   const { contacts, details, msg, ui } = useStores()
@@ -26,6 +27,21 @@ export default function Head({ setWidth, width }) {
     ])
     setRefreshing(false)
   }
+
+  function startResetIP(){
+    setRefreshing(true)
+  }
+
+  useEffect(()=>{
+    refresh()
+    
+    EE.on(RESET_IP, startResetIP)
+    EE.on(RESET_IP_FINISHED, refresh)
+    return ()=>{
+      EE.removeListener(RESET_IP, startResetIP)
+      EE.removeListener(RESET_IP_FINISHED, refresh)
+    }
+  },[])
 
   function setWidthHandler(width: number) {
     setWidth(width)
@@ -46,7 +62,7 @@ export default function Head({ setWidth, width }) {
         <div></div>
         <Tooltip title={ui.connected ? 'Connected' : 'Not Connected'} placement="left">
           {refreshing ?
-            <CircularProgress size='24px' style={{ marginRight: 20, marginLeft: -20, color: '#49ca97' }} /> :
+            <CircularProgress size={18} style={{ marginRight: 20, marginLeft: -20, color: 'white' }} /> :
             <FlashOnButton style={{
               marginRight: 20, marginLeft: -20, height: 20,
               color: ui.connected ? '#49ca97' : '#febd59'

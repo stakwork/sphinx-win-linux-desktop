@@ -11,7 +11,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import actions from '../../src/store/actions'
 
 function Onboard(props){
-  const {user,contacts} = useStores()
+  const {user,contacts,chats} = useStores()
   const [text,setText] = useState('')
   const [showPin, setShowPin] = useState(false)
   const [checking, setChecking] = useState(false)
@@ -70,12 +70,17 @@ function Onboard(props){
     await contacts.updateContact(1, {
       alias, contact_key: publicKey // set my pubkey in relay
     })
-    await contacts.addContact({
-      alias: user.invite.inviterNickname,
-      public_key: user.invite.inviterPubkey,
-      status: constants.contact_statuses.confirmed,
-    })
-    await actions(user.invite.action)
+    user.setAlias(alias)
+    await Promise.all([
+      contacts.addContact({
+        alias: user.invite.inviterNickname,
+        public_key: user.invite.inviterPubkey,
+        status: constants.contact_statuses.confirmed,
+      }),
+      actions(user.invite.action),
+      user.finishInvite(),
+      chats.joinDefaultTribe()
+    ])
     setChecking(false)
     props.onRestore()
   }

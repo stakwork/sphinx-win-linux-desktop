@@ -61,7 +61,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
   // }, [refreshing])
 
   async function onEndReached() {
-    EE.emit(SHOW_REFRESHER)
+    // EE.emit(SHOW_REFRESHER)
     wait(10).then(onLoadMoreMsgs)
   }
 
@@ -85,7 +85,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
 
   if (chat.status === constants.chat_statuses.pending) {
     return <View style={{ display: 'flex', alignItems: 'center' }}>
-      <Text style={{ marginTop: 27 }}>Waiting for admin approval</Text>
+      <Text style={{ marginTop: 27, color:theme.subtitle }}>Waiting for admin approval</Text>
     </View>
   }
 

@@ -2,11 +2,21 @@ import React, {useState} from 'react'
 import {View, StyleSheet, Dimensions, Text} from 'react-native'
 import Scanner from '../../utils/scanner'
 import {TextInput,Button} from 'react-native-paper'
+import {useTheme} from '../../../store'
 
-export default function Scan({pay,loading}){
+export default function Scan({pay,loading,isLoopout,error}){
+  const theme = useTheme()
   const [addy, setAddy] = useState('')
   const [focused, setFocused] = useState(false)
   function scanned({ type, data }){
+    if(isLoopout) {
+      if(data.startsWith('bitcoin:')) {
+        const arr = data.split(':')
+        if(arr.length>1) setAddy(arr[1])
+      } else {
+        setAddy(data)
+      }
+    }
     if(data.length===66) setAddy(data)
   }
   const w = Dimensions.get('screen').width
@@ -21,9 +31,14 @@ export default function Scan({pay,loading}){
           handleBarCodeScanned={scanned}
         />
       </View>
+      {(error?true:false)&&<View style={styles.errorWrap}>
+        <Text style={{color:theme.error,...styles.error}}>
+          {error}
+        </Text>
+      </View>}
       <View style={styles.inputWrap}>
         <TextInput
-          label="Scan or Enter Public Key"
+          label={isLoopout?"Scan or Enter Bitcoin Address":"Scan or Enter Public Key"}
           style={styles.input}
           onChangeText={e=> setAddy(e)}
           value={addy}
@@ -98,4 +113,13 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     borderRadius:20,
   },
+  errorWrap:{
+    width:'100%',
+    display:'flex',
+    alignItems:'center',
+    marginBottom:20
+  },
+  error:{
+
+  }
 })

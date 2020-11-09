@@ -16,6 +16,7 @@ import * as localForage from 'localforage'
 import Modals from './modals'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import 'react-h5-audio-player/lib/styles.css';
+import EE, {RESET_IP, RESET_IP_FINISHED} from './utils/ee'
 
 const palette = {
   primary: {
@@ -60,7 +61,9 @@ function App(){
           ui.setConnected(true)
         }, function(){
           ui.setConnected(false)
-        })
+        },
+          resetIP
+        )
       }
 
       const pinWasEnteredRecently = await wasEnteredRecently()
@@ -73,6 +76,17 @@ function App(){
       // },1000)
     })()
   },[])
+
+  async function resetIP(){
+    EE.emit(RESET_IP)
+    const newIP = await user.resetIP()
+    instantiateRelay(newIP, user.authToken, function(){
+      ui.setConnected(true)
+    }, function(){
+      ui.setConnected(false)
+    })
+    EE.emit(RESET_IP_FINISHED)
+  }
 
   if(!signedUp) {
     return <Onboard welcome={welcome} onRestore={async()=>{
@@ -92,12 +106,10 @@ function App(){
 function Main(){
   const {contacts,msg,details,meme} = useStores()
   useEffect(()=>{
-    contacts.getContacts().then(()=>{
+    setTimeout(()=>{
       meme.authenticateAll()
       meme.checkCacheEnabled()
-    })
-    details.getBalance()
-    msg.getMessages()
+    }, 1500)
     msg.initLastSeen()
   },[])
   return <main className="main" style={{background:theme.bg}}>

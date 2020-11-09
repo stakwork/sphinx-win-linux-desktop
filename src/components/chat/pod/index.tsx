@@ -12,27 +12,18 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
 import Replay from './replay'
+import {getPosition,setPosition} from './position'
 
-export default function Pod({ show, chat, url, onBoost }) {
-  const {host,uuid} = chat
+export default function Pod({ pod, show, chatID, onBoost, podError }) {
   const theme = useTheme()
-  const { chats, feed, user, msg } = useStores()
-  const [pod, setPod] = useState(null)
+  const { feed, user, msg, chats } = useStores()
+ 
   const [loading, setLoading] = useState(false)
   const [playing,setPlaying] = useState(false)
   // const [list,setList] = useState(false)
   const [duration,setDuration] = useState(0)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
   const [full, setFull] = useState(false)
-
-  async function loadPod() {
-    setLoading(true)
-    console.log("LOAD FEEED NOW")
-    const params = await chats.loadFeed(host, uuid, url)
-    if (params) setPod(params)
-    if (params) initialSelect(params)
-    setLoading(false)
-  }
 
   function getAndSetDuration(){
     setTimeout(async ()=>{
@@ -90,11 +81,14 @@ export default function Pod({ show, chat, url, onBoost }) {
   }
 
   let pricePerMinute = 0
-  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+  if(chats.pricesPerMinute[chatID] || chats.pricesPerMinute[chatID]===0) {
+    pricePerMinute = chats.pricesPerMinute[chatID]
+  } else if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
   async function sendPayments(mult:number){
+    if(!pricePerMinute) return
     console.log('=> sendPayments!')
     const pos = await TrackPlayer.getPosition()
     const dests = pod && pod.value && pod.value.destinations    
@@ -113,6 +107,7 @@ export default function Pod({ show, chat, url, onBoost }) {
   const storedTime = useRef(0)
   useInterval(()=>{
     if(playing) {
+      setPosition()
       const c = count.current
       if(c && c%NUM_SECONDS===0) {
         sendPayments(1)
@@ -148,11 +143,11 @@ export default function Pod({ show, chat, url, onBoost }) {
   }, [show])
 
   useEffect(()=>{
-    if(url && !pod) loadPod()
-  },[url])
+    if(pod) initialSelect(pod)
+  },[pod])
 
   function onClipPayment(d){
-    if(d.pubkey && d.ts) {
+    if(pricePerMinute && d.pubkey && d.ts) {
       const dests = pod && pod.value && pod.value.destinations    
       if(!dests) return
       const extraDest:Destination = {
@@ -187,9 +182,8 @@ export default function Pod({ show, chat, url, onBoost }) {
     setFull(false)
   }
   function openFull(){
-    const theID = chat&&chat.id
-    if(!theID) return
-    const msgs = msg.messages[theID] || []
+    if(!chatID) return
+    const msgs = msg.messages[chatID] || []
     const msgsForEpisode = msgs.filter(m=>m.message_content&&m.message_content.includes('::')&&m.message_content.includes(episode.id))
     const msgsforReplay = []
     msgsForEpisode.forEach(m=>{
@@ -201,6 +195,7 @@ export default function Pod({ show, chat, url, onBoost }) {
           ...dat,
           type:arr[0],
           alias:m.sender_alias||(m.sender===1?user.alias:''),
+          date:m.date,
         })
       } catch(e){}
     })
@@ -208,16 +203,24 @@ export default function Pod({ show, chat, url, onBoost }) {
     setFull(true)
   }
 
-  if (!show || !episode) {
+  if (!show) {
     return <></>
+  }
+
+  if (!episode) {
+    return <PodBar episode={episode} 
+      onToggle={onToggle} playing={playing}
+      onShowFull={openFull} boost={boost}
+      duration={duration} loading={true}
+      podError={podError}
+    />
   }
 
   function boost(){
     EE.emit(PLAY_ANIMATION)
-    return
     const amount = 100
     requestAnimationFrame(async ()=>{
-      const pos = await TrackPlayer.getPosition()
+      const pos = getPosition()
       const sp:StreamPayment = {
         feedID: pod.id,
         itemID: selectedEpisodeID,
@@ -234,10 +237,10 @@ export default function Pod({ show, chat, url, onBoost }) {
   }
 
   if(!full) {
-    return <PodBar pod={pod} episode={episode} 
+    return <PodBar episode={episode} 
       onToggle={onToggle} playing={playing}
-      onShowFull={openFull}
-      boost={boost}
+      onShowFull={openFull} boost={boost}
+      duration={duration}
     />
   }
 
@@ -275,7 +278,7 @@ export default function Pod({ show, chat, url, onBoost }) {
         <FastImage source={{ uri: episode.image||pod.image }}
           style={{ width: width-78, height: width-78, marginLeft:39, marginTop:25, borderRadius:19 }} resizeMode={'cover'}
         />
-        {/* <Replay msgs={replayMsgs.current} playing={playing} /> */}
+        <Replay msgs={replayMsgs.current} playing={playing} />
       </View>}
       <View style={styles.top}>
         {episode.title && <Text style={{ color: theme.title, fontSize:18 }} numberOfLines={1}>

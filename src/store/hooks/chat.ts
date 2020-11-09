@@ -63,6 +63,9 @@ export function useReplyContent(msgs, replyUUID, extraTextContent): replyContent
 export function calcBotPrice(bots:Array<BotJSON>,text:string): CalcBotPriceResponse{
   let price = 0
   let failureMessage = ''
+  if(!bots) {
+    return {price, failureMessage}
+  }
   bots.forEach(b=>{
     if(!text.startsWith(b.prefix)) return // skip this bot if not right prefix
     if(b.price && b.price>0) {
