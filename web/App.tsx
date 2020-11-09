@@ -24,6 +24,9 @@ const palette = {
   },
   secondary: {
     main: theme.secondary
+  },
+  action: {
+      disabledBackground: theme.disabledPrimary,
   }
 }
 

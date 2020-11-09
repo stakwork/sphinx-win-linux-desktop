@@ -4,6 +4,7 @@ import styled from 'styled-components'
 const colorz=["#FF70E9","#7077FF","#DBD23C","#F57D25","#9F70FF","#9BC351","#FF3D3D","#C770FF","#62C784","#C99966","#76D6CA","#ABDB50","#FF708B","#5AD7F7","#5FC455","#FF9270","#3FABFF","#56D978","#FFBA70","#5078F2","#618AFF"]
 
 export default function Avatar(props){
+  console.log(props)
   const name = props.alias||'Sphinx'
   const photo = props.photo
   const size = props.big?48:42

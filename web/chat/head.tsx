@@ -80,7 +80,7 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
           </AvatarWrap>
           <ChatInfo>
             <NameWrap>
-              <Name onClick={viewContact} style={{cursor:'pointer'}}>{chat.name}</Name>
+              <Name onClick={viewContact} style={{cursor:(chat && chat.type === constants.chat_types.conversation) ? 'pointer' : 'auto'}}>{chat.name}</Name>
               {status && chat.type!==constants.chat_types.group && <Tooltip title={status==='active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
                 <LockIcon style={{color:status==='active'?'#49ca97':'#febd59',fontSize:12,marginLeft:8,marginBottom:2}} />
               </Tooltip>}

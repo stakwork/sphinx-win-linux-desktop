@@ -6,7 +6,6 @@ import { constants } from '../../constants'
 import moment from 'moment'
 
 export function useChats(){
-  console.log("USE CHATS")
   const {chats,msg,contacts,ui} = useStores()
   const theChats = allChats(chats.chats, contacts.contacts)
   const chatsToShow = filterChats(theChats, ui.searchTerm)

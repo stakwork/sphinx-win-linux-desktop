@@ -45,7 +45,7 @@ const AvatarWrap = styled.div`
   height:80px;
   display:flex;
   align-items:center;
-  justify-contents:center;
+  justify-content:center;
   margin-left:10px;
 `
 const Name = styled.div`
