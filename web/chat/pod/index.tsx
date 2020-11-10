@@ -6,14 +6,14 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
 import Stats from './stats'
-import EE, {CLIP_PAYMENT} from '../../utils/ee'
-import {StreamPayment,Destination} from '../../../src/store/feed'
+import EE, { CLIP_PAYMENT, PLAY_ANIMATION } from '../../utils/ee'
+import { StreamPayment, Destination } from '../../../src/store/feed'
 
-export default function Pod({ top, url, host, showPod, setShowPod }) {
+export default function Pod({ url, host, onBoost }) {
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
-  const [showStats,setShowStats] = useState(false)
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState(null)
+  const [showStats, setShowStats] = useState(false)
+  const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
   const { chats, msg, feed } = useStores()
   const scrollRef = useRef<HTMLDivElement>()
 
@@ -25,80 +25,100 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
     if (thepod) {
       setPod(thepod)
       const episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
-      if (episode) setSelectedEpisodeId(episode.id)
+      if (episode) setSelectedEpisodeID(episode.id)
     }
     setLoading(false)
   }
 
   function selectEpisode(e) {
-    setSelectedEpisodeId(e.id)
+    setSelectedEpisodeID(e.id)
     if (scrollRef && scrollRef.current) scrollRef.current.scrollTop = 0
   }
 
   const previousFeedUrl = usePrevious(url)
 
-  function sendPayments(ts:number){
-    console.log('=> sendPayments!')
-    const dests = pod && pod.value && pod.value.destinations
-    console.log(dests,pod)
-    if(!dests) return
-    if(!pod || !episode)
-    if(!pod.id || !episode.id) return
-    if(!pod.value.model) return
-    const sp:StreamPayment = {
+  function boost(pos: number) {
+    console.log("BOOST")
+    EE.emit(PLAY_ANIMATION)
+    return
+    const amount = 100
+    const sp: StreamPayment = {
       feedID: pod.id,
-      itemID: episode.id,
-      ts: ts||0,
+      itemID: selectedEpisodeID,
+      ts: Math.round(pos) || 0,
+      amount,
     }
+    onBoost(sp)
+    const dests = pod && pod.value && pod.value.destinations
+    if (!dests) return
+    if (!pod.id || !selectedEpisodeID) return
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests,memo,pricePerMinute)
+    feed.sendPayments(dests, memo, amount)
+
   }
 
-  function onClipPayment(d){
-    if(d.pubkey && d.ts) {
-      const extraDest:Destination = {
+  function sendPayments(ts: number) {
+    console.log('=> sendPayments!')
+    const dests = pod && pod.value && pod.value.destinations
+    console.log(dests, pod)
+    if (!dests) return
+    if (!pod || !episode)
+      if (!pod.id || !episode.id) return
+    if (!pod.value.model) return
+    const sp: StreamPayment = {
+      feedID: pod.id,
+      itemID: episode.id,
+      ts: ts || 0,
+    }
+    const memo = JSON.stringify(sp)
+    feed.sendPayments(dests, memo, pricePerMinute)
+  }
+
+  function onClipPayment(d) {
+    if (d.pubkey && d.ts) {
+      const extraDest: Destination = {
         address: d.pubkey,
         split: 1,
         type: 'node'
       }
       const dests = pod && pod.value && pod.value.destinations
-      const sp:StreamPayment = {
+      const sp: StreamPayment = {
         feedID: d.feedID,
         itemID: d.itemID,
-        ts: d.ts||0,
+        ts: d.ts || 0,
       }
-      if(d.uuid) sp.uuid=d.uuid
+      if (d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
-      const finalDests:Destination[] = dests.concat(extraDest)
-      feed.sendPayments(finalDests,memo,pricePerMinute)
+      const finalDests: Destination[] = dests.concat(extraDest)
+      feed.sendPayments(finalDests, memo, pricePerMinute)
     }
   }
 
-  useEffect(()=>{
-    EE.on(CLIP_PAYMENT,onClipPayment)
-    return ()=> {
-      EE.removeListener(CLIP_PAYMENT,onClipPayment)
+  useEffect(() => {
+    EE.on(CLIP_PAYMENT, onClipPayment)
+    return () => {
+      EE.removeListener(CLIP_PAYMENT, onClipPayment)
     }
-  },[pod]) // reset listener on pod change
-
-  useEffect(()=>{
-    if(url && !pod) {
-      loadPod()
-    }
-  },[url])
+  }, [pod]) // reset listener on pod change
 
   useEffect(() => {
-    if (showPod && !selectedEpisodeId) loadPod()
-  }, [showPod])
-  const episode = selectedEpisodeId && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeId)
+    if (url && !pod) {
+      loadPod()
+    }
+  }, [url])
+
+  useEffect(() => {
+    if (!selectedEpisodeID) loadPod()
+  }, [])
+  const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
 
   let earned = 0
   let incomingPayments = []
-  if(pod && pod.id){
+  if (pod && pod.id) {
     incomingPayments = msg.filterMessagesByContent(0, `"feedID":${pod.id}`)
-    if(incomingPayments) {
-      earned = incomingPayments.reduce((acc,m)=>{
-        if(m.sender!==1 && m.amount) {
+    if (incomingPayments) {
+      earned = incomingPayments.reduce((acc, m) => {
+        if (m.sender !== 1 && m.amount) {
           return acc + Number(m.amount)
         }
         return acc
@@ -108,48 +128,51 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   }
 
   let pricePerMinute = 0
-  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+  if (pod && pod.value && pod.value.model && pod.value.model.suggested) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
-  if(pod && showStats) {
-    return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
-      <Stats pod={pod} onClose={()=>setShowStats(false)} 
+  if (pod && showStats) {
+    return <PodWrap bg={theme.bg} ref={scrollRef} style={{ padding: 16 }}>
+      <Stats pod={pod} onClose={() => setShowStats(false)}
         incomingPayments={incomingPayments} earned={earned}
       />
     </PodWrap>
   }
 
-  return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
+  return <PodWrap bg={theme.bg} ref={scrollRef}>
+    {pod && <PodImage src={pod.image} alt={pod.title} />}
+
+    {(earned ? true : false) && <Earned onClick={() => setShowStats(true)}>
+      <div>Earned:</div>
+      <div>{`${earned} sats`}</div>
+    </Earned>}
+
     {pod ? <PodInfo>
-      <PodImage src={pod.image} alt={pod.title} />
       <PodText>
-        <PodTitle>
-          {pod.title}
-        </PodTitle>
         {episode && <PodEpisode>
           {episode.title}
         </PodEpisode>}
-        {(pricePerMinute?true:false) && <Price>
+        {/* {(pricePerMinute?true:false) && <Price>
           {`Price per Minute: ${pricePerMinute} sats`}  
-        </Price>}
+        </Price>} */}
       </PodText>
-      {(earned?true:false) && <Earned onClick={()=>setShowStats(true)}>
-        <div>Earned:</div>
-        <div>{`${earned} sats`}</div>
-      </Earned>}
     </PodInfo> : <Center><CircularProgress /></Center>}
 
     <Player pod={pod} episode={episode}
       sendPayments={sendPayments}
+      boost={boost}
     />
 
     {pod && pod.episodes && <PodEpisodes>
-      <span style={{ marginBottom: 3 }}>Episodes:</span>
+      <div style={{ marginBottom: 5 }}>{`Episodes: ${pod.episodes.length}`}</div>
       <EpisodeList>
         {pod.episodes.map((e, i) => {
+          const selected = e.id === selectedEpisodeID
           return <ListedEpisode onClick={() => selectEpisode(e)} key={i}>
-            <PlayArrowIcon style={{ marginRight: 8, color: 'white', fontSize: 13 }} /> {e.title}
+            {selected && <PlayArrowIcon style={{ position: 'absolute', left: -16, top: 13, fontSize: 15 }} />}
+            <EpisodeImg src={e.image || pod.image} />
+            <span>{e.title}</span>
           </ListedEpisode>
         })}
       </EpisodeList>
@@ -160,28 +183,29 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
 const PodWrap = styled.div`
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
   box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.95);
-  padding: 13px;
-  display: ${p => p.show ? 'block' : 'none'};
-  width:360px;
-  height:300px;
+  width:302px;
+  height:100%;
   background:black;
-  position:absolute;
-  right: 7px;
-  top:${p => p.top + 7}px;
   background: ${p => p.bg};
-  overflow-y: scroll;
+  overflow-y: overlay;
+  border-left:2px solid #3a4754;
+  z-index:999;
+  position:relative;
+  &::-webkit-scrollbar-track {background: transparent;}
+  &::-webkit-scrollbar {display: none;}
 `
 
 const PodInfo = styled.div`
   display: flex;
   position:relative;
+  flex-direction:column;
+  padding:18px;
 `
 const Earned = styled.div`
   position:absolute;
-  top:0px;
-  right:0px;
+  top:5px;
+  right:5px;
   border:1px solid #809ab7;
   background:black;
   color:#809ab7;
@@ -196,8 +220,8 @@ const Earned = styled.div`
 `
 const PodImage = styled.img`
   display: flex;
-  height: 75px;
-  width: 75px;
+  height: 300px;
+  width: 300px;
 `
 
 const PodText = styled.div`
@@ -208,6 +232,7 @@ const PodText = styled.div`
   `
 
 const PodTitle = styled.div`
+  font-size:48px;
   display: flex;
   max-width: calc(100% - 26px);
   overflow:hidden;
@@ -217,13 +242,12 @@ const PodTitle = styled.div`
 
 const PodEpisode = styled.div`
   display: flex;
-  margin-top: 5px;
-  font-size: 13px;
+  margin-top: 15px;
+  font-size: 22px;
   color: #eee;
   max-width: calc(100% - 26px);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  margin:0 auto;
+  text-align:center;
 `
 const Price = styled.div`
   display: flex;
@@ -236,7 +260,7 @@ const Price = styled.div`
   white-space:nowrap;
 `
 const PodEpisodes = styled.div`
-
+  padding:20px;
 `
 
 const EpisodeList = styled.div`
@@ -246,24 +270,43 @@ const EpisodeList = styled.div`
 const ListedEpisode = styled.div`
   display: flex;
   align-items: center;
+  position:relative;
   cursor: pointer;
- border-top: solid 1px #809ab7;
- padding: 3px;
- color: #ddd;
-&:hover{
-  color: white;
-  background: #141d27;
-}
+  padding: 3px;
+  color: #ddd;
+  &:hover{
+    color: white;
+    background: #141d27;
+  }
+  & span {
+    white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  margin:4px 0;
 `
-
+const EpisodeImg = styled.div`
+  width:32px;
+  height:32px;
+  min-width:32px;
+  min-height:32px;
+  background-image:url(${p => p.src});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:cover;
+  margin-right:10px;
+`
 const Center = styled.div`
   display: flex;
   flex: 1;
   justify-content: center;
   align-items: center;
 `
-function usePrevious(value) { 
-  const ref = useRef(); 
-  useEffect(() => { ref.current = value; }); 
-  return ref.current; 
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => { ref.current = value; });
+  return ref.current;
 }

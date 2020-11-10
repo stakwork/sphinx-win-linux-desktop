@@ -15,7 +15,9 @@ import { uploadFile } from '../utils/meme'
 import Bots from './bots'
 import MsgMenu from './msgMenu'
 import {useHasReplyContent} from '../../src/store/hooks/chat'
-import { allChats, filterChats } from '../../src/store/hooks/chats'
+import Pod from './pod'
+import {StreamPayment} from '../../src/store/feed'
+import Anim from './anim'
 const { useMsgs } = hooks
 
 const headHeight = 65
@@ -23,7 +25,7 @@ const headHeight = 65
 export type RouteStatus = 'active' | 'inactive' | null
 
 function Chat() {
-  const { chats, ui } = useStores()
+  const { chats, ui, msg } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [tribeBots, setTribeBots] = useState([])
@@ -48,6 +50,17 @@ function Chat() {
 
     if (useHasReplyContent()) footHeight = 120
     const chat = ui.selectedChat
+
+    function onBoost(sp:StreamPayment){
+      if(!(chat&&chat.id)) return
+      msg.sendMessage({
+        contact_id:null,
+        text:`boost::${JSON.stringify(sp)}`,
+        chat_id: chat.id||null,
+        amount: pricePerMessage,
+        reply_uuid:''
+      })
+    }
 
     useEffect(() => {
       setPricePerMessage(0)
@@ -98,18 +111,31 @@ function Chat() {
     }, [chat])
 
     return <Section style={{ background: theme.deep }}>
-      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
-        pricePerMessage={pricePerMessage} status={status}
-      />
-      <ChatContent appMode={appMode} footHeight={footHeight} 
-        pricePerMessage={pricePerMessage} 
-      />
-      <Foot height={footHeight} tribeBots={tribeBots}
-        pricePerMessage={pricePerMessage}
-      />
+      <Inner>
+        <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
+          pricePerMessage={pricePerMessage} status={status}
+        />
+        <ChatContent appMode={appMode} footHeight={footHeight} 
+          pricePerMessage={pricePerMessage} 
+        />
+        <Foot height={footHeight} tribeBots={tribeBots}
+          pricePerMessage={pricePerMessage}
+        />
+      </Inner>
+      {ui.feedURL && 
+        <Pod url={ui.feedURL} host={chat && chat.host}
+          onBoost={onBoost}
+        />
+      }
     </Section>
   })
 }
+
+const Inner = styled.div`
+  display:flex;
+  flex-direction:column;
+  flex:1;
+`
 
 
 function ChatContent({ appMode, footHeight, pricePerMessage }) {
@@ -186,7 +212,7 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
     }
 
     return (
-      <Wrap h={h} >
+      <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
           {({ getRootProps, getInputProps, isDragActive }) => (
             <div style={{ flex: 1 }} {...getRootProps()}>
@@ -229,7 +255,7 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
             </div>
           )}
         </Dropzone>
-
+        <Anim />
       </Wrap>
     )
   })
@@ -292,6 +318,8 @@ const Section = styled.section`
   flex:1;
   position:relative;
   z-index:99;
+  display:flex;
+  flex-direction:row;
 `
 const MsgList = styled.div`
   overflow:auto;

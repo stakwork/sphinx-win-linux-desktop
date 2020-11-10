@@ -12,8 +12,6 @@ import { constants } from '../../src/constants'
 import ChatIcon from '@material-ui/icons/Chat';
 import OpenInBrowserIcon from '@material-ui/icons/OpenInBrowser';
 import { SvgIcon } from '@material-ui/core';
-import RssFeedIcon from '@material-ui/icons/RssFeed';
-import Pod from './pod'
 import Tooltip from '@material-ui/core/Tooltip';
 import PhoneIcon from '@material-ui/icons/Phone'
 import LockIcon from '@material-ui/icons/Lock';
@@ -22,7 +20,6 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const { contacts, ui, msg } = useStores()
-  const [showPod, setShowPod] = useState(false)
 
   return useObserver(() => {
     const chat = ui.selectedChat
@@ -30,7 +27,6 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
     const owner = contacts.contacts.find(c => c.id === 1)
     const isTribeOwner = owner && owner.public_key === ownerPubkey
     const appURL = ui.applicationURL
-    const feedURL = ui.feedURL
 
     function goToURL() {
       ui.setApplicationURL(URL)
@@ -48,7 +44,6 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
         setURL('')
         setShowURL(false)
       }
-      setShowPod(false)
     }, [chat])
 
     let photoURL = chat && chat.photo_url
@@ -104,14 +99,6 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
       </Left>}
       <Right>
 
-        {/*podcast*/}
-        {feedURL &&
-          <Tooltip title="Podcast" placement="left">
-            <RssFeedIcon onClick={() => setShowPod(!showPod)}
-              style={{ marginRight: 12, cursor: 'pointer' }}/>
-          </Tooltip>
-        }
-
         {/*apps*/}
         {appURL && <> {appMode ? <ChatIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
           onClick={() => setAppMode(false)}
@@ -138,7 +125,6 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
         />}
 
       </Right>
-      <Pod top={height} url={feedURL} host={chat && chat.host} setShowPod={setShowPod} showPod={showPod} />
     </Wrap>
   })
 }
