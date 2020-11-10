@@ -137,6 +137,8 @@ export default function GroupInfo({ visible }) {
   let sliderValue = ppms.indexOf(ppm)
   if(sliderValue<0) sliderValue=2
 
+  const showValueSlider = (isTribe && !isTribeAdmin && (group&&group.feed_url)) ? true : false
+
   return useObserver(() => {
     const contactsToShow = contacts.contacts.filter(c => {
       return c.id > 1 && group && group.contact_ids.includes(c.id)
@@ -176,7 +178,7 @@ export default function GroupInfo({ visible }) {
             />
           </View>}
 
-          {isTribe && !isTribeAdmin && (group&&group.feed_url) && <View style={styles.slideWrap}>
+          {showValueSlider && <View style={styles.slideWrap}>
             <View style={styles.slideText}>
               <Text style={{...styles.slideLabel,color:theme.subtitle}}>Podcast: sats per minute</Text>
               <Text style={{...styles.slideValue,color:theme.subtitle}}>{ppm}</Text>
