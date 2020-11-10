@@ -9,7 +9,7 @@ import Stats from './stats'
 import EE, {CLIP_PAYMENT} from '../../utils/ee'
 import {StreamPayment,Destination} from '../../../src/store/feed'
 
-export default function Pod({ top, url, host, showPod, setShowPod }) {
+export default function Pod({ url, host }) {
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
   const [showStats,setShowStats] = useState(false)
@@ -88,8 +88,8 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   },[url])
 
   useEffect(() => {
-    if (showPod && !selectedEpisodeId) loadPod()
-  }, [showPod])
+    if (!selectedEpisodeId) loadPod()
+  }, [])
   const episode = selectedEpisodeId && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeId)
 
   let earned = 0
@@ -113,16 +113,16 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
   }
 
   if(pod && showStats) {
-    return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
+    return <PodWrap bg={theme.bg} ref={scrollRef}>
       <Stats pod={pod} onClose={()=>setShowStats(false)} 
         incomingPayments={incomingPayments} earned={earned}
       />
     </PodWrap>
   }
 
-  return <PodWrap top={top} bg={theme.bg} show={showPod} ref={scrollRef}>
-    {pod ? <PodInfo>
-      <PodImage src={pod.image} alt={pod.title} />
+  return <PodWrap bg={theme.bg} ref={scrollRef}>
+    {pod && <PodImage src={pod.image} alt={pod.title} />}
+    {pod ? <PodInfo>    
       <PodText>
         <PodTitle>
           {pod.title}
@@ -160,23 +160,21 @@ export default function Pod({ top, url, host, showPod, setShowPod }) {
 const PodWrap = styled.div`
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
   box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.95);
-  padding: 13px;
-  display: ${p => p.show ? 'block' : 'none'};
-  width:360px;
-  height:300px;
+  width:300px;
+  height:100%;
   background:black;
-  position:absolute;
-  right: 7px;
-  top:${p => p.top + 7}px;
   background: ${p => p.bg};
   overflow-y: scroll;
+  border-left:2px solid #3a4754;
+  z-index:999;
+  position:relative;
 `
 
 const PodInfo = styled.div`
   display: flex;
   position:relative;
+  flex-direction:column;
 `
 const Earned = styled.div`
   position:absolute;
@@ -196,8 +194,12 @@ const Earned = styled.div`
 `
 const PodImage = styled.img`
   display: flex;
-  height: 75px;
-  width: 75px;
+  height: 300px;
+  width: 300px;
+  /* background:url(${p=>p.src});
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:cover; */
 `
 
 const PodText = styled.div`

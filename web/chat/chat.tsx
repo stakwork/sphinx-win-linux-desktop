@@ -15,7 +15,7 @@ import { uploadFile } from '../utils/meme'
 import Bots from './bots'
 import MsgMenu from './msgMenu'
 import {useHasReplyContent} from '../../src/store/hooks/chat'
-import { allChats, filterChats } from '../../src/store/hooks/chats'
+import Pod from './pod'
 const { useMsgs } = hooks
 
 const headHeight = 65
@@ -98,18 +98,29 @@ function Chat() {
     }, [chat])
 
     return <Section style={{ background: theme.deep }}>
-      <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
-        pricePerMessage={pricePerMessage} status={status}
-      />
-      <ChatContent appMode={appMode} footHeight={footHeight} 
-        pricePerMessage={pricePerMessage} 
-      />
-      <Foot height={footHeight} tribeBots={tribeBots}
-        pricePerMessage={pricePerMessage}
-      />
+      <Inner>
+        <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
+          pricePerMessage={pricePerMessage} status={status}
+        />
+        <ChatContent appMode={appMode} footHeight={footHeight} 
+          pricePerMessage={pricePerMessage} 
+        />
+        <Foot height={footHeight} tribeBots={tribeBots}
+          pricePerMessage={pricePerMessage}
+        />
+      </Inner>
+      {ui.feedURL && 
+        <Pod url={ui.feedURL} host={chat && chat.host} />
+      }
     </Section>
   })
 }
+
+const Inner = styled.div`
+  display:flex;
+  flex-direction:column;
+  flex:1;
+`
 
 
 function ChatContent({ appMode, footHeight, pricePerMessage }) {
@@ -229,7 +240,6 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
             </div>
           )}
         </Dropzone>
-
       </Wrap>
     )
   })
@@ -292,6 +302,8 @@ const Section = styled.section`
   flex:1;
   position:relative;
   z-index:99;
+  display:flex;
+  flex-direction:row;
 `
 const MsgList = styled.div`
   overflow:auto;
