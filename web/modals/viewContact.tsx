@@ -104,6 +104,7 @@ const InitialsWrapper = styled.div`
 const ImageWrapper = styled.div`
     background: url(${p => p.src}) no-repeat;
     background-size: 100%;
+    background-position: center;
     border-radius: 50%;
     width: 100px;
     height: 100px;

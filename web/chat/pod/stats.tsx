@@ -16,6 +16,9 @@ export default function Stats({ pod, onClose, incomingPayments, earned }) {
   const episodes = processEpisodeEarning(pod,incomingPayments)
 
   function selectEpisode(e){
+    if(e.id===selectedEpisodeID) {
+      return setSelectedEpisodeID(null)
+    }
     const filtered = incomingPayments.filter(p=>p.message_content.includes(`"itemID":${e.id}`))
     if(filtered.length===0) return
     setSelectedEpisodeID(e.id)
@@ -32,8 +35,8 @@ export default function Stats({ pod, onClose, incomingPayments, earned }) {
       {`${pod.title} statistics`}
     </PodTitle>
     <General>
-      <Item>{`Total payments: ${l}`}</Item>
-      <Item>{`Total earned: ${earned} sats`}</Item>
+      <Item>{`Payments: ${l}`}</Item>
+      <Item style={{margin:0}}>{`Earned: ${earned} sats`}</Item>
     </General>
     <ChartWrap>
       <canvas ref={chartRef} width="100%" height="100%"></canvas>
@@ -102,7 +105,7 @@ const ByEpisode = styled.div`
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  margin-bottom:5px;
+  margin:10px 0;
 `
 const General = styled.div`
   display: flex;
@@ -137,7 +140,7 @@ const EpisodeEarning = styled.div`
   display:flex;
   align-items:center;
   color:#809ab7;
-  font-size:${p=>p.selected?14:12}px;
+  font-size:12px;
   justify-content:space-between;
   font-weight:${p=>p.selected?'bold':'normal'};
 `

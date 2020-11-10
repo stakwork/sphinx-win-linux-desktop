@@ -133,7 +133,7 @@ export default function Pod({ url, host, onBoost }) {
   }
 
   if (pod && showStats) {
-    return <PodWrap bg={theme.bg} ref={scrollRef}>
+    return <PodWrap bg={theme.bg} ref={scrollRef} style={{ padding: 16 }}>
       <Stats pod={pod} onClose={() => setShowStats(false)}
         incomingPayments={incomingPayments} earned={earned}
       />
@@ -142,6 +142,12 @@ export default function Pod({ url, host, onBoost }) {
 
   return <PodWrap bg={theme.bg} ref={scrollRef}>
     {pod && <PodImage src={pod.image} alt={pod.title} />}
+
+    {(earned ? true : false) && <Earned onClick={() => setShowStats(true)}>
+      <div>Earned:</div>
+      <div>{`${earned} sats`}</div>
+    </Earned>}
+
     {pod ? <PodInfo>
       <PodText>
         {episode && <PodEpisode>
@@ -151,10 +157,6 @@ export default function Pod({ url, host, onBoost }) {
           {`Price per Minute: ${pricePerMinute} sats`}  
         </Price>} */}
       </PodText>
-      {/* {(earned?true:false) && <Earned onClick={()=>setShowStats(true)}>
-        <div>Earned:</div>
-        <div>{`${earned} sats`}</div>
-      </Earned>} */}
     </PodInfo> : <Center><CircularProgress /></Center>}
 
     <Player pod={pod} episode={episode}
@@ -166,9 +168,10 @@ export default function Pod({ url, host, onBoost }) {
       <div style={{ marginBottom: 5 }}>{`Episodes: ${pod.episodes.length}`}</div>
       <EpisodeList>
         {pod.episodes.map((e, i) => {
+          const selected = e.id === selectedEpisodeID
           return <ListedEpisode onClick={() => selectEpisode(e)} key={i}>
-            <PlayArrowIcon style={{ position:'absolute', left: -16, top: 13, fontSize: 15 }} /> 
-            <EpisodeImg src={e.image||pod.image} />
+            {selected && <PlayArrowIcon style={{ position: 'absolute', left: -16, top: 13, fontSize: 15 }} />}
+            <EpisodeImg src={e.image || pod.image} />
             <span>{e.title}</span>
           </ListedEpisode>
         })}
@@ -201,8 +204,8 @@ const PodInfo = styled.div`
 `
 const Earned = styled.div`
   position:absolute;
-  top:0px;
-  right:0px;
+  top:5px;
+  right:5px;
   border:1px solid #809ab7;
   background:black;
   color:#809ab7;
@@ -281,8 +284,9 @@ const ListedEpisode = styled.div`
     text-overflow: ellipsis;
     display: block;
     overflow: hidden;
-    font-size: 12px;
+    font-size: 13px;
   }
+  margin:4px 0;
 `
 const EpisodeImg = styled.div`
   width:32px;
