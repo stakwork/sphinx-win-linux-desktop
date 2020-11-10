@@ -134,6 +134,7 @@
     "react-h5-audio-player": "^3.4.1",
     "react-jutsu": "^2.3.0",
     "react-linkify": "^1.0.0-alpha",
+    "react-lottie": "^1.2.3",
     "react-moment": "^0.9.7",
     "react-native": "^0.63.3",
     "react-native-android-badge": "^0.5.0",

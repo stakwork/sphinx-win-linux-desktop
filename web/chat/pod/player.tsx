@@ -98,6 +98,9 @@ const PodPlayer = styled.div`
   & .rhap_container{
     background-color: #141d27;
   }
+  & .rhap_controls-section{
+    margin-top: 22px !important;
+  }
   & .rhap_main-controls-button{
     color: #809ab7;
   }
@@ -113,10 +116,16 @@ const PodPlayer = styled.div`
   & .rhap_current-time{
     color: #809ab7;
     font-size: 13px;
+    position: absolute;
+    top: 35px;
+    left:20px;
   }
   & .rhap_time{
     color: #809ab7;
     font-size: 13px;
+    position: absolute;
+    top: 35px;
+    right:20px;
   }
   & .rhap_volume-indicator{
     background: #809ab7;
@@ -128,7 +137,7 @@ const PodPlayer = styled.div`
 const MsgWrap = styled.div`
   position:absolute;
   left:14px;
-  top:48px;
+  top:62px;
   color:white;
   cursor:pointer;
   & svg {
@@ -141,7 +150,7 @@ const MsgWrap = styled.div`
 const BoostWrap = styled.div`
   position:absolute;
   right:14px;
-  top:48px;
+  top:62px;
   color:white;
   cursor:pointer;
   & svg {

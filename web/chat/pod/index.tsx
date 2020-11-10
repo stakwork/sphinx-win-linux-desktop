@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
 import Stats from './stats'
-import EE, { CLIP_PAYMENT } from '../../utils/ee'
+import EE, { CLIP_PAYMENT, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
 
 export default function Pod({ url, host, onBoost }) {
@@ -38,7 +38,9 @@ export default function Pod({ url, host, onBoost }) {
   const previousFeedUrl = usePrevious(url)
 
   function boost(pos: number) {
-    // EE.emit(PLAY_ANIMATION)
+    console.log("BOOST")
+    EE.emit(PLAY_ANIMATION)
+    return
     const amount = 100
     const sp: StreamPayment = {
       feedID: pod.id,
@@ -161,11 +163,13 @@ export default function Pod({ url, host, onBoost }) {
     />
 
     {pod && pod.episodes && <PodEpisodes>
-      <span style={{ marginBottom: 3 }}>{`Episodes: ${pod.episodes.length}`}</span>
+      <div style={{ marginBottom: 5 }}>{`Episodes: ${pod.episodes.length}`}</div>
       <EpisodeList>
         {pod.episodes.map((e, i) => {
           return <ListedEpisode onClick={() => selectEpisode(e)} key={i}>
-            <PlayArrowIcon style={{ marginRight: 8, color: 'white', fontSize: 13 }} /> {e.title}
+            <PlayArrowIcon style={{ position:'absolute', left: -16, top: 13, fontSize: 15 }} /> 
+            <EpisodeImg src={e.image||pod.image} />
+            <span>{e.title}</span>
           </ListedEpisode>
         })}
       </EpisodeList>
@@ -177,14 +181,16 @@ const PodWrap = styled.div`
   display: flex;
   flex-direction: column;
   box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.95);
-  width:300px;
+  width:302px;
   height:100%;
   background:black;
   background: ${p => p.bg};
-  overflow-y: scroll;
+  overflow-y: overlay;
   border-left:2px solid #3a4754;
   z-index:999;
   position:relative;
+  &::-webkit-scrollbar-track {background: transparent;}
+  &::-webkit-scrollbar {display: none;}
 `
 
 const PodInfo = styled.div`
@@ -234,7 +240,7 @@ const PodTitle = styled.div`
 const PodEpisode = styled.div`
   display: flex;
   margin-top: 15px;
-  font-size: 24px;
+  font-size: 22px;
   color: #eee;
   max-width: calc(100% - 26px);
   margin:0 auto;
@@ -251,7 +257,7 @@ const Price = styled.div`
   white-space:nowrap;
 `
 const PodEpisodes = styled.div`
-
+  padding:20px;
 `
 
 const EpisodeList = styled.div`
@@ -261,16 +267,34 @@ const EpisodeList = styled.div`
 const ListedEpisode = styled.div`
   display: flex;
   align-items: center;
+  position:relative;
   cursor: pointer;
- border-top: solid 1px #809ab7;
- padding: 3px;
- color: #ddd;
-&:hover{
-  color: white;
-  background: #141d27;
-}
+  padding: 3px;
+  color: #ddd;
+  &:hover{
+    color: white;
+    background: #141d27;
+  }
+  & span {
+    white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
+    font-size: 12px;
+  }
 `
-
+const EpisodeImg = styled.div`
+  width:32px;
+  height:32px;
+  min-width:32px;
+  min-height:32px;
+  background-image:url(${p => p.src});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:cover;
+  margin-right:10px;
+`
 const Center = styled.div`
   display: flex;
   flex: 1;

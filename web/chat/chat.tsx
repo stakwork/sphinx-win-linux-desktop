@@ -17,6 +17,7 @@ import MsgMenu from './msgMenu'
 import {useHasReplyContent} from '../../src/store/hooks/chat'
 import Pod from './pod'
 import {StreamPayment} from '../../src/store/feed'
+import Anim from './anim'
 const { useMsgs } = hooks
 
 const headHeight = 65
@@ -211,7 +212,7 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
     }
 
     return (
-      <Wrap h={h} >
+      <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
           {({ getRootProps, getInputProps, isDragActive }) => (
             <div style={{ flex: 1 }} {...getRootProps()}>
@@ -254,6 +255,7 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
             </div>
           )}
         </Dropzone>
+        <Anim />
       </Wrap>
     )
   })
