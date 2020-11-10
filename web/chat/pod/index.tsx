@@ -40,7 +40,6 @@ export default function Pod({ url, host, onBoost }) {
   function boost(pos: number) {
     console.log("BOOST")
     EE.emit(PLAY_ANIMATION)
-    return
     const amount = 100
     const sp: StreamPayment = {
       feedID: pod.id,
