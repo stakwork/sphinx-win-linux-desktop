@@ -16,6 +16,7 @@ import Bots from './bots'
 import MsgMenu from './msgMenu'
 import {useHasReplyContent} from '../../src/store/hooks/chat'
 import Pod from './pod'
+import {StreamPayment} from '../../src/store/feed'
 const { useMsgs } = hooks
 
 const headHeight = 65
@@ -23,7 +24,7 @@ const headHeight = 65
 export type RouteStatus = 'active' | 'inactive' | null
 
 function Chat() {
-  const { chats, ui } = useStores()
+  const { chats, ui, msg } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [pricePerMessage, setPricePerMessage] = useState(0)
   const [tribeBots, setTribeBots] = useState([])
@@ -48,6 +49,17 @@ function Chat() {
 
     if (useHasReplyContent()) footHeight = 120
     const chat = ui.selectedChat
+
+    function onBoost(sp:StreamPayment){
+      if(!(chat&&chat.id)) return
+      msg.sendMessage({
+        contact_id:null,
+        text:`boost::${JSON.stringify(sp)}`,
+        chat_id: chat.id||null,
+        amount: pricePerMessage,
+        reply_uuid:''
+      })
+    }
 
     useEffect(() => {
       setPricePerMessage(0)
@@ -110,7 +122,9 @@ function Chat() {
         />
       </Inner>
       {ui.feedURL && 
-        <Pod url={ui.feedURL} host={chat && chat.host} />
+        <Pod url={ui.feedURL} host={chat && chat.host}
+          onBoost={onBoost}
+        />
       }
     </Section>
   })

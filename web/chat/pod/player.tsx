@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 import AudioPlayer from 'react-h5-audio-player';
 import { useStores } from '../../../src/store'
-import Message from '@material-ui/icons/Message'
 import { StreamPayment,NUM_SECONDS } from '../../../src/store/feed'
+import {ChatQuote, BoostIcon, Forward30, Back15} from './icons'
 
-export default function Player({pod,episode,sendPayments}){
+export default function Player({pod,episode,sendPayments,boost}){
   const { ui, user } = useStores()
   const ts = useRef(0)
   const secs = useRef(0)
@@ -42,10 +42,13 @@ export default function Player({pod,episode,sendPayments}){
     }
     ui.setExtraTextContent(sp)
   }
+  function clickBoost(){
+    boost(ts.current)
+  }
 
   return <PodPlayer>
     {episode && <MsgWrap>
-      <Message style={{fontSize:20}} onClick={clickMsg} />
+      <ChatQuote style={{height:24,width:24}} onClick={clickMsg} />
     </MsgWrap>}
     {episode && <AudioPlayer
       autoPlay={false}
@@ -54,12 +57,39 @@ export default function Player({pod,episode,sendPayments}){
       onListen={onListen}
       loop={false}
       customAdditionalControls={[]}
+      customVolumeControls={[]}
       showDownloadProgress={false}
       showFilledProgress={false}
+      progressJumpSteps={{
+        backward:15,
+        forward:30,
+      }}
+      customIcons={{
+        rewind: <Back15 style={{fill:'#809ab7',marginRight:10,height:24,width:24}} />,
+        forward: <Forward30 style={{fill:'#809ab7',marginLeft:10,height:24,width:24}} />
+      }}
     // other props here
     />}
+    {episode && <BoostWrap>
+      <Boost style={{height:24,width:24}} onClick={clickBoost} />
+    </BoostWrap>}
   </PodPlayer>
 }
+
+function Boost({onClick,style}){
+  return <BoostGreen onClick={onClick} style={style||{}}>
+    <BoostIcon style={{height:20,width:20}} />
+  </BoostGreen>
+}
+const BoostGreen = styled.div`
+  background:#48c998;
+  height:24px;
+  width:24px;
+  border-radius:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+`
 
 const PodPlayer = styled.div`
   display: flex;
@@ -108,7 +138,19 @@ const MsgWrap = styled.div`
     color:white;
   }
 `
-
+const BoostWrap = styled.div`
+  position:absolute;
+  right:14px;
+  top:48px;
+  color:white;
+  cursor:pointer;
+  & svg {
+    color:#809ab7;
+  }
+  &:hover svg{
+    color:white;
+  }
+`
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
