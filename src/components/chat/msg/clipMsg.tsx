@@ -2,24 +2,22 @@ import React, {useRef} from 'react'
 import {View,Text,StyleSheet} from 'react-native'
 import { useParsedClipMsg } from '../../../store/hooks/msg'
 import AudioPlayer from './audioPlayer'
-import EE, {CLIP_PAYMENT} from '../../utils/ee'
+import EE from '../../utils/ee'
 import {useTheme} from '../../../store'
-import { StreamPayment,NUM_SECONDS } from '../../../store/feed'
+
+const NUM_SECONDS = 5
 
 export default function ClipMessage(props){
   const count = useRef(0)
   const theme = useTheme()
-  const {message_content,uuid} = props
+  const {message_content} = props
   
   const obj = useParsedClipMsg(message_content)
-  const { url, title, text, ts, feedID, itemID, pubkey } = obj
+  const { url, title, text, ts } = obj
   function onListenOneSecond(feedURL){
     count.current = count.current + 1
     if(count.current && count.current%NUM_SECONDS===0) {
-      const sp:StreamPayment= {
-        feedID, itemID, pubkey, ts:Math.round(count.current), uuid
-      }
-      EE.emit(CLIP_PAYMENT,sp)
+      EE.emit('clip-payment',obj)
     }
   };
   return <View>

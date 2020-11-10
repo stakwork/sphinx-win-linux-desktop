@@ -1,5 +1,4 @@
 
-
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import {AppState} from 'react-native'
 

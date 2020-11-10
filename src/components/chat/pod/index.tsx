@@ -26,6 +26,14 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
   const [full, setFull] = useState(false)
   const [queuedTrackID, setQueuedTrackID] = useState(null)
 
+  // async function loadPod() {
+  //   setLoading(true)
+  //   const params = await chats.loadFeed(host, uuid, url)
+  //   if (params) setPod(params)
+  //   if (params) initialSelect(params)
+  //   setLoading(false)
+  // }
+
   function getAndSetDuration(){
     setTimeout(async ()=>{
       const dur = await TrackPlayer.getDuration()
@@ -185,11 +193,11 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
   }
 
   useEffect(()=>{
-    EE.on(CLIP_PAYMENT,onClipPayment)
+    EE.on('clip-payment',onClipPayment)
     return ()=> {
-      EE.removeListener(CLIP_PAYMENT,onClipPayment)
+      EE.removeListener('clip-payment',onClipPayment)
     }
-  },[pod])
+  },[])
 
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e=>e.id===selectedEpisodeID)
 

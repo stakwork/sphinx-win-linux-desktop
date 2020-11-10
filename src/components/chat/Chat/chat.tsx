@@ -1,36 +1,41 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { View, StyleSheet, InteractionManager, BackHandler, ToastAndroid } from 'react-native'
-import Header from './header'
-import MsgList from './msgList'
-import BottomBar from './bottomBar'
-import { ChatRouteProp } from '../../types'
+import Header from '../header'
+import MsgList from '../msgList/index'
+import BottomBar from '../bottomBar'
+import { ChatRouteProp } from '../../../types'
 import { useRoute } from '@react-navigation/native'
-import { useStores, useTheme } from '../../store'
-import { contactForConversation } from './utils'
-import EE, {LEFT_GROUP,LEFT_IMAGE_VIEWER} from '../utils/ee'
+import { useStores, useTheme } from '../../../store'
+import { contactForConversation } from '../utils'
+import EE from '../../utils/ee'
 import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
-import { constants } from '../../constants'
-import Frame from './frame'
-import Pod from './pod'
-import {StreamPayment} from '../../store/feed'
-import Anim from './pod/anim'
-import {useIncomingPayments} from '../../store/hooks/pod'
+import { constants } from '../../../constants'
+import Frame from '../frame'
+import { reducer, initialState } from './reducer'
+import Pod from '../pod'
+import {StreamPayment} from '../../../store/feed'
+import Anim from '../pod/anim'
+import {useIncomingPayments} from '../../../store/hooks/pod'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
 export default function Chat() {
   const { contacts, user, chats, ui, msg } = useStores()
+  const [state, dispatch] = useReducer(reducer, initialState)
   const theme = useTheme()
 
-  const [show, setShow] = useState(false)
-  const [pricePerMessage, setPricePerMessage] = useState(0)
-  const [appMode, setAppMode] = useState(false)
-  // const [showPod, setShowPod] = useState(false)
-  const [status, setStatus] = useState<RouteStatus>(null)
-  const [tribeParams, setTribeParams] = useState(null)
-  const [pod, setPod] = useState(null)
-  const [podError, setPodError] = useState(null)
+  const setAppModeHandler = (payload: boolean) => {
+    dispatch({ type: 'setAppMode', payload })
+  }
+
+  const setShowPodHandler = (payload: boolean) => {
+    dispatch({ type: 'setShowPod', payload })
+  }
+
+  const setStatusHandler = (payload: any) => {
+    dispatch({ type: 'setStatus', payload })
+  }
 
   const route = useRoute<ChatRouteProp>()
   const chatID = route.params.id
@@ -50,14 +55,14 @@ export default function Chat() {
     if (contact && !contact.contact_key) {
       contacts.exchangeKeys(contact.id)
     }
-    EE.on(LEFT_GROUP, () => {
+    EE.on('left-group', () => {
       navigation.navigate('Home', { params: { rnd: Math.random() } })
     })
-    EE.on(LEFT_IMAGE_VIEWER, () => {
+    EE.on('left-image-viewer', () => {
       handleBack()
     })
     InteractionManager.runAfterInteractions(() => {
-      setShow(true)
+      dispatch({ type: 'setShow', payload: true })
     })
 
     handleBack()
@@ -65,7 +70,7 @@ export default function Chat() {
     fetchTribeParams()
 
     return () => {
-      setTribeParams(null)
+      dispatch({type:'setTribeParams',payload:null})
     }
 
   }, [])
@@ -76,12 +81,13 @@ export default function Chat() {
     // let isAppURL = false
     // let isFeedURL = false
     if (isTribe) { //&& !isTribeAdmin) {
-      setAppMode(true)
-      // setLoadingChat(true)
+      setAppModeHandler(true)
+      dispatch({ type: 'setLoadingChat', payload: true })
       const params = await chats.getTribeDetails(chat.host, chat.uuid)
       if (params) {
         const price = params.price_per_message + params.escrow_amount
-        setPricePerMessage(price)
+        dispatch({ type: 'setPricePerMessage', payload: price })
+        dispatch({ type: 'setShowPricePerMessage', payload: true })
         ToastAndroid.showWithGravityAndOffset(
           'Price Per Message: '+price+' sat',
           ToastAndroid.SHORT,
@@ -93,36 +99,36 @@ export default function Chat() {
             chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
           }
         }
-        setTribeParams(params)
+        dispatch({ type: 'setTribeParams', payload: params })
         if(params.feed_url) {
           loadPod(params)
         }
       }
-      // setLoadingChat(false)
+      dispatch({ type: 'setLoadingChat', payload: false })
     } else {
-      setAppMode(false)
-      setTribeParams(null)
+      setAppModeHandler(false)
     }
 
     const r = await chats.checkRoute(chat.id)
     if(r && r.success_prob && r.success_prob>0) {
-      setStatus('active')
+      setStatusHandler('active')
     } else {
-      setStatus('inactive')
+      setStatusHandler('inactive')
     }
   }
 
   async function loadPod(tr) {
     const params = await chats.loadFeed(chat.host, chat.uuid, tr.feed_url)
-    if (params) setPod(params)
-    if(!params) setPodError('no podcast found')
+    if (params) dispatch({type:'setPod',payload:params})
+    if(!params) dispatch({type:'setPodError',payload:'no podcast found'})
     // if (params) initialSelect(params)
   }
 
-  const appURL = tribeParams && tribeParams.app_url
-  const feedURL = tribeParams && tribeParams.feed_url
-  const tribeBots = tribeParams && tribeParams.bots
-  const theShow = show
+  const appURL = state.tribeParams && state.tribeParams.app_url
+  const pod = state.pod
+  const feedURL = state.tribeParams && state.tribeParams.feed_url
+  const tribeBots = state.tribeParams && state.tribeParams.bots
+  const theShow = state.show
 
   function onBoost(sp:StreamPayment){
     if(!(chat && chat.id)) return
@@ -130,7 +136,7 @@ export default function Chat() {
       contact_id:null,
       text:`boost::${JSON.stringify(sp)}`,
       chat_id: chat.id||null,
-      amount: pricePerMessage,
+      amount: state.pricePerMessage,
       reply_uuid:''
     })
   }
@@ -142,27 +148,27 @@ export default function Chat() {
   if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
-  return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
-
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} tribeParams={tribeParams} 
-      earned={earned} spent={spent} pricePerMinute={pricePerMinute}
+  return <View style={{...styles.main,backgroundColor:theme.bg}}>
+    <Header chat={chat} appMode={state.appMode} setAppMode={setAppModeHandler} status={state.status} 
+      tribeParams={state.tribeParams} pricePerMinute={pricePerMinute}
+      earned={earned} spent={spent}
     />
-
-    {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: appMode ? 100 : 99 }} accessibilityLabel="chat-application-frame">
+    {(appURL ? true : false) && <View style={{ ...styles.layer, zIndex: state.appMode ? 100 : 99 }}>
       <Frame url={appURL} />
     </View>}
 
-    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
+
+    <View style={{ ...styles.layer, zIndex: state.appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
       {theShow && <MsgList chat={chat} />}
 
-      <Pod pod={pod} show={feedURL?true:false} chatID={chat.id} onBoost={onBoost} podError={podError} />
+      <Pod pod={pod} show={feedURL?true:false} chatID={chat.id} onBoost={onBoost} podError={state.podError} />
 
       <Anim dark={theme.dark} />
 
-      {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
+      {theShow && <BottomBar chat={chat} pricePerMessage={state.pricePerMessage}
         tribeBots={tribeBots}
       />}
     </View>

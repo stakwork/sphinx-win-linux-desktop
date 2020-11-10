@@ -19,7 +19,7 @@ import Clipboard from "@react-native-community/clipboard";
 import BotResMsg from './botResMsg'
 import Popover from 'react-native-popover-view';
 import {useTheme} from '../../../store'
-import EE, {CANCEL_REPLY_UUID, CLEAR_REPLY_UUID, REPLY_UUID} from '../../utils/ee'
+import EE from '../../utils/ee'
 
 export default function MsgRow(props) {
   const theme = useTheme()
@@ -35,9 +35,9 @@ export default function MsgRow(props) {
     }
   }
   useLayoutEffect(()=> {
-    EE.on(CLEAR_REPLY_UUID, clearReplyUUID)
+    EE.on('clear-reply-uuid', clearReplyUUID)
     return ()=> {
-      EE.removeListener(CLEAR_REPLY_UUID,clearReplyUUID)
+      EE.removeListener('clear-reply-uuid',clearReplyUUID)
     }
   },[swipeRowRef])
 
@@ -68,12 +68,12 @@ export default function MsgRow(props) {
 
   const onRowOpenHandler = () => {
     if (props.message_content) {
-      EE.emit(REPLY_UUID,props.uuid)
+      EE.emit('reply-uuid',props.uuid)
       setShowReply(true)
     }
   }
   const onRowCloseHandler = () => {
-    EE.emit(CANCEL_REPLY_UUID,'')
+    EE.emit('cancel-reply-uuid','')
     setShowReply(false)
   }
   return <View style={{
@@ -145,7 +145,6 @@ function MsgBubble(props) {
       onRequestCloseHandler()
     }
   }
-
   return (
       <Popover
         isVisible={showPopover}
@@ -164,7 +163,12 @@ function MsgBubble(props) {
               content={props.reply_message_content}
               senderAlias={props.reply_message_sender_alias}
             />}
-            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} />}
+            {!isDeleted && (
+              <>
+                {props.id < 0 && <View style={{ opacity: 0.5 }}><Message {...props} onLongPress={onLongPressHandler} /></View>}
+                {props.id > 0 && <Message {...props} onLongPress={onLongPressHandler} />}
+              </>
+            )}
           </View>
         )}
       >

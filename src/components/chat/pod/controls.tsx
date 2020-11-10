@@ -4,7 +4,6 @@ import TrackPlayer from 'react-native-track-player';
 import moment from 'moment'
 import EE, { EXTRA_TEXT_CONTENT } from '../../utils/ee'
 import momentDurationFormatSetup from "moment-duration-format";
-import { StreamPayment } from '../../../store/feed';
 momentDurationFormatSetup(moment);
 import Slider from '@react-native-community/slider';
 import TouchableIcon from '../../utils/touchableIcon'
@@ -13,6 +12,7 @@ import Rocket from './rocket'
 import CustomIcon from '../../utils/customIcons'
 import { getPosition, setPosition } from './position'
 import useInterval from '../../utils/useInterval'
+import {StreamPayment} from '../../../store/feed'
 
 export default function Controls(props) {
   const [pos,setPos] = useState(0)

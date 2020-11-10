@@ -1,3 +1,4 @@
+
 import React from 'react'
 import {TouchableOpacity, Text, View, StyleSheet} from 'react-native'
 import { useObserver } from 'mobx-react-lite'
@@ -8,7 +9,7 @@ import { useStores, useTheme } from '../../store'
 import { contactForConversation } from './utils'
 import { constants } from '../../constants'
 import { randAscii } from '../../crypto/rand'
-import {RouteStatus} from './chat'
+import {RouteStatus} from './Chat/chat'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useChatPicSrc } from '../utils/picSrc'
 import Avatar from './msg/avatar'
