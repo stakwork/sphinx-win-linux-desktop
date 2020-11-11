@@ -78,18 +78,18 @@ class MsgStore {
     this.lastUpdated = 0
   }
 
-  @action
-  async getAllMessages() {
-    try {
-      const r = await relay.get('messages')
-      if (!r) return
-      const msgs = await decodeMessages(r.new_messages)
-      this.messages = orgMsgs(msgs)
-      this.lastFetched = new Date().getTime()
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  // @action
+  // async getAllMessages() {
+  //   try {
+  //     const r = await relay.get('messages')
+  //     if (!r) return
+  //     const msgs = await decodeMessages(r.new_messages)
+  //     this.messages = orgMsgs(msgs)
+  //     this.lastFetched = new Date().getTime()
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
 
   @action
   async getMessages() {
@@ -99,6 +99,7 @@ class MsgStore {
       const dateq = moment.utc(this.lastFetched - 1000 * mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else { // else just get last week
+      console.log("=> GET LAST WEEK")
       const start = moment().subtract(DAYS, 'days').format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }

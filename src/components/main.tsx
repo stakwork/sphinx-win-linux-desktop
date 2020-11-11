@@ -7,6 +7,7 @@ import * as push from './push'
 import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
 import EE, {RESET_IP,RESET_IP_FINISHED} from './utils/ee'
+import { initialLoad, hasData } from '../realm/api'
 
 async function createPrivateKeyIfNotExists(contacts){
   const priv = await rsa.getPrivateKey()
@@ -26,11 +27,20 @@ push.configure((t)=>{
   // console.log("ON FINISH",n)
 })
 
+function migrateRealm(){
+  const hasRealmData = hasData()
+  console.log('hasRealmData',hasRealmData)
+  
+}
+
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
+    console.log("<Main /> loaded!")
+    migrateRealm()
+
     AppState.addEventListener("change", handleAppStateChange);
     return () => {
       AppState.removeEventListener("change", handleAppStateChange);

@@ -10,7 +10,7 @@ class DetailsStore {
   async getBalance() {
     try {
       const r = await relay.get('balance')
-      console.log("===========>",r)
+      // console.log("===========>",r)
       if (!r) return
       const b = r.balance && parseInt(r.balance)
       this.balance = b || 0
