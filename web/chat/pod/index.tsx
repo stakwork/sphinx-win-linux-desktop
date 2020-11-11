@@ -8,13 +8,23 @@ import Player from './player'
 import Stats from './stats'
 import EE, { CLIP_PAYMENT, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
+import Slider from '@material-ui/core/Slider';
+import { version } from 'punycode';
 
-export default function Pod({ url, host, onBoost }) {
+export default function Pod({ url, chat, onBoost }) {
+  const { chats, msg, feed } = useStores()
+  const host = chat&&chat.host
+  const chatID = chat&&chat.id
+
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
   const [showStats, setShowStats] = useState(false)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
-  const { chats, msg, feed } = useStores()
+
+  let initppm = chats.pricesPerMinute[chatID]
+  if(!(initppm||initppm===0)) initppm = chat.pricePerMinute||5
+  const [ppm,setPpm] = useState<number>(initppm)
+  
   const scrollRef = useRef<HTMLDivElement>()
 
   async function loadPod() {
@@ -139,6 +149,22 @@ export default function Pod({ url, host, onBoost }) {
     </PodWrap>
   }
 
+  const ppms = [0,3,5,10,20,50,100]
+  function chooseSatsPerMinute(e, n){
+    if(!chatID) return
+    const price = ppms[n] || 0
+    chats.setPricePerMinute(chatID,price)
+  }
+  function satsPerMinuteChanged(e,v){
+    setPpm(ppms[v]||0)
+  }
+  let sliderValue = ppms.indexOf(ppm)
+  if(sliderValue<0) sliderValue=2
+
+  function valueLabelFormat(v){
+    return `${ppms[v]}`
+  }
+
   return <PodWrap bg={theme.bg} ref={scrollRef}>
     {pod && <PodImage src={pod.image} alt={pod.title} />}
 
@@ -146,6 +172,25 @@ export default function Pod({ url, host, onBoost }) {
       <div>Earned:</div>
       <div>{`${earned} sats`}</div>
     </Earned>}
+
+    {pod && <SliderWrap>
+      <SliderText>
+        <span>Podcast: price to minute</span>
+        <span>{`${ppms[sliderValue]}`}</span>
+      </SliderText>
+      <Slider
+        getAriaValueText={valueLabelFormat}
+        valueLabelFormat={valueLabelFormat}
+        onChangeCommitted={chooseSatsPerMinute}
+        aria-labelledby="value-slider"
+        valueLabelDisplay="auto"
+        step={1}
+        min={0}
+        max={6}
+        value={sliderValue}
+        onChange={satsPerMinuteChanged}
+      />
+    </SliderWrap>}
 
     {pod ? <PodInfo>
       <PodText>
@@ -309,3 +354,20 @@ function usePrevious(value) {
   useEffect(() => { ref.current = value; });
   return ref.current;
 }
+
+const SliderWrap = styled.div`
+  margin:20px 20px 0 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+`
+const SliderText = styled.div`
+  display:flex;
+  width:100%;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  & span {
+    font-size:12px;
+  }
+`

@@ -123,7 +123,7 @@ function Chat() {
         />
       </Inner>
       {ui.feedURL && 
-        <Pod url={ui.feedURL} host={chat && chat.host}
+        <Pod url={ui.feedURL} chat={chat}
           onBoost={onBoost}
         />
       }
