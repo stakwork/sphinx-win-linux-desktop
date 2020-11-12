@@ -7,6 +7,5 @@ export default {
     messages: { type: 'Message[]' },
     lastSeen: { type: 'LastSeen[]' },
     lastFetched: { type: 'double', default: 0, optional: true },
-    lastUpdated: { type: 'double', default: 0, optional: true },
   }
 }

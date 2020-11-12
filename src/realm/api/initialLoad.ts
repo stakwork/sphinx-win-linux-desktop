@@ -48,7 +48,6 @@ export default (props: InitialLoad) => {
         messages: allMessages,
         lastSeen,
         lastFetched: msg.lastFetched || null,
-        lastUpdated: msg.lastUpdated || null,
       }
 
       create({

@@ -27,19 +27,12 @@ push.configure((t)=>{
   // console.log("ON FINISH",n)
 })
 
-function migrateRealm(){
-  const hasRealmData = hasData()
-  console.log('hasRealmData',hasRealmData)
-  
-}
 
 export default function Main() {
   const {contacts,msg,details,user,meme,ui} = useStores()
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
-    console.log("<Main /> loaded!")
-    migrateRealm()
 
     AppState.addEventListener("change", handleAppStateChange);
     return () => {

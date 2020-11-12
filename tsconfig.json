@@ -12,13 +12,13 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "allowJs": true,
-    "target": "es5",
+    "target": "esnext",
     "esModuleInterop": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "isolatedModules": true
   },
-  // "include": ["src"]
-  "include": ["src/index.web.tsx","web"]
+  "include": ["src"]
+  // "include": ["src/index.web.tsx","web"]
 }

@@ -15,8 +15,8 @@ export default (props: Create) => {
       if (exists) response = `${schema} already exist!`
       if (!exists) {
         response = realm.create(schema, body);
-        console.log(`Created object in shcema: ${schema}`);
-        console.log('response: ', response);
+        console.log(`Created object in schema: ${schema}`);
+        // console.log('response: ', response);
       }
     });
     return response;

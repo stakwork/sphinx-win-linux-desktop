@@ -16,6 +16,8 @@ import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import * as hookz from './hooks'
 import * as localForage from 'localforage'
+import {getRealmMessages,updateRealmMsg} from '../realm/funcs'
+import {hasData} from '../realm/api'
 
 export const DEBOUNCE_TIME = 280
 
@@ -37,6 +39,48 @@ async function testAsyncStorage(){
   // console.log(msgs&&msgs.length, typeof msgs)
 }
 
+// check if in localforage
+// ifnot, load from persist and into localforage
+async function hydrateMessageStoreFromLocalforage(){
+  const lfm:string = await localForage.getItem('_msg')
+  if(lfm) {
+    try {
+      const rs = JSON.parse(lfm)
+      msgStore.messages = rs.messages
+      msgStore.lastSeen = rs.lastSeen
+      msgStore.lastFetched = rs.lastFetched
+    } catch(e) {
+      console.log("LOCALFORAGE ERROR",e)
+    }
+  } else {
+    await hydrate('msg', msgStore)
+    await sleep(DEBOUNCE_TIME)
+    const obj = {
+      messages: msgStore.messages,
+      lastSeen: msgStore.lastSeen,
+      lastFetched: msgStore.lastFetched
+    }
+    localForage.setItem('_msg', JSON.stringify(obj))
+  }
+}
+
+// check if realm
+// if not, load from persist and into realm
+async function hydrateMessageStoreFromRealm(){
+  console.log('hydrateMessageStoreFromRealm')
+  const hasRealmData = hasData()
+  if(hasRealmData.msg) {
+    console.log('has msgs')
+    const rs = getRealmMessages()
+    msgStore.messages = rs.messages
+    msgStore.lastSeen = rs.lastSeen
+    msgStore.lastFetched = rs.lastFetched
+  } else {
+    await hydrate('msg', msgStore)
+    await sleep(DEBOUNCE_TIME)
+    updateRealmMsg(msgStore)
+  }
+}
 function initAndroid(){
   console.log('=> initialize store')
   Promise.all([
@@ -47,9 +91,9 @@ function initAndroid(){
     hydrate('meme', memeStore),
   ]).then(()=> {
     console.log('=> store initialized')
-    uiStore.setReady(true)
-    hydrate('msg', msgStore)
+    uiStore.setReady(true)    
     testAsyncStorage()
+    hydrateMessageStoreFromRealm()
   })
   hydrate('theme', themeStore)
 }
@@ -62,7 +106,8 @@ function initWeb(){
     hydrate('contacts', contactStore),
     hydrate('chats', chatStore),
     hydrate('meme', memeStore),
-    hydrate('msg', msgStore)
+    // hydrate('msg', msgStore)
+    hydrateMessageStoreFromLocalforage()
   ]).then(()=> {
     console.log('=> store initialized')
     uiStore.setReady(true)
@@ -96,3 +141,7 @@ export const useStores = () => React.useContext(ctx)
 export const useTheme = () => React.useContext(React.createContext(themeStore))
 
 export const hooks = hookz
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}

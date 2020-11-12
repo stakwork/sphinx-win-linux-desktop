@@ -12,7 +12,7 @@ export default (props: Update) => {
   let response = null;
   try {
     realm.write(() => {
-      console.log(`Updating object in schema: ${schema}`);
+      // console.log(`Updating object in schema: ${schema}`);
       response = realm.objects(schema).find((e: any) => e.id === id);
       if (schema === 'Msg') response = realm.objects(schema)[0]
       const availableFields = [];
@@ -33,10 +33,9 @@ export default (props: Update) => {
           response.messages = body.messages;
           response.lastSeen = body.lastSeen;
           response.lastFetched = body.lastFetched;
-          response.lastUpdated = body.lastUpdated;
         }
-        if (schema === 'Msg') console.log('updatedObject: ', response.messages.length);
-        if (schema !== 'Msg') console.log('updatedObject: ', response);
+        // if (schema === 'Msg') console.log('updatedObject: ', response.messages.length);
+        // if (schema !== 'Msg') console.log('updatedObject: ', response);
       }
     });
     return response;
