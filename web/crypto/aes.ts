@@ -17,3 +17,11 @@ export function decryptSync(data:string,password:string){
   const ret = ipc.sendSync('decryptSync', obj)
   return ret
 }
+
+export async function encryptSymmetric(data:string,password:string){
+  const obj={data,password}
+  const ret = await ipc.send('encrypt-symmetric', obj)
+  return ret
+}
+
+

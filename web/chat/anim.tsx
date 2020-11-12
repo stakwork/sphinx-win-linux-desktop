@@ -16,7 +16,7 @@ export default function Animation(){
   const [show,setShow] = useState(false)
 
   const meContact = contacts.contacts.find(c => c.id === 1)
-  let meIMG = meContact.photo_url
+  let meIMG = meContact && meContact.photo_url
 
   function play() {
     const name = 'confetti'
@@ -49,7 +49,7 @@ export default function Animation(){
         height={400}
         width={400}
       />}
-      <Img src={meIMG} />
+      {meIMG && <Img src={meIMG} />}
     </ContentWrap>
   </Wrap>
 }

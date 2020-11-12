@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import TextField from '@material-ui/core/TextField';
 
-export default function TextInput({ name, label, error, required, readOnly, handleChange, handleBlur, handleFocus, value }) {
+export default function TextInput({ name, label, error, required, readOnly, handleChange, handleBlur, handleFocus, value, style }) {
     return <Text
             id={name}
             value={value}
@@ -12,6 +12,7 @@ export default function TextInput({ name, label, error, required, readOnly, hand
             InputProps={{ readOnly, name }}
             onFocus={handleFocus}
             error={error ? true : false}
+            style={style||{marginTop:18,marginBottom:18}}
         />
 }
 

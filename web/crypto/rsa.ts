@@ -4,6 +4,11 @@ export async function setPrivateKey(priv) {
   await ipc.send('set-private-key', {key:priv})
 }
 
+export async function getPrivateKey() {
+  const pk = await ipc.send('get-private-key', {})
+  return pk
+}
+
 export async function genKeys() {
   const publicKey = await ipc.send('gen-keys', {})
   return publicKey

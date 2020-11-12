@@ -18,7 +18,6 @@ export default function Form(props){
                         handleChange={e=>setFieldValue(item.name, e)}
                         handleBlur={()=>setFieldTouched(item.name, false)}
                         handleFocus={()=>setFieldTouched(item.name, true)}
-                        style={{marginBottom: '20px'}}
                     />
                 })}
                 <Button color={'primary'} loading={props.loading} onClick={handleSubmit} disabled={!isValid || !dirty}>{props.buttonText || "Save Changes"}</Button>
