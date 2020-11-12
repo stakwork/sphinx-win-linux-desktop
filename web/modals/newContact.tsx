@@ -42,6 +42,7 @@ export default function NewContact() {
     const { ui, contacts, details, user } = useStores()
     const [contactState, setContactState] = useState('')
     const [price, setPrice] = useState('')
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         (async () => {
@@ -86,14 +87,19 @@ export default function NewContact() {
                             buttonStyle={{
                                 marginTop: 10
                             }}
-                            />
-                        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center', color: '#6a7a8c', marginTop: 5 }}>
-                            Estimated Cost:&nbsp; <span style={{color: 'white'}}>{price}</span> &nbsp;SAT
+                        />
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', color: '#6a7a8c', marginTop: 5 }}>
+                            Estimated Cost:&nbsp; <span style={{ color: 'white' }}>{price}</span> &nbsp;SAT
                         </div>
                     </div> :
                     <div>
                         <Form
-                            onSubmit={v => console.log(v)}
+                            onSubmit={async (values) => {
+                                setLoading(true)
+                                await contacts.addContact(values)
+                                setLoading(false)
+                                close()
+                            }}
                             schema={alreadySchema}
                             buttonText={'Save To Contacts'} />
                     </div>
