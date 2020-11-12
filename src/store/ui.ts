@@ -257,6 +257,11 @@ export class UiStore {
     this.showProfile = b
   }
 
+  @observable newContact: boolean = false
+  @action setNewContact(b) {
+    this.newContact = b
+  }
+
 }
 
 export const uiStore = new UiStore()

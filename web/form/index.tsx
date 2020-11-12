@@ -8,7 +8,7 @@ import Button from '../utils/button'
 export default function Form(props){
 
     return <Formik initialValues={props.initialValues || {}} onSubmit={props.onSubmit} validationSchema={validator(props.schema)}>
-        {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid }) => {
+        {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid}) => {
             return <Wrap>
                 {props.schema && props.schema.map(item=>{
                     return <Input {...item}
@@ -18,10 +18,9 @@ export default function Form(props){
                         handleChange={e=>setFieldValue(item.name, e)}
                         handleBlur={()=>setFieldTouched(item.name, false)}
                         handleFocus={()=>setFieldTouched(item.name, true)}
-                        style={{marginBottom: '20px'}}
                     />
                 })}
-                <Button color={'primary'} loading={props.loading} onClick={handleSubmit} disabled={!isValid || !dirty}>{props.buttonText || "Save Changes"}</Button>
+                <Button style={props.buttonStyle} color={props.buttonColor || 'primary'} loading={props.loading} onClick={handleSubmit} disabled={!isValid || !dirty}>{props.buttonText || "Save Changes"}</Button>
             </Wrap>
         }}
     </Formik>

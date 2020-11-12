@@ -42,8 +42,6 @@ export default function Profile() {
     setLoading(false)
   }
 
-  console.log(me)
-
   function handleCloseModal() {
     ui.setShowProfile(false)
   }
@@ -65,19 +63,25 @@ export default function Profile() {
       </TopWrapper>
       <Toggle onChange={e=>setAdvanced(e==='Advanced')} items={['Basic', 'Advanced']} value={advanced?'Advanced':'Basic'}/>
               {advanced?
-              <Form key={'adv'} onSubmit={v=>user.setCurrentIP(v.currentIP)} schema={advSchema} initialValues={{currentIP: user.currentIP}}/>
+              <div style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
+                <Form buttonStyle={{marginTop: 20}} key={'adv'} onSubmit={v=>user.setCurrentIP(v.currentIP)} schema={advSchema} initialValues={{currentIP: user.currentIP}}/>
+              </div>
               :
-              <Form key={'basic'} onSubmit={updateMe} schema={schema} initialValues={me} loading={loading}/>}
+              <div style={{display: 'flex', flexDirection: 'column', marginTop: 10, marginBottom: 10, alignItems: 'center'}}>
+                <Form key={'basic'} onSubmit={updateMe} schema={schema} initialValues={me} loading={loading} buttonStyle={{marginTop: 20}}/>
+                <div style={{marginTop: 20}}>Want to switch to a new device?</div>
+                <div style={{color: theme.primary, cursor: 'pointer'}} onClick={p=>console.log(p)}>
+                  Export Keys</div>
+              </div>
+              }
     </Content>
   </Modal>
 }
 
 const Content = styled.div`
-  padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px 0px 30px 0px;
     border-radius: 8px;
     width: 300px;
-    height: 450px;
     background: ${p => p.bg};
     display: flex;
     flex-direction: column;
