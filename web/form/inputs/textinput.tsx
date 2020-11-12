@@ -12,7 +12,7 @@ export default function TextInput({ name, label, error, required, readOnly, hand
             InputProps={{ readOnly, name }}
             onFocus={handleFocus}
             error={error ? true : false}
-            style={style || {marginTop: 10, marginBottom: 10}}
+            style={style||{marginTop:18,marginBottom:18}}
         />
 }
 

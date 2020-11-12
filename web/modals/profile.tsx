@@ -7,15 +7,16 @@ import Avatar from '../utils/avatar'
 import Toggle from '../utils/toggle'
 import Form from '../form'
 import * as Yup from 'yup'
-import { contact } from '../../src/store/websocketHandlers';
-
+import * as rsa from '../crypto/rsa'
+import * as aes from '../crypto/aes'
+import {userPinCode} from './pin'
 
 const schema = [{
   name: 'alias',
   type: 'text',
   label: 'User Name',
   validator: Yup.string().required('Required'),
-},{
+}, {
   name: 'public_key',
   type: 'text',
   label: 'Address',
@@ -35,15 +36,34 @@ export default function Profile() {
   const me = contacts.contacts.find(c => c.id === 1)
   const [advanced, setAdvanced] = useState(false)
   const [loading, setLoading] = useState(false)
-  
-  async function updateMe(v){
+  const [copied,setCopied] = useState(false)
+
+  async function updateMe(v) {
     setLoading(true)
-    await contacts.updateContact(1, {alias: v.alias})
+    await contacts.updateContact(1, { alias: v.alias })
     setLoading(false)
   }
 
   function handleCloseModal() {
     ui.setShowProfile(false)
+  }
+
+  async function exportKeys(){
+    if(copied) return
+    const priv = await rsa.getPrivateKey()
+    const me = contacts.contacts.find(c=>c.id===1)
+    const pub = me && me.contact_key
+    const ip = user.currentIP
+    const token = user.authToken
+    if(!priv || !pub || !ip || !token) return
+    const str = `${priv}::${pub}::${ip}::${token}`
+    const pin = await userPinCode()
+    const enc = await aes.encryptSymmetric(str,pin)
+    const final = btoa(`keys::${enc}`)
+    navigator.clipboard.writeText(final)
+    setCopied(true)
+    await sleep(4000)
+    setCopied(false)
   }
 
   return <Modal
@@ -55,38 +75,37 @@ export default function Profile() {
   >
     <Content bg={theme.bg}>
       <TopWrapper>
-        <Avatar xx-large photo={me.photo_url} alias={me.alias} style={{size: '50px'}} />
+        <Avatar xx-large photo={me.photo_url} alias={me.alias} style={{ size: '50px' }} />
         <InnerTopWrapper>
           <Name>{me.alias.toUpperCase()}</Name>
-          <Sat>{details.balance} <span style={{color: '#6b7b8d'}}>sat</span></Sat>
+          <Sat>{details.balance} <span style={{ color: '#6b7b8d' }}>sat</span></Sat>
         </InnerTopWrapper>
       </TopWrapper>
-      <Toggle onChange={e=>setAdvanced(e==='Advanced')} items={['Basic', 'Advanced']} value={advanced?'Advanced':'Basic'}/>
-              {advanced?
-              <div style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
-                <Form buttonStyle={{marginTop: 20}} key={'adv'} onSubmit={v=>user.setCurrentIP(v.currentIP)} schema={advSchema} initialValues={{currentIP: user.currentIP}}/>
-              </div>
-              :
-              <div style={{display: 'flex', flexDirection: 'column', marginTop: 10, marginBottom: 10, alignItems: 'center'}}>
-                <Form key={'basic'} onSubmit={updateMe} schema={schema} initialValues={me} loading={loading} buttonStyle={{marginTop: 20}}/>
-                <div style={{marginTop: 20}}>Want to switch to a new device?</div>
-                <div style={{color: theme.primary, cursor: 'pointer'}} onClick={p=>console.log(p)}>
-                  Export Keys</div>
-              </div>
-              }
+      <Toggle onChange={e => setAdvanced(e === 'Advanced')} items={['Basic', 'Advanced']} value={advanced ? 'Advanced' : 'Basic'} />
+      {advanced ?
+        <Form key={'adv'} onSubmit={v => user.setCurrentIP(v.currentIP)} schema={advSchema} initialValues={{ currentIP: user.currentIP }} />
+        :
+        <Form key={'basic'} onSubmit={updateMe} schema={schema} initialValues={me} loading={loading} />
+      }
+
+      <ExportKeysWrap style={{color:theme.primary}} onClick={exportKeys}>
+        {copied?'Keys Copied!':'Export Keys'}
+      </ExportKeysWrap>
+
     </Content>
   </Modal>
 }
 
 const Content = styled.div`
-    padding: 10px 0px 30px 0px;
-    border-radius: 8px;
-    width: 300px;
-    background: ${p => p.bg};
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 8px;
+  width: 300px;
+  background: ${p => p.bg};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
 `
 const TopWrapper = styled.div`
   display: flex;
@@ -114,3 +133,20 @@ const Name = styled.div`
 const Sat = styled.div`
 
 `
+const ExportKeysWrap = styled.div`
+  margin-top:25px;
+  margin-bottom:25px;
+  width:100%;
+  cursor:pointer;
+  display:flex;
+  border-top:1px solid grey;
+  border-bottom:1px solid grey;
+  height:44px;
+  align-items:center;
+  justify-content:center;
+  background:#252429;
+`
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}

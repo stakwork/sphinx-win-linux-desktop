@@ -30,6 +30,20 @@ ipcMain.on('link', async (event, args) => {
     }
 })
 
+ipcMain.on('encrypt-symmetric', (event, args) => {
+    console.log("encrypt-symmetric")
+    try {
+        if(!args.rid) return
+        // args.data is base64 encoded
+        // args.password is string
+        const buf = Buffer.from(args.data, 'ascii');
+        const enc = RNCryptor.Encrypt(buf, args.password)
+        event.reply(args.rid, enc)
+    } catch(e) {
+        console.log(e)
+    }
+})
+
 ipcMain.on('decrypt', (event, args) => {
     try {
         if(!args.rid) return
@@ -72,6 +86,16 @@ ipcMain.on('set-private-key', (event, args) => {
         // args.key
         keytar.setPrivateKey(args.key)
         event.reply(args.rid, true)
+    } catch(e) {
+        console.log(e)
+    }
+})
+
+ipcMain.on('get-private-key', async (event, args) => {
+    try {
+        if(!args.rid) return
+        const pk = await keytar.getPrivateKey()
+        event.reply(args.rid, pk)
     } catch(e) {
         console.log(e)
     }

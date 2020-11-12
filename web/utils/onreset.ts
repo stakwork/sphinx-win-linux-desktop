@@ -13,6 +13,7 @@ const electron = window.require ? window.require("electron") : {}
 export default function onreset(callback){
   if(electron.ipcRenderer) {
     electron.ipcRenderer.on('reset', (event, message) => {
+      localStorage.clear()
       localForage.clear()
       botStore.reset()
       chatStore.reset()

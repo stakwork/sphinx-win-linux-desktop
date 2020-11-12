@@ -24,6 +24,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
   const [duration,setDuration] = useState(0)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
   const [full, setFull] = useState(false)
+  const [queuedTrackID, setQueuedTrackID] = useState(null)
 
   function getAndSetDuration(){
     setTimeout(async ()=>{
@@ -62,16 +63,32 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
   }
 
   async function initialSelect(ps){
-    TrackPlayer.reset()
-    const episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
+    
+    let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
+    if(queuedTrackID) {
+      const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e=>e.id==queuedTrackID)
+      if(qe) {
+        episode=qe
+      } else {
+        // new podcast! switch it up
+        TrackPlayer.reset()
+      }
+    }
     if(!episode) return
+
     setSelectedEpisodeID(episode.id)
     await addEpisodeToQueue(episode)
     if(!duration) getAndSetDuration()
   }
 
   async function checkState(){
+    const trackID = await TrackPlayer.getCurrentTrack()
+    if(trackID) {
+      setQueuedTrackID(trackID)
+    }
+    
     const state = await TrackPlayer.getState()
+    console.log(state)
     if(state===TrackPlayer.STATE_PAUSED || state===TrackPlayer.STATE_STOPPED) {
       setPlaying(false)
     }
