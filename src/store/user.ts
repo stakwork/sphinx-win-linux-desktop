@@ -40,6 +40,9 @@ class UserStore {
   @persist @observable
   deviceId: string = ''
 
+  @persist @observable
+  tipAmount: number = 100
+
   @action reset() {
     this.code = ''
     this.alias = ''
@@ -79,6 +82,11 @@ class UserStore {
   @action
   setAuthToken(t) {
     this.authToken = t
+  }
+
+  @action
+  setTipAmount(s:number) {
+    this.tipAmount = s
   }
 
   @action

@@ -152,7 +152,7 @@ const tribe = [
     name:'feed_url',
     type:'text',
     label:{en:'RSS Feed URL',es:'RSS Feed URL'},
-    validator: Yup.number(),
+    validator: Yup.string(),
   },
   {
     name:'unlisted',

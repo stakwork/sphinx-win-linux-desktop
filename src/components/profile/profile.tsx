@@ -38,6 +38,7 @@ export default function Profile() {
   const [pinTimeout, setPinTimeout] = useState(12)
   const [initialPinTimeout, setInitialPinTimeout] = useState(12)
   const [serverURL, setServerURL] = useState('')
+  const [tipAmount, setTipAmount] = useState(user.tipAmount+'')
 
   async function loadPinTimeout(){
     const pt = await getPinTimeout()
@@ -60,6 +61,13 @@ export default function Profile() {
   }
   function serverURLDoneChanging(){
     user.setCurrentIP(serverURL)
+  }
+  function tipAmountChange(ta){
+    const int = parseInt(ta)
+    setTipAmount(int ? int+'' : '')
+  }
+  function tipAmountDoneChanging(){
+    user.setTipAmount(parseInt(tipAmount))
   }
 
   const isDark = useDarkMode()
@@ -245,6 +253,18 @@ export default function Profile() {
           />
         </View>
 
+        <View style={{...styles.inputs,...cardStyles}}>
+          <Text style={{...styles.label,color:theme.subtitle}}>Default tip amount</Text>
+          <Text style={{paddingLeft:12,paddingRight:12}}>
+            <TextInput
+              placeholder="Default Tip Amount"
+              value={tipAmount+''}
+              onChangeText={tipAmountChange}
+              onBlur={tipAmountDoneChanging}
+            />
+          </Text>
+        </View>
+
         <TouchableOpacity style={{...styles.export,...cardStyles}}
           onPress={()=>setShowPIN(true)}>
           <Text style={styles.exportText}>
@@ -395,6 +415,14 @@ const styles = StyleSheet.create({
     borderBottomWidth:1,
     borderTopWidth:1,
   },
+  inputs:{
+    maxHeight:100,
+    minHeight:124,
+    borderBottomWidth:1,
+    borderTopWidth:1,
+    marginBottom:10,
+    marginTop:10,
+  },
   export:{
     width:'100%',
     display:'flex',
@@ -404,6 +432,7 @@ const styles = StyleSheet.create({
     marginTop:10,
     borderBottomWidth:1,
     borderTopWidth:1,
+    marginBottom:25
   },
   exportText:{
     color:'#6289FD',
