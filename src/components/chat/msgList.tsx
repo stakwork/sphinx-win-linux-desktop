@@ -35,7 +35,6 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
   return useObserver(() => {
     const msgs = useMsgs(chat, limit) || []
     return <MsgList
-      lastUpdated={msg.lastUpdated}
       msgs={msgs}
       msgsLength={(msgs && msgs.length) || 0}
       chat={chat}
@@ -48,7 +47,7 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, lastUpdated }) {
+function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
   // const [viewableIds, setViewableIds] = useState({})

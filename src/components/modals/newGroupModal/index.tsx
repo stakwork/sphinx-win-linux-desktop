@@ -16,7 +16,7 @@ export default function NewGroup({ visible }) {
   const { ui, contacts } = useStores()
   const [selected, setSelected] = useState([])
   const [next, setNext] = useState(false)
-  const [theMode, setMode] = useState('')
+  const [theMode, setMode] = useState('tribe')
 
   function close() {
     ui.setNewGroupModal(false)

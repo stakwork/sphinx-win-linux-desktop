@@ -54,7 +54,7 @@ export default function ChatList() {
         accessibilityLabel="new-group-button" 
         style={moreStyles.button}
         onPress={setNewGroupModalHandler}>
-        Group
+        Tribe
       </Button>
     </View>
   )
