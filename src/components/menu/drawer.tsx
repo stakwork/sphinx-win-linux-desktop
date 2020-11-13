@@ -24,6 +24,8 @@ export default function TheDrawer(props) {
   const goToProfileHandler = () => navigate('Profile')
   const openAddFriendModalHandler = () => ui.setAddFriendModal(true)
   const openSupportModalHandler = () => ui.setSupportModal(true)
+  const setNewGroupModalHandler = () => ui.setNewGroupModal(true)
+
   return useObserver(() =>
     <DrawerContentScrollView {...props} style={{...props.style,backgroundColor:theme.main}}>
       <View style={{height:height-52,...styles.wrap}}>
@@ -75,6 +77,12 @@ export default function TheDrawer(props) {
           onPress={openAddFriendModalHandler}
           style={{backgroundColor:'#55D1A9',borderRadius:25,width:'60%',height:50,display:'flex',justifyContent:'center',marginLeft:20,marginTop:15}}>
           Add Friend
+        </Button>
+        <Button mode="contained" dark={true} icon="plus"
+          accessibilityLabel="menu-new-group-button" 
+          style={{backgroundColor:theme.primary,borderRadius:25,width:'60%',height:50,display:'flex',justifyContent:'center',marginLeft:20,marginTop:22}}
+          onPress={setNewGroupModalHandler}>
+          Tribe
         </Button>
         <View style={styles.versionWrap}>
           <Text style={{...styles.versionWrap,color:theme.title}}>

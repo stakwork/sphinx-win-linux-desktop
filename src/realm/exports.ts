@@ -41,7 +41,7 @@ export function getRealmMessages() {
 export function updateRealmMsg(data:Data) {
   if(Platform.OS==='web') return
 
-  console.log("UPDATE DATE IN REALM NOW!")
+  console.log("UPDATE DATA IN REALM NOW!")
 
   const hasRealmData = hasData();
   if (hasRealmData.msg) {
