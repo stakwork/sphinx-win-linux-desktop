@@ -81,6 +81,7 @@ project.ext.react = [
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 apply plugin: 'com.google.gms.google-services'
 
@@ -163,6 +164,9 @@ dependencies {
     implementation project(':react-native-image-picker')
     implementation project(':react-native-camera')
 
+    implementation project(':realm')
+    implementation project(':react-native-community-netinfo')
+
     compile project(':react-native-android-badge')
     compile project(':react-native-fast-image')
     implementation project(':react-native-audio-recorder-player')
@@ -191,7 +195,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
     implementation project(':lottie-react-native')
-
+    
     compile project(':react-native-track-player')
     
     // fixes memory leak related crash
