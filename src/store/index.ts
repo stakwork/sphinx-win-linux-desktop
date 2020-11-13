@@ -16,8 +16,8 @@ import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import * as hookz from './hooks'
 import * as localForage from 'localforage'
-import {getRealmMessages,updateRealmMsg} from '../realm/funcs'
-import {hasData} from '../realm/api'
+import {getRealmMessages,updateRealmMsg} from '../realm/exports'
+import {hasData} from '../realm/exports'
 
 export const DEBOUNCE_TIME = 280
 

@@ -1,17 +1,16 @@
-import React, {useRef, useEffect, useState} from 'react'
-import {AppState} from 'react-native'
+import React, { useRef, useEffect, useState } from 'react'
+import { AppState } from 'react-native'
 import MainNav from './mainnav'
-import {useStores} from '../store'
-import {initPicSrc} from './utils/picSrc'
+import { useStores } from '../store'
+import { initPicSrc } from './utils/picSrc'
 import * as push from './push'
 import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
-import EE, {RESET_IP,RESET_IP_FINISHED} from './utils/ee'
-import { initialLoad, hasData } from '../realm/api'
+import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
 
-async function createPrivateKeyIfNotExists(contacts){
+async function createPrivateKeyIfNotExists(contacts) {
   const priv = await rsa.getPrivateKey()
-  if(priv) return // all good
+  if (priv) return // all good
 
   const keyPair = await rsa.generateKeyPair()
   contacts.updateContact(1, {
@@ -20,16 +19,16 @@ async function createPrivateKeyIfNotExists(contacts){
 }
 
 let pushToken = ''
-push.configure((t)=>{
-  console.log("PUSH TOKEN:",t&&t.token)
+push.configure((t) => {
+  console.log("PUSH TOKEN:", t && t.token)
   pushToken = t.token
-},(n)=>{
+}, (n) => {
   // console.log("ON FINISH",n)
 })
 
 
 export default function Main() {
-  const {contacts,msg,details,user,meme,ui} = useStores()
+  const { contacts, msg, details, user, meme, ui } = useStores()
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
@@ -51,8 +50,8 @@ export default function Main() {
     appState.current = nextAppState;
   }
 
-  async function loadHistory(){
-    console.log("============> LOAD HISTORY",user.currentIP)
+  async function loadHistory() {
+    console.log("============> LOAD HISTORY", user.currentIP)
     ui.setLoadingHistory(true)
     await Promise.all([
       contacts.getContacts(),
@@ -66,14 +65,14 @@ export default function Main() {
     meme.authenticateAll()
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     (async () => {
 
       loadHistory()
 
       initPicSrc()
 
-      if(pushToken && !user.deviceId || user.deviceId!==pushToken) {
+      if (pushToken && !user.deviceId || user.deviceId !== pushToken) {
         user.registerMyDeviceId(pushToken)
       }
 
@@ -81,14 +80,14 @@ export default function Main() {
     })()
 
     EE.on(RESET_IP_FINISHED, loadHistory)
-    return ()=>{
+    return () => {
       EE.removeListener(RESET_IP_FINISHED, loadHistory)
     }
-  },[])
+  }, [])
 
   return <MainNav />
 }
 
 async function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }

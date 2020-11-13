@@ -7,7 +7,7 @@ import { persist } from 'mobx-persist'
 import moment from 'moment'
 import { encryptText, makeRemoteTextMap, decodeSingle, decodeMessages, orgMsgsFromExisting, orgMsgs, putIn, putInReverse } from './msgHelpers'
 import { Platform } from 'react-native'
-import {updateRealmMsg} from '../realm/funcs'
+import {updateRealmMsg} from '../realm/exports'
 
 const DAYS = Platform.OS === 'android' ? 7 : 30
 export const MAX_MSGS_PER_CHAT = Platform.OS === 'android' ? 100 : 1000

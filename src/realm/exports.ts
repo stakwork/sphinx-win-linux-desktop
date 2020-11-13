@@ -1,8 +1,9 @@
-import { hasData, get, update } from './api'
+import { hasData, get, update, initialLoad } from './api'
 import { Platform } from 'react-native'
 import {Msg} from '../store/msg'
 import {orgMsgsFromRealm} from '../store/msgHelpers'
 
+export {hasData, initialLoad}
 /*** 
  * Update Msg schema in realm
 ***/
