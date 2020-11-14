@@ -137,6 +137,9 @@ function MsgBubble(props) {
     Clipboard.setString(props.message_content || '')
     onRequestCloseHandler()
   }
+  const onBoostHandler = async () => {
+    await props.onBoostMsg()
+  }
   const onDeleteHandler = async () => {
     if (!deleting) {
       setDeleting(true)
@@ -170,12 +173,18 @@ function MsgBubble(props) {
       >
           <TouchableOpacity
             onPress={onCopyHandler}
-            style={{ padding: 10 }}
+            style={{ padding: 10, minWidth:99 }}
           >
             <Text style={{ textAlign: 'center' }}>Copy</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onBoostHandler}
+            style={{ padding: 10, minWidth:99, borderTopWidth: 1, borderTopColor: '#ddd', }}
+          >
+            <Text style={{ textAlign: 'center' }}>Boost</Text>
+          </TouchableOpacity>
           {(isMe || props.isTribeOwner) && <TouchableOpacity onPress={onDeleteHandler}
-            style={{ padding: 10, borderTopWidth: 1, borderTopColor: '#ddd', display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
+            style={{ padding: 10, borderTopWidth: 1, borderTopColor: '#ddd', display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center', minWidth:99 }}>
             {deleting && <ActivityIndicator color="#888" size={10} />}
             <Text style={{ textAlign: 'center', marginLeft: 6 }}>Delete</Text>
           </TouchableOpacity>}

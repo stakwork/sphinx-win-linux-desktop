@@ -235,7 +235,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
 
   function boost(){
     EE.emit(PLAY_ANIMATION)
-    const amount = 100
+    const amount = user.tipAmount || 100
     requestAnimationFrame(async ()=>{
       const pos = getPosition()
       const sp:StreamPayment = {

@@ -21,6 +21,9 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
     setLimit(c => c + 40)
   }
 
+  async function onBoostMsg(){
+    console.log('onBoostMsg')
+  }
   async function onDelete(id) {
     await msg.deleteMessage(id)
   }
@@ -43,11 +46,12 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
       onApproveOrDenyMember={onApproveOrDenyMember}
       onDeleteChat={onDeleteChat}
       onLoadMoreMsgs={onLoadMoreMsgs}
+      onBoostMsg={onBoostMsg}
     />
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs }) {
+function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
   // const [viewableIds, setViewableIds] = useState({})
@@ -140,6 +144,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
           onDelete={onDelete} myPubkey={myPubkey}
           onApproveOrDenyMember={onApproveOrDenyMember}
           onDeleteChat={onDeleteChat}
+          onBoostMsg={onBoostMsg}
         />
       }}
       keyExtractor={(item: any) => item.id + ''}
@@ -170,7 +175,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -184,6 +189,7 @@ function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, senderAlias, 
     senderAlias={senderAlias} senderPhoto={senderPhoto}
     onDelete={onDelete} myPubkey={myPubkey} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
+    onBoostMsg={onBoostMsg}
   />, [m.id, m.type, m.media_token, m.status, m.sold])
 }
 
