@@ -18,8 +18,7 @@ import * as hookz from './hooks'
 import * as localForage from 'localforage'
 import {getRealmMessages,updateRealmMsg} from '../realm/exports'
 import {hasData} from '../realm/exports'
-
-export const DEBOUNCE_TIME = 280
+import {DEBOUNCE_TIME, persistMsgLocalForage} from './storage'
 
 const strg = {
   ios: AsyncStorage,
@@ -54,13 +53,7 @@ async function hydrateMessageStoreFromLocalforage(){
     }
   } else {
     await hydrate('msg', msgStore)
-    await sleep(DEBOUNCE_TIME)
-    const obj = {
-      messages: msgStore.messages,
-      lastSeen: msgStore.lastSeen,
-      lastFetched: msgStore.lastFetched
-    }
-    localForage.setItem('_msg', JSON.stringify(obj))
+    persistMsgLocalForage(msgStore)
   }
 }
 
@@ -145,3 +138,4 @@ export const hooks = hookz
 async function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms))
 }
+

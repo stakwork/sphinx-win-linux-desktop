@@ -8,8 +8,9 @@ import moment from 'moment'
 import { encryptText, makeRemoteTextMap, decodeSingle, decodeMessages, orgMsgsFromExisting, orgMsgs, putIn, putInReverse } from './msgHelpers'
 import { Platform } from 'react-native'
 import {updateRealmMsg} from '../realm/exports'
+import {persistMsgLocalForage} from './storage'
 
-const DAYS = Platform.OS === 'android' ? 7 : 30
+const DAYS = Platform.OS === 'android' ? 7 : 7
 export const MAX_MSGS_PER_CHAT = Platform.OS === 'android' ? 100 : 1000
 
 export interface Msg {
@@ -89,6 +90,15 @@ class MsgStore {
   //   }
   // }
 
+  @action persister(){
+    if(Platform.OS === 'android') {
+      updateRealmMsg(this)
+    }
+    if(Platform.OS === 'web') {
+      persistMsgLocalForage(this)
+    }
+  }
+
   @action
   async getMessages() {
     let route = 'messages'
@@ -116,7 +126,9 @@ class MsgStore {
   }
 
   async batchDecodeMessages(msgs: Msg[]) {
+    console.log("BATCH DECODED MSGS")
     this.lastFetched = new Date().getTime()
+    console.log(this.lastFetched)
     const first10 = msgs.slice(msgs.length - 10)
     const rest = msgs.slice(0, msgs.length - 10)
     const decodedMsgs = await decodeMessages(first10)
@@ -133,7 +145,7 @@ class MsgStore {
     putInReverse(allms, decoded)
     this.sortAllMsgs(allms)
     console.log("NOW ALL ARE DONE!")
-    updateRealmMsg(this)
+    this.persister()
   }
 
   sortAllMsgs(allms: { [k: number]: Msg[] }) {
@@ -158,7 +170,7 @@ class MsgStore {
           // add alias?
           status: this.messages[newMsg.chat_id][idx].status
         }
-        updateRealmMsg(this)
+        this.persister()
       }
     }
   }
@@ -171,7 +183,7 @@ class MsgStore {
         const invoice = msgs.find(c => c.payment_hash === m.payment_hash)
         if (invoice) {
           invoice.status = constants.statuses.confirmed
-          updateRealmMsg(this)
+          this.persister()
         }
       }
     }
@@ -361,7 +373,7 @@ class MsgStore {
     if (!r) return
     if (r.chat_id) {
       putIn(this.messages, r, r.chat_id)
-      updateRealmMsg(this)
+      this.persister()
     }
   }
 
@@ -406,7 +418,7 @@ class MsgStore {
       const msg = msgs.find(m => m.id === msgId)
       if (msg) {
         msg.type = r.message.type
-        updateRealmMsg(this)
+        this.persister()
       }
       // update chat
       chatStore.gotChat(r.chat)
@@ -419,7 +431,7 @@ class MsgStore {
     const chatID = newMsg.chat_id
     if (chatID) {
       putIn(this.messages, newMsg, chatID)
-      updateRealmMsg(this)
+      this.persister()
       if (newMsg.chat) chatStore.gotChat(newMsg.chat)
     }
   }
@@ -445,7 +457,7 @@ class MsgStore {
     msgs.sort((a, b) => moment(a.date).unix() - moment(b.date).unix())
     this.messages = orgMsgsFromExisting(this.messages, msgs)
     msgsBuffer = []
-    updateRealmMsg(this)
+    this.persister()
   }
 
   @action pushFirstFromBuffer() {
