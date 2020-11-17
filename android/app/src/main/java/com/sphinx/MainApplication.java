@@ -1,5 +1,6 @@
 package com.sphinx;
 
+import io.realm.react.RealmReactPackage; // add this import
 import androidx.annotation.Nullable;
 import android.app.Application;
 import android.webkit.WebView;
@@ -43,6 +44,7 @@ import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import com.guichaguri.trackplayer.TrackPlayer;
 import com.airbnb.android.react.lottie.LottiePackage;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,6 +63,7 @@ public class MainApplication extends Application implements ReactApplication {
           // new WebRTCModulePackage(),
           // new RNJitsiMeetPackage(),
           new MainReactPackage(),
+          new RealmReactPackage(),
           new ReactSliderPackage(),
           new LottiePackage(),
           new TrackPlayer(),
@@ -92,7 +95,8 @@ public class MainApplication extends Application implements ReactApplication {
           new SafeAreaContextPackage(),
           new ReanimatedPackage(),
           new RNScreensPackage(),
-          new RNSecureStoragePackage()
+          new RNSecureStoragePackage(),
+          new NetInfoPackage()
       );
     }
 

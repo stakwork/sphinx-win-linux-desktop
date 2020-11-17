@@ -149,6 +149,12 @@ const tribe = [
     description: 'The number of hours before the Escrow Amount is returned to the subscriber'
   },
   {
+    name:'feed_url',
+    type:'text',
+    label:{en:'RSS Feed URL',es:'RSS Feed URL'},
+    validator: Yup.string(),
+  },
+  {
     name:'unlisted',
     type:'radio',
     // inverted:true,

@@ -1,14 +1,23 @@
-import React, { useRef } from 'react'
+import React, { useRef, useLayoutEffect } from 'react'
 import styled from 'styled-components'
 import AudioPlayer from 'react-h5-audio-player';
 import { useStores } from '../../../src/store'
 import { StreamPayment,NUM_SECONDS } from '../../../src/store/feed'
 import {ChatQuote, BoostIcon, Forward30, Back15} from './icons'
 
-export default function Player({pod,episode,sendPayments,boost}){
+export default function Player({pod,episode,sendPayments,boost,initialTS}){
   const { ui, user } = useStores()
   const ts = useRef(0)
   const secs = useRef(0)
+
+  const ref = useRef<any>()
+  useLayoutEffect(()=>{
+    if(initialTS) {
+      if(ref&&ref.current&&ref.current.audio&&ref.current.audio.current) {
+        ref.current.audio.current.currentTime = initialTS||0
+      }
+    }
+  },[initialTS])
 
   function tick(){
     const s = secs.current
@@ -51,6 +60,7 @@ export default function Player({pod,episode,sendPayments,boost}){
       <ChatQuote style={{height:24,width:24}} onClick={clickMsg} />
     </MsgWrap>}
     {episode && <AudioPlayer
+      ref={ref}
       autoPlay={false}
       src={episode.enclosureUrl}
       onPlay={onPlay}
@@ -68,7 +78,6 @@ export default function Player({pod,episode,sendPayments,boost}){
         rewind: <Back15 style={{fill:'#809ab7',marginRight:10,height:24,width:24}} />,
         forward: <Forward30 style={{fill:'#809ab7',marginLeft:10,height:24,width:24}} />
       }}
-    // other props here
     />}
     {episode && <BoostWrap>
       <Boost style={{height:24,width:24}} onClick={clickBoost} />

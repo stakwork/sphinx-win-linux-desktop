@@ -92,6 +92,16 @@ export function orgMsgsFromExisting(allMsgs: { [k: number]: Msg[] }, messages: M
   return allms
 }
 
+export function orgMsgsFromRealm(messages: Msg[]) {
+  const orged: {[k:number]:Msg[]} = {}
+  const uniqueChatId = Array.from(new Set(messages.map((m) => m.chat_id)));
+
+  uniqueChatId.forEach((key: any) => {
+    orged[key] = messages.filter((message: any) => message.chat_id === key);
+  });
+  return orged
+}
+
 export function putInReverse(allms, decoded) {
   decoded.forEach(msg => {
     if (msg.chat_id || msg.chat_id === 0) {

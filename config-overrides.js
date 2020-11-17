@@ -1,4 +1,11 @@
-const { override, babelInclude, addDecoratorsLegacy, disableEsLint, removeModuleScopePlugin } = require("customize-cra");
+const { 
+    override, 
+    babelInclude, 
+    addDecoratorsLegacy, 
+    disableEsLint, 
+    removeModuleScopePlugin, 
+    addWebpackExternals 
+} = require("customize-cra");
 const path = require('path');
 
 module.exports = override(
@@ -8,7 +15,10 @@ module.exports = override(
     babelInclude([
         path.resolve("src"),
         path.resolve("web")
-    ])
+    ]),
+    addWebpackExternals({
+        realm:'RealmStub'
+    })
 )
 
 // const path = require('path');

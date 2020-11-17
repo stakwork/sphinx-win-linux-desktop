@@ -16,7 +16,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import PhoneIcon from '@material-ui/icons/Phone'
 import LockIcon from '@material-ui/icons/Lock';
 
-export default function Head({ height, appMode, setAppMode, pricePerMessage, status }) {
+export default function Head({ height, appMode, appURL, setAppMode, pricePerMessage, status }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const { contacts, ui, msg } = useStores()
@@ -26,7 +26,6 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
     const ownerPubkey = (chat && chat.owner_pubkey) || ''
     const owner = contacts.contacts.find(c => c.id === 1)
     const isTribeOwner = owner && owner.public_key === ownerPubkey
-    const appURL = ui.applicationURL
 
     function goToURL() {
       ui.setApplicationURL(URL)
@@ -36,7 +35,7 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
       ui.setApplicationURL('')
     }
     function openJitsi() {
-      ui.setStartJitsiParams({pricePerMessage})
+      ui.setStartJitsiParams({ pricePerMessage })
     }
 
     useEffect(() => {
@@ -55,11 +54,11 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
       }
     }
 
-    function viewContact(){
-      if(chat && chat.type === constants.chat_types.conversation) {
+    function viewContact() {
+      if (chat && chat.type === constants.chat_types.conversation) {
         const cid = chat.contact_ids.find(id => id !== 1)
-      const contact = contacts.contacts.find(c => c.id === cid)
-      ui.setViewContact(contact)
+        const contact = contacts.contacts.find(c => c.id === cid)
+        ui.setViewContact(contact)
       }
 
     }
@@ -75,12 +74,12 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
           </AvatarWrap>
           <ChatInfo>
             <NameWrap>
-              <Name onClick={viewContact} style={{cursor:(chat && chat.type === constants.chat_types.conversation) ? 'pointer' : 'auto'}}>{chat.name}</Name>
-              {status && chat.type!==constants.chat_types.group && <Tooltip title={status==='active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
-                <LockIcon style={{color:status==='active'?'#49ca97':'#febd59',fontSize:12,marginLeft:8,marginBottom:2}} />
+              <Name onClick={viewContact} style={{ cursor: (chat && chat.type === constants.chat_types.conversation) ? 'pointer' : 'auto' }}>{chat.name}</Name>
+              {status && chat.type !== constants.chat_types.group && <Tooltip title={status === 'active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
+                <LockIcon style={{ color: status === 'active' ? '#49ca97' : '#febd59', fontSize: 12, marginLeft: 8, marginBottom: 2 }} />
               </Tooltip>}
             </NameWrap>
-            {(pricePerMessage?true:false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}
+            {(pricePerMessage ? true : false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}
           </ChatInfo>
         </Left>
       </Inner>}
@@ -112,9 +111,9 @@ export default function Head({ height, appMode, setAppMode, pricePerMessage, sta
             onClick={() => { setShowURL(false); clearURL() }}
           /> :
           <IconzWrap>
-            <PublicIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
+            {false && <PublicIcon style={{ color: 'white', fontSize: 27, marginRight: 15, cursor: 'pointer' }}
               onClick={() => { setShowURL(true); ui.setSelectedChat(null) }}
-            />
+            />}
             {!chat && <Btn onClick={() => ui.toggleBots(ui.showBots ? false : true)}><BotIcon /></Btn>}
           </IconzWrap>}
         </>}

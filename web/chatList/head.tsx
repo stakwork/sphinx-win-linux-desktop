@@ -14,7 +14,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EE, {RESET_IP, RESET_IP_FINISHED} from '../utils/ee'
 
 export default function Head({ setWidth, width }) {
-  const { contacts, details, msg, ui } = useStores()
+  const { contacts, details, msg, ui, chats } = useStores()
   const [refreshing, setRefreshing] = useState(false)
   // const [snap, setSnap] = useState(false) =
   const snap = width < 250
@@ -25,6 +25,7 @@ export default function Head({ setWidth, width }) {
       contacts.getContacts(),
       details.getBalance(),
       msg.getMessages(),
+      // chats.getChats(),
     ])
     setRefreshing(false)
   }

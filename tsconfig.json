@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "allowJs": true,
-    "target": "es5",
+    "target": "esnext",
     "esModuleInterop": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,

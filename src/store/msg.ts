@@ -7,8 +7,10 @@ import { persist } from 'mobx-persist'
 import moment from 'moment'
 import { encryptText, makeRemoteTextMap, decodeSingle, decodeMessages, orgMsgsFromExisting, orgMsgs, putIn, putInReverse } from './msgHelpers'
 import { Platform } from 'react-native'
+import {updateRealmMsg} from '../realm/exports'
+import {persistMsgLocalForage} from './storage'
 
-const DAYS = Platform.OS === 'android' ? 7 : 30
+const DAYS = Platform.OS === 'android' ? 7 : 7
 export const MAX_MSGS_PER_CHAT = Platform.OS === 'android' ? 100 : 1000
 
 export interface Msg {
@@ -54,6 +56,7 @@ export interface Msg {
 }
 
 class MsgStore {
+
   @persist('object')
   @observable // chat id: message array
   messages: { [k: number]: Msg[] } = {}
@@ -64,9 +67,6 @@ class MsgStore {
   @persist @observable
   lastFetched: number
 
-  @persist @observable
-  lastUpdated: number
-
   @action clearAllMessages() {
     this.messages = {}
   }
@@ -75,19 +75,27 @@ class MsgStore {
     this.messages = {}
     this.lastSeen = {}
     this.lastFetched = 0
-    this.lastUpdated = 0
   }
 
-  @action
-  async getAllMessages() {
-    try {
-      const r = await relay.get('messages')
-      if (!r) return
-      const msgs = await decodeMessages(r.new_messages)
-      this.messages = orgMsgs(msgs)
-      this.lastFetched = new Date().getTime()
-    } catch (e) {
-      console.log(e)
+  // @action
+  // async getAllMessages() {
+  //   try {
+  //     const r = await relay.get('messages')
+  //     if (!r) return
+  //     const msgs = await decodeMessages(r.new_messages)
+  //     this.messages = orgMsgs(msgs)
+  //     this.lastFetched = new Date().getTime()
+  //   } catch (e) {
+  //     console.log(e)
+  //   }
+  // }
+
+  @action persister(){
+    if(Platform.OS === 'android') {
+      updateRealmMsg(this)
+    }
+    if(Platform.OS === 'web') {
+      persistMsgLocalForage(this)
     }
   }
 
@@ -99,6 +107,7 @@ class MsgStore {
       const dateq = moment.utc(this.lastFetched - 1000 * mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`
     } else { // else just get last week
+      console.log("=> GET LAST WEEK")
       const start = moment().subtract(DAYS, 'days').format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${start}`
     }
@@ -134,6 +143,7 @@ class MsgStore {
     putInReverse(allms, decoded)
     this.sortAllMsgs(allms)
     console.log("NOW ALL ARE DONE!")
+    this.persister()
   }
 
   sortAllMsgs(allms: { [k: number]: Msg[] }) {
@@ -158,6 +168,7 @@ class MsgStore {
           // add alias?
           status: this.messages[newMsg.chat_id][idx].status
         }
+        this.persister()
       }
     }
   }
@@ -170,7 +181,7 @@ class MsgStore {
         const invoice = msgs.find(c => c.payment_hash === m.payment_hash)
         if (invoice) {
           invoice.status = constants.statuses.confirmed
-          this.lastUpdated = new Date().getTime()
+          this.persister()
         }
       }
     }
@@ -360,6 +371,7 @@ class MsgStore {
     if (!r) return
     if (r.chat_id) {
       putIn(this.messages, r, r.chat_id)
+      this.persister()
     }
   }
 
@@ -402,7 +414,10 @@ class MsgStore {
     if (r && r.chat && r.chat.id) {
       const msgs = this.messages[r.chat.id]
       const msg = msgs.find(m => m.id === msgId)
-      if (msg) msg.type = r.message.type
+      if (msg) {
+        msg.type = r.message.type
+        this.persister()
+      }
       // update chat
       chatStore.gotChat(r.chat)
     }
@@ -414,6 +429,7 @@ class MsgStore {
     const chatID = newMsg.chat_id
     if (chatID) {
       putIn(this.messages, newMsg, chatID)
+      this.persister()
       if (newMsg.chat) chatStore.gotChat(newMsg.chat)
     }
   }
@@ -439,6 +455,7 @@ class MsgStore {
     msgs.sort((a, b) => moment(a.date).unix() - moment(b.date).unix())
     this.messages = orgMsgsFromExisting(this.messages, msgs)
     msgsBuffer = []
+    this.persister()
   }
 
   @action pushFirstFromBuffer() {
@@ -448,7 +465,6 @@ class MsgStore {
   }
 
 }
-
 
 export const msgStore = new MsgStore()
 

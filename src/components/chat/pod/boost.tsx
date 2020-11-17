@@ -1,11 +1,12 @@
 import React, { useRef } from 'react'
 import { Animated, Easing, StyleSheet, View, Text } from 'react-native'
-import { useTheme } from '../../../store'
+import { useTheme, useStores } from '../../../store'
 import { TouchableRipple } from 'react-native-paper'
 import CustomIcon from '../../utils/customIcons'
 
 export default function Boost({ style, onPress, inert }) {
   const theme = useTheme()
+  const {user} = useStores()
   const size = useRef(new Animated.Value(1)).current;
   function go() {
     if (inert) return
@@ -26,7 +27,9 @@ export default function Boost({ style, onPress, inert }) {
   return <TouchableRipple borderless style={{ ...styles.ripple, ...style }}
     onPress={inert ? null : go} rippleColor={theme.accent} underlayColor="black">
     <View style={{ ...styles.wrap, backgroundColor: theme.accent }}>
-      <Text style={styles.hundred}>100</Text>
+      <Text style={styles.hundred}>
+        {user.tipAmount || 100}
+      </Text>
       <Animated.View style={{
         ...styles.rocketWrap,
         transform: [{ scale: size }]

@@ -27,9 +27,8 @@ export type RouteStatus = 'active' | 'inactive' | null
 function Chat() {
   const { chats, ui, msg } = useStores()
   const [appMode, setAppMode] = useState(true)
-  const [pricePerMessage, setPricePerMessage] = useState(0)
-  const [tribeBots, setTribeBots] = useState([])
   const [status,setStatus] = useState<RouteStatus>(null)
+  const [tribeParams, setTribeParams] = useState(null)
   let footHeight = 65
 
   // function joinEvanTest(){
@@ -63,43 +62,19 @@ function Chat() {
     }
 
     useEffect(() => {
-      setPricePerMessage(0)
       setStatus(null)
-      setTribeBots([])
-      // console.log('user.currentIP',user.currentIP)
-      if (!chat) {
-        ui.setFeedURL(null)
-        ui.setApplicationURL(null)
-        return
-      }
+      setTribeParams(null)
+      if (!chat) return  
       (async () => {
         setAppMode(true)
-        let isAppURL = false
-        let isFeedURL = false
-        if (chat.type === constants.chat_types.tribe) {
+        const isTribe = chat.type === constants.chat_types.tribe
+        if (isTribe) {
           ui.setLoadingChat(true)
           const params = await chats.getTribeDetails(chat.host, chat.uuid)
           if (params) {
-            setPricePerMessage(params.price_per_message + params.escrow_amount)
-            if (params.app_url) {
-              isAppURL = true
-              ui.setApplicationURL(params.app_url)
-            }
-            if (params.feed_url) {
-              ui.setFeedURL(params.feed_url)
-              isFeedURL = true
-            }
-            if (params.bots && Array.isArray(params.bots)) {
-              setTribeBots(params.bots)
-            }
-            ui.setLoadingChat(false)
+            setTribeParams(params)
           }
-        }
-        if (!isFeedURL) {
-          ui.setFeedURL(null)
-        }
-        if (!isAppURL) {
-          ui.setApplicationURL('')
+          ui.setLoadingChat(false)
         }
         const r = await chats.checkRoute(chat.id)
         if(r && r.success_prob && r.success_prob>0.01) {
@@ -110,20 +85,28 @@ function Chat() {
       })()
     }, [chat])
 
+    const feedURL = tribeParams && tribeParams.feed_url
+    const appURL = tribeParams && tribeParams.app_url
+    const tribeBots = tribeParams && tribeParams.bots
+    let pricePerMessage = 0
+    if(tribeParams) {
+      pricePerMessage = tribeParams.price_per_message + tribeParams.escrow_amount
+    }
+
     return <Section style={{ background: theme.deep }}>
       <Inner>
-        <Head height={headHeight} setAppMode={setAppMode} appMode={appMode} 
+        <Head height={headHeight} appURL={appURL} setAppMode={setAppMode} appMode={appMode} 
           pricePerMessage={pricePerMessage} status={status}
         />
-        <ChatContent appMode={appMode} footHeight={footHeight} 
+        <ChatContent appMode={appMode} appURL={appURL} footHeight={footHeight} 
           pricePerMessage={pricePerMessage} 
         />
         <Foot height={footHeight} tribeBots={tribeBots}
           pricePerMessage={pricePerMessage}
         />
       </Inner>
-      {ui.feedURL && 
-        <Pod url={ui.feedURL} chat={chat}
+      {feedURL && 
+        <Pod url={feedURL} chat={chat}
           onBoost={onBoost}
         />
       }
@@ -138,7 +121,7 @@ const Inner = styled.div`
 `
 
 
-function ChatContent({ appMode, footHeight, pricePerMessage }) {
+function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -184,7 +167,6 @@ function ChatContent({ appMode, footHeight, pricePerMessage }) {
 
   return useObserver(() => {
     const chat = ui.selectedChat
-    const appURL = ui.applicationURL
 
     const msgs = useMsgs(chat) || []
     const isTribe = chat && chat.type === constants.chat_types.tribe
