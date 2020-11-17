@@ -9,10 +9,9 @@ import Stats from './stats'
 import EE, { CLIP_PAYMENT, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
 import Slider from '@material-ui/core/Slider';
-import { version } from 'punycode';
 
 export default function Pod({ url, chat, onBoost }) {
-  const { chats, msg, feed } = useStores()
+  const { chats, msg, feed, user } = useStores()
   const host = chat&&chat.host
   const chatID = chat&&chat.id
 
@@ -20,6 +19,7 @@ export default function Pod({ url, chat, onBoost }) {
   const [pod, setPod] = useState(null)
   const [showStats, setShowStats] = useState(false)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
+  const [initialTS,setInitialTS] = useState(null)
 
   let initppm = chats.pricesPerMinute[chatID]
   if(!(initppm||initppm===0)) initppm = chat.pricePerMinute||5
@@ -27,15 +27,41 @@ export default function Pod({ url, chat, onBoost }) {
   
   const scrollRef = useRef<HTMLDivElement>()
 
+  let pricePerMinute = 0
+  if(chats.pricesPerMinute[chatID] || chats.pricesPerMinute[chatID]===0) {
+    pricePerMinute = chats.pricesPerMinute[chatID]
+  } else if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+    pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
+  }
+
   async function loadPod() {
     // console.log("LOAD POD", host, url)
     setLoading(true)
     const thepod = await chats.loadFeed(host, '', url)
-    console.log("THE POD", thepod)
+    // console.log("THE POD", thepod)
     if (thepod) {
       setPod(thepod)
-      const episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
-      if (episode) setSelectedEpisodeID(episode.id)
+      let isSet = false
+      if(chat.meta && chat.meta.itemID) {
+        if(chat.meta.ts) {
+          setInitialTS(chat.meta.ts)
+        }
+        if(chat.meta.sats_per_minute || chat.meta.sats_per_minute===0) {
+          if(chat.meta.sats_per_minute!==ppm) {
+            chats.setPricePerMinute(chatID,chat.meta.sats_per_minute)
+            setPpm(chat.meta.sats_per_minute)
+          }
+        }
+        const episode = thepod.episodes && thepod.episodes.length && thepod.episodes.find(e=>e.id===chat.meta.itemID)
+        if (episode) {
+          setSelectedEpisodeID(episode.id)
+          isSet = true
+        }
+      }
+      if(!isSet) {
+        const episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
+        if (episode) setSelectedEpisodeID(episode.id)
+      }
     }
     setLoading(false)
   }
@@ -50,7 +76,7 @@ export default function Pod({ url, chat, onBoost }) {
   function boost(pos: number) {
     console.log("BOOST")
     EE.emit(PLAY_ANIMATION)
-    const amount = 100
+    const amount = user.tipAmount || 100
     const sp: StreamPayment = {
       feedID: pod.id,
       itemID: selectedEpisodeID,
@@ -62,7 +88,7 @@ export default function Pod({ url, chat, onBoost }) {
     if (!dests) return
     if (!pod.id || !selectedEpisodeID) return
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, amount)
+    feed.sendPayments(dests, memo, amount, chatID)
 
   }
 
@@ -80,7 +106,7 @@ export default function Pod({ url, chat, onBoost }) {
       ts: ts || 0,
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, pricePerMinute)
+    feed.sendPayments(dests, memo, pricePerMinute, chatID)
   }
 
   function onClipPayment(d) {
@@ -99,7 +125,7 @@ export default function Pod({ url, chat, onBoost }) {
       if (d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
       const finalDests: Destination[] = dests.concat(extraDest)
-      feed.sendPayments(finalDests, memo, pricePerMinute)
+      feed.sendPayments(finalDests, memo, pricePerMinute, chatID)
     }
   }
 
@@ -116,9 +142,9 @@ export default function Pod({ url, chat, onBoost }) {
     }
   }, [url])
 
-  useEffect(() => {
-    if (!selectedEpisodeID) loadPod()
-  }, [])
+  // useEffect(() => {
+  //   if (!selectedEpisodeID) loadPod()
+  // }, [])
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
 
   let earned = 0
@@ -134,11 +160,6 @@ export default function Pod({ url, chat, onBoost }) {
       }, 0)
     }
     // console.log(earned)
-  }
-
-  let pricePerMinute = 0
-  if (pod && pod.value && pod.value.model && pod.value.model.suggested) {
-    pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
   if (pod && showStats) {
@@ -203,10 +224,10 @@ export default function Pod({ url, chat, onBoost }) {
       </PodText>
     </PodInfo> : <Center><CircularProgress /></Center>}
 
-    <Player pod={pod} episode={episode}
+    {episode && <Player pod={pod} episode={episode}
       sendPayments={sendPayments}
-      boost={boost}
-    />
+      boost={boost} initialTS={initialTS}
+    />}
 
     {pod && pod.episodes && <PodEpisodes>
       <div style={{ marginBottom: 5 }}>{`Episodes: ${pod.episodes.length}`}</div>
@@ -371,3 +392,7 @@ const SliderText = styled.div`
     font-size:12px;
   }
 `
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
+}

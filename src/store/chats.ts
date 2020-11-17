@@ -48,6 +48,8 @@ export interface Chat {
   photo_uri: string
 
   pricePerMinute: number // for setting in group modal
+
+  meta: {[k:string]:any}
 }
 
 export interface TribeServer {
@@ -63,7 +65,7 @@ export class ChatStore {
 
   @action
   setChats(chats: Chat[]) {
-    this.chats = chats
+    this.chats = chats.map(c=>this.parseChat(c))
   }
 
   @action
@@ -93,14 +95,32 @@ export class ChatStore {
     this.chats = chats
   }
 
+  @action parseChat(c):Chat {
+    if(c.meta && typeof c.meta==='string') {
+      let meta
+      try {
+        meta = JSON.parse(String(c.meta))
+      } catch(e){}
+      return {...c, meta}
+    }
+    return c
+  }
+
+  @action
+  async getChats() {
+    const chats = await relay.get('chats')
+    if(!(chats && chats.length)) return
+    this.chats = this.chats.map(c=> this.parseChat(c))
+  }
+
   @action
   gotChat(chat: Chat) {
-    // console.log("====> GOT CHAT", chat)
+    console.log("====> GOT CHAT", chat)
     const existingIndex = this.chats.findIndex(ch => ch.id === chat.id)
     if (existingIndex > -1) {
-      this.chats[existingIndex] = chat
+      this.chats[existingIndex] = this.parseChat(chat)
     } else {
-      this.chats.unshift(chat)
+      this.chats.unshift(this.parseChat(chat))
     }
   }
 

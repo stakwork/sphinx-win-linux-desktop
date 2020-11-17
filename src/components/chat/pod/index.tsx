@@ -117,7 +117,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
       ts: Math.round(pos)||0,
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, (pricePerMinute*mult||1))    
+    feed.sendPayments(dests, memo, (pricePerMinute*mult||1), chatID)    
   }
 
   const count = useRef(0)
@@ -180,7 +180,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
       }
       if(d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
-      feed.sendPayments(finalDests, memo, pricePerMinute)
+      feed.sendPayments(finalDests, memo, pricePerMinute, chatID)
     }
   }
 
@@ -249,7 +249,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
       if(!dests) return
       if(!pod.id || !selectedEpisodeID) return
       const memo = JSON.stringify(sp)
-      feed.sendPayments(dests, memo, amount)
+      feed.sendPayments(dests, memo, amount, chatID)
     })
   }
 
@@ -257,7 +257,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
     return <PodBar episode={episode} 
       onToggle={onToggle} playing={playing}
       onShowFull={openFull} boost={boost}
-      duration={duration}
+      duration={duration} loading={false} podError={''}
     />
   }
 

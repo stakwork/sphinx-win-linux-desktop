@@ -126,9 +126,7 @@ class MsgStore {
   }
 
   async batchDecodeMessages(msgs: Msg[]) {
-    console.log("BATCH DECODED MSGS")
     this.lastFetched = new Date().getTime()
-    console.log(this.lastFetched)
     const first10 = msgs.slice(msgs.length - 10)
     const rest = msgs.slice(0, msgs.length - 10)
     const decodedMsgs = await decodeMessages(first10)
