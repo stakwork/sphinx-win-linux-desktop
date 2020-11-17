@@ -10,7 +10,7 @@ import JitsiMsg from './jitsiMsg'
 import Boost from './boostMsg'
 
 export default function TextMsg(props) {
-  const { message_content, sender } = props
+  const { message_content, sender, joinTribe } = props
   const isMe = sender === 1
   const link = useHasLink(props)
   const hasLink = message_content && link

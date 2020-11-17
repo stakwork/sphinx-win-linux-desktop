@@ -66,7 +66,7 @@ export default function NewContact() {
     >
         {!contactState ?
             <Content bg={theme.bg}>
-                <Title>Add Contact</Title>
+                <Title>ADD CONTACT</Title>
                 <Button style={{ marginTop: 20, color: 'white', height: '45px', width: '220px', backgroundColor: theme.secondary }}
                     onClick={() => setContactState('new')}>
                     New to Sphinx</Button>
@@ -76,7 +76,7 @@ export default function NewContact() {
             </Content>
             :
             <Content contactState={contactState} bg={theme.bg}>
-                <Title>{contactState === 'new' ? 'New Contact' : 'Add User'}</Title>
+                <Title>{contactState === 'new' ? 'NEW CONTACT' : 'ADD USER'}</Title>
                 {contactState === 'new' ?
                     <div>
                         <Form
@@ -132,5 +132,4 @@ const Content = styled.div`
 
 const Title = styled.div`
     font-size: 25px;
-    border-bottom: 1px solid;
 `

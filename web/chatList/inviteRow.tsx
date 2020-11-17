@@ -22,8 +22,8 @@ export default function InviteRow(props) {
     const [loading, setLoading] = useState(false)
 
     const expiredStatus = props.invite.status === 5
-    const yesterday = moment().utc().add(-24, 'hours')
-    const isExpired = moment(invite.created_at || (new Date())).utc().isBefore(yesterday)
+    const isExpired = moment(invite.expires_on || (new Date())).utc().isBefore(moment())
+
     if (isExpired || expiredStatus) return <></>
 
     const actions = {
@@ -51,6 +51,8 @@ export default function InviteRow(props) {
           setLoading(false)
         }
       }
+
+      
 
 
     return <Wrap 
