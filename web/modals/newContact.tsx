@@ -8,7 +8,7 @@ import * as Yup from 'yup'
 import Button from '../utils/button'
 
 const newSchema = [{
-    name: 'name',
+    name: 'alias',
     type: 'textArea',
     label: 'Nickname',
     validator: Yup.string().required('Required'),
@@ -26,12 +26,12 @@ const newSchema = [{
 }]
 
 const alreadySchema = [{
-    name: 'name',
+    name: 'alias',
     type: 'textArea',
     label: 'Nickname',
     validator: Yup.string().required('Required'),
 }, {
-    name: 'address',
+    name: 'public_key',
     type: 'textArea',
     label: 'Address',
     validator: Yup.string().required('Required'),
@@ -80,7 +80,13 @@ export default function NewContact() {
                 {contactState === 'new' ?
                     <div>
                         <Form
-                            onSubmit={v => console.log(v)}
+                            onSubmit={async (values) => {
+                                setLoading(true)
+                                await contacts.createInvite(values.alias, values.message)
+                                setLoading(false)
+                                handleCloseModal()
+                            }}
+                            loading={loading}
                             schema={newSchema}
                             buttonColor={'secondary'}
                             buttonText={'Create Invitation'}
@@ -88,9 +94,9 @@ export default function NewContact() {
                                 marginTop: 10
                             }}
                         />
-                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', color: '#6a7a8c', marginTop: 5 }}>
+                        {price && <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', color: '#6a7a8c', marginTop: 5 }}>
                             Estimated Cost:&nbsp; <span style={{ color: 'white' }}>{price}</span> &nbsp;SAT
-                        </div>
+                        </div>}
                     </div> :
                     <div>
                         <Form
@@ -98,8 +104,9 @@ export default function NewContact() {
                                 setLoading(true)
                                 await contacts.addContact(values)
                                 setLoading(false)
-                                close()
+                                handleCloseModal()
                             }}
+                            loading={loading}
                             schema={alreadySchema}
                             buttonText={'Save To Contacts'} />
                     </div>
