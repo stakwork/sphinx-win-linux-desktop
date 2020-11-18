@@ -13,5 +13,7 @@ export const SHOW_REFRESHER = 'show-refresher'
 export const RESET_IP = 'reset-ip'
 export const RESET_IP_FINISHED = 'reset-ip-finished'
 export const PLAY_ANIMATION = 'play-animation'
+export const EPISODE_SELECTED = 'episode-selected'
+export const INITIAL_TS = 'initial-ts'
 
 export default EE

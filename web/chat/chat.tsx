@@ -105,11 +105,9 @@ function Chat() {
           pricePerMessage={pricePerMessage}
         />
       </Inner>
-      {feedURL && 
-        <Pod url={feedURL} chat={chat}
-          onBoost={onBoost}
-        />
-      }
+      <Pod url={feedURL} chat={chat}
+        onBoost={onBoost}
+      />
     </Section>
   })
 }
@@ -119,7 +117,6 @@ const Inner = styled.div`
   flex-direction:column;
   flex:1;
 `
-
 
 function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()

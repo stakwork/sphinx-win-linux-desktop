@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
 import Stats from './stats'
-import EE, { CLIP_PAYMENT, PLAY_ANIMATION } from '../../utils/ee'
+import EE, { CLIP_PAYMENT, INITIAL_TS, EPISODE_SELECTED, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
 import Slider from '@material-ui/core/Slider';
 
@@ -19,12 +19,17 @@ export default function Pod({ url, chat, onBoost }) {
   const [pod, setPod] = useState(null)
   const [showStats, setShowStats] = useState(false)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
-  const [initialTS,setInitialTS] = useState(null)
 
-  let initppm = chats.pricesPerMinute[chatID]
-  if(!(initppm||initppm===0)) initppm = chat.pricePerMinute||5
-  const [ppm,setPpm] = useState<number>(initppm)
+  const [ppm,setPpm] = useState<number>(5)
   
+  useEffect(()=>{
+    if(chat) {
+      let initppm = chats.pricesPerMinute[chatID]
+      if(!(initppm||initppm===0)) initppm = chat.pricePerMinute||5
+      if(initppm) setPpm(initppm)
+    }
+  }, [])
+
   const scrollRef = useRef<HTMLDivElement>()
 
   let pricePerMinute = 0
@@ -35,16 +40,16 @@ export default function Pod({ url, chat, onBoost }) {
   }
 
   async function loadPod() {
-    // console.log("LOAD POD", host, url)
     setLoading(true)
     const thepod = await chats.loadFeed(host, '', url)
-    // console.log("THE POD", thepod)
     if (thepod) {
       setPod(thepod)
       let isSet = false
       if(chat.meta && chat.meta.itemID) {
         if(chat.meta.ts) {
-          setInitialTS(chat.meta.ts)
+          setTimeout(()=>{
+            EE.emit(INITIAL_TS,chat.meta)
+          }, 1000)
         }
         if(chat.meta.sats_per_minute || chat.meta.sats_per_minute===0) {
           if(chat.meta.sats_per_minute!==ppm) {
@@ -67,11 +72,11 @@ export default function Pod({ url, chat, onBoost }) {
   }
 
   function selectEpisode(e) {
+    if(selectedEpisodeID===e.id) return
     setSelectedEpisodeID(e.id)
     if (scrollRef && scrollRef.current) scrollRef.current.scrollTop = 0
+    EE.emit(EPISODE_SELECTED, e)
   }
-
-  const previousFeedUrl = usePrevious(url)
 
   function boost(pos: number) {
     console.log("BOOST")
@@ -88,8 +93,7 @@ export default function Pod({ url, chat, onBoost }) {
     if (!dests) return
     if (!pod.id || !selectedEpisodeID) return
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, amount, chatID)
-
+    feed.sendPayments(dests, memo, amount, chatID, false)
   }
 
   function sendPayments(ts: number) {
@@ -106,7 +110,7 @@ export default function Pod({ url, chat, onBoost }) {
       ts: ts || 0,
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, pricePerMinute, chatID)
+    feed.sendPayments(dests, memo, pricePerMinute, chatID, true)
   }
 
   function onClipPayment(d) {
@@ -125,7 +129,7 @@ export default function Pod({ url, chat, onBoost }) {
       if (d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
       const finalDests: Destination[] = dests.concat(extraDest)
-      feed.sendPayments(finalDests, memo, pricePerMinute, chatID)
+      feed.sendPayments(finalDests, memo, pricePerMinute, chatID, false)
     }
   }
 
@@ -136,15 +140,22 @@ export default function Pod({ url, chat, onBoost }) {
     }
   }, [pod]) // reset listener on pod change
 
-  useEffect(() => {
-    if (url && !pod) {
+  function newFeedURL(){
+    if(url) {
       loadPod()
+    } else {
+      setPod(null)
+      setSelectedEpisodeID(null)
     }
-  }, [url])
+  }
 
-  // useEffect(() => {
-  //   if (!selectedEpisodeID) loadPod()
-  // }, [])
+  const previousFeedURL = usePrevious(url)
+  useEffect(() => {
+    if(previousFeedURL!==url) {
+      newFeedURL()
+    }
+  }, [url,chatID])
+
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
 
   let earned = 0
@@ -186,7 +197,7 @@ export default function Pod({ url, chat, onBoost }) {
     return `${ppms[v]}`
   }
 
-  return <PodWrap bg={theme.bg} ref={scrollRef}>
+  return <PodWrap bg={theme.bg} ref={scrollRef} hide={!chatID||!url}>
     {pod && <PodImage src={pod.image} alt={pod.title} />}
 
     {(earned ? true : false) && <Earned onClick={() => setShowStats(true)}>
@@ -225,8 +236,7 @@ export default function Pod({ url, chat, onBoost }) {
     </PodInfo> : <Center><CircularProgress /></Center>}
 
     {episode && <Player pod={pod} episode={episode}
-      sendPayments={sendPayments}
-      boost={boost} initialTS={initialTS}
+      sendPayments={sendPayments} boost={boost}
     />}
 
     {pod && pod.episodes && <PodEpisodes>
@@ -246,7 +256,7 @@ export default function Pod({ url, chat, onBoost }) {
 }
 
 const PodWrap = styled.div`
-  display: flex;
+  display: ${p=>p.hide?'none':'flex'};
   flex-direction: column;
   box-shadow: 0px 2px 10px 1px rgba(0,0,0,0.95);
   width:302px;

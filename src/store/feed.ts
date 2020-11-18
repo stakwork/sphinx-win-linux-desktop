@@ -27,12 +27,13 @@ export interface StreamPayment {
 
 export class FeedStore {
 
-  @action async sendPayments(destinations: Destination[], text: string, amount: number, chat_id: number) {
+  @action async sendPayments(destinations: Destination[], text: string, amount: number, chat_id: number, update_meta: boolean) {
     await relay.post('stream', {
       destinations,
       text,
       amount,
-      chat_id
+      chat_id,
+      update_meta
     })
     // asyncForEach(dests, async (d: Destination) => {
     //   const amt = Math.max(Math.round((d.split / 100) * price), 1)
