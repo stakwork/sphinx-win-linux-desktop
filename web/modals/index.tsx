@@ -8,6 +8,8 @@ import SendRequest from './sendRequest'
 import StartJitsi from './startJitsi'
 import ViewContact from './viewContact'
 import Profile from './profile'
+import NewContact from './newContact'
+import ShareInvite from './shareInvite'
 import {uiStore} from '../../src/store/ui'
 
 const electron = window.require ? window.require("electron") : {}
@@ -30,6 +32,8 @@ export default function Modals(){
       {ui.startJitsiParams && <StartJitsi />}
       {ui.viewContact && <ViewContact />}
       {ui.showProfile && <Profile/>}
+      {ui.newContact && <NewContact />}
+      {ui.shareInviteModal && <ShareInvite />}
     </Wrap>
   })
 }

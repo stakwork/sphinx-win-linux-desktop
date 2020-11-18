@@ -10,6 +10,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import CachedButton from '@material-ui/icons/Cached';
 import ArrowBackIosButton from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosButton from '@material-ui/icons/ArrowForwardIos';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EE, {RESET_IP, RESET_IP_FINISHED} from '../utils/ee'
 
 export default function Head({ setWidth, width }) {
@@ -78,10 +79,11 @@ export default function Head({ setWidth, width }) {
           onChange={e => ui.setSearchTerm(e.target.value)}
           style={{ background: theme.deep, marginRight: 5 }}
         />
+        <PersonAddIcon onClick={()=>ui.setNewContact(true)} style={{color: '#8e9da9', position: 'absolute', right: '24px', marginTop: '9px', cursor: 'pointer'}}/>
         <ArrowBackIosButton onClick={() => setWidthHandler(11)}
           style={{
             fontWeight: 'bold', color: '#618af8', fontSize: 'medium', cursor: 'pointer',
-            position: 'absolute', float: 'right', marginTop: 13
+            position: 'absolute', right: '0px', marginTop: 13
           }}>
         </ArrowBackIosButton>
       </Searcher>}
@@ -123,9 +125,10 @@ const Balance = styled.div`
 const Searcher = styled.div`
   width:100%;
   position:relative;
+  display: flex;
 `
 const Search = styled.input`
-  width:90%;
+  width: calc(100% - 65px);
   height:42px;
   border:none;
   outline:none;

@@ -4,6 +4,7 @@ import Dragger from './dragger'
 import {useObserver} from 'mobx-react-lite'
 import Head from './head'
 import ChatRow from './chatRow'
+import InviteRow from './inviteRow'
 import {Chat} from '../../src/store/chats'
 import {Contact} from '../../src/store/contacts'
 import {constants} from '../../src/constants'
@@ -24,6 +25,11 @@ function ChatList(){
         <Chats>
           {theChats.map((c,i)=> {
             const contact = contactForConversation(c, contacts.contacts)
+            let showInvite = false
+            if (c.invite && c.invite.status !== 4) showInvite = true
+            if (showInvite){
+              return <InviteRow key={i} {...c}/>
+            }
             return <ChatRow 
               key={i} {...c} contact_photo={contact&&contact.photo_url}
               selected={c.id===scid&&c.name===scname} 

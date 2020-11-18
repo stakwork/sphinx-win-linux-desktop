@@ -190,6 +190,12 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
       }
     }
 
+    async function joinTribe (tribeLink) {
+      const p = new URLSearchParams(tribeLink)
+      const tribeParams = await chats.getTribeDetails(p.get('host'),p.get('uuid'))
+      if (tribeParams) ui.setJoinTribeParams(tribeParams)
+    }
+
     return (
       <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
@@ -217,7 +223,7 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
                       return <DateLine key={'date' + i} dateString={m.dateLine} />
                     }
                     if(!m.chat) m.chat = chat
-                    return <Msg key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} 
+                    return <Msg joinTribe={joinTribe} key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} 
                       handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
                       onCopy={onCopy}
                     />
