@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     marginTop:10,
     borderBottomWidth:1,
     borderTopWidth:1,
-    marginBottom:25
+    marginBottom:45
   },
   exportText:{
     color:'#6289FD',

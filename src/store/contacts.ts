@@ -62,6 +62,9 @@ class ContactStore {
         if (me) {
           userStore.setAlias(me.alias)
           userStore.setPublicKey(me.public_key)
+          if(me.tip_amount || me.tip_amount===0) {
+            userStore.setTipAmount(me.tip_amount)
+          }
         }
       }
       if (r.chats) chatStore.setChats(r.chats)

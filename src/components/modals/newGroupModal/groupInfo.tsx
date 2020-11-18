@@ -125,6 +125,19 @@ export default function GroupInfo({ visible }) {
   }
   const setEditDialogToFalseHandler = () => setEditDialog(false)
 
+  function fuzzyIndexOf(arr, n){
+    let smallestDiff = Infinity
+    let index = -1
+    arr.forEach((m,i)=>{
+      const diff = Math.abs(m-n)
+      if(diff<smallestDiff) {
+        smallestDiff = diff
+        index = i
+      }
+    })
+    return index
+  }
+
   const ppms = [0,3,5,10,20,50,100]
   function chooseSatsPerMinute(n){
     if(!group.id) return
@@ -134,7 +147,7 @@ export default function GroupInfo({ visible }) {
   function satsPerMinuteChanged(n){
     setPpm(ppms[n]||0)
   }
-  let sliderValue = ppms.indexOf(ppm)
+  let sliderValue = fuzzyIndexOf(ppms,ppm)
   if(sliderValue<0) sliderValue=2
 
   const showValueSlider = (isTribe && !isTribeAdmin && (group&&group.feed_url)) ? true : false
