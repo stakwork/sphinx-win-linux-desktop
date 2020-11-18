@@ -28,7 +28,7 @@ class MemeStore {
   @action
   async authenticateAll() {
     const lastAuth = this.lastAuthenticated || 0
-    const days = 5  // one week
+    const days = 3  // one week
     const isOld = moment(new Date(lastAuth)).isBefore(moment().subtract((days * 24 - 1), 'hours'))
     if (isOld) {
       await asyncForEach(this.servers, async (s) => {
@@ -53,6 +53,8 @@ class MemeStore {
     const r3 = await meme.post('verify', {
       id: r.id, sig: r2.sig, pubkey
     }, 'application/x-www-form-urlencoded')
+
+    console.log(r3)
     if (!(r3 && r3.token)) return
     server.token = r3.token
   }
