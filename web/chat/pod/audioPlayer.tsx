@@ -11,7 +11,7 @@ import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 export default function AudioPlayer({url, clickBoost, clickMsg, onPlay, onRewind, onForward, duration, ts, playing, onSeek}){
   const [position,setPosition] = useState(0) // number 0-100
   useEffect(()=>{
-    if(ts && duration) {
+    if((ts||ts===0) && duration) {
       setPosition((ts/duration)*100) // calc position from TS
     }
   },[ts,duration])
