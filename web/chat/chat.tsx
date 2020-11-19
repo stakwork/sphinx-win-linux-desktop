@@ -145,6 +145,18 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
     setUploading(false)
   }
 
+  function onMessageBoost(uuid){
+    if(!uuid) return
+    const amount = (user.tipAmount||100) + pricePerMessage
+    msg.sendMessage({
+      boost:true,
+      contact_id:null,
+      text:'', amount,
+      chat_id: chat.id||null,
+      reply_uuid:uuid
+    })
+  }
+
   const handleMenuClick = (event, m) => {
     setAnchorEl(event.currentTarget);
     setMenuMessage(m);
@@ -230,8 +242,8 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
                   })}
                 </MsgList>
                 {alert && <Alert style={{ position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
-                <MsgMenu anchorEl={anchorEl} menuMessage={menuMessage} isMe={isMe}
-                  handleMenuClose={handleMenuClose} onCopy={onCopy}
+                <MsgMenu anchorEl={anchorEl} menuMessage={menuMessage} isMe={isMe(menuMessage)}
+                  handleMenuClose={handleMenuClose} onCopy={onCopy} onBoost={onMessageBoost} 
                 />
               </Layer>
               {appURL && <Layer show={appMode} style={{ background: theme.deep, height: 'calc(100% + 63px)' }}>
