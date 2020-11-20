@@ -324,6 +324,7 @@ const MsgList = styled.div`
   display: flex;
   flex-direction: column-reverse;
   max-height:100%;
+  padding:8px 0;
 `
 const Layer = styled.div`
   flex:1;

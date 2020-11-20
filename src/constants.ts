@@ -53,6 +53,7 @@ const constants = {
     bot_cmd: 24,
     bot_res: 25,
     keysend: 28,
+    boost: 29,
   },
   payment_errors: {
     timeout: 'Timed Out',

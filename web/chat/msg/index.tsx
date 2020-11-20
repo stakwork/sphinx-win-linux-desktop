@@ -14,6 +14,7 @@ import MoreVertButton from '@material-ui/icons/MoreVert';
 import BotResMsg from './botRes'
 import moment from 'moment'
 import {useAvatarColor, useParsedGiphyMsg, useParsedClipMsg} from '../../../src/store/hooks/msg'
+import BoostSats from './boostSats'
 
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
 
@@ -30,13 +31,15 @@ export default function Msg(props) {
     return <DeletedMessage {...props} />
   }
 
-  return <MsgRow>
+  return <MsgRow showInfoBar={props.showInfoBar}>
     <Avatar alias={props.senderAlias}
       photo={props.senderPhoto}
       hide={!props.showInfoBar || isMe}
     />
     <InnerBox>
+
       {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
+
       <BubbleWrap style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
         <Bubble style={{ background: isMe ? theme.highlight : theme.extraDeep }}>
           {(props.reply_message_content ? true : false) &&
@@ -51,6 +54,9 @@ export default function Msg(props) {
         <MoreVertButton aria-controls="simple-menu" aria-haspopup="true" onClick={e => props.handleClick(e)}
           style={{ color: '#7f7f7f', cursor: 'pointer', fontSize: 17, marginLeft: -3, marginRight: -3 }} />
       </BubbleWrap>
+
+      {props.boosts_total_sats && <BoostSats {...props} />}
+
     </InnerBox>
   </MsgRow>
 }
@@ -142,7 +148,7 @@ const MsgRow = styled.div`
   flex-shrink:0;
   display:flex;
   padding-left:8px;
-  margin:4px 0 6px 0;
+  margin-top: ${p=>p.showInfoBar?'10px':0};
 `
 const InnerBox = styled.div`
   display:flex;

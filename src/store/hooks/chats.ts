@@ -33,6 +33,9 @@ function lastMessageText(msg){
   if(msg.type===constants.message_types.bot_res) {
     return msg.sender_alias ? `${msg.sender_alias} says...` : 'Bot Response'
   }
+  if(msg.type===constants.message_types.boost) {
+    return `Boost: ${msg.amount} sats`
+  }
   if(msg.message_content) {
     const verb = msg.sender===1 ? 'shared' : 'received'
     if(msg.message_content.startsWith('giphy::')) return 'GIF '+verb

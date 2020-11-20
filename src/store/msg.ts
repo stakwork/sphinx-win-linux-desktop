@@ -37,13 +37,13 @@ export interface Msg {
   media_key: string
   seen: boolean
   created_at: string
-  updated_at: string,
-  sender_alias: string,
+  updated_at: string
+  sender_alias: string
 
-  original_muid: string,
-  reply_uuid: string,
+  original_muid: string
+  reply_uuid: string
 
-  text: string,
+  text: string
 
   chat: Chat
 
@@ -53,6 +53,15 @@ export interface Msg {
   reply_message_content: string
   reply_message_sender_alias: string
   reply_message_sender: number
+
+  boosts_total_sats: number
+  boosts: BoostMsg[]
+}
+
+export interface BoostMsg {
+  amount: number
+  date: string
+  sender_alias: string
 }
 
 class MsgStore {
@@ -189,7 +198,10 @@ class MsgStore {
   }
 
   @action
-  async sendMessage({ contact_id, text, chat_id, amount, reply_uuid }:{ contact_id:number|null, text:string, chat_id:number|null, amount:number, reply_uuid:string, boost?:boolean }) {
+  async sendMessage(
+    { contact_id, text, chat_id, amount, reply_uuid, boost }:
+    { contact_id:number|null, text:string, chat_id:number|null, amount:number, reply_uuid:string, boost?:boolean }
+  ) {
     try {
       const encryptedText = await encryptText({ contact_id: 1, text })
       const remote_text_map = await makeRemoteTextMap({ contact_id, text, chat_id })
@@ -199,7 +211,8 @@ class MsgStore {
         text: encryptedText,
         remote_text_map,
         amount: amount || 0,
-        reply_uuid
+        reply_uuid,
+        boost: boost||false,
       }
       // const r = await relay.post('messages', v)
       // this.gotNewMessage(r)
@@ -208,7 +221,8 @@ class MsgStore {
         if (!r) return
         this.gotNewMessage(r)
       } else {
-        putIn(this.messages, { ...v, id: -1, sender: 1, date: moment().toISOString(), type: 0, message_content: text }, chat_id)
+        const putInMsgType = boost?constants.message_types.boost:constants.message_types.message
+        putIn(this.messages, { ...v, id: -1, sender: 1, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
         const r = await relay.post('messages', v)
         if (!r) return
         // console.log("RESULT")
