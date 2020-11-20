@@ -9,6 +9,7 @@ import Stats from './stats'
 import EE, { CLIP_PAYMENT, INITIAL_TS, EPISODE_SELECTED, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
 import Slider from '@material-ui/core/Slider';
+import * as Audio from './audio'
 
 export default function Pod({ url, chat, onBoost }) {
   const { chats, msg, feed, user } = useStores()
@@ -45,7 +46,9 @@ export default function Pod({ url, chat, onBoost }) {
     if (thepod) {
       setPod(thepod)
       let isSet = false
-      if(chat.meta && chat.meta.itemID) {
+      console.log("CHAT META",chat.meta)
+      const isPlaying = await Audio.playing()
+      if(!isPlaying && chat.meta && chat.meta.itemID) {
         if(chat.meta.ts) {
           setTimeout(()=>{
             EE.emit(INITIAL_TS,chat.meta)
@@ -64,7 +67,13 @@ export default function Pod({ url, chat, onBoost }) {
         }
       }
       if(!isSet) {
-        const episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
+        const eid = await Audio.getCurrentTrack()
+        let episode
+        if(isPlaying && eid) {
+          episode = thepod.episodes && thepod.episodes.length && thepod.episodes.find(e=>e.id===eid)
+        } else {
+          episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
+        }
         if (episode) setSelectedEpisodeID(episode.id)
       }
     }

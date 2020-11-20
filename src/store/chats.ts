@@ -253,6 +253,14 @@ export class ChatStore {
   }
 
   @action
+  updateChatMeta(chat_id, meta) {
+    const idx = this.chats.findIndex(c=>c.id===chat_id)
+    if(idx>-1) {
+      this.chats[idx].meta = meta
+    }
+  }
+
+  @action
   async getTribeDetails(host: string, uuid: string) {
     if (!host || !uuid) return
     const theHost = host.includes('localhost') ? 'tribes.sphinx.chat' : host
