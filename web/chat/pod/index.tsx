@@ -46,7 +46,6 @@ export default function Pod({ url, chat, onBoost }) {
     if (thepod) {
       setPod(thepod)
       let isSet = false
-      console.log("CHAT META",chat.meta)
       const isPlaying = await Audio.playing()
       if(!isPlaying && chat.meta && chat.meta.itemID) {
         if(chat.meta.ts) {
