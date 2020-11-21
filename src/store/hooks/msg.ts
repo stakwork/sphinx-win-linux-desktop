@@ -35,7 +35,7 @@ export function useMsgs(chat, limit?: number) {
 const hideTypes = ['payment', 'purchase', 'purchase_accept', 'purchase_deny', 'boost']
 function processMsgs(incomingmsgs: Msg[], isTribe: boolean, contacts: Contact[]) {
   // "deep clone" the messages array
-  const msgs = incomingmsgs.map(a => Object.assign({}, a)).reverse();
+  const msgs = incomingmsgs && incomingmsgs.map(a => Object.assign({}, a)).reverse();
   const ms = []
   if (!msgs) return ms
   for (let i = 0; i < msgs.length; i++) {
@@ -121,7 +121,7 @@ function getPrevious(msgs: Msg[], i: number) {
   const previous = msgs[i - 1]
   const mtype = constantCodes['message_types'][previous.type]
   if (hideTypes.includes(mtype)) {
-    return getPrevious(msgs, i + 1)
+    return getPrevious(msgs, i - 1)
   }
   return previous
 }
