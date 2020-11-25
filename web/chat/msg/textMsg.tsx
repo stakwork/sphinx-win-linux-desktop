@@ -9,7 +9,7 @@ import Clip from './clipMsg'
 import JitsiMsg from './jitsiMsg'
 import Boost from './boostMsg'
 import TribeMsg from './tribeMsg'
-import BoostSats from './boostSats'
+import BoostRow from './boostRow'
 
 export default function TextMsg(props) {
   const { message_content, sender, joinTribe } = props
@@ -77,17 +77,12 @@ export default function TextMsg(props) {
   return <Wrap {...props}>{message_content}</Wrap>
 }
 
-function Wrap(props:{children:any,style?:Object,boosts_total_sats:number,boosts:any}){
+function Wrap(props:{children:any,style?:Object,boosts_total_sats:number,boosts:any,sender:number}){
+  const isMe = props.sender===1
   const {children,style,boosts_total_sats,boosts} = props
-  if(boosts_total_sats) {
-    console.log("SATS",boosts_total_sats)
-  }
-  if(boosts) {
-    console.log(boosts)
-  }
   return <WrapDiv style={style}>
     {children}
-    {boosts_total_sats && <BoostSats {...props} />}
+    {boosts_total_sats && <BoostRow {...props} isMe={isMe} />}
   </WrapDiv>
 }
 

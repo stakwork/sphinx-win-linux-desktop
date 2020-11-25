@@ -56,7 +56,7 @@ function Chat() {
         contact_id:null,
         text:`boost::${JSON.stringify(sp)}`,
         chat_id: chat.id||null,
-        amount: pricePerMessage,
+        amount: messagePrice,
         reply_uuid:''
       })
     }
@@ -88,21 +88,21 @@ function Chat() {
     const feedURL = tribeParams && tribeParams.feed_url
     const appURL = tribeParams && tribeParams.app_url
     const tribeBots = tribeParams && tribeParams.bots
-    let pricePerMessage = 0
+    let messagePrice = 0
     if(tribeParams) {
-      pricePerMessage = tribeParams.price_per_message + tribeParams.escrow_amount
+      messagePrice = tribeParams.price_per_message + tribeParams.escrow_amount
     }
 
     return <Section style={{ background: theme.deep }}>
       <Inner>
         <Head height={headHeight} appURL={appURL} setAppMode={setAppMode} appMode={appMode} 
-          pricePerMessage={pricePerMessage} status={status}
+          messagePrice={messagePrice} status={status}
         />
         <ChatContent appMode={appMode} appURL={appURL} footHeight={footHeight} 
-          pricePerMessage={pricePerMessage} 
+          messagePrice={messagePrice} 
         />
         <Foot height={footHeight} tribeBots={tribeBots}
-          pricePerMessage={pricePerMessage}
+          messagePrice={messagePrice}
         />
       </Inner>
       <Pod url={feedURL} chat={chat}
@@ -118,7 +118,7 @@ const Inner = styled.div`
   flex:1;
 `
 
-function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
+function ChatContent({ appMode, appURL, footHeight, messagePrice }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -140,20 +140,21 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
       media_type: file.type,
       text: '',
       price: 0,
-      amount: pricePerMessage||0
+      amount: messagePrice||0
     })
     setUploading(false)
   }
 
   function onMessageBoost(uuid){
     if(!uuid) return
-    const amount = (user.tipAmount||100) + pricePerMessage
+    const amount = (user.tipAmount||100) + messagePrice
     msg.sendMessage({
       boost:true,
       contact_id:null,
       text:'', amount,
       chat_id: chat.id||null,
-      reply_uuid:uuid
+      reply_uuid:uuid,
+      message_price: messagePrice
     })
   }
 

@@ -23,7 +23,7 @@ import { calcBotPrice } from '../../src/store/hooks/chat'
 import { useReplyContent } from '../../src/store/hooks/chat'
 import ReactGiphySearchbox from 'react-giphy-searchbox'
 
-export default function Foot({ height, pricePerMessage, tribeBots }) {
+export default function Foot({ height, messagePrice, tribeBots }) {
   const { ui, msg, meme, contacts } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
@@ -67,7 +67,7 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
         return alert(failureMessage)
       }
       if(ui.imgViewerParams && ui.imgViewerParams.type === 'image/gif'){
-        return sendGif(pricePerMessage + price)
+        return sendGif(messagePrice + price)
       }
 
       let txt = text
@@ -79,7 +79,7 @@ export default function Foot({ height, pricePerMessage, tribeBots }) {
         contact_id,
         text: txt,
         chat_id: chat.id || null,
-        amount: (pricePerMessage + price) || 0, // 5, // CHANGE THIS
+        amount: (messagePrice + price) || 0, // 5, // CHANGE THIS
         reply_uuid: ui.replyUUID || ''
       })
       setText('')

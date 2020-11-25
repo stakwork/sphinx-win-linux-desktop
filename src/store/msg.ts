@@ -175,7 +175,7 @@ class MsgStore {
         this.messages[newMsg.chat_id][idx] = {
           ...m,
           // add alias?
-          status: this.messages[newMsg.chat_id][idx].status
+          status: this.messages[newMsg.chat_id][idx].status,
         }
         this.persister()
       }
@@ -199,13 +199,13 @@ class MsgStore {
 
   @action
   async sendMessage(
-    { contact_id, text, chat_id, amount, reply_uuid, boost }:
-    { contact_id:number|null, text:string, chat_id:number|null, amount:number, reply_uuid:string, boost?:boolean }
+    { contact_id, text, chat_id, amount, reply_uuid, boost, message_price }:
+    { contact_id:number|null, text:string, chat_id:number|null, amount:number, reply_uuid:string, boost?:boolean, message_price?:number }
   ) {
     try {
       const encryptedText = await encryptText({ contact_id: 1, text })
       const remote_text_map = await makeRemoteTextMap({ contact_id, text, chat_id })
-      const v = {
+      const v:{[k:string]:any} = {
         contact_id,
         chat_id: chat_id || null,
         text: encryptedText,
@@ -214,6 +214,7 @@ class MsgStore {
         reply_uuid,
         boost: boost||false,
       }
+      if(message_price) v.message_price = message_price
       // const r = await relay.post('messages', v)
       // this.gotNewMessage(r)
       if (!chat_id) {
@@ -222,7 +223,8 @@ class MsgStore {
         this.gotNewMessage(r)
       } else {
         const putInMsgType = boost?constants.message_types.boost:constants.message_types.message
-        putIn(this.messages, { ...v, id: -1, sender: 1, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
+        const amt = boost&&message_price&&message_price<amount ? amount-message_price : amount
+        putIn(this.messages, { ...v, id: -1, sender: 1, amount:amt, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
         const r = await relay.post('messages', v)
         if (!r) return
         // console.log("RESULT")
