@@ -1,39 +1,123 @@
-import React, { useRef, useLayoutEffect } from 'react'
-import styled from 'styled-components'
-import AudioPlayer from 'react-h5-audio-player';
+import React, { useRef, useEffect, useState } from 'react'
+import AudioPlayer from './audioPlayer'
 import { useStores } from '../../../src/store'
 import { StreamPayment,NUM_SECONDS } from '../../../src/store/feed'
-import {ChatQuote, BoostIcon, Forward30, Back15} from './icons'
+import * as Audio from './audio'
+import EE, { EPISODE_SELECTED, INITIAL_TS } from '../../utils/ee'
 
-export default function Player({pod,episode,sendPayments,boost,initialTS}){
+export default function Player({pod,episode,sendPayments,boost}){
   const { ui, user } = useStores()
-  const ts = useRef(0)
   const secs = useRef(0)
+  const [ts,setTS] = useState(0)
+  const [duration,setDuration] = useState(0)
+  const [playing,setPlaying] = useState(false)
 
-  const ref = useRef<any>()
-  useLayoutEffect(()=>{
-    if(initialTS) {
-      if(ref&&ref.current&&ref.current.audio&&ref.current.audio.current) {
-        ref.current.audio.current.currentTime = initialTS||0
-      }
+  async function seekTo(t){
+    if(!(t&&typeof t==='number')) return
+    setTS(t)
+    await Audio.seekTo(t)
+  }
+
+  async function newEpisode(ep){
+    const currentEpisodeID = await Audio.getCurrentTrack()
+    if(currentEpisodeID!==ep.id) {
+      const loaded = await Audio.add({
+        id: ep.id,
+        url: ep.enclosureUrl,
+        title: ep.title,
+        artist: ep.author || 'author',
+        artwork: ep.image
+      })
+    } else {
+      setPlaying(true) // same episode! keep it rollin
     }
-  },[initialTS])
+    const dur = await Audio.getDuration()
+    if(dur) setDuration(dur)
+  }
+  async function episodeSelected(ep){
+    await Audio.reset() // clear them out baby
+    await sleep(100)
+    setTS(0)
+    if(playing) setPlaying(false)
+    // setTimeout(()=>{
+    //   Audio.play(ep.id)
+    //   setPlaying(true)
+    // }, 500)
+  }
 
-  function tick(){
+  // FOR LOADING EPISODE VISUALS
+  useEffect(()=>{
+    if(episode) {
+      newEpisode(episode)
+    }
+  },[episode])
+
+  async function goInitialTS({ts,itemID}){
+    if(episode.id===itemID) {
+      setTS(ts) // only if NEW episode
+    }
+  }
+
+  // JUST FOR PLAYING IT!
+  useEffect(() => {
+    EE.on(EPISODE_SELECTED, episodeSelected)
+    EE.on(INITIAL_TS, goInitialTS)
+    return () => {
+      EE.removeListener(EPISODE_SELECTED, episodeSelected)
+      EE.removeListener(INITIAL_TS, goInitialTS)
+    }
+  }, [playing])
+
+  async function tick(){
+    if(!playing) return
     const s = secs.current
     if(s && s%NUM_SECONDS===0) {
-      sendPayments(ts.current)
+      sendPayments(ts)
     }
     secs.current = secs.current + 1
+    const pos = await Audio.getPosition()
+    if(pos) {
+      setTS(pos)
+    } else {
+      setTS(current=>current+1)
+    }    
   }
-  function onPlay(){
-    const dests = pod.value && pod.value.destinations
-    if(!dests) return
+  async function actuallyPlay(){
+    if(ts) {
+      await Audio.seekTo(ts)
+    }
+    await Audio.play(episode.id)
   }
-  function onListen(e){
+  async function playOrPauseAudio(){
+    // check if its switched
+    const eid = await Audio.getCurrentTrack()
+    const isPlaying = await Audio.playing()
+    if(isPlaying) {
+      if(eid!==episode.id) {
+        await Audio.stopAll() // stop the old one
+        await actuallyPlay()
+      } else {
+        // same episode!
+        await Audio.pause()
+      }
+    } else {
+      actuallyPlay()
+    }
+  }
+  async function onPlay(){
+    playOrPauseAudio()
+    setPlaying(c=>!c)
+  }
+  function onRewind() {
+    seekTo(ts - 15)
+  }
+  function onForward() {
+    seekTo(ts + 30)
+  }
+  useInterval(()=>{
     tick()
-    ts.current = Math.round(e.target.currentTime)
-  }
+  }, 1000)
+
   function clickMsg(){
     if(ui.extraTextContent) {
       ui.setExtraTextContent(null)
@@ -46,131 +130,47 @@ export default function Player({pod,episode,sendPayments,boost,initialTS}){
       title: episode.title,
       url: episode.enclosureUrl,
       pubkey: user.publicKey,
-      ts: ts.current,
+      ts: ts,
       type:'clip'
     }
     ui.setExtraTextContent(sp)
   }
   function clickBoost(){
-    boost(ts.current)
+    boost(ts)
   }
 
-  return <PodPlayer>
-    {episode && <MsgWrap>
-      <ChatQuote style={{height:24,width:24}} onClick={clickMsg} />
-    </MsgWrap>}
-    {episode && <AudioPlayer
-      ref={ref}
-      autoPlay={false}
-      src={episode.enclosureUrl}
-      onPlay={onPlay}
-      onListen={onListen}
-      loop={false}
-      customAdditionalControls={[]}
-      customVolumeControls={[]}
-      showDownloadProgress={false}
-      showFilledProgress={false}
-      progressJumpSteps={{
-        backward:15,
-        forward:30,
-      }}
-      customIcons={{
-        rewind: <Back15 style={{fill:'#809ab7',marginRight:10,height:24,width:24}} />,
-        forward: <Forward30 style={{fill:'#809ab7',marginLeft:10,height:24,width:24}} />
-      }}
-    />}
-    {episode && <BoostWrap>
-      <Boost style={{height:24,width:24}} onClick={clickBoost} />
-    </BoostWrap>}
-  </PodPlayer>
+  const url = (episode && episode.enclosureUrl) || ''
+  return <AudioPlayer url={url} playing={playing} 
+    ts={ts} duration={duration} onSeek={seekTo}
+    clickBoost={clickBoost} clickMsg={clickMsg}
+    onPlay={onPlay} onRewind={onRewind} onForward={onForward}
+  />
 }
 
-function Boost({onClick,style}){
-  return <BoostGreen onClick={onClick} style={style||{}}>
-    <BoostIcon style={{height:20,width:20}} />
-  </BoostGreen>
-}
-const BoostGreen = styled.div`
-  background:#48c998;
-  height:24px;
-  width:24px;
-  border-radius:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-`
+const useInterval = (callback, delay) => {
+  const savedCallback = useRef<Function>();
 
-const PodPlayer = styled.div`
-  display: flex;
-  flex-direction: column;
-  position:relative;
-  & .rhap_container{
-    background-color: #141d27;
-  }
-  & .rhap_controls-section{
-    margin-top: 22px !important;
-  }
-  & .rhap_main-controls-button{
-    color: #809ab7;
-  }
-  & .rhap_progress-indicator{
-    background-color: #809ab7
-  }
-  & .rhap_progress-filled{
-    background-color: #809ab7
-  }
-  & .rhap_progress-bar{
-    background-color: #809ab7
-  }
-  & .rhap_current-time{
-    color: #809ab7;
-    font-size: 13px;
-    position: absolute;
-    top: 35px;
-    left:20px;
-  }
-  & .rhap_time{
-    color: #809ab7;
-    font-size: 13px;
-    position: absolute;
-    top: 35px;
-    right:20px;
-  }
-  & .rhap_volume-indicator{
-    background: #809ab7;
-  }
-  & .rhap_volume-button{
-    color: #809ab7;
-  }
-`
-const MsgWrap = styled.div`
-  position:absolute;
-  left:14px;
-  top:62px;
-  color:white;
-  cursor:pointer;
-  & svg {
-    color:#809ab7;
-  }
-  &:hover svg{
-    color:white;
-  }
-`
-const BoostWrap = styled.div`
-  position:absolute;
-  right:14px;
-  top:62px;
-  color:white;
-  cursor:pointer;
-  & svg {
-    color:#809ab7;
-  }
-  &:hover svg{
-    color:white;
-  }
-`
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
-  }
+  useEffect(
+    () => {
+      savedCallback.current = callback;
+    },
+    [callback]
+  );
+
+  useEffect(
+    () => {
+      const handler = (...args) => savedCallback.current(...args);
+
+      if (delay !== null) {
+        const id = setInterval(handler, delay);
+        return () => clearInterval(id);
+      }
+    },
+    [delay]
+  );
+};
+
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms))
 }

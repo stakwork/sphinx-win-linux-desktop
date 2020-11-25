@@ -1,6 +1,5 @@
 import { action } from 'mobx'
-import { msgStore } from './msg'
-import { userStore } from './user'
+import { chatStore } from './chats'
 import { relay } from '../api'
 
 export const NUM_SECONDS = 60
@@ -27,13 +26,23 @@ export interface StreamPayment {
 
 export class FeedStore {
 
-  @action async sendPayments(destinations: Destination[], text: string, amount: number, chat_id: number) {
+  @action async sendPayments(destinations: Destination[], text: string, amount: number, chat_id: number, update_meta: boolean) {
     await relay.post('stream', {
       destinations,
       text,
       amount,
-      chat_id
+      chat_id,
+      update_meta
     })
+    if(chat_id && update_meta && text) {
+      let meta
+      try {
+        meta = JSON.parse(text)
+      } catch(e) {}
+      if(meta) {
+        chatStore.updateChatMeta(chat_id, meta)
+      }
+    }
     // asyncForEach(dests, async (d: Destination) => {
     //   const amt = Math.max(Math.round((d.split / 100) * price), 1)
     //   if (d.type === 'node') {

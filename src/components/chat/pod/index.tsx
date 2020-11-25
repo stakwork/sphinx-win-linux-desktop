@@ -14,8 +14,9 @@ import FastImage from 'react-native-fast-image'
 import Replay from './replay'
 import {getPosition,setPosition} from './position'
 
-export default function Pod({ pod, show, chatID, onBoost, podError }) {
+export default function Pod({ pod, show, chat, onBoost, podError }) {
   const theme = useTheme()
+  const chatID = chat.id
   const { feed, user, msg, chats } = useStores()
  
   const [loading, setLoading] = useState(false)
@@ -63,10 +64,13 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
   }
 
   async function initialSelect(ps){
-    
+    let theID = queuedTrackID
+    if(chat.meta && chat.meta.itemID) {
+      theID = chat.meta.itemID
+    }
     let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
-    if(queuedTrackID) {
-      const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e=>e.id==queuedTrackID)
+    if(theID) {
+      const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e=>e.id==theID)
       if(qe) {
         episode=qe
       } else {
@@ -79,6 +83,17 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
     setSelectedEpisodeID(episode.id)
     await addEpisodeToQueue(episode)
     if(!duration) getAndSetDuration()
+
+    const ts = chat.meta && chat.meta.ts
+    if(ts || ts===0) {
+      await TrackPlayer.seekTo(ts);
+      setPosition()
+    }
+    
+    const spm = chat.meta && chat.meta.sats_per_minute
+    if(spm || spm===0) {
+      chats.setPricePerMinute(chatID,spm)
+    }
   }
 
   async function checkState(){
@@ -88,7 +103,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
     }
     
     const state = await TrackPlayer.getState()
-    console.log(state)
+    // console.log(state)
     if(state===TrackPlayer.STATE_PAUSED || state===TrackPlayer.STATE_STOPPED) {
       setPlaying(false)
     }
@@ -117,7 +132,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
       ts: Math.round(pos)||0,
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, (pricePerMinute*mult||1), chatID)    
+    feed.sendPayments(dests, memo, (pricePerMinute*mult||1), chatID, true)    
   }
 
   const count = useRef(0)
@@ -180,7 +195,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
       }
       if(d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
-      feed.sendPayments(finalDests, memo, pricePerMinute, chatID)
+      feed.sendPayments(finalDests, memo, pricePerMinute, chatID, false)
     }
   }
 
@@ -249,7 +264,7 @@ export default function Pod({ pod, show, chatID, onBoost, podError }) {
       if(!dests) return
       if(!pod.id || !selectedEpisodeID) return
       const memo = JSON.stringify(sp)
-      feed.sendPayments(dests, memo, amount, chatID)
+      feed.sendPayments(dests, memo, amount, chatID, false)
     })
   }
 

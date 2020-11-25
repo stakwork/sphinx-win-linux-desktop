@@ -1,7 +1,7 @@
 
 import { useStores } from '../index'
 import { constants, constantCodes } from '../../constants'
-import { Msg } from '../msg'
+import { Msg, BoostMsg } from '../msg'
 import { Contact } from '../contacts'
 import moment from 'moment'
 import { parseLDAT, urlBase64FromAscii } from '../utils/ldat'
@@ -28,17 +28,20 @@ export function useMsgs(chat, limit?: number) {
   const msgsWithDates = msgs && injectDates(messages)
   const ms = msgsWithDates || []
 
-  const filtered = ms.filter(m => m.type !== constants.message_types.payment)
-  return filtered
+  return ms
 }
 
-const hideTypes = ['purchase', 'purchase_accept', 'purchase_deny']
-function processMsgs(msgs: Msg[], isTribe: boolean, contacts: Contact[]) {
+// "payment" is for paying an invoice
+const hideTypes = ['payment', 'purchase', 'purchase_accept', 'purchase_deny', 'boost']
+function processMsgs(incomingmsgs: Msg[], isTribe: boolean, contacts: Contact[]) {
+  // "deep clone" the messages array
+  const msgs = incomingmsgs && incomingmsgs.map(a => Object.assign({}, a)).reverse();
   const ms = []
   if (!msgs) return ms
   for (let i = 0; i < msgs.length; i++) {
     let skip = false
     const msg = msgs[i]
+
     msg.showInfoBar = calcShowInfoBar(msgs, msg, i, isTribe)
     const typ = constantCodes['message_types'][msg.type]
 
@@ -86,21 +89,39 @@ function processMsgs(msgs: Msg[], isTribe: boolean, contacts: Contact[]) {
       if (repmsg) msg.reply_message_sender = repmsg.sender
     }
 
+    // boost logic
+    if (typ === 'boost' && msg.reply_uuid) {
+      // look in "ms".. the existing result array. Its reversed so its forward in time
+      const repmsg = ms.find(m => m.uuid === msg.reply_uuid)
+      if(repmsg) {
+        const bm = <BoostMsg>{
+          amount: msg.amount,
+          sender_alias: msg.sender_alias,
+          date: msg.date,
+          sender: msg.sender,
+        }
+        if(!repmsg.boosts) repmsg.boosts = [bm]
+        else repmsg.boosts.push(bm)
+        // add up total sats 
+        if(!repmsg.boosts_total_sats) repmsg.boosts_total_sats=msg.amount
+        else repmsg.boosts_total_sats = repmsg.boosts_total_sats+msg.amount
+      }
+    }
+
+    if (!typ) skip = true // unknown types
     if (hideTypes.includes(typ)) skip = true
     if (!skip) ms.push(msg)
   }
-  return ms
+  return ms.reverse() // reverse it back to last msg first
 }
 
-// LIST IS REVERSED
-// need to filter out purchase, purchase_accept, purchase_deny
-const filterOut = ['purchase', 'purchase_accept', 'purchase_deny']
+// LIST IS REVERSED??
 function getPrevious(msgs: Msg[], i: number) {
-  if (i === msgs.length - 1) return null
-  const previous = msgs[i + 1]
+  if (i === 0) return null
+  const previous = msgs[i - 1]
   const mtype = constantCodes['message_types'][previous.type]
-  if (filterOut.includes(mtype)) {
-    return getPrevious(msgs, i + 1)
+  if (hideTypes.includes(mtype)) {
+    return getPrevious(msgs, i - 1)
   }
   return previous
 }

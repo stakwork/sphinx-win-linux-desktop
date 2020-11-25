@@ -44,7 +44,6 @@ import li.yunqi.rnsecurestorage.RNSecureStoragePackage;
 // import com.reactnativejitsimeet.RNJitsiMeetPackage;
 import com.guichaguri.trackplayer.TrackPlayer;
 import com.airbnb.android.react.lottie.LottiePackage;
-import com.reactnativecommunity.netinfo.NetInfoPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -95,8 +94,7 @@ public class MainApplication extends Application implements ReactApplication {
           new SafeAreaContextPackage(),
           new ReanimatedPackage(),
           new RNScreensPackage(),
-          new RNSecureStoragePackage(),
-          new NetInfoPackage()
+          new RNSecureStoragePackage()
       );
     }
 

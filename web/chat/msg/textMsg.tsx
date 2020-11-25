@@ -9,6 +9,7 @@ import Clip from './clipMsg'
 import JitsiMsg from './jitsiMsg'
 import Boost from './boostMsg'
 import TribeMsg from './tribeMsg'
+import BoostSats from './boostSats'
 
 export default function TextMsg(props) {
   const { message_content, sender, joinTribe } = props
@@ -16,7 +17,7 @@ export default function TextMsg(props) {
   const link = useHasLink(props)
   const hasLink = message_content && link
   if (hasLink) {
-    return <Wrap>
+    return <Wrap {...props}>
       <LinkifyWrapper>
         <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
           <a target="blank" href={decoratedHref} key={key} onClick={e => {
@@ -34,7 +35,7 @@ export default function TextMsg(props) {
         minLine={1}
         url={link}
       />
-    </Wrap >
+    </Wrap>
   }
 
   const isTribe = message_content &&
@@ -47,8 +48,8 @@ export default function TextMsg(props) {
   if (isGiphy) {
     const { url, aspectRatio, text } = useParsedGiphyMsg(message_content)
     return <div>
-          <GIF src={url} aspectRatio={aspectRatio} />
-          <TextWrap>{text}</TextWrap>
+      <GIF src={url} aspectRatio={aspectRatio} />
+      <TextWrap>{text}</TextWrap>
     </div>
   }
 
@@ -70,14 +71,27 @@ export default function TextMsg(props) {
 
   const emo_regex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])$/;
   if (emo_regex.test(message_content)) {
-    return <Wrap style={{ fontSize: 40 }}>{message_content}</Wrap>
+    return <Wrap {...props} style={{ fontSize: 40 }}>{message_content}</Wrap>
   }
 
-  return <Wrap>{message_content}</Wrap>
+  return <Wrap {...props}>{message_content}</Wrap>
 }
 
+function Wrap(props:{children:any,style?:Object,boosts_total_sats:number,boosts:any}){
+  const {children,style,boosts_total_sats,boosts} = props
+  if(boosts_total_sats) {
+    console.log("SATS",boosts_total_sats)
+  }
+  if(boosts) {
+    console.log(boosts)
+  }
+  return <WrapDiv style={style}>
+    {children}
+    {boosts_total_sats && <BoostSats {...props} />}
+  </WrapDiv>
+}
 
-const Wrap = styled.div`
+const WrapDiv = styled.div`
   padding:16px;
   max-width:440px;
   word-break: break-word;

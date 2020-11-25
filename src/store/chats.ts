@@ -70,6 +70,7 @@ export class ChatStore {
 
   @action
   setPricePerMinute(chatID: number, ppm: number) {
+    if(!chatID) return
     this.pricesPerMinute[chatID] = ppm
   }
 
@@ -115,7 +116,7 @@ export class ChatStore {
 
   @action
   gotChat(chat: Chat) {
-    console.log("====> GOT CHAT", chat)
+    // console.log("====> GOT CHAT", chat)
     const existingIndex = this.chats.findIndex(ch => ch.id === chat.id)
     if (existingIndex > -1) {
       this.chats[existingIndex] = this.parseChat(chat)
@@ -249,6 +250,14 @@ export class ChatStore {
       }
       return c
     })
+  }
+
+  @action
+  updateChatMeta(chat_id, meta) {
+    const idx = this.chats.findIndex(c=>c.id===chat_id)
+    if(idx>-1) {
+      this.chats[idx].meta = meta
+    }
   }
 
   @action

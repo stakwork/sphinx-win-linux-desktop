@@ -34,7 +34,6 @@ function ChatList(){
               key={i} {...c} contact_photo={contact&&contact.photo_url}
               selected={c.id===scid&&c.name===scname} 
               onClick={async ()=> {
-                console.log("SELECTD THIS CHAT",c)
                 msg.seeChat(c.id)
                 ui.setSelectedChat(c)
                 ui.toggleBots(false)

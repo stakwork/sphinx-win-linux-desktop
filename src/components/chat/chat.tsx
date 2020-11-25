@@ -158,7 +158,7 @@ export default function Chat() {
       </View>}
       {theShow && <MsgList chat={chat} />}
 
-      <Pod pod={pod} show={feedURL?true:false} chatID={chat.id} onBoost={onBoost} podError={podError} />
+      <Pod pod={pod} show={feedURL?true:false} chat={chat} onBoost={onBoost} podError={podError} />
 
       <Anim dark={theme.dark} />
 
