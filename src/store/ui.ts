@@ -262,6 +262,11 @@ export class UiStore {
     this.newContact = b
   }
 
+  @observable viewTribe: { [k: string]: any } = null
+  @action setViewTribe(obj: { [k: string]: any }) {
+    this.viewTribe = obj
+  }
+
 }
 
 export const uiStore = new UiStore()
