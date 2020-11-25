@@ -6,6 +6,7 @@ import Lottie from 'react-lottie';
 import Popover from '@material-ui/core/Popover';
 import { makeStyles } from '@material-ui/core/styles';
 import moment from 'moment'
+import {BoostIcon} from '../pod/icons'
 
 const useStyles = makeStyles((theme) => ({
   popover: {
@@ -52,9 +53,10 @@ export default function BoostSats(props){
         width={100}
       />}
     </LottieWrap>
-    <Box style={{borderColor:theme.active,color:theme.active}}
-      onMouseEnter={popoverOpen} onMouseLeave={popoverClose}>
-      {`${props.boosts_total_sats} sats`}
+    <Box onMouseEnter={popoverOpen} onMouseLeave={popoverClose}>
+      <Boost />
+      <BoxText>{props.boosts_total_sats}</BoxText>
+      <BoxSatsText>sats</BoxSatsText>
     </Box>
     <Popover
       className={classes.popover}
@@ -90,6 +92,21 @@ export default function BoostSats(props){
   </Wrap>
 }
 
+function Boost(){
+  return <BoostGreen>
+    <BoostIcon style={{height:20,width:20}} />
+  </BoostGreen>
+}
+const BoostGreen = styled.div`
+  background:#48c998;
+  height:18px;
+  width:18px;
+  border-radius:3px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+`
+
 const Wrap = styled.div`
   display:flex;
   max-height:24px;
@@ -98,13 +115,19 @@ const Wrap = styled.div`
   position:relative;
 `
 const Box = styled.div`
-  border-width:1px;
-  border-style:solid;
   border-radius:4px;
-  height:18px;
-  font-size:10px;
-  padding:2px 7px;
-  background:rgba(255,255,255,0.1);
+  height:19px;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+  margin-top:7px;
+`
+const BoxText = styled.div`
+  margin-left:8px;
+`
+const BoxSatsText = styled.div`
+  margin-left:3px;
+  color:grey;
 `
 const LottieWrap = styled.div`
   position:absolute;

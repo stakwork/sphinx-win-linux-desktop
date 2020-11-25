@@ -60,10 +60,10 @@ export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, 
       <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
     </MenuItem>
 
-    {/* {!isMe && <MenuItem onClick={() => { onBoost(menuMessage.uuid), handleMenuClose() }}
+    {!isMe && <MenuItem onClick={() => { onBoost(menuMessage.uuid), handleMenuClose() }}
       style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
       <Boost />Boost
-    </MenuItem>} */}
+    </MenuItem>}
 
     {isMe && <MenuItem onClick={deleteMessage}
       style={{ fontSize: 14, color: '#fe5251', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>

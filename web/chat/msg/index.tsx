@@ -14,7 +14,7 @@ import MoreVertButton from '@material-ui/icons/MoreVert';
 import BotResMsg from './botRes'
 import moment from 'moment'
 import {useAvatarColor, useParsedGiphyMsg, useParsedClipMsg} from '../../../src/store/hooks/msg'
-import BoostSats from './boostSats'
+// import BoostSats from './boostSats'
 
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
 
@@ -55,7 +55,7 @@ export default function Msg(props) {
           style={{ color: '#7f7f7f', cursor: 'pointer', fontSize: 17, marginLeft: -3, marginRight: -3 }} />
       </BubbleWrap>
 
-      {props.boosts_total_sats && <BoostSats {...props} />}
+      {/* {props.boosts_total_sats && <BoostSats {...props} />} */}
 
     </InnerBox>
   </MsgRow>
