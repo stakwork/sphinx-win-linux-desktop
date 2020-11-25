@@ -10,6 +10,7 @@ import ViewContact from './viewContact'
 import Profile from './profile'
 import NewContact from './newContact'
 import ShareInvite from './shareInvite'
+import ViewTribe from './viewTribe'
 import {uiStore} from '../../src/store/ui'
 
 const electron = window.require ? window.require("electron") : {}
@@ -34,6 +35,7 @@ export default function Modals(){
       {ui.showProfile && <Profile/>}
       {ui.newContact && <NewContact />}
       {ui.shareInviteModal && <ShareInvite />}
+      {ui.viewTribe && <ViewTribe />}
     </Wrap>
   })
 }

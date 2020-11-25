@@ -202,9 +202,7 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
       }
     }
 
-    async function joinTribe (tribeLink) {
-      const p = new URLSearchParams(tribeLink)
-      const tribeParams = await chats.getTribeDetails(p.get('host'),p.get('uuid'))
+    async function joinTribe (tribeParams) {
       if (tribeParams) ui.setJoinTribeParams(tribeParams)
     }
 

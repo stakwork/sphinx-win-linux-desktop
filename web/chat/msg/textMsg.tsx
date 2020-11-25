@@ -8,6 +8,7 @@ import { useHasLink } from './hooks'
 import Clip from './clipMsg'
 import JitsiMsg from './jitsiMsg'
 import Boost from './boostMsg'
+import TribeMsg from './tribeMsg'
 import BoostSats from './boostSats'
 
 export default function TextMsg(props) {
@@ -35,6 +36,12 @@ export default function TextMsg(props) {
         url={link}
       />
     </Wrap>
+  }
+
+  const isTribe = message_content &&
+  message_content.startsWith('sphinx.chat://?action=tribe')
+  if(isTribe) {
+    return <TribeMsg {...props} />
   }
 
   const isGiphy = message_content && message_content.startsWith('giphy::')
