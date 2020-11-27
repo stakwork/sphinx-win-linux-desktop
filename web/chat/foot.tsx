@@ -24,7 +24,7 @@ import { useReplyContent } from '../../src/store/hooks/chat'
 import ReactGiphySearchbox from 'react-giphy-searchbox'
 
 export default function Foot({ height, messagePrice, tribeBots }) {
-  const { ui, msg, meme, contacts } = useStores()
+  const { ui, msg, meme, details } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
@@ -66,6 +66,10 @@ export default function Foot({ height, messagePrice, tribeBots }) {
       if (failureMessage) {
         return alert(failureMessage)
       }
+      if(price>details.balance) {
+        return alert('Not enough balance')
+      }
+
       if(ui.imgViewerParams && ui.imgViewerParams.type === 'image/gif'){
         return sendGif(messagePrice + price)
       }
