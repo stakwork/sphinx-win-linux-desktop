@@ -7,6 +7,7 @@ const styles = {
     marginLeft: 8,
     marginRight: 8,
     marginTop: 5,
+    maxWidth:280
   },
   innerPad: {
     paddingLeft: 18,

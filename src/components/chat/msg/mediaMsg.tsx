@@ -10,6 +10,7 @@ import { parseLDAT } from '../../utils/ldat'
 import Video from 'react-native-video';
 import FileMsg from './fileMsg'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import BoostRow from './boostRow'
 
 export default function MediaMsg(props) {
   const { meme, ui, msg } = useStores()
@@ -70,6 +71,8 @@ export default function MediaMsg(props) {
   const showStats = isMe && amt
   const sold = props.sold
 
+  const showBoostRow = props.boosts_total_sats?true:false
+
   let isImg = false
   let minHeight = 60
   let showPayToUnlockMessage = false
@@ -129,6 +132,8 @@ export default function MediaMsg(props) {
       {hasContent && <View style={shared.innerPad}>
         <Text style={{...styles.text,color:theme.title}}>{message_content}</Text>
       </View>}
+
+      {showBoostRow && <BoostRow {...props} pad myAlias={props.myAlias}/>}
 
       {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
         onPress={onButtonPressHandler}

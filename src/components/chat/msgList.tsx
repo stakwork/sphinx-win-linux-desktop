@@ -13,7 +13,7 @@ const { useMsgs } = hooks
 const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
-export default function MsgListWrap({ chat }: { chat: Chat }) {
+export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pricePerMessage:number }) {
   const { msg, ui, user, chats } = useStores()
   const [limit, setLimit] = useState(40)
 
@@ -21,8 +21,18 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
     setLimit(c => c + 40)
   }
 
-  async function onBoostMsg(){
-    console.log('onBoostMsg')
+  async function onBoostMsg(m){
+    const {uuid} = m
+    if(!uuid) return
+    const amount = (user.tipAmount||100) + pricePerMessage
+    msg.sendMessage({
+      boost:true,
+      contact_id:null,
+      text:'', amount,
+      chat_id: chat.id||null,
+      reply_uuid:uuid,
+      message_price: pricePerMessage
+    })
   }
   async function onDelete(id) {
     await msg.deleteMessage(id)
@@ -42,7 +52,7 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
       msgsLength={(msgs && msgs.length) || 0}
       chat={chat}
       onDelete={onDelete}
-      myPubkey={user.publicKey}
+      myPubkey={user.publicKey} myAlias={user.alias}
       onApproveOrDenyMember={onApproveOrDenyMember}
       onDeleteChat={onDeleteChat}
       onLoadMoreMsgs={onLoadMoreMsgs}
@@ -51,7 +61,7 @@ export default function MsgListWrap({ chat }: { chat: Chat }) {
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg }) {
+function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
   // const [viewableIds, setViewableIds] = useState({})
@@ -141,7 +151,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, onApproveOrDenyMe
           m={item} chat={chat}
           senderAlias={senderAlias} senderPhoto={senderPhoto}
           isGroup={isGroup} isTribe={isTribe}
-          onDelete={onDelete} myPubkey={myPubkey}
+          onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias}
           onApproveOrDenyMember={onApproveOrDenyMember}
           onDeleteChat={onDeleteChat}
           onBoostMsg={onBoostMsg}
@@ -175,7 +185,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -187,10 +197,10 @@ function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, senderAlias, 
   return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
     senderAlias={senderAlias} senderPhoto={senderPhoto}
-    onDelete={onDelete} myPubkey={myPubkey} windowWidth={windowWidth}
+    onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
     onBoostMsg={onBoostMsg}
-  />, [m.id, m.type, m.media_token, m.status, m.sold])
+  />, [m.id, m.type, m.media_token, m.status, m.sold, m.boosts_total_sats])
 }
 
 function DateLine({ dateString }) {
