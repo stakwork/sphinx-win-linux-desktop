@@ -23,8 +23,8 @@ import { calcBotPrice } from '../../src/store/hooks/chat'
 import { useReplyContent } from '../../src/store/hooks/chat'
 import ReactGiphySearchbox from 'react-giphy-searchbox'
 
-export default function Foot({ height, pricePerMessage, tribeBots, msgPrice, setMsgPrice }) {
-  const { ui, msg, meme, contacts } = useStores()
+export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsgPrice }) {
+  const { ui, msg, meme, details, contacts } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
@@ -64,7 +64,6 @@ export default function Foot({ height, pricePerMessage, tribeBots, msgPrice, set
       const server = meme.getDefaultServer()
       const file = new File([text], 'message.txt', {type: "text/plain;charset=utf-8"})
       const r = await uploadFile(file, 'sphinx/text', server.host, server.token, 'message.txt')
-      // console.log('pricePerMessage',pricePerMessage)
       await msg.sendAttachment({
         contact_id: null, chat_id: chat.id,
         muid: r.muid,
@@ -72,7 +71,7 @@ export default function Foot({ height, pricePerMessage, tribeBots, msgPrice, set
         media_type: 'sphinx/text',
         text: '',
         price: parseInt(msgPrice) || 0,
-        amount: pricePerMessage||0
+        amount: messagePrice||0
       })
       setText('')
       setMsgPrice('')
@@ -89,8 +88,12 @@ export default function Foot({ height, pricePerMessage, tribeBots, msgPrice, set
       if (failureMessage) {
         return alert(failureMessage)
       }
+      if(price>details.balance) {
+        return alert('Not enough balance')
+      }
+
       if(ui.imgViewerParams && ui.imgViewerParams.type === 'image/gif'){
-        return sendGif(pricePerMessage + price)
+        return sendGif(messagePrice + price)
       }
 
       let txt = text
@@ -102,7 +105,7 @@ export default function Foot({ height, pricePerMessage, tribeBots, msgPrice, set
         contact_id,
         text: txt,
         chat_id: chat.id || null,
-        amount: (pricePerMessage + price) || 0, // 5, // CHANGE THIS
+        amount: (messagePrice + price) || 0, // 5, // CHANGE THIS
         reply_uuid: ui.replyUUID || ''
       })
       setText('')

@@ -99,7 +99,7 @@ export default function MsgRow(props) {
             style={{ marginLeft: 0, marginRight: 15 }}
           />}
         </View>
-        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} />
+        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} myAlias={props.myAlias} />
       </SwipeRow>
     </View>
   </View>
@@ -138,7 +138,8 @@ function MsgBubble(props) {
     onRequestCloseHandler()
   }
   const onBoostHandler = async () => {
-    await props.onBoostMsg()
+    await props.onBoostMsg(props)
+    onRequestCloseHandler()
   }
   const onDeleteHandler = async () => {
     if (!deleting) {
@@ -148,6 +149,8 @@ function MsgBubble(props) {
       onRequestCloseHandler()
     }
   }
+
+  const allowBoost = !isMe && !(props.message_content||'').startsWith('boost::')
 
   return (
       <Popover
@@ -167,7 +170,7 @@ function MsgBubble(props) {
               content={props.reply_message_content}
               senderAlias={props.reply_message_sender_alias}
             />}
-            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} />}
+            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} myAlias={props.myAlias} />}
           </View>
         )}
       >
@@ -177,12 +180,12 @@ function MsgBubble(props) {
           >
             <Text style={{ textAlign: 'center' }}>Copy</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {allowBoost && <TouchableOpacity
             onPress={onBoostHandler}
             style={{ padding: 10, minWidth:99, borderTopWidth: 1, borderTopColor: '#ddd', }}
           >
             <Text style={{ textAlign: 'center' }}>Boost</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
           {(isMe || props.isTribeOwner) && <TouchableOpacity onPress={onDeleteHandler}
             style={{ padding: 10, borderTopWidth: 1, borderTopColor: '#ddd', display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center', minWidth:99 }}>
             {deleting && <ActivityIndicator color="#888" size={10} />}

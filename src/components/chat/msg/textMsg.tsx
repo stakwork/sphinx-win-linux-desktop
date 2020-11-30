@@ -6,6 +6,7 @@ import { useParsedGiphyMsg } from '../../../store/hooks/msg'
 import {useTheme} from '../../../store'
 import ClipMessage from './clipMsg'
 import BoostMessage from './boostMsg'
+import BoostRow from './boostRow'
 
 export default function TextMsg(props) {
   const theme = useTheme()
@@ -16,20 +17,27 @@ export default function TextMsg(props) {
     Linking.openURL(message_content)
   }
 
+  const showBoostRow = props.boosts_total_sats?true:false
+
   const isGiphy = message_content && message_content.startsWith('giphy::')
   if (isGiphy) {
     const { url, aspectRatio, text } = useParsedGiphyMsg(message_content)
-    return <View>
+    return <View style={{...styles.column, maxWidth:200}}>
       <Image source={{ uri: url }}
-        style={{ width: 120 * (aspectRatio || 1), height: 120 }} resizeMode={'cover'}
+        style={{ width: 200, height: 200 / (aspectRatio||1) }} 
+        resizeMode={'cover'}
       />
       {(text?true:false) && <Text style={{...styles.textPad,color:theme.title}}>{text}</Text>}
+      {showBoostRow && <BoostRow {...props} myAlias={props.myAlias} pad marginTop={14} />}
     </View>
   }
 
   const isClip = message_content && message_content.startsWith('clip::')
   if(isClip) {
-    return <ClipMessage {...props} />
+    return <View style={styles.column}>
+      <ClipMessage {...props} />
+      {showBoostRow && <BoostRow {...props} myAlias={props.myAlias} pad marginTop={8} />}
+    </View>
   }
   const isBoost = message_content && message_content.startsWith('boost::')
   if(isBoost) {
@@ -37,6 +45,7 @@ export default function TextMsg(props) {
   }
 
   const onLongPressHandler = () => props.onLongPress(props)
+  
   return <TouchableOpacity style={isLink ? { width: 280, paddingLeft: 7, minHeight: 72 } : shared.innerPad}
     onLongPress={onLongPressHandler}>
     {isLink ? <View style={styles.linkWrap}>
@@ -47,7 +56,8 @@ export default function TextMsg(props) {
         text={message_content}
       /> 
     </View> :
-      <Text style={{...styles.text,color:theme.title}}>{message_content}</Text>}
+    <Text style={{...styles.text,color:theme.title}}>{message_content}</Text>}
+    {showBoostRow && <BoostRow {...props} myAlias={props.myAlias} marginTop={8} />}
   </TouchableOpacity>
 }
 
@@ -89,6 +99,10 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
+  },
+  column: {
+    display:'flex',
+    maxWidth:'100%',
   },
   textPad: {
     color: '#333',

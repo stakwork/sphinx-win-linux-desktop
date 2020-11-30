@@ -127,6 +127,11 @@ export function bot_res(data) {
   msgStore.gotNewMessageFromWS(data.response)
 }
 
+export function boost(data) {
+  log('[ws] boost', data)
+  msgStore.gotNewMessageFromWS(data.response)
+}
+
 const oktolog = false
 
 function log(a, b) {

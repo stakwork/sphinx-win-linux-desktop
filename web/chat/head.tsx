@@ -16,7 +16,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import PhoneIcon from '@material-ui/icons/Phone'
 import LockIcon from '@material-ui/icons/Lock';
 
-export default function Head({ height, appMode, appURL, setAppMode, pricePerMessage, status }) {
+export default function Head({ height, appMode, appURL, setAppMode, messagePrice, status }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const { contacts, ui, msg } = useStores()
@@ -35,7 +35,7 @@ export default function Head({ height, appMode, appURL, setAppMode, pricePerMess
       ui.setApplicationURL('')
     }
     function openJitsi() {
-      ui.setStartJitsiParams({ pricePerMessage })
+      ui.setStartJitsiParams({ messagePrice })
     }
 
     useEffect(() => {
@@ -79,7 +79,7 @@ export default function Head({ height, appMode, appURL, setAppMode, pricePerMess
                 <LockIcon style={{ color: status === 'active' ? '#49ca97' : '#febd59', fontSize: 12, marginLeft: 8, marginBottom: 2 }} />
               </Tooltip>}
             </NameWrap>
-            {(pricePerMessage ? true : false) && <Price>{`Price per Message: ${pricePerMessage}`}</Price>}
+            {(messagePrice ? true : false) && <Price>{`Price per Message: ${messagePrice}`}</Price>}
           </ChatInfo>
         </Left>
       </Inner>}

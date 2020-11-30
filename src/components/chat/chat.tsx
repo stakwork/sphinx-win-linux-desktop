@@ -156,7 +156,7 @@ export default function Chat() {
       {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
-      {theShow && <MsgList chat={chat} />}
+      {theShow && <MsgList chat={chat} pricePerMessage={pricePerMessage} />}
 
       <Pod pod={pod} show={feedURL?true:false} chat={chat} onBoost={onBoost} podError={podError} />
 

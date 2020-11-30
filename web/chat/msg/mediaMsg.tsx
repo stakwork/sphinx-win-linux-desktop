@@ -12,11 +12,12 @@ import CamIcon from '@material-ui/icons/CameraAltOutlined'
 import GetAppIcon from '@material-ui/icons/GetApp';
 import ReactAudioPlayer from 'react-audio-player'
 import { Player } from 'video-react';
+import BoostRow from './boostRow'
 
 export default function MediaMsg(props) {
   const { msg, ui } = useStores()
   const [buying, setBuying] = useState(false)
-  const { message_content, chat, media_token, media_type } = props
+  const { message_content, chat, media_token, media_type, boosts_total_sats } = props
   const isMe = props.sender === 1
 
   const ldat = parseLDAT(media_token)
@@ -104,6 +105,10 @@ export default function MediaMsg(props) {
       <BuyIcon purchased={purchased} loading={buying} />
       <BuyText>{purchased ? 'Purchased' : `Pay ${amt} sat`}</BuyText>
     </BuyButton>}
+
+    {boosts_total_sats && <BoostRowWrap>
+      <BoostRow {...props} isMe={isMe} />
+    </BoostRowWrap>}
   </Wrap>
 }
 
@@ -270,4 +275,8 @@ const PriceIcon = styled.div`
   height: 20px;
   border-radius: 5px;
   padding: 4px 8px;
+`
+
+const BoostRowWrap = styled.div`
+  padding:4px 12px 10px 12px;
 `
