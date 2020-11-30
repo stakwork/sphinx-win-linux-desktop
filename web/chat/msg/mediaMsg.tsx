@@ -68,11 +68,20 @@ export default function MediaMsg(props) {
       <CircularProgress size={17} style={{color:'white'}} />
     } */}
 
+    {amt && showStats && <PriceWrap>
+      <PriceIcon theme={theme}>
+        {amt} SAT
+      </PriceIcon>
+      <PriceIcon theme={theme}>
+        {sold ? 'Purchase Succeeded' : 'Pending'}
+      </PriceIcon>
+    </PriceWrap>}
+
     {needsPurchase && !isPaidMsg ?
       <NeedsPurchase>
         <CamIcon style={{ color: 'grey', fontSize: 30 }} />
       </NeedsPurchase> :
-      <Media type={media_type} data={data} filename={filename} onClick={() => ui.setImgViewerParams({ data, type:media_type })} />
+      <Media type={media_type} data={data} filename={filename} onClick={() => ui.setImgViewerParams({ data, type: media_type })} />
     }
     {message_content && <Content>
       {message_content}
@@ -85,7 +94,7 @@ export default function MediaMsg(props) {
       {loading && <LoadingWrap>
         <CircularProgress size={17} style={{ color: 'white' }} />
       </LoadingWrap>}
-      {paidMessageText && <Content>
+      {paidMessageText && <Content style={{paddingTop: 40}}>
         {paidMessageText}
       </Content>}
     </>}
@@ -113,19 +122,19 @@ function Media({ type, data, onClick, filename }) {
   if (type.startsWith('audio')) {
     return <ReactAudioPlayer src={data} controls />
   }
-  if(type.startsWith('video')) {
+  if (type.startsWith('video')) {
     return <VidWrap>
-      <Player><source 
+      <Player><source
         src={data}
-        type={type==='video/mov'?'video/mp4':type}
+        type={type === 'video/mov' ? 'video/mp4' : type}
       /></Player>
       <PlayArrow onClick={onClick}>
-        <PlayArrowIcon style={{fontSize:34}} />
+        <PlayArrowIcon style={{ fontSize: 34 }} />
       </PlayArrow>
       <VidOverlay />
     </VidWrap>
   }
-  
+
   return <>
     <Download src={data} filename={filename} onClick={() => download(data, filename)}>
       <span>Download file: {filename || "Attachment"}</span>
@@ -144,7 +153,17 @@ function download(dataURL, filename) {
 
 const Wrap = styled.div`
   min-width:240px;
+  position: relative;
 `
+const PriceWrap = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px 0px;
+  width: 100%;
+`
+
 const Download = styled.div`
   display: flex;
   align-items: center;
@@ -241,4 +260,14 @@ const PlayArrow = styled.div`
   &:hover svg {
     fill:white;
   }
+`
+const PriceIcon = styled.div`
+  position: relative;
+  color: white;
+  background-color: ${p => p.theme.secondary};
+  font-size: 10px;
+  font-weight: bold;
+  height: 20px;
+  border-radius: 5px;
+  padding: 4px 8px;
 `

@@ -29,6 +29,7 @@ function Chat() {
   const [appMode, setAppMode] = useState(true)
   const [status,setStatus] = useState<RouteStatus>(null)
   const [tribeParams, setTribeParams] = useState(null)
+  const [msgPrice, setMsgPrice] = useState('')
   let footHeight = 65
 
   // function joinEvanTest(){
@@ -98,10 +99,10 @@ function Chat() {
         <Head height={headHeight} appURL={appURL} setAppMode={setAppMode} appMode={appMode} 
           pricePerMessage={pricePerMessage} status={status}
         />
-        <ChatContent appMode={appMode} appURL={appURL} footHeight={footHeight} 
+        <ChatContent msgPrice={msgPrice} setMsgPrice={setMsgPrice} appMode={appMode} appURL={appURL} footHeight={footHeight} 
           pricePerMessage={pricePerMessage} 
         />
-        <Foot height={footHeight} tribeBots={tribeBots}
+        <Foot msgPrice={msgPrice} setMsgPrice={setMsgPrice} height={footHeight} tribeBots={tribeBots}
           pricePerMessage={pricePerMessage}
         />
       </Inner>
@@ -118,7 +119,7 @@ const Inner = styled.div`
   flex:1;
 `
 
-function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
+function ChatContent({ appMode, appURL, footHeight, pricePerMessage, msgPrice, setMsgPrice }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -126,6 +127,7 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
   const [menuMessage, setMenuMessage] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
+
 
   async function dropzoneUpload(files) {
     const file = files[0]
@@ -139,9 +141,10 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
       media_key: r.media_key,
       media_type: file.type,
       text: '',
-      price: 0,
+      price: parseInt(msgPrice) || 0,
       amount: pricePerMessage||0
     })
+    setMsgPrice('')
     setUploading(false)
   }
 
@@ -203,7 +206,7 @@ function ChatContent({ appMode, appURL, footHeight, pricePerMessage }) {
     }
 
     async function joinTribe (tribeParams) {
-      if (tribeParams) ui.setJoinTribeParams(tribeParams)
+      if (tribeParams) ui.setViewTribe(tribeParams)
     }
 
     return (

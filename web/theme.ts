@@ -9,6 +9,7 @@ const theme = {
     disabledPrimary: '#4c6bc0',
     greyText: '#6a798c',
     active:'#48c998',
+    lightGreen: '#76d7b2'
 }
 
 export default theme
