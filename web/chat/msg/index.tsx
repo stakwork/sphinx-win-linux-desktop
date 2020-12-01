@@ -37,7 +37,7 @@ export default function Msg(props) {
       hide={!props.showInfoBar || isMe}
     />
     <InnerBox>
-
+      
       {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
 
       <BubbleWrap style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>

@@ -15,24 +15,27 @@ export default function TribeMsg(props) {
         uuid: string
     }
 
-    const { ui } = useStores()
+    const { ui, chats, msg } = useStores()
     const [tribe, setTribe] = useState<Tribe>()
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(true)
+    const [alreadyJoined, setAlreadyJoined] = useState<any>()
 
     async function loadTribe() {
         const p = new URLSearchParams(props.message_content)
         const tribeParams = await getTribeDetails(p.get('host'), p.get('uuid'))
         if (tribeParams) { setTribe(tribeParams) }
         else { setError('Could not load Tribe.') }
+        if(tribe) { 
+            const AJ = chats.chats.find(c => c.uuid === tribe.uuid)
+            if(AJ) setAlreadyJoined(AJ)
+        }
         setLoading(false)
     }
-
+    
     useEffect(() => {
         loadTribe()
     }, [])
-
-    console.log(tribe)
 
     if (loading) return <Wrap><CircularProgress /></Wrap>
     if (!tribe.uuid) return <Wrap>Could not load tribe...</Wrap>
@@ -49,7 +52,18 @@ export default function TribeMsg(props) {
             </Text>
         </TribeWrap>
         <ButtonWrap>
-            <Button onClick={() => ui.setViewTribe(tribe)} color={'primary'} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 15 }}>
+            <Button onClick={alreadyJoined ? 
+            async ()=> {
+                console.log("SELECTD THIS CHAT",alreadyJoined)
+                msg.seeChat(alreadyJoined.id)
+                ui.setSelectedChat(alreadyJoined)
+                ui.toggleBots(false)
+                chats.checkRoute(alreadyJoined.id)
+              } :
+              ()=>props.joinTribe(tribe)
+              } 
+              color={alreadyJoined ? 'secondary' : 'primary'}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 15 }}>
                 <Row>
                     See Tribe
             <ArrowForwardIcon style={{ marginLeft: 10 }} />
