@@ -1,4 +1,4 @@
-import React, {useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { IconButton, ActivityIndicator } from 'react-native-paper'
 import { useTheme } from '../../../store'
@@ -11,20 +11,20 @@ import useInterval from '../../utils/useInterval'
 
 export default function PodBar({ duration, episode, onToggle, playing, onShowFull, boost, loading, podError }) {
   const theme = useTheme()
-  const [pos,setPos] = useState(0)
+  const [pos, setPos] = useState(0)
 
-  useEffect(()=>{
+  useEffect(() => {
     const p = getPosition()
-    if(p!==pos) setPos(p)
-  },[])
+    if (p !== pos) setPos(p)
+  }, [])
 
-  useInterval(()=>{
+  useInterval(() => {
     const p = getPosition()
-    if(p!==pos) setPos(p)
+    if (p !== pos) setPos(p)
   }, 1000)
 
-  function getProgress(){
-    if(!duration || !pos) return 0;
+  function getProgress() {
+    if (!duration || !pos) return 0;
     return pos / duration;
   }
 
@@ -36,13 +36,13 @@ export default function PodBar({ duration, episode, onToggle, playing, onShowFul
 
   const height = 58
 
-  if(loading || podError) {
+  if (loading || podError) {
     return <View style={{ ...styles.wrap, backgroundColor: theme.dark ? theme.deep : theme.bg, borderTopColor: theme.border, height }}>
       <View style={styles.inner}>
         <View style={styles.title}>
-          <ActivityIndicator animating={true} color={theme.title} size={13} style={{marginLeft:14}} />
+          <ActivityIndicator animating={true} color={theme.title} size={13} style={{ marginLeft: 14 }} />
           <Text style={{ color: theme.title, marginLeft: 14, maxWidth: '100%' }} numberOfLines={1}>
-            {podError?'Error loading podcast':'loading...'}
+            {podError ? 'Error loading podcast' : 'loading...'}
           </Text>
         </View>
       </View>
@@ -72,7 +72,7 @@ export default function PodBar({ duration, episode, onToggle, playing, onShowFul
         </View>
       </View>
       <View style={styles.progressWrap}>
-        <View style={{width:`${getProgress()*100}%`,...styles.progress,backgroundColor:theme.primary}} />
+        <View style={{ width: `${getProgress() * 100}%`, ...styles.progress, backgroundColor: theme.primary }} />
       </View>
     </TouchableOpacity>
   </View>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   touchable: {
     display: 'flex', flex: 1,
   },
-  inner:{
+  inner: {
     display: 'flex', flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -105,12 +105,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingRight: 10
   },
-  progressWrap:{
-    width:'100%',
-    height:3,
+  progressWrap: {
+    width: '100%',
+    height: 3,
   },
-  progress:{
-    height:3,
+  progress: {
+    height: 3,
   }
 })
 

@@ -15,6 +15,7 @@ export interface StreamPayment {
   feedID: number
   itemID: number
   ts: number
+  speed?: string,
   title?: string
   text?: string
   url?: string
@@ -40,6 +41,7 @@ export class FeedStore {
         meta = JSON.parse(text)
       } catch(e) {}
       if(meta) {
+        console.log("UPDATE CHAT META",meta)
         chatStore.updateChatMeta(chat_id, meta)
       }
     }

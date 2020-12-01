@@ -110,6 +110,7 @@ class MsgStore {
 
   @action
   async getMessages() {
+    console.log("=> GET MESSAGES")
     let route = 'messages'
     if (this.lastFetched) {
       const mult = 1

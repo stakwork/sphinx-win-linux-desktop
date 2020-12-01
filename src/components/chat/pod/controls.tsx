@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment'
@@ -8,27 +8,28 @@ import { StreamPayment } from '../../../store/feed';
 momentDurationFormatSetup(moment);
 import Slider from '@react-native-community/slider';
 import TouchableIcon from '../../utils/touchableIcon'
-import { IconButton } from 'react-native-paper'
 import Rocket from './rocket'
 import CustomIcon from '../../utils/customIcons'
 import { getPosition, setPosition } from './position'
 import useInterval from '../../utils/useInterval'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default function Controls(props) {
-  const [pos,setPos] = useState(0)
+  const [pos, setPos] = useState(0)
+  const [selectSpeed, setSelectSpeed] = useState(false)
 
-  useEffect(()=>{
+  useEffect(() => {
     const p = getPosition()
-    if(p!==pos) setPos(p)
-  },[])
+    if (p !== pos) setPos(p)
+  }, [])
 
-  useInterval(()=>{
+  useInterval(() => {
     const p = getPosition()
-    if(p!==pos) setPos(p)
+    if (p !== pos) setPos(p)
   }, 1000)
 
   async function fastForward() {
-    const n = pos+30
+    const n = pos + 30
     await TrackPlayer.seekTo(n);
     setPosition()
     setPos(n)
@@ -63,9 +64,14 @@ export default function Controls(props) {
       setPos(secs)
     }
   }
-  function getProgress(){
-    if(!props.duration || !pos) return 0;
+  function getProgress() {
+    if (!props.duration || !pos) return 0;
     return pos / props.duration;
+  }
+
+  function doSelectSpeed(s: string) {
+    setSelectSpeed(false)
+    props.setRate(s)
   }
 
   const { theme, onToggle, playing, duration } = props
@@ -95,6 +101,27 @@ export default function Controls(props) {
         <Text style={{ ...styles.durationText, color: theme.title }}>{durationText}</Text>
       </View>
 
+      {!selectSpeed && <View style={styles.speedWrap}>
+        <View style={styles.speedWrapInner}>
+          <TouchableOpacity style={styles.speedClickable} onPress={() => setSelectSpeed(true)}>
+            <Text style={{ ...styles.speed, color: theme.subtitle }}>
+              {`${props.speed || '1'}x`}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>}
+
+      {selectSpeed && <View style={styles.selectSpeed}>
+        <View style={styles.selectSpeedInner}>
+          {['0.5', '0.8', '1', '1.2', '1.5', '2'].map(s => {
+            return <TouchableOpacity key={s} onPress={() => doSelectSpeed(s)}
+              style={{ ...styles.speedBubble, backgroundColor: s === props.speed ? theme.primary : theme.deep }}>
+              <Text style={{ color: theme.title, fontSize: 11 }}>{`${s}x`}</Text>
+            </TouchableOpacity>
+          })}
+        </View>
+      </View>}
+
       <View style={styles.progressWrapBottom}>
 
         <View style={{ height: 48, width: 50 }}>
@@ -111,11 +138,9 @@ export default function Controls(props) {
             onPress={rewind}>
             <CustomIcon name="back-15" color={theme.title} size={28} />
           </TouchableIcon>
-          <IconButton icon={playing ? 'pause-circle' : 'play-circle'}
-            color={theme.primary} size={52}
-            onPress={onToggle}
-            style={{ marginLeft: 18, marginRight: 18 }}
-          />
+          <TouchableOpacity onPress={onToggle} style={{ marginLeft: 18, marginRight: 18 }}>
+            <Icon name={playing ? 'pause-circle' : 'play-circle'} size={52} color={theme.primary} />
+          </TouchableOpacity>
           <TouchableIcon
             rippleColor={theme.title} size={48}
             onPress={fastForward}>
@@ -137,12 +162,59 @@ const styles = StyleSheet.create({
   controls: {
     display: 'flex',
     alignItems: 'center',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   progressWrap: {
     marginTop: 5,
     display: 'flex',
     width: '100%',
+  },
+  speedWrap: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative'
+  },
+  speedWrapInner: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  speedClickable: {
+    width: 32, height: 32,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start'
+  },
+  speed: {
+    fontSize: 11
+  },
+  selectSpeed: {
+    height: 50, width: '100%',
+    position: 'relative',
+    paddingTop: 22
+  },
+  selectSpeedInner: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  speedBubble: {
+    width: 36, height: 26,
+    borderRadius: 10,
+    marginLeft: 3,
+    marginRight: 3,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   barWrap: {
     width: '100%',
@@ -160,6 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     maxWidth: '100%',
+    marginTop: 18
   },
   progressText: {
     position: 'absolute',

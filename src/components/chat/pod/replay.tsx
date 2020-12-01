@@ -63,10 +63,10 @@ export default function Replay({ msgs, playing }) {
   </>
 }
 
-function ItemList({data, renderItem, style}){
+function ItemList({ data, renderItem, style }) {
   return <View style={style}>
-    {data&&data.map((item,index)=>{
-      return renderItem({item,index})
+    {data && data.map((item, index) => {
+      return renderItem({ item, index })
     })}
   </View>
 }
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
   scroller: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 18,
-    display:'flex',
-    flexDirection:'column-reverse'
+    display: 'flex',
+    flexDirection: 'column-reverse'
   },
   backdrop: {
     position: 'absolute',

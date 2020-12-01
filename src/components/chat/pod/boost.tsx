@@ -6,7 +6,7 @@ import CustomIcon from '../../utils/customIcons'
 
 export default function Boost({ style, onPress, inert }) {
   const theme = useTheme()
-  const {user} = useStores()
+  const { user } = useStores()
   const size = useRef(new Animated.Value(1)).current;
   function go() {
     if (inert) return

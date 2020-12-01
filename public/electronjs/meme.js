@@ -18,7 +18,7 @@ async function uploadMeme(fileBase64, typ, host, token, filename) {
     const form = new FormData()
     form.append('file', encImgBuffer, {
       contentType: typ || 'image/jpg',
-      filename: 'Image.jpg',
+      filename: filename || 'Image.jpg',
       knownLength: encImgBuffer.length,
     })
     const formHeaders = form.getHeaders()
