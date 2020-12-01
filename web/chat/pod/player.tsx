@@ -139,6 +139,10 @@ export default function Player({pod,episode,sendPayments,boost}){
     boost(ts)
   }
 
+  function setRate(){
+    Audio.setRate
+  }
+
   const url = (episode && episode.enclosureUrl) || ''
   return <AudioPlayer url={url} playing={playing} 
     ts={ts} duration={duration} onSeek={seekTo}

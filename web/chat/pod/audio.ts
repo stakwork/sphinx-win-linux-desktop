@@ -108,6 +108,13 @@ export async function seekTo(s: number) {
   return a.sound.seek(s)
 }
 
+export async function setRate(r) {
+  const a = getCurrent()
+  if (!a) return
+  if (!a.sound) return
+  return a.sound.rate(r)
+}
+
 export async function getState() {
   return null
 }
