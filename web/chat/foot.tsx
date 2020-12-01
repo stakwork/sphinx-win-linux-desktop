@@ -23,8 +23,8 @@ import { calcBotPrice } from '../../src/store/hooks/chat'
 import { useReplyContent } from '../../src/store/hooks/chat'
 import ReactGiphySearchbox from 'react-giphy-searchbox'
 
-export default function Foot({ height, messagePrice, tribeBots }) {
-  const { ui, msg, meme, details } = useStores()
+export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsgPrice }) {
+  const { ui, msg, meme, details, contacts } = useStores()
   const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
@@ -59,8 +59,30 @@ export default function Foot({ height, messagePrice, tribeBots }) {
       setText('')
     }
 
+    async function sendPaidMsg(){
+      setUploading(true)
+      const server = meme.getDefaultServer()
+      const file = new File([text], 'message.txt', {type: "text/plain;charset=utf-8"})
+      const r = await uploadFile(file, 'sphinx/text', server.host, server.token, 'message.txt')
+      await msg.sendAttachment({
+        contact_id: null, chat_id: chat.id,
+        muid: r.muid,
+        media_key: r.media_key,
+        media_type: 'sphinx/text',
+        text: '',
+        price: parseInt(msgPrice) || 0,
+        amount: messagePrice||0
+      })
+      setText('')
+      setMsgPrice('')
+      setUploading(false)
+    }
+
     function sendMessage() {
       if (!text) return
+      if (msgPrice){
+        return sendPaidMsg()
+      }
       let contact_id = chat.contact_ids.find(cid => cid !== 1)
       let { price, failureMessage } = calcBotPrice(tribeBots, text)
       if (failureMessage) {
@@ -143,6 +165,13 @@ export default function Foot({ height, messagePrice, tribeBots }) {
     const [showGiphy, setShowGiphy] = useState(false)
     function handleGiphy() {
       setShowGiphy(true)
+    }
+
+    function handlePriceChange(e){
+      let numRegex = /^\d+$/;
+      if(numRegex.test(e.target.value) || e.target.value === ''){
+        setMsgPrice(e.target.value)
+      }
     }
 
     if (ui.showBots) {
@@ -244,9 +273,13 @@ export default function Foot({ height, messagePrice, tribeBots }) {
               if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
             }}
           ></Input>
+          <PriceInput theme={theme}>
+            <div>Price:</div>
+            <PriceAmount onChange={handlePriceChange} value={msgPrice} theme={theme} disabled={!chat}/>
+          </PriceInput>
           <IconButton style={{
             width: 39, height: 39, marginRight: 10, marginLeft: 10, backgroundColor: '#618af8'
-          }} disabled={!chat || !text} onClick={sendMessage}>
+          }} disabled={!chat || !text || uploading} onClick={sendMessage}>
             <SendIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
           </IconButton>
           <IconButton style={{
@@ -259,6 +292,35 @@ export default function Foot({ height, messagePrice, tribeBots }) {
     </Wrap>
   })
 }
+
+const PriceAmount = styled.input`
+  border: none;
+  margin-left: 5px;
+  height: 27px;
+  width: 50px;
+  border-radius: 15px;
+  margin-left: 5px;
+  background-color: ${p => p.theme.lightGreen};
+  cursor: text;
+  text-align: center;
+  outline: none;
+  color: white;
+  font-weight: bold;
+`
+
+const PriceInput = styled.div`
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 115px;
+    height: 42px;
+    background-color: ${p => p.theme.secondary};
+    border-radius: 20px;
+    padding: 0px 15px;
+    margin-left: 10px;
+    
+`
 
 const CloseWrap = styled.div`
     position: absolute;

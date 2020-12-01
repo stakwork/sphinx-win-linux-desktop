@@ -29,6 +29,7 @@ function Chat() {
   const [appMode, setAppMode] = useState(true)
   const [status,setStatus] = useState<RouteStatus>(null)
   const [tribeParams, setTribeParams] = useState(null)
+  const [msgPrice, setMsgPrice] = useState('')
   let footHeight = 65
 
   // function joinEvanTest(){
@@ -98,11 +99,11 @@ function Chat() {
         <Head height={headHeight} appURL={appURL} setAppMode={setAppMode} appMode={appMode} 
           messagePrice={messagePrice} status={status}
         />
-        <ChatContent appMode={appMode} appURL={appURL} footHeight={footHeight} 
-          messagePrice={messagePrice} 
+        <ChatContent msgPrice={msgPrice} setMsgPrice={setMsgPrice} appMode={appMode} appURL={appURL} footHeight={footHeight} 
+           messagePrice={messagePrice} 
         />
-        <Foot height={footHeight} tribeBots={tribeBots}
-          messagePrice={messagePrice}
+        <Foot msgPrice={msgPrice} setMsgPrice={setMsgPrice} height={footHeight} tribeBots={tribeBots}
+           messagePrice={messagePrice}
         />
       </Inner>
       <Pod url={feedURL} chat={chat}
@@ -118,7 +119,7 @@ const Inner = styled.div`
   flex:1;
 `
 
-function ChatContent({ appMode, appURL, footHeight, messagePrice }) {
+function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messagePrice }) {
   const { contacts, ui, chats, meme, msg, user } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
@@ -127,21 +128,22 @@ function ChatContent({ appMode, appURL, footHeight, messagePrice }) {
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
 
+
   async function dropzoneUpload(files) {
     const file = files[0]
     const server = meme.getDefaultServer()
     setUploading(true)
     const r = await uploadFile(file, file.type, server.host, server.token, 'Image.jpg')
-    // console.log('pricePerMessage',pricePerMessage)
     await msg.sendAttachment({
       contact_id: null, chat_id: chat.id,
       muid: r.muid,
       media_key: r.media_key,
       media_type: file.type,
       text: '',
-      price: 0,
+      price: parseInt(msgPrice) || 0,
       amount: messagePrice||0
     })
+    setMsgPrice('')
     setUploading(false)
   }
 
@@ -204,7 +206,7 @@ function ChatContent({ appMode, appURL, footHeight, messagePrice }) {
     }
 
     async function joinTribe (tribeParams) {
-      if (tribeParams) ui.setJoinTribeParams(tribeParams)
+      if (tribeParams) ui.setViewTribe(tribeParams)
     }
 
     return (
