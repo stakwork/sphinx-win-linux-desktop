@@ -7,6 +7,7 @@ import {useTheme} from '../../../store'
 import ClipMessage from './clipMsg'
 import BoostMessage from './boostMsg'
 import BoostRow from './boostRow'
+import TribeMsg from './tribeMsg'
 
 export default function TextMsg(props) {
   const theme = useTheme()
@@ -42,6 +43,12 @@ export default function TextMsg(props) {
   const isBoost = message_content && message_content.startsWith('boost::')
   if(isBoost) {
     return <BoostMessage {...props} />
+  }
+
+  const isTribe = message_content &&
+  message_content.startsWith('sphinx.chat://?action=tribe')
+  if(isTribe) {
+    return <TribeMsg {...props} />
   }
 
   const onLongPressHandler = () => props.onLongPress(props)
