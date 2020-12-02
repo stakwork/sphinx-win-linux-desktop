@@ -182,6 +182,19 @@ function rando() {
   return Math.random().toString(12).substring(0)
 }
 
+export function useMsgSender(m, contactList, isTribe) {
+  let senderAlias = ''
+  const sender = contactList.find(c => c.id === m.sender)
+  let senderPic = !isTribe && (sender && sender.photo_url) || ''
+  if (isTribe) {
+    senderAlias = m.sender_alias
+    if(m.sender_pic) senderPic = m.sender_pic
+  } else {
+    senderAlias = sender && sender.alias
+  }
+  return {senderAlias, senderPic}
+}
+
 export function useParsedClipMsg(message_content: string) {
   const arr = message_content.split('::')
   if (!(arr && arr[1])) return {}

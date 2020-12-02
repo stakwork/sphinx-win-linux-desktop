@@ -3,6 +3,7 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores, hooks, useTheme } from '../../store'
 import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native'
 import { Chat } from '../../store/chats'
+import { useMsgSender } from '../../store/hooks/msg'
 import Message from './msg'
 import { useNavigation } from '@react-navigation/native'
 import { constants } from '../../constants'
@@ -137,15 +138,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApprov
         // }, 200)
       }}
       renderItem={({ item, index }) => {
-        let senderAlias = ''
-        const sender = contacts.contacts.find(c => c.id === item.sender)
-        let senderPic = !isTribe && (sender && sender.photo_url) || ''
-        if (isTribe) {
-          senderAlias = item.sender_alias
-          if(item.sender_pic) senderPic = item.sender_pic
-        } else {
-          senderAlias = sender && sender.alias
-        }
+        const {senderAlias, senderPic} = useMsgSender(item, contacts.contacts, isTribe)
         return <ListItem key={item.id}
           windowWidth={windowWidth}
           // viewable={viewableIds[item.id] === true}
