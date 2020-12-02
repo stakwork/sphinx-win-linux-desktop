@@ -81,7 +81,7 @@ export default function MsgRow(props) {
     marginTop: props.showInfoBar ? 20 : 0
   }}>
     <Avatar alias={props.senderAlias}
-      photo={props.senderPhoto}
+      photo={props.senderPic}
       hide={!props.showInfoBar || isMe}
     />
     <View style={{ display: 'flex', width: w - 40 }}>

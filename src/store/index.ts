@@ -84,7 +84,7 @@ function initAndroid(){
     hydrate('meme', memeStore),
   ]).then(()=> {
     console.log('=> store initialized')
-    uiStore.setReady(true)    
+    uiStore.setReady(true)
     testAsyncStorage()
     hydrateMessageStoreFromRealm()
   })

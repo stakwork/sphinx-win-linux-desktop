@@ -139,9 +139,10 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApprov
       renderItem={({ item, index }) => {
         let senderAlias = ''
         const sender = contacts.contacts.find(c => c.id === item.sender)
-        const senderPhoto = !isTribe && (sender && sender.photo_url) || ''
+        let senderPic = !isTribe && (sender && sender.photo_url) || ''
         if (isTribe) {
           senderAlias = item.sender_alias
+          if(item.sender_pic) senderPic = item.sender_pic
         } else {
           senderAlias = sender && sender.alias
         }
@@ -149,7 +150,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApprov
           windowWidth={windowWidth}
           // viewable={viewableIds[item.id] === true}
           m={item} chat={chat}
-          senderAlias={senderAlias} senderPhoto={senderPhoto}
+          senderAlias={senderAlias} senderPic={senderPic}
           isGroup={isGroup} isTribe={isTribe}
           onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias}
           onApproveOrDenyMember={onApproveOrDenyMember}
@@ -185,7 +186,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPic, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -196,7 +197,7 @@ function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, send
   if (!m.chat) msg.chat = chat
   return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
-    senderAlias={senderAlias} senderPhoto={senderPhoto}
+    senderAlias={senderAlias} senderPic={senderPic}
     onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
     onBoostMsg={onBoostMsg}
