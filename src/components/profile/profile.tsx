@@ -147,6 +147,7 @@ export default function Profile() {
     .then(async (resp) => {
       let json = resp.json()
       if(json.muid){
+        console.log("UPLOADED!!", json.muid)
         setPhotoUrl(`https://${server.host}/public/${json.muid}`)
       }
       setUploading(false)
