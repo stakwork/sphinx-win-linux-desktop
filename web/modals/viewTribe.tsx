@@ -5,13 +5,14 @@ import theme from '../theme'
 import styled from 'styled-components'
 import Button from '../utils/button'
 import { CircularProgress } from '@material-ui/core';
-
+import TextField from '@material-ui/core/TextField';
 
 export default function ViewTribe() {
 
     const { msg, ui, chats } = useStores()
     const tribe = ui.viewTribe
     const [loading, setLoading] = useState(false)
+    const [alias, setAlias] = useState('')
 
     async function joinTribe() {
         setLoading(true)
@@ -25,6 +26,7 @@ export default function ViewTribe() {
             img: tribe.img,
             amount: tribe.price_to_join || 0,
             is_private: tribe.private,
+            ...alias && { my_alias: alias }
         })
         setLoading(false)
         handleClose()
@@ -40,8 +42,6 @@ export default function ViewTribe() {
 
     const alreadyJoined = chats.chats.find(c => c.uuid === tribe.uuid)
 
-    console.log(tribe)
-
     if (!tribe) {
         return <div></div>
     }
@@ -52,7 +52,7 @@ export default function ViewTribe() {
     >
         <Content bg={theme.bg}>
             <Header>JOIN TRIBE</Header>
-                <Image style={{ backgroundImage: `url(${tribe.img})` }}></Image>
+            <Image style={{ backgroundImage: `url(${tribe.img})` }}></Image>
             <Title>{tribe.name}</Title>
             <Description grey={theme.greyText}>{tribe.description}</Description>
             <Details grey={theme.greyText}>
@@ -64,20 +64,28 @@ export default function ViewTribe() {
                     <RowContent>{millisToHours(tribe.escrow_millis)}</RowContent>
                 </DetailRow>
             </Details>
+            {!alreadyJoined && <AliasWrap>
+                <TextField variant="outlined" style={{ marginBottom: 5, width: '100%' }}
+                    label="My Name for this Tribe" type="text" value={alias}
+                    inputProps={{ style: { textAlign: 'center' } }}
+                    onChange={(e) => setAlias(e.target.value)}
+                />
+            </AliasWrap>}
             {alreadyJoined ?
-                <Button color={'secondary'} style={{marginTop: 20}}
-                onClick={async ()=> {
-                    console.log("SELECTD THIS CHAT",alreadyJoined)
-                    msg.seeChat(alreadyJoined.id)
-                    ui.setSelectedChat(alreadyJoined)
-                    ui.toggleBots(false)
-                    chats.checkRoute(alreadyJoined.id)
-                    handleClose()
-                  }}>
-                      Already Joined!</Button> :
+                <Button color={'secondary'} style={{ marginTop: 20 }}
+                    onClick={async () => {
+                        console.log("SELECTD THIS CHAT", alreadyJoined)
+                        msg.seeChat(alreadyJoined.id)
+                        ui.setSelectedChat(alreadyJoined)
+                        ui.toggleBots(false)
+                        chats.checkRoute(alreadyJoined.id)
+                        handleClose()
+                    }}>
+                    Already Joined!
+                </Button> :
 
-                <Button disabled={loading} onClick={joinTribe} color={'primary'} style={{marginTop: 20}}>
-                    {loading && <CircularProgress size={14}/>} Join Tribe
+                <Button disabled={loading} onClick={joinTribe} color={'primary'} style={{ marginTop: 20 }}>
+                    {loading && <CircularProgress size={14} />} Join Tribe
                 </Button>
             }
 
@@ -156,4 +164,8 @@ const RowTitle = styled.div`
 
 const RowContent = styled.div`
     color: ${p => p.grey};
+`
+
+const AliasWrap = styled.div`
+    width: 80%;
 `

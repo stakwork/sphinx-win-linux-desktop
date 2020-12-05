@@ -49,11 +49,12 @@ export default function TribeMessage(props) {
   </View>
   if (!(tribe && tribe.uuid)) return <View style={styles.wrap}>Could not load tribe...</View>
 
+  const hasImg = tribe.img?true:false
   return <View style={{ ...styles.wrap }}>
     <View style={styles.tribeWrap}>
-      {tribe.img && <FastImage source={{uri:tribe.img}} resizeMode={FastImage.resizeMode.cover} 
+      <FastImage source={hasImg?{uri:tribe.img}:require('../../../../android_assets/tent.png')} resizeMode={FastImage.resizeMode.cover} 
         style={{width:70,height:70,flexShrink:0,minWidth:75}}
-      />}
+      />
       <View style={styles.tribeText}>
         <Text style={{...styles.tribeName,color:theme.title}}
           numberOfLines={1}>

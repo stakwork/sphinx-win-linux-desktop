@@ -176,9 +176,13 @@ export class ChatStore {
   }
 
   @action
-  async joinTribe({ name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private }) {
+  async joinTribe({ 
+    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias 
+  } : {
+    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string
+  }) {
     const r = await relay.post('tribe', {
-      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private,
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias
     })
     if (!r) return
     this.gotChat(r)
@@ -200,7 +204,7 @@ export class ChatStore {
       uuid: params.uuid,
       img: params.img,
       amount: params.price_to_join || 0,
-      is_private: params.private
+      is_private: params.private,
     })
   }
 

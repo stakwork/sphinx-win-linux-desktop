@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, useTheme } from '../../store'
-import {View, Text, StyleSheet, Image} from 'react-native'
-import {Button, Portal} from 'react-native-paper'
+import {View, Text, StyleSheet, Image, Dimensions} from 'react-native'
+import {Button, Portal, TextInput} from 'react-native-paper'
 import ModalWrap from './modalWrap'
 import Header from './modalHeader'
 
@@ -10,6 +10,8 @@ export default function JoinTribe({visible}) {
   const { ui, chats } = useStores()
   const theme = useTheme()
   const [loading,setLoading] = useState(false)
+  const [alias,setAlias] = useState('')
+  const [key,setKey] = useState(false)
 
   function close(){
     ui.setJoinTribeParams(null)
@@ -28,6 +30,7 @@ export default function JoinTribe({visible}) {
       img: params.img,
       amount:params.price_to_join||0,
       is_private:params.private,
+      ...alias && {my_alias:alias},
     })
     setLoading(false)
     close()
@@ -42,14 +45,17 @@ export default function JoinTribe({visible}) {
     ]
   }
 
+  const h = Dimensions.get('screen').height
+
+  const hasImg = params&&params.img?true:false
   return useObserver(() => <ModalWrap onClose={close} visible={visible}>
     <Portal.Host>
       <Header title="Join Group" onClose={()=>close()} />
 
       {params && <View style={styles.content}>
-        {params.img.length>0 ? <Image source={{uri:params.img}} 
+        <Image source={hasImg?{uri:params.img}:require('../../../android_assets/tent.png')} 
           style={{width:150,height:150,borderRadius:75,marginTop:15}} resizeMode={'cover'}
-        /> : <View style={{height:150}} />}
+        />
 
         <Text style={{marginTop:15,fontWeight:'bold',fontSize:22,color:theme.title}}>
           {params.name}
@@ -59,7 +65,7 @@ export default function JoinTribe({visible}) {
           {params.description}
         </Text>
 
-        <View style={styles.table}>
+        {!key && <View style={styles.table}>
           {prices && prices.map((p,i)=>{
             return <View key={i} style={{...styles.tableRow,borderBottomWidth:i===prices.length-1?0:1}}>
               <Text style={{...styles.tableRowLabel,color:theme.title}}>
@@ -70,10 +76,19 @@ export default function JoinTribe({visible}) {
               </Text>
             </View>
           })}
-        </View>
+        </View>}
+
+        <TextInput mode="outlined"
+          placeholder="Your Name in this Tribe"
+          onChangeText={e=> setAlias(e)}
+          value={alias}
+          style={styles.input}
+          onFocus={()=> setKey(true)}
+          onBlur={()=> setKey(false)}
+        />
 
         <Button onPress={joinTribe} mode="contained"
-          dark={true} style={styles.button} loading={loading}>
+          dark={true} style={{...styles.button,top:h-250}} loading={loading}>
           Join Group
         </Button>
       </View>}
@@ -99,13 +114,13 @@ const styles = StyleSheet.create({
     display:'flex',
     justifyContent:'center',
     position:'absolute',
-    bottom:35,
   },
   table:{
     borderWidth:1,
     borderColor:'#ccc',
     borderRadius:5,
     marginTop:15,
+    width:240
   },
   tableRow:{
     borderBottomWidth:1,
@@ -125,7 +140,12 @@ const styles = StyleSheet.create({
     fontWeight:'bold',
     display:'flex',
     alignItems:'center',
-    minWidth:42,
-    textAlign:'center'
+    minWidth:62,
+    textAlign:'right'
+  },
+  input:{
+    maxHeight:65,
+    marginTop:15,
+    minWidth:240
   }
 })

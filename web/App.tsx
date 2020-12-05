@@ -15,10 +15,12 @@ import Chat from './chat/chat'
 import * as localForage from 'localforage'
 import Modals from './modals'
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { PaletteType } from '@material-ui/core';
 import 'react-h5-audio-player/lib/styles.css';
 import EE, {RESET_IP, RESET_IP_FINISHED} from './utils/ee'
 
 const palette = {
+  type: 'dark' as PaletteType,
   primary: {
     main: theme.primary
   },
@@ -26,7 +28,7 @@ const palette = {
     main: theme.secondary
   },
   action: {
-      disabledBackground: theme.disabledPrimary,
+    disabledBackground: theme.disabledPrimary,
   }
 }
 
