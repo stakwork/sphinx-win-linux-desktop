@@ -32,7 +32,7 @@ function Media({data,type}){
     return <Player autoPlay fluid={false} height="100%" width="100%">
       <source 
         src={data}
-        type={type==='video/mov'?'video/mp4':type}
+        type={type==='video/mov'||type==='video/quicktime'?'video/mp4':type}
       />
     </Player>
   }

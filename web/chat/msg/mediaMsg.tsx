@@ -131,7 +131,7 @@ function Media({ type, data, onClick, filename }) {
     return <VidWrap>
       <Player><source
         src={data}
-        type={type === 'video/mov' ? 'video/mp4' : type}
+        type={type === 'video/mov'||type==='video/quicktime' ? 'video/mp4' : type}
       /></Player>
       <PlayArrow onClick={onClick}>
         <PlayArrowIcon style={{ fontSize: 34 }} />

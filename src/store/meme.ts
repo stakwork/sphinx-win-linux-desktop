@@ -3,6 +3,7 @@ import { relay, composeAPI } from '../api'
 import { persist } from 'mobx-persist'
 import { userStore } from './user'
 import moment from 'moment'
+import * as localForage from 'localforage'
 
 export interface Server {
   host: string
@@ -68,7 +69,8 @@ class MemeStore {
   @persist('object') @observable cacheTS: { [k: string]: number } = {}
   @persist('object') @observable cacheFileName: { [k: string]: string } = {}
   @action addToCache(muid: string, data: string, filename?: string) {
-    this.cache[muid] = data
+    // this.cache[muid] = data
+    localForage.setItem(muid, data)
     this.cacheTS[muid] = moment().unix()
     if (filename) this.cacheFileName[muid] = filename
   }
