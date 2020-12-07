@@ -66,6 +66,8 @@ export default function Profile() {
     setCopied(false)
   }
 
+  console.log(me.public_key)
+
   return <Modal
     open={true}
     onClose={handleCloseModal}
