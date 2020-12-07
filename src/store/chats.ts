@@ -179,12 +179,12 @@ export class ChatStore {
 
   @action
   async joinTribe({ 
-    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias 
+    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias, my_photo_url,
   } : {
-    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string
+    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string, my_photo_url?:string,
   }) {
     const r = await relay.post('tribe', {
-      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias:my_alias||'', my_photo_url:my_photo_url||''
     })
     if (!r) return
     this.gotChat(r)

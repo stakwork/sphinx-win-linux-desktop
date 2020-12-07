@@ -132,7 +132,17 @@ ipcMain.on('upload-file', async (event, args) => {
         // args.host is string
         // args.token is string (the auth token for meme server)
         // args.filename is string
-        const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename)
+        const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, false)
+        event.reply(args.rid, res)
+    } catch(e) {
+        console.log(e)
+    }
+})
+
+ipcMain.on('upload-public-file', async (event, args) => {
+    try {
+        if(!args.rid) return
+        const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, true)
         event.reply(args.rid, res)
     } catch(e) {
         console.log(e)
