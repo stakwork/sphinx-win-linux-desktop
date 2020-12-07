@@ -54,7 +54,7 @@ export default function AddFriend({visible}) {
       <FadeView opacity={addContact?1:0} style={styles.content}>
         <View style={styles.former} accessibilityLabel="add-friend-form-wrap">
           <Form schema={contact} loading={loading} 
-            buttonAccessibilityLabel="add-friend-form-button"
+            // buttonAccessibilityLabel="add-friend-form-button"
             buttonText="Save to Contacts"
             onSubmit={async (values)=> {
               setLoading(true)

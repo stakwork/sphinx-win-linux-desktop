@@ -137,6 +137,8 @@ export class ChatStore {
 
   @action
   async createTribe({ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url }) {
+    console.log('======>',{ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url })
+    await sleep(1);
     const r = await relay.post('group', {
       name, description, tags: tags || [],
       is_tribe: true, is_listed: true,
@@ -325,3 +327,8 @@ export class ChatStore {
 }
 
 export const chatStore = new ChatStore()
+
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
