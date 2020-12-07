@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {useStores} from '../../../src/store'
 import * as aes from '../../crypto/aes'
+import * as localForage from 'localforage'
 
 export function useCachedEncryptedFile(props, ldat){
   const {meme} = useStores()
@@ -27,7 +28,7 @@ export function useCachedEncryptedFile(props, ldat){
 
     // check if cached
     if(meme.checkCacheEnabled) {
-      const dat = meme.cache[ldat.muid]
+      const dat: string = await localForage.getItem(ldat.muid)
       const fn = meme.cacheFileName[ldat.muid]
       if(fn) setFileName(fn)
       if(dat) {
