@@ -39,6 +39,7 @@ export interface Msg {
   created_at: string
   updated_at: string
   sender_alias: string
+  sender_pic: string
 
   original_muid: string
   reply_uuid: string

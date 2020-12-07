@@ -7,6 +7,7 @@ import {useTheme} from '../../../store'
 import ClipMessage from './clipMsg'
 import BoostMessage from './boostMsg'
 import BoostRow from './boostRow'
+import TribeMsg from './tribeMsg'
 
 export default function TextMsg(props) {
   const theme = useTheme()
@@ -19,17 +20,20 @@ export default function TextMsg(props) {
 
   const showBoostRow = props.boosts_total_sats?true:false
 
+  const onLongPressHandler = () => props.onLongPress(props)
+  
   const isGiphy = message_content && message_content.startsWith('giphy::')
   if (isGiphy) {
     const { url, aspectRatio, text } = useParsedGiphyMsg(message_content)
-    return <View style={{...styles.column, maxWidth:200}}>
+    return <TouchableOpacity style={{...styles.column, maxWidth:200}}
+      onLongPress={onLongPressHandler}>
       <Image source={{ uri: url }}
         style={{ width: 200, height: 200 / (aspectRatio||1) }} 
         resizeMode={'cover'}
       />
       {(text?true:false) && <Text style={{...styles.textPad,color:theme.title}}>{text}</Text>}
       {showBoostRow && <BoostRow {...props} myAlias={props.myAlias} pad marginTop={14} />}
-    </View>
+    </TouchableOpacity>
   }
 
   const isClip = message_content && message_content.startsWith('clip::')
@@ -44,7 +48,11 @@ export default function TextMsg(props) {
     return <BoostMessage {...props} />
   }
 
-  const onLongPressHandler = () => props.onLongPress(props)
+  const isTribe = message_content &&
+  message_content.startsWith('sphinx.chat://?action=tribe')
+  if(isTribe) {
+    return <TribeMsg {...props} />
+  }
   
   return <TouchableOpacity style={isLink ? { width: 280, paddingLeft: 7, minHeight: 72 } : shared.innerPad}
     onLongPress={onLongPressHandler}>

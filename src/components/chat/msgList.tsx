@@ -3,6 +3,7 @@ import { useObserver } from 'mobx-react-lite'
 import { useStores, hooks, useTheme } from '../../store'
 import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native'
 import { Chat } from '../../store/chats'
+import { useMsgSender } from '../../store/hooks/msg'
 import Message from './msg'
 import { useNavigation } from '@react-navigation/native'
 import { constants } from '../../constants'
@@ -137,19 +138,12 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApprov
         // }, 200)
       }}
       renderItem={({ item, index }) => {
-        let senderAlias = ''
-        const sender = contacts.contacts.find(c => c.id === item.sender)
-        const senderPhoto = !isTribe && (sender && sender.photo_url) || ''
-        if (isTribe) {
-          senderAlias = item.sender_alias
-        } else {
-          senderAlias = sender && sender.alias
-        }
+        const {senderAlias, senderPic} = useMsgSender(item, contacts.contacts, isTribe)
         return <ListItem key={item.id}
           windowWidth={windowWidth}
           // viewable={viewableIds[item.id] === true}
           m={item} chat={chat}
-          senderAlias={senderAlias} senderPhoto={senderPhoto}
+          senderAlias={senderAlias} senderPic={senderPic}
           isGroup={isGroup} isTribe={isTribe}
           onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias}
           onApproveOrDenyMember={onApproveOrDenyMember}
@@ -185,7 +179,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPhoto, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPic, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -196,7 +190,7 @@ function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, send
   if (!m.chat) msg.chat = chat
   return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
-    senderAlias={senderAlias} senderPhoto={senderPhoto}
+    senderAlias={senderAlias} senderPic={senderPic}
     onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
     onBoostMsg={onBoostMsg}

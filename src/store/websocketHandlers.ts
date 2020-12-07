@@ -23,7 +23,7 @@ export function invoice_payment(data) {
 /* sphinx types */
 
 export function message(data) {
-  log('[ws] message', data)
+  log('[ws] message', data.response)
   msgStore.gotNewMessageFromWS(data.response)
 }
 

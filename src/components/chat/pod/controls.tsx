@@ -76,6 +76,8 @@ export default function Controls(props) {
 
   const { theme, onToggle, playing, duration } = props
 
+  const ratez = ['0.5', '0.8', '1', '1.2', '1.5', '2.1']
+
   // @ts-ignore
   const progressText = moment.duration(pos, 'seconds').format('hh:mm:ss')
   // @ts-ignore
@@ -113,7 +115,7 @@ export default function Controls(props) {
 
       {selectSpeed && <View style={styles.selectSpeed}>
         <View style={styles.selectSpeedInner}>
-          {['0.5', '0.8', '1', '1.2', '1.5', '2'].map(s => {
+          {ratez.map(s => {
             return <TouchableOpacity key={s} onPress={() => doSelectSpeed(s)}
               style={{ ...styles.speedBubble, backgroundColor: s === props.speed ? theme.primary : theme.deep }}>
               <Text style={{ color: theme.title, fontSize: 11 }}>{`${s}x`}</Text>
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
   },
   speedBubble: {
     width: 36, height: 26,
-    borderRadius: 10,
+    borderRadius: 7,
     marginLeft: 3,
     marginRight: 3,
     display: 'flex',

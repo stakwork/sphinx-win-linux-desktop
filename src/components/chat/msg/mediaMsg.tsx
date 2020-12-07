@@ -95,10 +95,12 @@ export default function MediaMsg(props) {
     if (!purchased) buy(amt)
   }
 
+  const onLongPressHandler = () => props.onLongPress(props)
+
   return <View collapsable={false}>
     <TouchableOpacity style={{ ...styles.wrap, minHeight: wrapHeight }}
       //onPressIn={tap} onPressOut={untap}
-      // onLongPress={()=>longPress()}
+      onLongPress={onLongPressHandler}
       onPress={press}
       activeOpacity={0.65}>
 

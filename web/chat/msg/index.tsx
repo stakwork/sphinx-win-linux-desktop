@@ -33,7 +33,7 @@ export default function Msg(props) {
 
   return <MsgRow showInfoBar={props.showInfoBar}>
     <Avatar alias={props.senderAlias}
-      photo={props.senderPhoto}
+      photo={props.senderPic}
       hide={!props.showInfoBar || isMe}
     />
     <InnerBox>

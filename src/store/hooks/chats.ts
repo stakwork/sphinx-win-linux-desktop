@@ -41,6 +41,7 @@ function lastMessageText(msg){
     if(msg.message_content.startsWith('giphy::')) return 'GIF '+verb
     if(msg.message_content.startsWith('clip::')) return 'Clip '+verb
     if(msg.message_content.startsWith('boost::')) return 'Boost '+verb
+    if(msg.message_content.startsWith('sphinx.chat://?action=tribe')) return 'Tribe Link '+verb
     if(msg.message_content.startsWith('https://jitsi.sphinx.chat/')) return 'Join Call'
     return msg.message_content
   }

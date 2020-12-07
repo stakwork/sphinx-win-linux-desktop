@@ -15,6 +15,7 @@ import { uploadFile } from '../utils/meme'
 import Bots from './bots'
 import MsgMenu from './msgMenu'
 import {useHasReplyContent} from '../../src/store/hooks/chat'
+import {useMsgSender} from '../../src/store/hooks/msg'
 import Pod from './pod'
 import {StreamPayment} from '../../src/store/feed'
 import Anim from './anim'
@@ -128,7 +129,6 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
 
-
   async function dropzoneUpload(files) {
     const file = files[0]
     const server = meme.getDefaultServer()
@@ -224,19 +224,12 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
 
                 <MsgList className="msg-list" onScroll={handleScroll} id='chat-content'>
                   {shownMsgs.map((m, i) => {
-                    let senderAlias = ''
-                    const sender = contacts.contacts.find(c => c.id === m.sender)
-                    const senderPhoto = !isTribe && (sender && sender.photo_url) || ''
-                    if (isTribe) {
-                      senderAlias = m.sender_alias
-                    } else {
-                      senderAlias = sender && sender.alias
-                    }
+                    const {senderAlias, senderPic} = useMsgSender(m, contacts.contacts, isTribe)
                     if (m.dateLine) {
                       return <DateLine key={'date' + i} dateString={m.dateLine} />
                     }
                     if(!m.chat) m.chat = chat
-                    return <Msg joinTribe={joinTribe} key={m.id} {...m} senderAlias={senderAlias} senderPhoto={senderPhoto} 
+                    return <Msg joinTribe={joinTribe} key={m.id} {...m} senderAlias={senderAlias} senderPic={senderPic} 
                       handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
                       onCopy={onCopy}
                     />

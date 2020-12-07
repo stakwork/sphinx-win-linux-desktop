@@ -60,8 +60,11 @@ export default function AudioPlayer({ url, clickBoost, clickMsg, onPlay, onRewin
     </Top>
     {rateSelect ?
       <RateSelect>
-        {rateChoices.map((r) => 
-          <RateBox style={{background: r===rateChoice && '#3d6189'}} onClick={()=>HandleRateChange(r)} >{r}x</RateBox>
+        {rateChoices.map((r) => <RateBox key={r+''}
+          style={{background: r===rateChoice && '#3d6189'}} 
+          onClick={()=>HandleRateChange(r)} >
+            {r}x
+          </RateBox>
         )}
       </RateSelect> :
       <RateDisplay onClick={()=>setRateSelect(true)}>{rateChoice}x</RateDisplay>}

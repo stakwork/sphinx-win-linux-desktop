@@ -5,74 +5,71 @@ import Button from '../../utils/button'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+interface Tribe {
+  name: string,
+  description: string,
+  img: string,
+  uuid: string
+}
 
 export default function TribeMsg(props) {
+  const { ui, chats, msg } = useStores()
+  const [tribe, setTribe] = useState<Tribe>()
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [alreadyJoined, setAlreadyJoined] = useState<any>()
 
-    interface Tribe {
-        name: string,
-        description: string,
-        img: string,
-        uuid: string
+  async function loadTribe() {
+    const p = new URLSearchParams(props.message_content)
+    const tribeParams = await getTribeDetails(p.get('host'), p.get('uuid'))
+    if (tribeParams) { setTribe(tribeParams) }
+    else { setError('Could not load Tribe.') }
+    if (tribeParams) {
+      const AJ = chats.chats.find(c => c.uuid === tribeParams.uuid)
+      if (AJ) setAlreadyJoined(AJ)
     }
+    setLoading(false)
+  }
 
-    const { ui, chats, msg } = useStores()
-    const [tribe, setTribe] = useState<Tribe>()
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(true)
-    const [alreadyJoined, setAlreadyJoined] = useState<any>()
+  useEffect(() => {
+    loadTribe()
+  }, [])
 
-    async function loadTribe() {
-        const p = new URLSearchParams(props.message_content)
-        const tribeParams = await getTribeDetails(p.get('host'), p.get('uuid'))
-        if (tribeParams) { setTribe(tribeParams) }
-        else { setError('Could not load Tribe.') }
-        if(tribe) { 
-            const AJ = chats.chats.find(c => c.uuid === tribe.uuid)
-            if(AJ) setAlreadyJoined(AJ)
-        }
-        setLoading(false)
-    }
-    
-    useEffect(() => {
-        loadTribe()
-    }, [])
-
-    if (loading) return <Wrap><CircularProgress /></Wrap>
-    if (!tribe.uuid) return <Wrap>Could not load tribe...</Wrap>
-    return <Wrap>
-        <TribeWrap>
-            <TribeImage style={{ backgroundImage: `url(${tribe.img})` }} />
-            <Text>
-                <TribeName>
-                    {tribe.name}
-                </TribeName>
-                <TribeInfo>
-                    {tribe.description}
-                </TribeInfo>
-            </Text>
-        </TribeWrap>
-        <ButtonWrap>
-            <Button onClick={alreadyJoined ? 
-            async ()=> {
-                console.log("SELECTD THIS CHAT",alreadyJoined)
-                msg.seeChat(alreadyJoined.id)
-                ui.setSelectedChat(alreadyJoined)
-                ui.toggleBots(false)
-                chats.checkRoute(alreadyJoined.id)
-              } :
-              ()=>props.joinTribe(tribe)
-              } 
-              color={alreadyJoined ? 'secondary' : 'primary'}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 15 }}>
-                <Row>
-                    See Tribe
+  if (loading) return <Wrap><CircularProgress /></Wrap>
+  if (!(tribe && tribe.uuid)) return <Wrap>Could not load tribe...</Wrap>
+  return <Wrap>
+    <TribeWrap>
+      <TribeImage style={{ backgroundImage: `url(${tribe.img})` }} />
+      <Text>
+        <TribeName>
+          {tribe.name}
+        </TribeName>
+        <TribeInfo>
+          {tribe.description}
+        </TribeInfo>
+      </Text>
+    </TribeWrap>
+    <ButtonWrap>
+      <Button onClick={alreadyJoined ?
+        async () => {
+          console.log("SELECTD THIS CHAT", alreadyJoined)
+          msg.seeChat(alreadyJoined.id)
+          ui.setSelectedChat(alreadyJoined)
+          chats.checkRoute(alreadyJoined.id)
+        } :
+        () => props.joinTribe(tribe)
+      }
+        color={alreadyJoined ? 'secondary' : 'primary'}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 15 }}>
+        <Row>
+          See Tribe
             <ArrowForwardIcon style={{ marginLeft: 10 }} />
-                </Row>
-            </Button>
-        </ButtonWrap>
+        </Row>
+      </Button>
+    </ButtonWrap>
 
 
-    </Wrap>
+  </Wrap>
 
 }
 
@@ -98,7 +95,7 @@ const Wrap = styled.div`
 `
 
 const TribeWrap = styled.div`
-      display: flex;
+  display: flex;
   justify-content: center;
   flex-direction: row;
 `
@@ -132,21 +129,21 @@ const TribeInfo = styled.div`
 `
 
 async function getTribeDetails(host: string, uuid: string) {
-    if (!host || !uuid) return
-    const theHost = host.includes('localhost') ? 'tribes.sphinx.chat' : host
-    try {
-        const r = await fetch(`https://${theHost}/tribes/${uuid}`)
-        const j = await r.json()
-        if (j.bots) {
-            try {
-                const bots = JSON.parse(j.bots)
-                j.bots = bots
-            } catch (e) {
-                j.bots = []
-            }
-        }
-        return j
-    } catch (e) {
-        console.log(e)
+  if (!host || !uuid) return
+  const theHost = host.includes('localhost') ? 'tribes.sphinx.chat' : host
+  try {
+    const r = await fetch(`https://${theHost}/tribes/${uuid}`)
+    const j = await r.json()
+    if (j.bots) {
+      try {
+        const bots = JSON.parse(j.bots)
+        j.bots = bots
+      } catch (e) {
+        j.bots = []
+      }
     }
+    return j
+  } catch (e) {
+    console.log(e)
+  }
 }
