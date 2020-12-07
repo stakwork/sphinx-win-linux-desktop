@@ -25,19 +25,20 @@ import ReactGiphySearchbox from 'react-giphy-searchbox'
 
 export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsgPrice }) {
   const { ui, msg, meme, details, contacts } = useStores()
-  const [text, setText] = useState('')
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
   const [uploading, setUploading] = useState(false)
 
   return useObserver(() => {
     const chat = ui.selectedChat
+    let text = (chat ? ui.tribeText[chat.id] : "") || ""
 
     useEffect(() => {
       if (recording) {
         setRecord(true)
       }
     }, [recording])
+
 
     async function sendGif(amount: number){
       const params = ui.imgViewerParams
@@ -56,7 +57,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
         amount: amount || 0,
       })
       ui.setImgViewerParams(null)
-      setText('')
+      ui.setTribeText(chat.id, "")
     }
 
     async function sendPaidMsg(){
@@ -73,7 +74,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
         price: parseInt(msgPrice) || 0,
         amount: messagePrice||0
       })
-      setText('')
+      ui.setTribeText(chat.id, "")
       setMsgPrice('')
       setUploading(false)
     }
@@ -108,7 +109,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
         amount: (messagePrice + price) || 0, // 5, // CHANGE THIS
         reply_uuid: ui.replyUUID || ''
       })
-      setText('')
+      ui.setTribeText(chat.id, "")
       if (ui.replyUUID) ui.setReplyUUID('')
       if (ui.extraTextContent) ui.setExtraTextContent(null)
     }
@@ -264,9 +265,9 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
               horizontal: 'left',
             }}
           >
-            <Picker showPreview={false} showSkinTones={false} onSelect={emoji => setText(text + emoji.native)} />
+            <Picker showPreview={false} showSkinTones={false} onSelect={emoji => ui.setTribeText(chat.id, text + emoji.native)} />
           </Popover>
-          <Input value={text} onChange={e => setText(e.target.value)}
+          <Input value={text} onChange={e => ui.setTribeText(chat.id, e.target.value)}
             placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
             disabled={!chat}
             onKeyPress={e => {
