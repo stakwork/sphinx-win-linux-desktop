@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { useParsedClipMsg } from '../../../store/hooks/msg'
+import { useParsedJsonOrClipMsg } from '../../../store/hooks/msg'
 import { useTheme } from '../../../store'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import CustomIcon from '../../utils/customIcons'
@@ -9,7 +9,7 @@ export default function BoostMessage(props) {
   const theme = useTheme()
   const { message_content } = props
 
-  const obj = useParsedClipMsg(message_content)
+  const obj = useParsedJsonOrClipMsg(message_content)
   const { ts, feedID, itemID, amount } = obj
 
   return <View style={{ ...styles.pad }}>

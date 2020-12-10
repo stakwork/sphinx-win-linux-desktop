@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, useTheme } from '../../../store'
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native'
-import { Portal, IconButton, Button, Dialog } from 'react-native-paper'
+import { Portal, IconButton, Button, Dialog, TextInput } from 'react-native-paper'
 import ModalWrap from '../modalWrap'
 import Header from './header'
 import FadeView from '../../utils/fadeView'
@@ -27,6 +27,14 @@ export default function GroupInfo({ visible }) {
   const [loadingTribe, setLoadingTribe] = useState(false)
   
   const group = ui.groupModalParams
+
+  const [alias,setAlias] = useState((group&&group['my_alias'])||'')
+  function maybeUpdateAlias(){
+    if(!(group&&group.id)) return
+    if(alias!==group['my_alias']) {
+      chats.updateMyInfoInChat(group.id, alias, '')
+    }
+  }
 
   let initppm = chats.pricesPerMinute[group.id]
   if(!(initppm||initppm===0)) initppm = group.pricePerMinute||5
@@ -206,6 +214,18 @@ export default function GroupInfo({ visible }) {
             />
           </View>}
 
+          <View style={styles.inputWrap}>
+            <Text style={{...styles.inputLabel,color:theme.subtitle}}>My Name in this tribe</Text>
+            <TextInput mode="outlined"
+              placeholder="Your Name in this Tribe"
+              onChangeText={e=> setAlias(e)}
+              value={alias}
+              style={styles.input}
+              // onFocus={()=> setKey(true)}
+              onBlur={maybeUpdateAlias}
+            />
+          </View>
+
           {(!isTribe || isTribeAdmin) && <View style={styles.members}>
             {contactsToShow && contactsToShow.length > 0 && <>
               <Text style={styles.membersTitle}>GROUP MEMBERS</Text>
@@ -378,6 +398,17 @@ const styles = StyleSheet.create({
   slideValue:{
     fontSize:15,
     fontWeight:'bold'
+  },
+  inputWrap:{
+    display:'flex',
+    marginTop:15,
+  },
+  inputLabel:{
+    fontSize:11
+  },
+  input:{
+    maxHeight:55,
+    minWidth:240
   }
 })
 

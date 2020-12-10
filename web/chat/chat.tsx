@@ -52,14 +52,17 @@ function Chat() {
     if (useHasReplyContent()) footHeight = 120
     const chat = ui.selectedChat
 
-    function onBoost(sp:StreamPayment){
+    // this the boost MESSAGE (doesnt actually include the boost amount),
+    // the actual boost amount is sent by feed.sendPayments by the podcast XML
+    function onBoostPod(sp:StreamPayment){
       if(!(chat&&chat.id)) return
       msg.sendMessage({
         contact_id:null,
-        text:`boost::${JSON.stringify(sp)}`,
+        text:`${JSON.stringify(sp)}`,
         chat_id: chat.id||null,
         amount: messagePrice,
-        reply_uuid:''
+        reply_uuid:'', // not replying
+        boost:true
       })
     }
 
@@ -108,7 +111,7 @@ function Chat() {
         />
       </Inner>
       <Pod url={feedURL} chat={chat}
-        onBoost={onBoost}
+        onBoost={onBoostPod}
       />
     </Section>
   })
@@ -147,6 +150,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
     setUploading(false)
   }
 
+  // boost an existing message
   function onMessageBoost(uuid){
     if(!uuid) return
     const amount = (user.tipAmount||100) + messagePrice

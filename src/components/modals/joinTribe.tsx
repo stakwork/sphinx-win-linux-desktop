@@ -78,14 +78,14 @@ export default function JoinTribe({visible}) {
           })}
         </View>}
 
-        {/* <TextInput mode="outlined"
+        <TextInput mode="outlined"
           placeholder="Your Name in this Tribe"
           onChangeText={e=> setAlias(e)}
           value={alias}
           style={styles.input}
           onFocus={()=> setKey(true)}
           onBlur={()=> setKey(false)}
-        /> */}
+        />
 
         <Button onPress={joinTribe} mode="contained"
           dark={true} style={{...styles.button,top:h-250}} loading={loading}>

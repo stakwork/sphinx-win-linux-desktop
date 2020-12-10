@@ -17,6 +17,7 @@ import Avatar from './avatar'
 import MemberRequest from './memberRequest'
 import Clipboard from "@react-native-community/clipboard";
 import BotResMsg from './botResMsg'
+import BoostMsg from './boostMsg'
 import Popover from 'react-native-popover-view';
 import {useTheme} from '../../../store'
 import EE, {CANCEL_REPLY_UUID, CLEAR_REPLY_UUID, REPLY_UUID} from '../../utils/ee'
@@ -214,6 +215,8 @@ function Message(props) {
       return <TextMsg {...props} />
     case 'bot_res':
       return <BotResMsg {...props} />
+    case 'boost':
+      return <BoostMsg {...props} />
     default:
       return <></>
   }

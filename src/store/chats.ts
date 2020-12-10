@@ -50,6 +50,8 @@ export interface Chat {
   pricePerMinute: number // for setting in group modal
 
   meta: {[k:string]:any}
+  my_alias: string
+  my_photo_url: string
 }
 
 export interface TribeServer {
@@ -230,6 +232,20 @@ export class ChatStore {
     if (r === true) { // success
       const chat = this.chats.find(c => c.id === chatID)
       if (chat) chat.contact_ids = chat.contact_ids.filter(cid => cid !== contactID)
+    }
+  }
+
+  @action
+  async updateMyInfoInChat(tribeID: number, my_alias: string, my_photo_url: string) {
+    const r = await relay.put(`chats/${tribeID}`, { my_alias, my_photo_url })
+    if (r) {
+      const cs = [...this.chats]
+      this.chats = cs.map(c => {
+        if (c.id === tribeID) {
+          return { ...c, my_alias, my_photo_url }
+        }
+        return c
+      })
     }
   }
 

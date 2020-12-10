@@ -60,7 +60,6 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
         const contact = contacts.contacts.find(c => c.id === cid)
         ui.setViewContact(contact)
       }
-
     }
 
     return <Wrap style={{ background: theme.bg, height }}>

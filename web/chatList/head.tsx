@@ -24,7 +24,7 @@ export default function Head({ setWidth, width }) {
     await Promise.all([
       contacts.getContacts(),
       details.getBalance(),
-      msg.getMessages(),
+      msg.getMessages(true),
       // chats.getChats(),
     ])
     setRefreshing(false)
