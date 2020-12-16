@@ -23,7 +23,7 @@ import {getPinTimeout,updatePinTimeout} from '../utils/pin'
 import Slider from '@react-native-community/slider';
 
 export default function Profile() {
-  const { details, user, contacts, meme } = useStores()
+  const { details, user, contacts, meme, ui } = useStores()
   const theme = useTheme()
   const [uploading, setUploading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
