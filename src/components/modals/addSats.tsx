@@ -37,12 +37,9 @@ export default function AddSats({ visible }) {
 
 function Apps({selectApp}) {
   const theme = useTheme()
-  function openLink(url){
-    Linking.openURL(url)
-  }
   return <View style={styles.appsWrap}>
     {apps.map(app=>{
-      return <TouchableOpacity style={{...styles.appWrap,borderColor:theme.border,backgroundColor:theme.main}}
+      return <TouchableOpacity key={app.name} style={{...styles.appWrap,borderColor:theme.border,backgroundColor:theme.main}}
         onPress={()=>selectApp(app)}>
         <FastImage source={app.img} 
           style={{height:48,width:48,marginRight:12}}
