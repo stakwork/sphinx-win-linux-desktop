@@ -127,7 +127,7 @@ export class UiStore {
   @observable showPayModal: boolean = false
   @observable payMode: PayMode = ''
   @observable chatForPayModal: Chat | null
-  @action setPayMode(m:PayMode, c) {
+  @action setPayMode(m: PayMode, c) {
     this.payMode = m
     this.chatForPayModal = c
     this.showPayModal = true
@@ -267,11 +267,15 @@ export class UiStore {
     this.viewTribe = obj
   }
 
-  @observable tribeText: {[k:number]:string} = {}
+  @observable tribeText: { [k: number]: string } = {}
   @action setTribeText(chatID: number, text: string) {
-      this.tribeText[chatID] = text
-    }
+    this.tribeText[chatID] = text
+  }
 
+  @observable addSatsModal: boolean = false
+  @action setAddSatsModal(b: boolean) {
+    this.addSatsModal = b
+  }
 }
 
 export const uiStore = new UiStore()

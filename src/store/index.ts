@@ -11,6 +11,7 @@ import { authStore } from './auth'
 import { botStore } from './bots'
 import { themeStore } from './theme'
 import { feedStore } from './feed'
+import { queryStore } from './queries'
 import { create } from 'mobx-persist'
 import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
@@ -127,6 +128,7 @@ const ctx = React.createContext({
   auth: authStore,
   bots: botStore,
   feed: feedStore,
+  queries: queryStore
 })
 
 export const useStores = () => React.useContext(ctx)

@@ -8,6 +8,7 @@ import { useStores, useTheme } from '../../store'
 import { useObserver } from 'mobx-react-lite'
 import {usePicSrc} from '../utils/picSrc'
 import VERSION from '../../version'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const itemStyle = {height:60,paddingLeft:15}
 
@@ -42,6 +43,12 @@ export default function TheDrawer(props) {
               <Text style={{marginLeft:60,color:theme.title}}>{details.balance}</Text>
               <Text style={{marginLeft:10,marginRight:10,color:'#c0c0c0'}}>sat</Text>
               <AntDesign name="wallet" color="#d0d0d0" size={20} />
+            </View>
+            <View style={{marginLeft:60,marginTop:12}}>
+              <TouchableOpacity style={{...styles.addSats,backgroundColor:theme.primary}}
+                onPress={()=> ui.setAddSatsModal(true)}>
+                <Text style={{color:'white',fontSize:10}}>ADD SATS</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -150,6 +157,14 @@ const styles = StyleSheet.create({
   },
   supportButton:{
 
+  },
+  addSats:{
+    width:80,
+    height:32,
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+    borderRadius:16
   }
 })
 
