@@ -18,6 +18,7 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { PaletteType } from '@material-ui/core';
 import 'react-h5-audio-player/lib/styles.css';
 import EE, {RESET_IP, RESET_IP_FINISHED} from './utils/ee'
+import setupDeepLink from './utils/deeplink'
 
 const palette = {
   type: 'dark' as PaletteType,
@@ -49,6 +50,7 @@ function App(){
   const [welcome, setWelcome] = useState(false)
 
   useEffect(()=>{
+    setupDeepLink()
     onreset(function(){
       setSignedUp(false)
     })

@@ -1,4 +1,4 @@
-const {ipcMain} = require('electron')
+const {ipcMain, ipcRenderer} = require('electron')
 const RNCryptor = require('jscryptor')
 const rsa = require('./rsa')
 const keytar = require('./keytar')
@@ -174,4 +174,3 @@ ipcMain.on('rand', (event, args) => {
         event.returnValue = ''
     }
 })
-
