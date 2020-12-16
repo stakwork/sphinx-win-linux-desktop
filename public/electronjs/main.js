@@ -1,4 +1,6 @@
 const { app, BrowserWindow, Menu, shell, dialog, nativeImage } = require('electron')
+const { Deeplink } = require('electron-deeplink');
+const isDev = require('electron-is-dev');
 const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
 const VERSION = require('./version')
@@ -15,6 +17,14 @@ const iconPath = path.join(__dirname, "..", "static", "icon.png")
 const appIcon = nativeImage.createFromPath(iconPath);
 
 let mainWindow;
+const protocol = "sphinx.chat"
+const deeplink = new Deeplink({ app, mainWindow, protocol, isDev, debugLogging:true });
+
+deeplink.on('received', (link) => {
+    // do stuff here
+    mainWindow.webContents.send('deeplink', link);
+
+});
 
 // app.setName('Sphinx Chat');
 

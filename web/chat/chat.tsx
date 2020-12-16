@@ -129,6 +129,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
 
+
   async function dropzoneUpload(files) {
     const file = files[0]
     const server = meme.getDefaultServer()
