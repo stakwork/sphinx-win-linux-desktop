@@ -4,25 +4,29 @@ const crypto = require('crypto')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 
-async function uploadMeme(fileBase64, typ, host, token, filename) {
+async function uploadMeme(fileBase64, typ, host, token, filename, isPublic) {
   try {
 
     let imgBuf = dataURLtoBuf(fileBase64);
 
-    const newKey = crypto.randomBytes(20).toString('hex')
-
-    const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey)
-
-    var encImgBuffer = Buffer.from(encImgBase64, 'base64');
+    let finalImgBuffer
+    let newKey = ''
+    if(isPublic) {
+      finalImgBuffer = Buffer.from(imgBuf)
+    } else {
+      newKey = crypto.randomBytes(20).toString('hex')
+      const encImgBase64 = RNCryptor.Encrypt(imgBuf, newKey)
+      finalImgBuffer = Buffer.from(encImgBase64, 'base64');
+    }
 
     const form = new FormData()
-    form.append('file', encImgBuffer, {
+    form.append('file', finalImgBuffer, {
       contentType: typ || 'image/jpg',
       filename: filename || 'Image.jpg',
-      knownLength: encImgBuffer.length,
+      knownLength: finalImgBuffer.length,
     })
     const formHeaders = form.getHeaders()
-    const resp = await fetch(`https://${host}/file`, {
+    const resp = await fetch(`https://${host}/${isPublic?'public':'file'}`, {
       method: 'POST',
       headers: {
         ...formHeaders, // THIS IS REQUIRED!!!

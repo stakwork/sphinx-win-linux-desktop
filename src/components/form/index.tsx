@@ -10,14 +10,16 @@ export default function Form(props) {
   return (
     <Formik
       initialValues={props.initialValues||{}}
-      onSubmit={values=> props.onSubmit(values)}
+      onSubmit={values=> {
+        props.onSubmit(values)
+      }}
       validationSchema={validator(props.schema)}
       // validateOnChange={false}
       >
       {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, errors, dirty, isValid }) => {
         // console.log('============================')
         // console.log("VALUES",values)
-        // console.log("ERRORS",errors)
+        // console.log("ERRORS",errors,isValid)
         return (<View style={styles.wrap}>
           <View style={{...styles.topper,padding:props.nopad?0:25}}>
             {props.schema.map(item=>{
@@ -36,7 +38,7 @@ export default function Form(props) {
           {/* <View style={{height:1,backgroundColor:'#ddd'}}></View> */}
           {!props.displayOnly && <View style={styles.buttonWrap}>
             <Button mode="contained"
-              accessibilityLabel={props.buttonAccessibilityLabel||'form-button'}
+              accessibilityLabel={'form-button'}
               onPress={handleSubmit} 
               disabled={!props.forceEnable && (!dirty || !isValid)}
               dark={true} style={styles.button} loading={props.loading}>

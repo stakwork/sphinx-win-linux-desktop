@@ -50,6 +50,8 @@ export interface Chat {
   pricePerMinute: number // for setting in group modal
 
   meta: {[k:string]:any}
+  my_alias: string
+  my_photo_url: string
 }
 
 export interface TribeServer {
@@ -137,6 +139,8 @@ export class ChatStore {
 
   @action
   async createTribe({ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url }) {
+    console.log('======>',{ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url })
+    await sleep(1);
     const r = await relay.post('group', {
       name, description, tags: tags || [],
       is_tribe: true, is_listed: true,
@@ -177,12 +181,12 @@ export class ChatStore {
 
   @action
   async joinTribe({ 
-    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias 
+    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias, my_photo_url,
   } : {
-    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string
+    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string, my_photo_url?:string,
   }) {
     const r = await relay.post('tribe', {
-      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias:my_alias||'', my_photo_url:my_photo_url||''
     })
     if (!r) return
     this.gotChat(r)
@@ -228,6 +232,20 @@ export class ChatStore {
     if (r === true) { // success
       const chat = this.chats.find(c => c.id === chatID)
       if (chat) chat.contact_ids = chat.contact_ids.filter(cid => cid !== contactID)
+    }
+  }
+
+  @action
+  async updateMyInfoInChat(tribeID: number, my_alias: string, my_photo_url: string) {
+    const r = await relay.put(`chats/${tribeID}`, { my_alias, my_photo_url })
+    if (r) {
+      const cs = [...this.chats]
+      this.chats = cs.map(c => {
+        if (c.id === tribeID) {
+          return { ...c, my_alias, my_photo_url }
+        }
+        return c
+      })
     }
   }
 
@@ -325,3 +343,8 @@ export class ChatStore {
 }
 
 export const chatStore = new ChatStore()
+
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

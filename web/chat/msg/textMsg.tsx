@@ -60,8 +60,7 @@ export default function TextMsg(props) {
   }
   const isBoost = message_content && message_content.startsWith('boost::')
   if (isBoost) {
-    const params = useParsedClipMsg(message_content)
-    return <Boost {...params} isMe={isMe} />
+    return <Boost {...props} isMe={isMe} />
   }
 
   const isJitsi = message_content && message_content.startsWith('https://jitsi.sphinx.chat/')

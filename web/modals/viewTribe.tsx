@@ -6,13 +6,17 @@ import styled from 'styled-components'
 import Button from '../utils/button'
 import { CircularProgress } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
+import Dropzone from 'react-dropzone'
+import { uploadFile } from '../utils/meme'
 
 export default function ViewTribe() {
 
-    const { msg, ui, chats } = useStores()
+    const { msg, ui, chats, meme } = useStores()
     const tribe = ui.viewTribe
     const [loading, setLoading] = useState(false)
     const [alias, setAlias] = useState('')
+    const [picsrc, setPicsrc] = useState('')
+    const [uploading, setUploading] = useState(false)
 
     async function joinTribe() {
         setLoading(true)
@@ -26,7 +30,8 @@ export default function ViewTribe() {
             img: tribe.img,
             amount: tribe.price_to_join || 0,
             is_private: tribe.private,
-            ...alias && { my_alias: alias }
+            ...alias && { my_alias: alias },
+            ...picsrc && {my_photo_url: picsrc}
         })
         setLoading(false)
         handleClose()
@@ -42,6 +47,17 @@ export default function ViewTribe() {
 
     const alreadyJoined = chats.chats.find(c => c.uuid === tribe.uuid)
 
+    async function dropzoneUpload(files){
+        const file = files[0]
+        const server = meme.getDefaultServer()
+        setUploading(true)
+        const r = await uploadFile(file, file.type, server.host, server.token, 'Image.jpg', true)
+        if(r && r.muid) {
+            // console.log(`https://${server.host}/public/${r.muid}`)
+            setPicsrc(`https://${server.host}/public/${r.muid}`)
+        }
+    }
+
     if (!tribe) {
         return <div></div>
     }
@@ -52,7 +68,7 @@ export default function ViewTribe() {
     >
         <Content bg={theme.bg}>
             <Header>JOIN TRIBE</Header>
-            <Image style={{ backgroundImage: `url(${tribe.img})` }}></Image>
+            <Image style={{ backgroundImage: `url(${tribe.img||'/static/tent.png'})` }}></Image>
             <Title>{tribe.name}</Title>
             <Description grey={theme.greyText}>{tribe.description}</Description>
             <Details grey={theme.greyText}>
@@ -71,6 +87,17 @@ export default function ViewTribe() {
                     onChange={(e) => setAlias(e.target.value)}
                 />
             </AliasWrap>}
+            {!alreadyJoined && <PicWrap>
+                <Dropzone multiple={false} onDrop={dropzoneUpload}>
+                    {({ getRootProps, getInputProps, isDragActive }) => (
+                        <PicDropWrap {...getRootProps()}>
+                            <input {...getInputProps()} />
+                            <Pic style={{ backgroundImage: `url(${picsrc?picsrc+'?thumb=true':'/static/avatar3x.png'})` }} />
+                        </PicDropWrap>
+                    )}
+                </Dropzone>
+                <Text style={{color:theme.greyText}}>My Picture for this Tribe</Text>
+            </PicWrap>}
             {alreadyJoined ?
                 <Button color={'secondary'} style={{ marginTop: 20 }}
                     onClick={async () => {
@@ -112,6 +139,8 @@ const Content = styled.div`
     align-items: center;
     justify-content: space-between;
     flex-direction: column;
+    max-height: 80vh;
+    overflow: auto;
 `
 const Header = styled.div`
     margin-bottom: 15px;
@@ -120,6 +149,14 @@ const Header = styled.div`
 const Image = styled.div`
     height: 100px;
     width: 100px;
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+`
+const Pic = styled.div`
+    height:50px;
+    width: 50px;
     border-radius: 50%;
     background-position: center;
     background-size: cover;
@@ -168,4 +205,15 @@ const RowContent = styled.div`
 
 const AliasWrap = styled.div`
     width: 80%;
+`
+const PicWrap = styled.div`
+    width: 80%;
+    display:flex;
+    align-items:center;
+`
+const PicDropWrap = styled.div`
+    cursor:pointer;
+`
+const Text = styled.div`
+    margin-left:15px;
 `

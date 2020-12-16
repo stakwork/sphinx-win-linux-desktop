@@ -32,8 +32,10 @@ export default function NewTribe({ onFinish }) {
     //   await createChatPic(group.id, img.uri)
     //   chats.updateChatPhotoURI(group.id, img.uri)
     // }
-    onFinish()
-    setLoading(false)
+    setTimeout(()=>{
+      onFinish()
+      setLoading(false)
+    },150)
   }
   const showDone = true
 
@@ -49,12 +51,16 @@ export default function NewTribe({ onFinish }) {
         />}
       </TouchableOpacity> */}
       <Form schema={tribe} loading={loading}
-        buttonAccessibilityLabel="tribe-form-button"
+        // buttonAccessibilityLabel="tribe-form-button"
         buttonText={(ui.editTribeParams ? 'Edit' : 'Create') + ' Group'}
         onSubmit={finish}
         initialValues={ui.editTribeParams ? theEditTribeParams : {
           escrow_amount: 10, escrow_time: 12,
           price_to_join: 0, price_per_message: 0,
+          name: '', description: '', 
+          img: '', tags:[],
+          feed_url: '', app_url :'',
+          unlisted: false, is_private: false,
         }}
       />
     </ScrollView>

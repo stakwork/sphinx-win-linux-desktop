@@ -32,7 +32,7 @@ export function useMsgs(chat, limit?: number) {
 }
 
 // "payment" is for paying an invoice
-const hideTypes = ['payment', 'purchase', 'purchase_accept', 'purchase_deny', 'boost']
+const hideTypes = ['payment', 'purchase', 'purchase_accept', 'purchase_deny']
 function processMsgs(incomingmsgs: Msg[], isTribe: boolean, contacts: Contact[]) {
   // "deep clone" the messages array
   const msgs = incomingmsgs && incomingmsgs.map(a => Object.assign({}, a)).reverse();
@@ -91,6 +91,7 @@ function processMsgs(incomingmsgs: Msg[], isTribe: boolean, contacts: Contact[])
 
     // boost logic
     if (typ === 'boost' && msg.reply_uuid) {
+      skip = true
       // look in "ms".. the existing result array. Its reversed so its forward in time
       const repmsg = ms.find(m => m.uuid === msg.reply_uuid)
       if(repmsg) {
@@ -195,7 +196,24 @@ export function useMsgSender(m, contactList, isTribe) {
   return {senderAlias, senderPic}
 }
 
+export function useParsedJsonOrClipMsg(message_content) {
+  if(!message_content) return {}
+  if(message_content.includes('::')) return useParsedClipMsg(message_content)
+  return useParsedJsonMsg(message_content)
+}
+
+export function useParsedJsonMsg(message_content: string) {
+  if(!message_content) return {}
+  try {
+    const r = JSON.parse(message_content)
+    return r
+  } catch (e) {
+    return {}
+  }
+}
+
 export function useParsedClipMsg(message_content: string) {
+  if(!message_content) return {}
   const arr = message_content.split('::')
   if (!(arr && arr[1])) return {}
   try {

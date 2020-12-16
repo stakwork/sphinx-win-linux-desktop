@@ -2,9 +2,13 @@ import React, {useEffect,useLayoutEffect,useRef} from 'react'
 import {useTheme} from '../../../src/store'
 import styled from 'styled-components'
 import SvgIcon from '@material-ui/core/SvgIcon';
+import { useParsedJsonOrClipMsg } from '../../../src/store/hooks/msg'
 
-export default function Clip(props){
-  const {feedID, itemID, ts, amount, isMe} = props
+export default function BoostMsg(props){
+  const {sender, message_content} = props
+  const params = useParsedJsonOrClipMsg(message_content)
+  const {feedID, itemID, ts, amount} = params
+  // const isMe = sender === 1
   const theme = useTheme()
   return <Pad>
     <span>{`Boost ${amount}`}</span>

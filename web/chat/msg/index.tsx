@@ -12,6 +12,7 @@ import PaymentMessage from './paymentMsg'
 import InvoiceMsg from './invoiceMsg'
 import MoreVertButton from '@material-ui/icons/MoreVert';
 import BotResMsg from './botRes'
+import BoostMsg from './boostMsg'
 import moment from 'moment'
 import {useAvatarColor, useParsedGiphyMsg, useParsedClipMsg} from '../../../src/store/hooks/msg'
 // import BoostSats from './boostSats'
@@ -76,6 +77,8 @@ function Message(props) {
       return <PaymentMessage {...props} />
     case 'bot_res':
       return <BotResMsg {...props} />
+    case 'boost':
+      return <BoostMsg {...props} />
     default:
       return <></>
   }

@@ -110,10 +110,10 @@ class MsgStore {
   }
 
   @action
-  async getMessages() {
+  async getMessages(forceMore?:boolean) {
     console.log("=> GET MESSAGES")
     let route = 'messages'
-    if (this.lastFetched) {
+    if (!forceMore && this.lastFetched) {
       const mult = 1
       const dateq = moment.utc(this.lastFetched - 1000 * mult).format('YYYY-MM-DD%20HH:mm:ss')
       route += `?date=${dateq}`

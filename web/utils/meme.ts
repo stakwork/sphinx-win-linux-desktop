@@ -1,9 +1,10 @@
 import * as ipc from '../crypto/ipc'
 
-export async function uploadFile(file:File,type:string,host:string,token:string,filename:string){
+export async function uploadFile(file:File,type:string,host:string,token:string,filename:string,isPublic?:boolean){
   const fileBase64 = await toBase64(file)
   const args={file:fileBase64, type, host, token, filename}
-  const ret = await ipc.send('upload-file', args)
+  const evtName = isPublic?'upload-public-file':'upload-file'
+  const ret = await ipc.send(evtName, args)
   const obj:{[k:string]:any} = typeof ret==='object' ? ret : {}
   return {
     muid: obj.muid,

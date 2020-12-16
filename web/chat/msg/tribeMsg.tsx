@@ -39,7 +39,7 @@ export default function TribeMsg(props) {
   if (!(tribe && tribe.uuid)) return <Wrap>Could not load tribe...</Wrap>
   return <Wrap>
     <TribeWrap>
-      <TribeImage style={{ backgroundImage: `url(${tribe.img})` }} />
+      <TribeImage style={{ backgroundImage: `url(${tribe.img||'/static/tent.png'})` }} />
       <Text>
         <TribeName>
           {tribe.name}
