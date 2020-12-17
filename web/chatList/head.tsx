@@ -12,6 +12,8 @@ import ArrowBackIosButton from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosButton from '@material-ui/icons/ArrowForwardIos';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EE, {RESET_IP, RESET_IP_FINISHED} from '../utils/ee'
+import { urlBase64FromAscii } from '../../src/store/utils/ldat';
+import Button from '../utils/button'
 
 export default function Head({ setWidth, width }) {
   const { contacts, details, msg, ui, chats } = useStores()
@@ -62,6 +64,11 @@ export default function Head({ setWidth, width }) {
           <span>sat</span>
         </Balance>
         <div></div>
+        <div 
+        onClick={() => ui.setOnchain(true)}
+        style={{cursor: 'pointer', height: 20, width: 40, borderRadius: 20, backgroundColor: theme.primary, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+          <p style={{marginLeft: 5}}>+</p><img src="/static/btc-icon-white.png" style={{height: 15, width: 15}}/>
+        </div>
         <Tooltip title={ui.connected ? 'Connected' : 'Not Connected'} placement="left">
           {refreshing ?
             <CircularProgress size={18} style={{ marginRight: 20, marginLeft: -20, color: 'white' }} /> :

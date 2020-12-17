@@ -257,6 +257,11 @@ export class UiStore {
     this.showProfile = b
   }
 
+  @observable onchain: boolean = false
+  @action setOnchain(b) {
+    this.onchain = b
+  }
+
   @observable newContact: boolean = false
   @action setNewContact(b) {
     this.newContact = b
