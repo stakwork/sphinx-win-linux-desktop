@@ -16,6 +16,6 @@
     "module": "esnext",
     "isolatedModules": true
   },
-  "include": ["src"]
-  // "include": ["src/index.web.tsx","web"]
+  // "include": ["src"]
+  "include": ["src/index.web.tsx","web"]
 }
