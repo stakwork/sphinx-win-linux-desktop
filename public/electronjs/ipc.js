@@ -9,7 +9,7 @@ const open = require('open');
 const log = require('electron-log');
 
 ipcMain.on('etch', async (event, args) => {
-    console.log('=> etch')
+    // console.log('=> etch')
     try {
         if(!args.rid) return
         const url = args.url.replace('https://cors-anywhere.herokuapp.com/','')
@@ -23,7 +23,7 @@ ipcMain.on('etch', async (event, args) => {
 })
 
 ipcMain.on('link', async (event, args) => {
-    console.log('=> link')
+    // console.log('=> link')
     try {
         if(!args.rid) return
         await open(args.link||'');
@@ -34,7 +34,7 @@ ipcMain.on('link', async (event, args) => {
 })
 
 ipcMain.on('encrypt-symmetric', (event, args) => {
-    console.log("=> encrypt-symmetric")
+    // console.log("=> encrypt-symmetric")
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -48,7 +48,7 @@ ipcMain.on('encrypt-symmetric', (event, args) => {
 })
 
 ipcMain.on('decrypt', (event, args) => {
-    console.log('=> decrypt')
+    // console.log('=> decrypt')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -61,7 +61,7 @@ ipcMain.on('decrypt', (event, args) => {
 })
 
 ipcMain.on('decrypt-64', (event, args) => {
-    console.log('=> decrypt-64')
+    // console.log('=> decrypt-64')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -74,7 +74,7 @@ ipcMain.on('decrypt-64', (event, args) => {
 })
 
 ipcMain.on('decrypt-rsa', async (event, args) => {
-    console.log('=> decrypt-rsa')
+    // console.log('=> decrypt-rsa')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -87,7 +87,7 @@ ipcMain.on('decrypt-rsa', async (event, args) => {
 })
 
 ipcMain.on('set-private-key', (event, args) => {
-    console.log('=> set-private-key')
+    // console.log('=> set-private-key')
     try {
         if(!args.rid) return
         // args.key
@@ -99,7 +99,7 @@ ipcMain.on('set-private-key', (event, args) => {
 })
 
 ipcMain.on('get-private-key', async (event, args) => {
-    console.log('=> get-private-key')
+    // console.log('=> get-private-key')
     try {
         if(!args.rid) return
         const pk = await keytar.getPrivateKey()
@@ -110,7 +110,7 @@ ipcMain.on('get-private-key', async (event, args) => {
 })
 
 ipcMain.on('gen-keys', async (event, args) => {
-    console.log('=> gen-keys')
+    // console.log('=> gen-keys')
     try {
         if(!args.rid) return // no other args
         const {public,private} = await rsa.genKeys()
@@ -122,7 +122,7 @@ ipcMain.on('gen-keys', async (event, args) => {
 })
 
 ipcMain.on('encrypt-rsa', (event, args) => {
-    console.log('=> encrypt-rsa')
+    // console.log('=> encrypt-rsa')
     try {
         if(!args.rid) return
         // args.pubkey is string
@@ -135,7 +135,7 @@ ipcMain.on('encrypt-rsa', (event, args) => {
 })
 
 ipcMain.on('upload-file', async (event, args) => {
-    console.log('=> upload-file')
+    // console.log('=> upload-file')
     try {
         if(!args.rid) return
         // args.file is a string (base64)
@@ -151,7 +151,7 @@ ipcMain.on('upload-file', async (event, args) => {
 })
 
 ipcMain.on('upload-public-file', async (event, args) => {
-    console.log('=> upload-public-file')
+    // console.log('=> upload-public-file')
     try {
         if(!args.rid) return
         const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, true)
@@ -162,7 +162,7 @@ ipcMain.on('upload-public-file', async (event, args) => {
 })
 
 ipcMain.on('decryptSync', (event, arg) => {
-    console.log('=> decryptSync')
+    // console.log('=> decryptSync')
     try {
         const args = JSON.parse(arg)
         // args.data is base64 encoded
@@ -176,7 +176,7 @@ ipcMain.on('decryptSync', (event, arg) => {
 })
 
 ipcMain.on('rand', (event, args) => {
-    console.log('=> rand')
+    // console.log('=> rand')
     try {
         if(!args.rid) return
         // args.length
