@@ -14,6 +14,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import EE, {RESET_IP, RESET_IP_FINISHED} from '../utils/ee'
 import { urlBase64FromAscii } from '../../src/store/utils/ldat';
 import Button from '../utils/button'
+import {whiteBitcoinIcon} from '../images'
 
 export default function Head({ setWidth, width }) {
   const { contacts, details, msg, ui, chats } = useStores()
@@ -67,7 +68,7 @@ export default function Head({ setWidth, width }) {
         <div 
         onClick={() => ui.setOnchain(true)}
         style={{cursor: 'pointer', height: 20, width: 40, borderRadius: 20, backgroundColor: theme.primary, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
-          <p style={{marginLeft: 5}}>+</p><img src="/static/btc-icon-white.png" style={{height: 15, width: 15}}/>
+          <p style={{marginLeft: 5}}>+</p><img src={whiteBitcoinIcon} style={{height: 15, width: 15}}/>
         </div>
         <Tooltip title={ui.connected ? 'Connected' : 'Not Connected'} placement="left">
           {refreshing ?

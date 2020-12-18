@@ -8,6 +8,7 @@ import { CircularProgress } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Dropzone from 'react-dropzone'
 import { uploadFile } from '../utils/meme'
+import {tentIcon, avatarIcon} from '../images'
 
 export default function ViewTribe() {
 
@@ -68,7 +69,7 @@ export default function ViewTribe() {
     >
         <Content bg={theme.bg}>
             <Header>JOIN TRIBE</Header>
-            <Image style={{ backgroundImage: `url(${tribe.img||'/static/tent.png'})` }}></Image>
+            <Image style={{ backgroundImage: `url(${tribe.img||tentIcon})` }}></Image>
             <Title>{tribe.name}</Title>
             <Description grey={theme.greyText}>{tribe.description}</Description>
             <Details grey={theme.greyText}>
@@ -92,7 +93,7 @@ export default function ViewTribe() {
                     {({ getRootProps, getInputProps, isDragActive }) => (
                         <PicDropWrap {...getRootProps()}>
                             <input {...getInputProps()} />
-                            <Pic style={{ backgroundImage: `url(${picsrc?picsrc+'?thumb=true':'/static/avatar3x.png'})` }} />
+                            <Pic style={{ backgroundImage: `url(${picsrc?picsrc+'?thumb=true':avatarIcon})` }} />
                         </PicDropWrap>
                     )}
                 </Dropzone>
