@@ -18,12 +18,11 @@ const appIcon = nativeImage.createFromPath(iconPath);
 
 let mainWindow;
 const protocol = "sphinx.chat"
-const deeplink = new Deeplink({ app, mainWindow, protocol, isDev, debugLogging:true });
 
+const deeplink = new Deeplink({ app, mainWindow, protocol, isDev, debugLogging:true });
 deeplink.on('received', (link) => {
     // do stuff here
     mainWindow.webContents.send('deeplink', link);
-
 });
 
 // app.setName('Sphinx Chat');

@@ -132,17 +132,17 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
 
-
   async function dropzoneUpload(files) {
     const file = files[0]
     const server = meme.getDefaultServer()
     setUploading(true)
-    const r = await uploadFile(file, file.type, server.host, server.token, 'Image.jpg')
+    const typ = file.type||'sphinx/text'
+    const r = await uploadFile(file, typ, server.host, server.token, file.name || 'Image.jpg')
     await msg.sendAttachment({
       contact_id: null, chat_id: chat.id,
       muid: r.muid,
       media_key: r.media_key,
-      media_type: file.type,
+      media_type: typ,
       text: '',
       price: parseInt(msgPrice) || 0,
       amount: messagePrice||0
