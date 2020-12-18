@@ -22,6 +22,7 @@ import { uploadFile } from '../utils/meme'
 import { calcBotPrice } from '../../src/store/hooks/chat'
 import { useReplyContent } from '../../src/store/hooks/chat'
 import ReactGiphySearchbox from 'react-giphy-searchbox'
+import {giphyIcon} from '../images'
 
 export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsgPrice }) {
   const { ui, msg, meme, details, contacts } = useStores()
@@ -248,7 +249,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
             onClick={() => ui.setSendRequestModal(chat)}>
             <AddIcon style={{ color: chat ? '#ffffff' : '#b0c4ff', fontSize: 22 }} />
           </IconButton>
-          <img src="/static/GIPHY Icon DarkBackgrounds 27.png" onClick={chat && handleGiphy} style={{cursor: chat ? 'pointer' : 'auto', marginLeft: '15px', filter: chat ? 'grayscale(0%)' : 'grayscale(75%)'}} />
+          <img src={giphyIcon} onClick={chat && handleGiphy} style={{cursor: chat ? 'pointer' : 'auto', marginLeft: '15px', filter: chat ? 'grayscale(0%)' : 'grayscale(75%)'}} />
           <InsertEmoticonButton style={{ pointerEvents: chat ? "auto" : "none", cursor: 'pointer', marginLeft: 10, color: chat ? "#8f9ca9" : "#2a3540", fontSize: 30 }}
             aria-describedby={id} onClick={handleClick} />
           <Popover

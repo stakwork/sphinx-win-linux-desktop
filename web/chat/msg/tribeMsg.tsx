@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import Button from '../../utils/button'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {tentIcon} from '../../images'
 
 interface Tribe {
   name: string,
@@ -39,7 +40,7 @@ export default function TribeMsg(props) {
   if (!(tribe && tribe.uuid)) return <Wrap>Could not load tribe...</Wrap>
   return <Wrap>
     <TribeWrap>
-      <TribeImage style={{ backgroundImage: `url(${tribe.img||'/static/tent.png'})` }} />
+      <TribeImage style={{ backgroundImage: `url(${tribe.img||tentIcon})` }} />
       <Text>
         <TribeName>
           {tribe.name}
