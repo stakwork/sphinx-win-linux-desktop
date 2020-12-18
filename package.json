@@ -92,7 +92,7 @@
     "dns.js": "^1.0.1",
     "domain-browser": "^1.2.0",
     "dompurify": "^2.0.15",
-    "electron-deeplink": "^1.0.5",
+    "electron-deeplink": "git+https://github.com/glawson/electron-deeplink.git#fixes-uncaught-on-windows",
     "electron-default-menu": "^1.0.2",
     "electron-log": "^4.2.2",
     "electron-unhandled": "^3.0.2",
