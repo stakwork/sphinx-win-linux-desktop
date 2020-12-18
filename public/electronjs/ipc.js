@@ -6,6 +6,7 @@ const fetch = require('node-fetch')
 const Crypto = require('crypto')
 const meme = require('./meme')
 const open = require('open');
+const log = require('electron-log');
 
 ipcMain.on('etch', async (event, args) => {
     console.log('=> etch')
@@ -17,7 +18,7 @@ ipcMain.on('etch', async (event, args) => {
         const data = await response.text()
         event.reply(args.rid, {data,mimeType})
     } catch(e) {
-        console.log(e)
+        log.error('etch ERROR', e)
     }
 })
 
@@ -28,7 +29,7 @@ ipcMain.on('link', async (event, args) => {
         await open(args.link||'');
         event.reply(args.rid, {success:true})
     } catch(e) {
-        console.log(e)
+        log.error('link ERROR', e)
     }
 })
 
@@ -42,7 +43,7 @@ ipcMain.on('encrypt-symmetric', (event, args) => {
         const enc = RNCryptor.Encrypt(buf, args.password)
         event.reply(args.rid, enc)
     } catch(e) {
-        console.log(e)
+        log.error('encrypt-symmetric ERROR', e)
     }
 })
 
@@ -55,7 +56,7 @@ ipcMain.on('decrypt', (event, args) => {
         const dec = RNCryptor.Decrypt(args.data, args.password)
         event.reply(args.rid, dec.toString('ascii'))
     } catch(e) {
-        console.log(e)
+        log.error('decrypt ERROR', e)
     }
 })
 
@@ -68,7 +69,7 @@ ipcMain.on('decrypt-64', (event, args) => {
         const dec = RNCryptor.Decrypt(args.data, args.password)
         event.reply(args.rid, dec.toString('base64'))
     } catch(e) {
-        console.log('ERROR! decrypt-64')
+        log.error('decrypt-64 ERROR', e)
     }
 })
 
@@ -81,7 +82,7 @@ ipcMain.on('decrypt-rsa', async (event, args) => {
         const dec = rsa.decrypt(private, args.data)
         event.reply(args.rid, dec)
     } catch(e) {
-        console.log(e)
+        log.error('decrypt-rsa ERROR', e)
     }
 })
 
@@ -93,7 +94,7 @@ ipcMain.on('set-private-key', (event, args) => {
         keytar.setPrivateKey(args.key)
         event.reply(args.rid, true)
     } catch(e) {
-        console.log(e)
+        log.error('set-private-key ERROR', e)
     }
 })
 
@@ -104,7 +105,7 @@ ipcMain.on('get-private-key', async (event, args) => {
         const pk = await keytar.getPrivateKey()
         event.reply(args.rid, pk)
     } catch(e) {
-        console.log(e)
+        log.error('get-private-key ERROR', e)
     }
 })
 
@@ -116,7 +117,7 @@ ipcMain.on('gen-keys', async (event, args) => {
         keytar.setPrivateKey(private)
         event.reply(args.rid, public)
     } catch(e) {
-        console.log(e)
+        log.error('gen-keys ERROR', e)
     }
 })
 
@@ -129,7 +130,7 @@ ipcMain.on('encrypt-rsa', (event, args) => {
         const dec = rsa.encrypt(args.pubkey, args.data)
         event.reply(args.rid, dec)
     } catch(e) {
-        console.log(e)
+        log.error('encrypt-rsa ERROR', e)
     }
 })
 
@@ -145,7 +146,7 @@ ipcMain.on('upload-file', async (event, args) => {
         const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, false)
         event.reply(args.rid, res)
     } catch(e) {
-        console.log(e)
+        log.error('upload-file ERROR', e)
     }
 })
 
@@ -156,7 +157,7 @@ ipcMain.on('upload-public-file', async (event, args) => {
         const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, true)
         event.reply(args.rid, res)
     } catch(e) {
-        console.log(e)
+        log.error('upload-public-file ERROR', e)
     }
 })
 
@@ -169,7 +170,7 @@ ipcMain.on('decryptSync', (event, arg) => {
         const dec = RNCryptor.Decrypt(args.data, args.password)
         event.returnValue = dec.toString('ascii')
     } catch(e) {
-        console.log(e)
+        log.error('decryptSync ERROR', e)
         event.returnValue = ''
     }
 })
@@ -183,7 +184,7 @@ ipcMain.on('rand', (event, args) => {
         const r = Crypto.randomBytes(size).toString('base64').slice(0, size)
         event.reply(args.rid, r)
     } catch(e) {
-        console.log(e)
+        log.error('rand ERROR', e)
         event.returnValue = ''
     }
 })
