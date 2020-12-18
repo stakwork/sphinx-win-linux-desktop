@@ -1,5 +1,5 @@
 const {ipcMain, ipcRenderer} = require('electron')
-const RNCryptor = require('jscryptor')
+const RNCryptor = require('jscryptor-2')
 const rsa = require('./rsa')
 const keytar = require('./keytar')
 const fetch = require('node-fetch')
@@ -7,6 +7,13 @@ const Crypto = require('crypto')
 const meme = require('./meme')
 const open = require('open');
 const log = require('electron-log');
+
+const okToLog = false
+function logger() {
+    if(!okToLog) return
+    console.log(...arguments)
+}
+
 
 ipcMain.on('etch', async (event, args) => {
     // console.log('=> etch')
@@ -34,7 +41,7 @@ ipcMain.on('link', async (event, args) => {
 })
 
 ipcMain.on('encrypt-symmetric', (event, args) => {
-    // console.log("=> encrypt-symmetric")
+    logger("=> encrypt-symmetric")
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -48,7 +55,7 @@ ipcMain.on('encrypt-symmetric', (event, args) => {
 })
 
 ipcMain.on('decrypt', (event, args) => {
-    // console.log('=> decrypt')
+    logger('=> decrypt')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -61,20 +68,21 @@ ipcMain.on('decrypt', (event, args) => {
 })
 
 ipcMain.on('decrypt-64', (event, args) => {
-    // console.log('=> decrypt-64')
+    logger('=> decrypt-64', args.data.length, args.password.length)
     try {
         if(!args.rid) return
         // args.data is base64 encoded
         // args.password is string
         const dec = RNCryptor.Decrypt(args.data, args.password)
-        event.reply(args.rid, dec.toString('base64'))
+        const b64 = dec.toString('base64')
+        event.reply(args.rid, b64)
     } catch(e) {
         log.error('decrypt-64 ERROR', e)
     }
 })
 
 ipcMain.on('decrypt-rsa', async (event, args) => {
-    // console.log('=> decrypt-rsa')
+    // logger('=> decrypt-rsa')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -87,7 +95,7 @@ ipcMain.on('decrypt-rsa', async (event, args) => {
 })
 
 ipcMain.on('set-private-key', (event, args) => {
-    // console.log('=> set-private-key')
+    logger('=> set-private-key')
     try {
         if(!args.rid) return
         // args.key
@@ -99,7 +107,7 @@ ipcMain.on('set-private-key', (event, args) => {
 })
 
 ipcMain.on('get-private-key', async (event, args) => {
-    // console.log('=> get-private-key')
+    logger('=> get-private-key')
     try {
         if(!args.rid) return
         const pk = await keytar.getPrivateKey()
@@ -110,7 +118,7 @@ ipcMain.on('get-private-key', async (event, args) => {
 })
 
 ipcMain.on('gen-keys', async (event, args) => {
-    // console.log('=> gen-keys')
+    logger('=> gen-keys')
     try {
         if(!args.rid) return // no other args
         const {public,private} = await rsa.genKeys()
@@ -122,7 +130,7 @@ ipcMain.on('gen-keys', async (event, args) => {
 })
 
 ipcMain.on('encrypt-rsa', (event, args) => {
-    // console.log('=> encrypt-rsa')
+    logger('=> encrypt-rsa')
     try {
         if(!args.rid) return
         // args.pubkey is string
@@ -135,7 +143,7 @@ ipcMain.on('encrypt-rsa', (event, args) => {
 })
 
 ipcMain.on('upload-file', async (event, args) => {
-    // console.log('=> upload-file')
+    logger('=> upload-file')
     try {
         if(!args.rid) return
         // args.file is a string (base64)
@@ -151,7 +159,7 @@ ipcMain.on('upload-file', async (event, args) => {
 })
 
 ipcMain.on('upload-public-file', async (event, args) => {
-    // console.log('=> upload-public-file')
+    logger('=> upload-public-file')
     try {
         if(!args.rid) return
         const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, true)
@@ -162,7 +170,7 @@ ipcMain.on('upload-public-file', async (event, args) => {
 })
 
 ipcMain.on('decryptSync', (event, arg) => {
-    // console.log('=> decryptSync')
+    logger('=> decryptSync')
     try {
         const args = JSON.parse(arg)
         // args.data is base64 encoded
@@ -176,7 +184,7 @@ ipcMain.on('decryptSync', (event, arg) => {
 })
 
 ipcMain.on('rand', (event, args) => {
-    // console.log('=> rand')
+    logger('=> rand')
     try {
         if(!args.rid) return
         // args.length
