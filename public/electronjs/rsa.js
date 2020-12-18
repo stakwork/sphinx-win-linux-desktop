@@ -19,6 +19,7 @@ function encrypt(key, txt){
     })
     return finalBuf.toString('base64')
   } catch(e) {
+    console.log('encrypt ERROR',e)
     return ''
   }
 }
@@ -39,6 +40,7 @@ function decrypt(privateKey, enc){
     })
     return finalDec
   } catch(e) {
+    console.log('decrypt ERROR',e)
     return ''
   }
 }

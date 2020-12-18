@@ -4,7 +4,6 @@ const isDev = require('electron-is-dev');
 const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
 const VERSION = require('./version')
-const os = require('os')
 require('./ipc')
 
 unhandled();
@@ -20,13 +19,11 @@ const appIcon = nativeImage.createFromPath(iconPath);
 let mainWindow;
 const protocol = "sphinx.chat"
 
-if (os.platform() !== 'win32') {
-    const deeplink = new Deeplink({ app, mainWindow, protocol, isDev, debugLogging:true });
-    deeplink.on('received', (link) => {
-        // do stuff here
-        mainWindow.webContents.send('deeplink', link);
-    });
-}
+const deeplink = new Deeplink({ app, mainWindow, protocol, isDev, debugLogging:true });
+deeplink.on('received', (link) => {
+    // do stuff here
+    mainWindow.webContents.send('deeplink', link);
+});
 
 // app.setName('Sphinx Chat');
 
