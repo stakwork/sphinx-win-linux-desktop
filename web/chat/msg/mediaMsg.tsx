@@ -120,14 +120,15 @@ function BuyIcon({ purchased, loading }) {
 
 function Media({ type, data, onClick, filename }) {
   // console.log(type,data)
-  if (type === 'sphinx/text') return <></>
-  if (type.startsWith('image')) {
+  const typ = type || 'sphinx/text'
+  if (typ === 'sphinx/text') return <></>
+  if (typ.startsWith('image')) {
     return <Image src={data} onClick={onClick} />
   }
-  if (type.startsWith('audio')) {
+  if (typ.startsWith('audio')) {
     return <ReactAudioPlayer src={data} controls />
   }
-  if (type.startsWith('video')) {
+  if (typ.startsWith('video')) {
     return <VidWrap>
       <Player><source
         src={data}
