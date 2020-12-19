@@ -62,11 +62,23 @@ export async function decodeSingle(m: Msg) {
   return msg
 }
 
+const typesToDecrypt = [
+  constants.message_types.message,
+  constants.message_types.invoice,
+  constants.message_types.attachment,
+  constants.message_types.purchase,
+  constants.message_types.purchase_accept,
+  constants.message_types.purchase_deny,
+]
 export async function decodeMessages(messages: Msg[]) {
   const msgs = []
   for (const m of messages) {
-    const msg = await decodeSingle(m)
-    msgs.push(msg)
+    if(typesToDecrypt.includes(m.type)) {
+      const msg = await decodeSingle(m)
+      msgs.push(msg)
+    } else {
+      msgs.push(m)
+    }
   }
   return msgs
 }

@@ -8,7 +8,7 @@ const meme = require('./meme')
 const open = require('open');
 const log = require('electron-log');
 
-const okToLog = false
+const okToLog = true
 function logger() {
     if(!okToLog) return
     console.log(...arguments)
