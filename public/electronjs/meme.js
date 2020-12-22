@@ -1,4 +1,4 @@
-const RNCryptor = require('jscryptor')
+const RNCryptor = require('jscryptor-2')
 const base64 = require('base-64')
 const crypto = require('crypto')
 const FormData = require('form-data')

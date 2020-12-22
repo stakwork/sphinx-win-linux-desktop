@@ -1,14 +1,22 @@
 const {ipcMain, ipcRenderer} = require('electron')
-const RNCryptor = require('jscryptor')
+const RNCryptor = require('jscryptor-2')
 const rsa = require('./rsa')
 const keytar = require('./keytar')
 const fetch = require('node-fetch')
 const Crypto = require('crypto')
 const meme = require('./meme')
 const open = require('open');
+const log = require('electron-log');
+
+const okToLog = true
+function logger() {
+    if(!okToLog) return
+    console.log(...arguments)
+}
+
 
 ipcMain.on('etch', async (event, args) => {
-    console.log('=> etch')
+    // console.log('=> etch')
     try {
         if(!args.rid) return
         const url = args.url.replace('https://cors-anywhere.herokuapp.com/','')
@@ -17,23 +25,23 @@ ipcMain.on('etch', async (event, args) => {
         const data = await response.text()
         event.reply(args.rid, {data,mimeType})
     } catch(e) {
-        console.log(e)
+        log.error('etch ERROR', e)
     }
 })
 
 ipcMain.on('link', async (event, args) => {
-    console.log('=> link')
+    // console.log('=> link')
     try {
         if(!args.rid) return
         await open(args.link||'');
         event.reply(args.rid, {success:true})
     } catch(e) {
-        console.log(e)
+        log.error('link ERROR', e)
     }
 })
 
 ipcMain.on('encrypt-symmetric', (event, args) => {
-    console.log("=> encrypt-symmetric")
+    logger("=> encrypt-symmetric")
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -42,12 +50,12 @@ ipcMain.on('encrypt-symmetric', (event, args) => {
         const enc = RNCryptor.Encrypt(buf, args.password)
         event.reply(args.rid, enc)
     } catch(e) {
-        console.log(e)
+        log.error('encrypt-symmetric ERROR', e)
     }
 })
 
 ipcMain.on('decrypt', (event, args) => {
-    console.log('=> decrypt')
+    logger('=> decrypt')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -55,25 +63,26 @@ ipcMain.on('decrypt', (event, args) => {
         const dec = RNCryptor.Decrypt(args.data, args.password)
         event.reply(args.rid, dec.toString('ascii'))
     } catch(e) {
-        console.log(e)
+        log.error('decrypt ERROR', e)
     }
 })
 
 ipcMain.on('decrypt-64', (event, args) => {
-    console.log('=> decrypt-64')
+    logger('=> decrypt-64', args.data.length, args.password.length)
     try {
         if(!args.rid) return
         // args.data is base64 encoded
         // args.password is string
         const dec = RNCryptor.Decrypt(args.data, args.password)
-        event.reply(args.rid, dec.toString('base64'))
+        const b64 = dec.toString('base64')
+        event.reply(args.rid, b64)
     } catch(e) {
-        console.log('ERROR! decrypt-64')
+        log.error('decrypt-64 ERROR', e)
     }
 })
 
 ipcMain.on('decrypt-rsa', async (event, args) => {
-    console.log('=> decrypt-rsa')
+    // logger('=> decrypt-rsa')
     try {
         if(!args.rid) return
         // args.data is base64 encoded
@@ -81,47 +90,47 @@ ipcMain.on('decrypt-rsa', async (event, args) => {
         const dec = rsa.decrypt(private, args.data)
         event.reply(args.rid, dec)
     } catch(e) {
-        console.log(e)
+        log.error('decrypt-rsa ERROR', e)
     }
 })
 
 ipcMain.on('set-private-key', (event, args) => {
-    console.log('=> set-private-key')
+    logger('=> set-private-key')
     try {
         if(!args.rid) return
         // args.key
         keytar.setPrivateKey(args.key)
         event.reply(args.rid, true)
     } catch(e) {
-        console.log(e)
+        log.error('set-private-key ERROR', e)
     }
 })
 
 ipcMain.on('get-private-key', async (event, args) => {
-    console.log('=> get-private-key')
+    logger('=> get-private-key')
     try {
         if(!args.rid) return
         const pk = await keytar.getPrivateKey()
         event.reply(args.rid, pk)
     } catch(e) {
-        console.log(e)
+        log.error('get-private-key ERROR', e)
     }
 })
 
 ipcMain.on('gen-keys', async (event, args) => {
-    console.log('=> gen-keys')
+    logger('=> gen-keys')
     try {
         if(!args.rid) return // no other args
         const {public,private} = await rsa.genKeys()
         keytar.setPrivateKey(private)
         event.reply(args.rid, public)
     } catch(e) {
-        console.log(e)
+        log.error('gen-keys ERROR', e)
     }
 })
 
 ipcMain.on('encrypt-rsa', (event, args) => {
-    console.log('=> encrypt-rsa')
+    logger('=> encrypt-rsa')
     try {
         if(!args.rid) return
         // args.pubkey is string
@@ -129,12 +138,12 @@ ipcMain.on('encrypt-rsa', (event, args) => {
         const dec = rsa.encrypt(args.pubkey, args.data)
         event.reply(args.rid, dec)
     } catch(e) {
-        console.log(e)
+        log.error('encrypt-rsa ERROR', e)
     }
 })
 
 ipcMain.on('upload-file', async (event, args) => {
-    console.log('=> upload-file')
+    logger('=> upload-file')
     try {
         if(!args.rid) return
         // args.file is a string (base64)
@@ -145,23 +154,23 @@ ipcMain.on('upload-file', async (event, args) => {
         const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, false)
         event.reply(args.rid, res)
     } catch(e) {
-        console.log(e)
+        log.error('upload-file ERROR', e)
     }
 })
 
 ipcMain.on('upload-public-file', async (event, args) => {
-    console.log('=> upload-public-file')
+    logger('=> upload-public-file')
     try {
         if(!args.rid) return
         const res = await meme.uploadMeme(args.file, args.type, args.host, args.token, args.filename, true)
         event.reply(args.rid, res)
     } catch(e) {
-        console.log(e)
+        log.error('upload-public-file ERROR', e)
     }
 })
 
 ipcMain.on('decryptSync', (event, arg) => {
-    console.log('=> decryptSync')
+    logger('=> decryptSync')
     try {
         const args = JSON.parse(arg)
         // args.data is base64 encoded
@@ -169,13 +178,13 @@ ipcMain.on('decryptSync', (event, arg) => {
         const dec = RNCryptor.Decrypt(args.data, args.password)
         event.returnValue = dec.toString('ascii')
     } catch(e) {
-        console.log(e)
+        log.error('decryptSync ERROR', e)
         event.returnValue = ''
     }
 })
 
 ipcMain.on('rand', (event, args) => {
-    console.log('=> rand')
+    logger('=> rand')
     try {
         if(!args.rid) return
         // args.length
@@ -183,7 +192,7 @@ ipcMain.on('rand', (event, args) => {
         const r = Crypto.randomBytes(size).toString('base64').slice(0, size)
         event.reply(args.rid, r)
     } catch(e) {
-        console.log(e)
+        log.error('rand ERROR', e)
         event.returnValue = ''
     }
 })

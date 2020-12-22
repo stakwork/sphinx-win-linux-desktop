@@ -22,12 +22,12 @@ export default function Head({ setWidth, width }) {
   // const [snap, setSnap] = useState(false) =
   const snap = width < 250
 
-  async function refresh() {
+  async function refresh(forceMore?:boolean) {
     setRefreshing(true)
     await Promise.all([
       contacts.getContacts(),
       details.getBalance(),
-      msg.getMessages(true),
+      msg.getMessages(forceMore?true:false),
       // chats.getChats(),
     ])
     setRefreshing(false)
@@ -56,7 +56,7 @@ export default function Head({ setWidth, width }) {
     {snap ? <div></div> :
       <Top style={{ overflow: 'hidden' }}>
         <Tooltip title="Refresh" placement="right">
-          <CachedButton style={{ cursor: 'pointer', marginLeft: 20, marginRight: 20 }} onClick={() => refresh()} >
+          <CachedButton style={{ cursor: 'pointer', marginLeft: 20, marginRight: 20 }} onClick={() => refresh(true)} >
           </CachedButton>
         </Tooltip>
         <div></div>

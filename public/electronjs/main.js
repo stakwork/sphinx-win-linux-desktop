@@ -5,6 +5,12 @@ const defaultMenu = require('electron-default-menu');
 const unhandled = require('electron-unhandled');
 const VERSION = require('./version')
 require('./ipc')
+const { crashReporter } = require('electron')
+
+crashReporter.start({
+    submitURL:'',
+    uploadToServer:false,
+})
 
 unhandled();
 

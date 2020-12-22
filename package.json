@@ -106,7 +106,7 @@
     "https-browserify": "0.0.1",
     "install": "^0.13.0",
     "ion-sdk-js": "^0.3.4",
-    "jscryptor": "0.0.12",
+    "jscryptor-2": "0.0.1",
     "keytar": "^6.0.1",
     "localforage": "^1.8.1",
     "lottie-react-native": "^3.5.0",
