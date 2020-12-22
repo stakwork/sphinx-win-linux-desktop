@@ -40,21 +40,20 @@ const alreadySchema = [{
 export default function NewContact() {
 
     const { ui, contacts, details, user } = useStores()
-    const [contactState, setContactState] = useState('')
+    const [contactState, setContactState] = useState(ui.newContact.pubKey?"already":"")
     const [price, setPrice] = useState('')
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         (async () => {
             const price = await contacts.getLowestPriceForInvite()
-            console.log("PRICE", price)
             if (price || price === 0) setPrice(price)
         })()
     }, [])
 
 
     function handleCloseModal() {
-        ui.setNewContact(false)
+        ui.setNewContact(null)
         setContactState('')
     }
     return <Modal
@@ -108,7 +107,8 @@ export default function NewContact() {
                             }}
                             loading={loading}
                             schema={alreadySchema}
-                            buttonText={'Save To Contacts'} />
+                            buttonText={'Save To Contacts'}
+                            initialValues={{"public_key": ui.newContact.pubKey || ""}} />
                     </div>
                 }
             </Content>

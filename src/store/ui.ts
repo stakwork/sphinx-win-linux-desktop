@@ -262,9 +262,9 @@ export class UiStore {
     this.onchain = b
   }
 
-  @observable newContact: boolean = false
-  @action setNewContact(b) {
-    this.newContact = b
+  @observable newContact: {[k:string]:string} = null
+  @action setNewContact(obj: { [k: string]: any }) {
+    this.newContact = obj
   }
 
   @observable viewTribe: { [k: string]: any } = null

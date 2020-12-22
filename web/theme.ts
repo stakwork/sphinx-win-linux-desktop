@@ -11,6 +11,7 @@ const theme = {
     active:'#48c998',
     lightGreen: '#76d7b2',
     border:'#1a242f',
+    iconGrey: '#44505d'
 }
 
 export default theme

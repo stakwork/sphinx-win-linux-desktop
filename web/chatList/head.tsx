@@ -87,7 +87,7 @@ export default function Head({ setWidth, width }) {
           onChange={e => ui.setSearchTerm(e.target.value)}
           style={{ background: theme.deep, marginRight: 5 }}
         />
-        <PersonAddIcon onClick={()=>ui.setNewContact(true)} style={{color: '#8e9da9', position: 'absolute', right: '24px', marginTop: '9px', cursor: 'pointer'}}/>
+        <PersonAddIcon onClick={()=>ui.setNewContact({})} style={{color: '#8e9da9', position: 'absolute', right: '24px', marginTop: '9px', cursor: 'pointer'}}/>
         <ArrowBackIosButton onClick={() => setWidthHandler(11)}
           style={{
             fontWeight: 'bold', color: '#618af8', fontSize: 'medium', cursor: 'pointer',

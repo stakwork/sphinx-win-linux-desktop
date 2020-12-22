@@ -10,6 +10,7 @@ import JitsiMsg from './jitsiMsg'
 import Boost from './boostMsg'
 import TribeMsg from './tribeMsg'
 import BoostRow from './boostRow'
+import ContactMsg from './contactMsg'
 
 export default function TextMsg(props) {
   const { message_content, sender, joinTribe } = props
@@ -42,6 +43,11 @@ export default function TextMsg(props) {
   message_content.startsWith('sphinx.chat://?action=tribe')
   if(isTribe) {
     return <TribeMsg {...props} />
+  }
+
+  const contactRegex = /^[0-9a-fA-F]{66}$/
+  if (contactRegex.test(message_content)) {
+    return <ContactMsg {...props} />
   }
 
   const isGiphy = message_content && message_content.startsWith('giphy::')
