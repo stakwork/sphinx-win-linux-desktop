@@ -197,6 +197,7 @@ export function useMsgSender(m, contactList, isTribe) {
 }
 
 export function useParsedJsonOrClipMsg(message_content) {
+  console.log(message_content)
   if(!message_content) return {}
   if(message_content.includes('::')) return useParsedClipMsg(message_content)
   return useParsedJsonMsg(message_content)

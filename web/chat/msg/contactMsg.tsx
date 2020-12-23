@@ -16,7 +16,6 @@ export default function ContactMsg(props) {
     const contactAlready = contactKeys.includes(props.message_content)
     const userData = contacts.contacts.find(g => g.public_key === props.message_content)
 
-    if (loading) return <Wrap><CircularProgress /></Wrap>
     return <Wrap>
 
         {contactAlready ?

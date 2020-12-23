@@ -6,6 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import Player from './player'
 import Stats from './stats'
+import Replay from './replay'
 import EE, { CLIP_PAYMENT, INITIAL_TS, EPISODE_SELECTED, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
 import Slider from '@material-ui/core/Slider';
@@ -206,7 +207,10 @@ export default function Pod({ url, chat, onBoost }) {
   }
 
   return <PodWrap bg={theme.bg} ref={scrollRef} hide={!chatID||!url}>
-    {pod && <PodImage src={pod.image} alt={pod.title} />}
+      {pod && <PodImage src={pod.image} alt={pod.title} />}
+      {chat && episode && <Replay chat={chat} episode={episode}/> }
+
+    
 
     {(earned ? true : false) && <Earned onClick={() => setShowStats(true)}>
       <div>Earned:</div>
