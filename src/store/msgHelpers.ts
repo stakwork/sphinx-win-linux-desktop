@@ -69,6 +69,7 @@ const typesToDecrypt = [
   constants.message_types.purchase,
   constants.message_types.purchase_accept,
   constants.message_types.purchase_deny,
+  constants.message_types.bot_res
 ]
 export async function decodeMessages(messages: Msg[]) {
   const msgs = []
