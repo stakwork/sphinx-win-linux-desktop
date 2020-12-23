@@ -13,8 +13,6 @@ export default function ViewContact() {
     const { ui, msg, details, contacts } = useStores()
     const [alert, setAlert] = useState(``)
     const contact = ui.viewContact
-    console.log(contact)
-    console.log(contact.alias)
 
     let initial = ''
     const arr = contact.alias.split(' ')
