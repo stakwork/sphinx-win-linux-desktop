@@ -26,7 +26,9 @@ export default function AudioPlayer({ url, clickBoost, clickMsg, onPlay, onRewin
   }
 
   function onChangeCommitted(e, percent) {
-    if (duration && position) {
+    console.log("percent", percent)
+    console.log("duration", duration)
+    if (duration && (percent || percent===0)) {
       onSeek(duration * (percent / 100))
     }
   }

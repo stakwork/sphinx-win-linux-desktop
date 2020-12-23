@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { useStores } from '../../../src/store'
 import { constants } from '../../../src/constants'
+import {useInterval} from './useInterval'
+import * as Audio from './audio'
 
 export default function Replay(props) {
 
@@ -9,15 +11,25 @@ export default function Replay(props) {
     const { episode, chat} = props
     const chatID = chat.id
     const [msgsForReplay, setMsgsForReplay] = useState(null)
+    const [position, setPosition] = useState(0)
+
+    useInterval(()=>{
+        tick()
+      }, 1000)
+
+    async function tick(){
+        const pos = await Audio.getPosition()
+        setPosition(pos)
+    }
 
     function parseMsgs() {
         if (!chatID) return
         const msgs = msg.messages[chatID] || []
         const msgsForEpisode = msgs.filter(m => {
-            (m.message_content && m.message_content.includes('::') && m.message_content.includes(episode.id)) ||
-            (m.message_content && m.type===constants.message_types.boost)
+            return (m.message_content && m.message_content.includes('::') && m.message_content.includes(episode.id)) ||
+                (m.message_content && m.type===constants.message_types.boost && m.message_content.includes(episode.id))
         })
-        const msgsforReplay = []
+        const msgArray = []
         msgsForEpisode.forEach(m => {
             let json = ""
             let type = ""
@@ -30,17 +42,19 @@ export default function Replay(props) {
                 json = m.message_content
                 type = "boost"
             }
+            console.log("json", json, typeof json)
             try {
                 const dat = JSON.parse(json)
-                if (dat) msgsforReplay.push({
+                console.log("dat", dat)
+                if (dat) msgArray.push({
                     ...dat,
                     type: type,
                     alias: m.sender_alias || (m.sender === 1 ? user.alias : ''),
                     date: m.date,
                 })
-            } catch (e) { }
+            } catch (e) { console.log("error", e) }
         })
-        setMsgsForReplay(msgsForReplay)
+        setMsgsForReplay(msgArray)
     }
 
     useEffect(() => {
@@ -48,14 +62,20 @@ export default function Replay(props) {
     }, [])
 
     console.log("msgsForReplay", msgsForReplay)
+    const msgsToShow = msgsForReplay && msgsForReplay.filter(m => {
+        return m.ts <= position && m.ts >= position-5
+    })
+
+    console.log("msgsToShow", msgsToShow)
 
     return <ReplayWrap>
-        I am here {msgsForReplay}
+        {/* {msgsToShow && msgsToShow.map(m=>{
+            return <span>{m.text}</span>
+        })}  */}
     </ReplayWrap>
 }
 
 const ReplayWrap = styled.div`
-    background-color: blue;
     position: absolute;
     top: 275px;
     left: 220px;

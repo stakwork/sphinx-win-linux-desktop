@@ -4,6 +4,7 @@ import { useStores } from '../../../src/store'
 import { StreamPayment,NUM_SECONDS } from '../../../src/store/feed'
 import * as Audio from './audio'
 import EE, { EPISODE_SELECTED, INITIAL_TS } from '../../utils/ee'
+import {useInterval} from './useInterval'
 
 export default function Player({pod,episode,sendPayments,boost}){
   const { ui, user } = useStores()
@@ -13,7 +14,7 @@ export default function Player({pod,episode,sendPayments,boost}){
   const [playing,setPlaying] = useState(false)
 
   async function seekTo(t){
-    if(!(t&&typeof t==='number')) return
+    if(!(t || t===0)) return
     setTS(t)
     await Audio.seekTo(t)
   }
@@ -150,29 +151,6 @@ export default function Player({pod,episode,sendPayments,boost}){
     onPlay={onPlay} onRewind={onRewind} onForward={onForward}
   />
 }
-
-const useInterval = (callback, delay) => {
-  const savedCallback = useRef<Function>();
-
-  useEffect(
-    () => {
-      savedCallback.current = callback;
-    },
-    [callback]
-  );
-
-  useEffect(
-    () => {
-      const handler = (...args) => savedCallback.current(...args);
-
-      if (delay !== null) {
-        const id = setInterval(handler, delay);
-        return () => clearInterval(id);
-      }
-    },
-    [delay]
-  );
-};
 
 
 async function sleep(ms) {
