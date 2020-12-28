@@ -41,7 +41,6 @@ export class FeedStore {
         meta = JSON.parse(text)
       } catch(e) {}
       if(meta) {
-        console.log("UPDATE CHAT META",meta)
         chatStore.updateChatMeta(chat_id, meta)
       }
     }

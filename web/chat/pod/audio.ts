@@ -1,4 +1,5 @@
 import { Howl, Howler } from 'howler';
+import { Destination } from '../../../src/store/feed'
 
 let playlist: Audio[] = [] // list of episodes
 let index = 0
@@ -12,10 +13,14 @@ interface Item {
   url: string,
   title: string,
   artist: string,
-  artwork: string
+  artwork: string,
+  feedID: number,
+  chatID: number,
+  price: number,
+  dests: Destination[]
 }
 
-function getCurrent() {
+export function getCurrent() {
   let a
   playlist.forEach(h=>{
     if(h.sound.playing()) a = h

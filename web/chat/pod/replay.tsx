@@ -44,10 +44,8 @@ export default function Replay(props) {
                 json = m.message_content
                 type = "boost"
             }
-            console.log("json", json, typeof json)
             try {
                 const dat = JSON.parse(json)
-                console.log("dat", dat)
                 if (dat) msgArray.push({
                     ...dat,
                     type: type,
@@ -67,14 +65,10 @@ export default function Replay(props) {
         return m.ts <= position && m.ts >= position - 5
     })
 
-    console.log("msgsToShow", msgsToShow)
-    console.log("msgsForReplay", msgsForReplay)
-
     return <ReplayWrap>
-        {msgsToShow && msgsToShow.map(m => {
-            console.log("msgsToShowType", m.type)
+        {msgsToShow && msgsToShow.map((m, i) => {
 
-            return <div>
+            return <div key={i}>
                 {m.amount && <BoostWrap bg={theme.highlight}>
                     {(m.type === "boost") && <span style={{display: 'flex', alignItems: 'center'}}>Boost! {m.amount}
                         <Circle style={{ background: theme.lightGreen }}>
