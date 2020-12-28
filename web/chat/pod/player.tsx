@@ -15,6 +15,7 @@ export default function Player({pod,episode,sendPayments,boost}){
 
   async function seekTo(t){
     if(!(t || t===0)) return
+    if(t<0)t=0
     setTS(t)
     await Audio.seekTo(t)
   }
