@@ -39,13 +39,16 @@ export default function Player({pod,episode,sendPayments,boost,chat, ppm}){
       setTS(0)
     } else {
       const isPlaying = await Audio.playing()
+      console.log("isPlaying", isPlaying)
       if(isPlaying) setPlaying(true) // same episode! keep it rollin
 
         const pos = await Audio.getPosition()
+        console.log("pos", pos)
         if(pos) setTS(pos)
 
     }
     const dur = await Audio.getDuration()
+    console.log("dur", dur)
     if(dur) setDuration(dur)
   }
   async function episodeSelected(ep){
@@ -168,6 +171,8 @@ export default function Player({pod,episode,sendPayments,boost,chat, ppm}){
   function setRate(){
     Audio.setRate
   }
+
+  console.log("player duration", duration)
 
   const url = (episode && episode.enclosureUrl) || ''
   if(!episode) return <span></span>

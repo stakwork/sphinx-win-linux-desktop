@@ -66,7 +66,7 @@ export default function Replay(props) {
     })
 
     return <ReplayWrap>
-        {msgsToShow && msgsToShow.map((m, i) => {
+        {(position>0) && msgsToShow && msgsToShow.map((m, i) => {
 
             return <div key={i}>
                 {m.amount && <BoostWrap bg={theme.highlight}>

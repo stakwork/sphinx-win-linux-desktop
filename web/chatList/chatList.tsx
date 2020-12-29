@@ -38,6 +38,7 @@ function ChatList(){
                 ui.setSelectedChat(c)
                 ui.toggleBots(false)
                 chats.checkRoute(c.id)
+                ui.setImgViewerParams(null)
               }}
             />
           })}

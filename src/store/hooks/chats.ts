@@ -62,7 +62,7 @@ function lastMessageText(msg){
   return ''
 }
 
-function countUnseen(msgs, lastSeen:number):number{
+export function countUnseen(msgs, lastSeen:number):number{
   if(!msgs) return 0
   let unseenCount = 0
   msgs.forEach(m=>{
@@ -71,6 +71,7 @@ function countUnseen(msgs, lastSeen:number):number{
       if(unseen) unseenCount+=1
     }
   })
+  console.log("unseenCount", unseenCount)
   return Math.min(unseenCount,99)
 }
 
