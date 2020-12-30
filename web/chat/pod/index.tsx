@@ -210,9 +210,6 @@ export default function Pod({ url, chat, onBoost }) {
     return `${ppms[v]}`
   }
 
-  console.log("episode", episode)
-  console.log("pod episodes", pod)
-
   return <PodWrap bg={theme.bg} ref={scrollRef} hide={!chatID||!url}>
       {pod && <PodImage src={pod.image} alt={pod.title} />}
       {chat && episode && <Replay chat={chat} episode={episode}/> }

@@ -44,7 +44,7 @@ export async function playing() {
   return playing
 }
 
-export async function add(item: Item) {
+export async function add(item: Item):Promise<number> {
   return new Promise((resolve, reject) => {
     var sound: Howl = new Howl({
       src: [item.url],
@@ -53,10 +53,11 @@ export async function add(item: Item) {
     })
     playlist.unshift({ item, sound })
     sound.on('load', function (e) {
-      resolve(true)
+      const duration = sound.duration()
+      resolve(duration)
     })
     sound.on('loaderror', function (e) {
-      resolve(false)
+      resolve(0)
     })
   })
 }

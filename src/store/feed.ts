@@ -1,6 +1,7 @@
 import { action } from 'mobx'
 import { chatStore } from './chats'
 import { relay } from '../api'
+import {detailsStore} from './details'
 
 export const NUM_SECONDS = 60
 
@@ -44,6 +45,7 @@ export class FeedStore {
         chatStore.updateChatMeta(chat_id, meta)
       }
     }
+    if (amount) detailsStore.addToBalance(amount * -1)
     // asyncForEach(dests, async (d: Destination) => {
     //   const amt = Math.max(Math.round((d.split / 100) * price), 1)
     //   if (d.type === 'node') {

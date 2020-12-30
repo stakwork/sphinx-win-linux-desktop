@@ -8,6 +8,8 @@ const {useChatRow} = hooks
 export default function ChatRow(props){
   const {lastMsgText,hasLastMsg,unseenCount,hasUnseen} = useChatRow(props.id)
   const {name,photo_url,onClick,selected,contact_photo} = props
+
+
   return <Wrap onClick={onClick} style={{
     borderColor:theme.deep,
     background:selected?theme.deep:theme.bg

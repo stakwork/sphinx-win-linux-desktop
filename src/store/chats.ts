@@ -3,6 +3,7 @@ import { persist } from 'mobx-persist'
 import { Invite, contactStore } from './contacts'
 import { relay } from '../api'
 import { constants } from '../constants'
+import { detailsStore } from './details'
 
 /*
 disconneted - socket?
@@ -190,6 +191,7 @@ export class ChatStore {
     })
     if (!r) return
     this.gotChat(r)
+    if (amount) detailsStore.addToBalance(amount * -1)
     return r
   }
 

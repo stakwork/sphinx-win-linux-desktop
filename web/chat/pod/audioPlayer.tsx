@@ -44,7 +44,6 @@ export default function AudioPlayer({ url, clickBoost, clickMsg, onPlay, onRewin
 
   const rateChoices = [0.5, 0.8, 1, 1.2, 1.5, 2.1]
 
-  console.log("duration text", durationText)
 
   return <Wrap>
     <Top>

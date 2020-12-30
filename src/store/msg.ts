@@ -255,6 +255,7 @@ class MsgStore {
       // this.gotNewMessage(r)
       if (!chat_id) {
         const r = await relay.post('messages', v)
+        console.log("257 ==============", r)
         if (!r) return
         this.gotNewMessage(r)
       } else {
@@ -262,9 +263,11 @@ class MsgStore {
         const amt = boost&&message_price&&message_price<amount ? amount-message_price : amount
         putIn(this.messages, { ...v, id: -1, sender: 1, amount:amt, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
         const r = await relay.post('messages', v)
+        console.log("266 ==============", r)
         if (!r) return
         // console.log("RESULT")
         this.messagePosted(r)
+        if (amount) detailsStore.addToBalance(amount * -1)
       }
     } catch (e) {
       console.log(e)
@@ -432,6 +435,7 @@ class MsgStore {
     if (!id) return
     this.lastSeen[id] = new Date().getTime()
     relay.post(`messages/${id}/read`)
+    this.persister()
   }
 
   @action

@@ -24,7 +24,7 @@ export default function Player({pod,episode,sendPayments,boost,chat, ppm}){
   async function newEpisode(ep){
     const currentEpisodeID = await Audio.getCurrentTrack()
     if(currentEpisodeID!==ep.id) {
-      const loaded = await Audio.add({
+      const dur = await Audio.add({
         id: ep.id,
         url: ep.enclosureUrl,
         title: ep.title,
@@ -35,21 +35,20 @@ export default function Player({pod,episode,sendPayments,boost,chat, ppm}){
         price: ppm,
         dests: pod && pod.value && pod.value.destinations
       })
+      setDuration(dur)
       if(playing) setPlaying(false);
       setTS(0)
     } else {
       const isPlaying = await Audio.playing()
-      console.log("isPlaying", isPlaying)
       if(isPlaying) setPlaying(true) // same episode! keep it rollin
 
         const pos = await Audio.getPosition()
-        console.log("pos", pos)
         if(pos) setTS(pos)
 
+        const dur = await Audio.getDuration()
+        if(dur) setDuration(dur)
     }
-    const dur = await Audio.getDuration()
-    console.log("dur", dur)
-    if(dur) setDuration(dur)
+
   }
   async function episodeSelected(ep){
     await Audio.reset() // clear them out baby
@@ -172,7 +171,6 @@ export default function Player({pod,episode,sendPayments,boost,chat, ppm}){
     Audio.setRate
   }
 
-  console.log("player duration", duration)
 
   const url = (episode && episode.enclosureUrl) || ''
   if(!episode) return <span></span>
