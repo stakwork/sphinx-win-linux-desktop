@@ -6,6 +6,8 @@ import { useInterval } from './useInterval'
 import * as Audio from './audio'
 import theme from '../../theme'
 import SvgIcon from '@material-ui/core/SvgIcon';
+import { getColor } from '../../utils/avatar'
+import { resetGlobalState } from 'mobx/lib/internal'
 
 export default function Replay(props) {
 
@@ -51,6 +53,7 @@ export default function Replay(props) {
                     type: type,
                     alias: m.sender_alias || (m.sender === 1 ? user.alias : ''),
                     date: m.date,
+                    isMe: (m.sender === 1 ? true : false)
                 })
             } catch (e) { console.log("error", e) }
         })
@@ -59,17 +62,20 @@ export default function Replay(props) {
 
     useEffect(() => {
         parseMsgs()
-    }, [])
+    }, [episode])
+
 
     const msgsToShow = msgsForReplay && msgsForReplay.filter(m => {
         return m.ts <= position && m.ts >= position - 5
-    })
+    }).sort((a, b) => b.ts - a.ts)
 
-    return <ReplayWrap>
+
+    return <ReplayWrap style={{background: (position>0) && msgsToShow && msgsToShow[0] ? 'rgba(0, 0, 0, 0.7)' : "transparent"}}>
         {(position>0) && msgsToShow && msgsToShow.map((m, i) => {
 
-            return <div key={i}>
-                {m.amount && <BoostWrap bg={theme.highlight}>
+            return <div key={i} style={{alignSelf: m.isMe ? "flex-end" : "start"}}>
+                {!m.isMe && <span style={{color: getColor(m.alias), marginLeft: 8}}>{m.alias}</span>}
+                {m.amount && <BoostWrap bg={m.isMe ? theme.highlight : theme.notMeMessage} >
                     {(m.type === "boost") && <span style={{display: 'flex', alignItems: 'center'}}>Boost! {m.amount}
                         <Circle style={{ background: theme.lightGreen }}>
                             <RocketIcon style={{ height: 13, width: 13, fill: 'white' }} />
@@ -96,16 +102,20 @@ const ReplayWrap = styled.div`
     position: absolute;
     height: 300px;
     width: 300px;
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     align-items: baseline;
-    justify-content: flex-end;
-    flex-wrap: wrap-reverse;
+    overflow: hidden;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
+    justify-content: start;
+
 `
 
 const ClipWrap = styled.div`
     background-color: ${p => p.bg};
     margin: 5px;
+    margin-top: 0px;
     padding: 10px;
     border-radius: 6px;
 `
@@ -113,6 +123,7 @@ const ClipWrap = styled.div`
 const BoostWrap = styled.div`
     background-color: ${p => p.bg};
     margin: 5px;
+    margin-top: 0px;
     padding: 6px;
     border-radius: 6px;
 `
