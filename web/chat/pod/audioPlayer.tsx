@@ -26,9 +26,7 @@ export default function AudioPlayer({ url, clickBoost, clickMsg, onPlay, onRewin
   }
 
   function onChangeCommitted(e, percent) {
-    console.log("percent", percent)
-    console.log("duration", duration)
-    if (duration && (percent || percent===0)) {
+    if (duration && (percent || percent === 0)) {
       onSeek(duration * (percent / 100))
     }
   }
@@ -38,7 +36,7 @@ export default function AudioPlayer({ url, clickBoost, clickMsg, onPlay, onRewin
   const durationText = moment.duration(duration, 'seconds').format('hh:mm:ss')
   const playStyle = { fontSize: 42, color: '#6089ff', marginLeft: 12, marginRight: 12, cursor: 'pointer' }
 
-  function HandleRateChange(newRate){
+  function HandleRateChange(newRate) {
     setRateChoice(newRate)
     Audio.setRate(newRate)
     setRateSelect(false)
@@ -62,14 +60,14 @@ export default function AudioPlayer({ url, clickBoost, clickMsg, onPlay, onRewin
     </Top>
     {rateSelect ?
       <RateSelect>
-        {rateChoices.map((r) => <RateBox key={r+''}
-          style={{background: r===rateChoice && '#3d6189'}} 
-          onClick={()=>HandleRateChange(r)} >
-            {r}x
+        {rateChoices.map((r) => <RateBox key={r + ''}
+          style={{ background: r === rateChoice && '#3d6189' }}
+          onClick={() => HandleRateChange(r)} >
+          {r}x
           </RateBox>
         )}
       </RateSelect> :
-      <RateDisplay onClick={()=>setRateSelect(true)}>{rateChoice}x</RateDisplay>}
+      <RateDisplay onClick={() => setRateSelect(true)}>{rateChoice}x</RateDisplay>}
     {url && <Bottom>
       <MsgWrap>
         <ChatQuote style={{ height: 24, width: 24 }} onClick={clickMsg} />

@@ -71,7 +71,8 @@ export default function Pod({ url, chat, onBoost }) {
         let episode
         if(isPlaying && eid) {
           episode = thepod.episodes && thepod.episodes.length && thepod.episodes.find(e=>e.id===eid)
-        } else {
+        } 
+        if(!episode) {
           episode = thepod.episodes && thepod.episodes.length && thepod.episodes[0]
         }
         if (episode) setSelectedEpisodeID(episode.id)
@@ -88,7 +89,6 @@ export default function Pod({ url, chat, onBoost }) {
   }
 
   function boost(pos: number) {
-    console.log("BOOST")
     EE.emit(PLAY_ANIMATION)
     const amount = user.tipAmount || 100
     const sp: StreamPayment = {
@@ -105,21 +105,25 @@ export default function Pod({ url, chat, onBoost }) {
     feed.sendPayments(dests, memo, amount, chatID, false)
   }
 
-  function sendPayments(ts: number) {
+  async function sendPayments(ts: number) {
     console.log('=> sendPayments!')
-    const dests = pod && pod.value && pod.value.destinations
-    console.log(dests, pod)
+
+    const current = Audio.getCurrent()
+    if(!current) return
+    const item = current.item
+    if(!item) return
+    const dests = item.dests
     if (!dests) return
-    if (!pod || !episode)
-      if (!pod.id || !episode.id) return
-    if (!pod.value.model) return
+
+    const pos = await Audio.getPosition()
+
     const sp: StreamPayment = {
-      feedID: pod.id,
-      itemID: episode.id,
-      ts: ts || 0,
+      feedID: item.feedID,
+      itemID: item.id,
+      ts: Math.round(pos),
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, pricePerMinute, chatID, true)
+    feed.sendPayments(dests, memo, item.price || pricePerMinute, item.chatID || chatID, true)
   }
 
   function onClipPayment(d) {
@@ -247,9 +251,9 @@ export default function Pod({ url, chat, onBoost }) {
       </PodText>
     </PodInfo> : <Center><CircularProgress /></Center>}
 
-    {episode && <Player pod={pod} episode={episode}
-      sendPayments={sendPayments} boost={boost}
-    />}
+     <Player pod={pod} episode={episode}
+      sendPayments={sendPayments} boost={boost} chat={chat} ppm={ppm}
+    />
 
     {pod && pod.episodes && <PodEpisodes>
       <div style={{ marginBottom: 5 }}>{`Episodes: ${pod.episodes.length}`}</div>

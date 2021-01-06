@@ -1,4 +1,5 @@
 import { Howl, Howler } from 'howler';
+import { Destination } from '../../../src/store/feed'
 
 let playlist: Audio[] = [] // list of episodes
 let index = 0
@@ -12,10 +13,14 @@ interface Item {
   url: string,
   title: string,
   artist: string,
-  artwork: string
+  artwork: string,
+  feedID: number,
+  chatID: number,
+  price: number,
+  dests: Destination[]
 }
 
-function getCurrent() {
+export function getCurrent() {
   let a
   playlist.forEach(h=>{
     if(h.sound.playing()) a = h
@@ -39,7 +44,7 @@ export async function playing() {
   return playing
 }
 
-export async function add(item: Item) {
+export async function add(item: Item):Promise<number> {
   return new Promise((resolve, reject) => {
     var sound: Howl = new Howl({
       src: [item.url],
@@ -48,10 +53,11 @@ export async function add(item: Item) {
     })
     playlist.unshift({ item, sound })
     sound.on('load', function (e) {
-      resolve(true)
+      const duration = sound.duration()
+      resolve(duration)
     })
     sound.on('loaderror', function (e) {
-      resolve(false)
+      resolve(0)
     })
   })
 }

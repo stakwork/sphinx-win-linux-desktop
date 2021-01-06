@@ -6,7 +6,6 @@ import CloseButton from '@material-ui/icons/Close';
 import { Player } from 'video-react';
 
 export default function ViewImg({ params }) {
-  console.log(params)
   const { ui } = useStores()
   const setImgViewerParamsHandler = () => ui.setImgViewerParams(null)
   const chatContent = document.getElementById('chat-content')

@@ -11,7 +11,8 @@ const theme = {
     active:'#48c998',
     lightGreen: '#76d7b2',
     border:'#1a242f',
-    iconGrey: '#44505d'
+    iconGrey: '#44505d',
+    notMeMessage: '#232f39'
 }
 
 export default theme
