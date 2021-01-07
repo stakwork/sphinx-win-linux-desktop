@@ -38,7 +38,11 @@ export default function Code(props) {
     await user.signupWithIP(ip)
     await sleep(200)
     const token = await user.generateToken(pwd)
-    if(token) onDone()
+    if(token) {
+      onDone()
+    } else {
+      setWrong('Cannot reach server...')
+    }
     setChecking(false)
   }
 
@@ -88,16 +92,26 @@ export default function Code(props) {
       return
     }
 
-    const codeR = await user.signupWithCode(theCode)
-    if(!codeR) {
-      setChecking(false)
-      return
+    let theIP = user.currentIP
+    let thePassword = ''
+    if(!theIP) {
+      const codeR = await user.signupWithCode(theCode)
+      if(!codeR) {
+        setChecking(false)
+        return
+      }
+      const {ip,password} = codeR
+      theIP = ip
+      thePassword = password
     }
-    const {ip,password} = codeR
     await sleep(200)
-    if (ip) {
-      const token = await user.generateToken(password||'')
-      if(token) onDone()
+    if (theIP) {
+      const token = await user.generateToken(thePassword||'')
+      if(token) {
+        onDone()
+      } else {
+        setWrong('Cannot reach server...')
+      }
     }
     setChecking(false)
   }

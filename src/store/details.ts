@@ -49,6 +49,16 @@ class DetailsStore {
     this.logs = ''
   }
 
+  @action
+  async getVersions() {
+    try {
+      const r = await relay.get('app_versions')
+      if (r) return r
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   @action reset() {
     this.balance = 0
     this.logs = ''

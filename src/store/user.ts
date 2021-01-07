@@ -177,12 +177,17 @@ class UserStore {
 
   @action
   async generateToken(pwd: string) {
+    if(api.relay===null && this.currentIP) {
+      api.instantiateRelay(this.currentIP)
+      await sleep(1)
+    }
     try {
       const token = await randString(20)
       console.log("OK GEN TOKEN!", this.currentIP, pwd)
-      await api.relay.post(`contacts/tokens?pwd=${pwd}`, {
+      const r = await api.relay.post(`contacts/tokens?pwd=${pwd}`, {
         token
       })
+      if(!r) return console.log("=> FAILED TO REACH RELAY")
       this.authToken = token
       api.instantiateRelay(this.currentIP, token,
         () => uiStore.setConnected(true),
