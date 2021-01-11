@@ -152,7 +152,7 @@ export async function wasEnteredRecently(): Promise<boolean> {
   if(!enteredAt){
     return false
   }
-  if(now < enteredAt+(60*60*hours)) { // five minutes
+  if(now < enteredAt+(60*60*hours)) { 
     return true
   }
   return false

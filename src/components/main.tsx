@@ -7,6 +7,7 @@ import * as push from './push'
 import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
+import {check, wasCheckedRecently} from './checkVersion'
 
 async function createPrivateKeyIfNotExists(contacts) {
   const priv = await rsa.getPrivateKey()
@@ -28,11 +29,11 @@ push.configure((t) => {
 
 
 export default function Main() {
+  
   const { contacts, msg, details, user, meme, ui } = useStores()
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
-
     AppState.addEventListener("change", handleAppStateChange);
     return () => {
       AppState.removeEventListener("change", handleAppStateChange);
@@ -42,12 +43,17 @@ export default function Main() {
   function handleAppStateChange(nextAppState) {
     if (appState.current.match(/inactive|background/) && nextAppState === "active") {
       loadHistory()
+      checkVersion()
     }
     if (appState.current.match(/active/) && nextAppState === "background") {
       const count = msg.countUnseenMessages()
       BadgeAndroid.setBadge(count);
     }
     appState.current = nextAppState;
+  }
+
+  async function checkVersion() {
+    // const showDialog = await check()
   }
 
   async function loadHistory() {
