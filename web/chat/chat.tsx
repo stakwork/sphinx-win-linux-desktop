@@ -131,6 +131,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const [menuMessage, setMenuMessage] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
+  const [customBoost, setCustomBoost] = useState(user.tipAmount||100)
 
   async function dropzoneUpload(files) {
     const file = files[0]
@@ -154,7 +155,8 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   // boost an existing message
   function onMessageBoost(uuid){
     if(!uuid) return
-    const amount = (user.tipAmount||100) + messagePrice
+    console.log("CUSTOM BOOST in onMESSAGEBOOST", customBoost)
+    const amount = (customBoost||user.tipAmount||100) + messagePrice
     msg.sendMessage({
       boost:true,
       contact_id:null,
@@ -163,6 +165,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
       reply_uuid:uuid,
       message_price: messagePrice
     })
+    setCustomBoost(user.tipAmount||100)
   }
 
   const handleMenuClick = (event, m) => {
@@ -173,6 +176,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const handleMenuClose = () => {
     setAnchorEl(null);
     setMenuMessage(null);
+    setCustomBoost(user.tipAmount||100)
   };
 
   function onCopy(word) {
@@ -243,6 +247,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
                 {alert && <Alert style={{ position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
                 <MsgMenu anchorEl={anchorEl} menuMessage={menuMessage} isMe={isMe(menuMessage)}
                   handleMenuClose={handleMenuClose} onCopy={onCopy} onBoost={onMessageBoost} 
+                  customBoost={customBoost} setCustomBoost={setCustomBoost}
                 />
               </Layer>
               {appURL && <Layer show={appMode} style={{ background: theme.deep, height: 'calc(100% + 63px)' }}>

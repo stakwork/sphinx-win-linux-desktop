@@ -10,8 +10,9 @@ import { useStores, hooks } from '../../src/store'
 import theme from '../theme'
 import styled from 'styled-components'
 import {BoostIcon} from './pod/icons'
+import TextField from '@material-ui/core/TextField';
 
-export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, onCopy, onBoost }) {
+export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, onCopy, onBoost, customBoost, setCustomBoost }) {
   const [deleting, setDeleting] = useState(false)
   const { ui, msg } = useStores()
 
@@ -60,9 +61,21 @@ export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, 
       <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
     </MenuItem>
 
-    {!isMe && <MenuItem onClick={() => { onBoost(menuMessage.uuid), handleMenuClose() }}
+    {!isMe && <MenuItem 
       style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
-      <Boost />Boost
+      <div onClick={() => { onBoost(menuMessage.uuid), handleMenuClose() }} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+        <Boost />
+        <div style={{marginRight: 5}}>Boost</div>
+      </div>
+      <CustomBoostWrapper>
+          <TextField 
+            id="standard-number" 
+            type="number" 
+            value={customBoost}
+            onChange={e => setCustomBoost(parseInt(e.target.value))}
+            inputProps={{ style: { textAlign: 'center' } }}
+            style={{width: 40, padding: 0}} /> 
+      </CustomBoostWrapper>
     </MenuItem>}
 
     {isMe && <MenuItem onClick={deleteMessage}
@@ -76,7 +89,7 @@ export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, 
 
 function Boost(){
   return <BoostGreen>
-    <BoostIcon style={{height:20,width:20}} />
+    <BoostIcon style={{height:20,width:20}} /> 
   </BoostGreen>
 }
 const BoostGreen = styled.div`
@@ -89,4 +102,11 @@ const BoostGreen = styled.div`
   display:flex;
   align-items:center;
   justify-content:center;
+`
+
+const CustomBoostWrapper = styled.div`
+
+  & .MuiInputBase-input{
+    padding: 0px;
+  }
 `
