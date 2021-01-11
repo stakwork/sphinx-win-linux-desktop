@@ -13,6 +13,7 @@ import ShareInvite from './shareInvite'
 import ViewTribe from './viewTribe'
 import Onchain from './onchain'
 import {uiStore} from '../../src/store/ui'
+import VersionModal from './versionModal'
 
 const electron = window.require ? window.require("electron") : {}
 if(electron.ipcRenderer) {
@@ -38,6 +39,7 @@ export default function Modals(){
       {ui.shareInviteModal && <ShareInvite />}
       {ui.viewTribe && <ViewTribe />}
       {ui.onchain && <Onchain />}
+      {ui.showVersionDialog && <VersionModal />}
     </Wrap>
   })
 }
