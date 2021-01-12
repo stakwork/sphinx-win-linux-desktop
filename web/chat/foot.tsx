@@ -269,7 +269,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
             <Picker showPreview={false} showSkinTones={false} onSelect={emoji => ui.setTribeText(chat.id, text + emoji.native)} />
           </Popover>
           <Input value={text} onChange={e => ui.setTribeText(chat.id, e.target.value)}
-            placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18 }}
+            placeholder="Message" style={{ background: theme.extraDeep, fontSize: 18, textAlign: "left" }}
             disabled={!chat}
             onKeyPress={e => {
               if (e.key === 'Enter') { e.preventDefault(), sendMessage() }
