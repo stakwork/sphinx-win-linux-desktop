@@ -19,6 +19,7 @@ import { PaletteType } from '@material-ui/core';
 import 'react-h5-audio-player/lib/styles.css';
 import EE, {RESET_IP, RESET_IP_FINISHED} from './utils/ee'
 import setupDeepLink from './utils/deeplink'
+import {check} from './version'
 
 const palette = {
   type: 'dark' as PaletteType,
@@ -108,14 +109,23 @@ function App(){
 }
 
 function Main(){
-  const {contacts,msg,details,meme} = useStores()
+  const {contacts,msg,ui,meme} = useStores()
+
   useEffect(()=>{
     setTimeout(()=>{
       meme.authenticateAll()
       meme.checkCacheEnabled()
     }, 1500)
     msg.initLastSeen()
+    checkVersion()
   },[])
+
+  async function checkVersion(){
+    const show = await check()
+    console.log("SHOW VERSION DIALOG",show)
+    if(show) ui.setShowVersionDialog(true)
+  }
+
   return <main className="main" style={{background:theme.bg}}>
     <ChatList />
     <Chat />

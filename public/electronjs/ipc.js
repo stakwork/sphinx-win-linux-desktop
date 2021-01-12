@@ -7,6 +7,8 @@ const Crypto = require('crypto')
 const meme = require('./meme')
 const open = require('open');
 const log = require('electron-log');
+const VERSION = require('./version')
+const os = require('os');
 
 const okToLog = true
 function logger() {
@@ -194,5 +196,18 @@ ipcMain.on('rand', (event, args) => {
     } catch(e) {
         log.error('rand ERROR', e)
         event.returnValue = ''
+    }
+})
+
+ipcMain.on('version-and-platform', (event, args) => {
+    logger('=> version')
+    try {
+        if(!args.rid) return
+        event.reply(args.rid, {
+            version: VERSION,
+            platform: os.platform() // "linux", "win32"
+        })
+    } catch(e) {
+        log.error('version ERROR', e)
     }
 })

@@ -281,6 +281,11 @@ export class UiStore {
   @action setAddSatsModal(b: boolean) {
     this.addSatsModal = b
   }
+
+  @observable showVersionDialog: boolean = false
+  @action setShowVersionDialog(b: boolean) {
+    this.showVersionDialog = b
+  }
 }
 
 export const uiStore = new UiStore()

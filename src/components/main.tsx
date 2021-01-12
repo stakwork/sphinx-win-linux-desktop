@@ -7,7 +7,7 @@ import * as push from './push'
 import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
-import {check, wasCheckedRecently} from './checkVersion'
+import {check, VersionDialog} from './checkVersion'
 
 async function createPrivateKeyIfNotExists(contacts) {
   const priv = await rsa.getPrivateKey()
@@ -30,6 +30,7 @@ push.configure((t) => {
 
 export default function Main() {
   
+  const [showVersionDialog, setShowVersionDialog] = useState(false)
   const { contacts, msg, details, user, meme, ui } = useStores()
   const appState = useRef(AppState.currentState);
 
@@ -53,7 +54,8 @@ export default function Main() {
   }
 
   async function checkVersion() {
-    // const showDialog = await check()
+    const showDialog = await check()
+    if(showDialog) setShowVersionDialog(true)
   }
 
   async function loadHistory() {
@@ -75,6 +77,7 @@ export default function Main() {
     (async () => {
 
       loadHistory()
+      checkVersion()
 
       initPicSrc()
 
@@ -91,7 +94,17 @@ export default function Main() {
     }
   }, [])
 
-  return <MainNav />
+  function onCloseVersionDialog(){
+    setShowVersionDialog(false)
+  }
+
+  return <>
+    <MainNav />
+    <VersionDialog 
+      showVersionDialog={showVersionDialog}
+      onCloseVersionDialog={onCloseVersionDialog}
+    />
+  </>
 }
 
 async function sleep(ms) {

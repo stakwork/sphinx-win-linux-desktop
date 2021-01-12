@@ -20,8 +20,13 @@
     "isolatedModules": true
   },
   // "include": ["src"]
+<<<<<<< HEAD
   "include": [
     "src/index.web.tsx",
     "web"
   ]
 }
+=======
+  "include": ["src/index.web.tsx","web"]
+}
+>>>>>>> e75ab4f373ad28e2a719a06f2ab885eb543a6e38
