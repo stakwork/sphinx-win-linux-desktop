@@ -9,7 +9,7 @@ import { useHasLink } from './msg/hooks'
 import { useStores, hooks } from '../../src/store'
 import theme from '../theme'
 import styled from 'styled-components'
-import {BoostIcon} from './pod/icons'
+import { BoostIcon } from './pod/icons'
 import TextField from '@material-ui/core/TextField';
 
 export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, onCopy, onBoost, customBoost, setCustomBoost }) {
@@ -61,20 +61,20 @@ export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, 
       <ReplyIcon style={{ fontSize: 'medium', marginRight: 8 }} />Reply
     </MenuItem>
 
-    {!isMe && <MenuItem 
+    {!isMe && <MenuItem
       style={{ fontSize: 14, color: 'white', backgroundColor: isMe ? theme.highlight : theme.extraDeep }}>
-      <div onClick={() => { onBoost(menuMessage.uuid), handleMenuClose() }} style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+      <div onClick={() => { onBoost(menuMessage.uuid), handleMenuClose() }} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Boost />
-        <div style={{marginRight: 5}}>Boost</div>
+        <div style={{ marginRight: 5 }}>Boost</div>
       </div>
       <CustomBoostWrapper>
-          <TextField 
-            id="standard-number" 
-            type="number" 
-            value={customBoost}
-            onChange={e => setCustomBoost(parseInt(e.target.value))}
-            inputProps={{ style: { textAlign: 'center' } }}
-            style={{width: 40, padding: 0}} /> 
+        <TextField
+          id="standard-number"
+          type="number"
+          value={customBoost}
+          onChange={e => setCustomBoost(parseInt(e.target.value))}
+          inputProps={{ style: { textAlign: 'center' } }}
+          style={{ width: 40, padding: 0 }} />
       </CustomBoostWrapper>
     </MenuItem>}
 
@@ -87,9 +87,9 @@ export default function msgMenu({ anchorEl, menuMessage, isMe, handleMenuClose, 
   </Menu>
 }
 
-function Boost(){
+function Boost() {
   return <BoostGreen>
-    <BoostIcon style={{height:20,width:20}} /> 
+    <BoostIcon style={{ height: 20, width: 20 }} />
   </BoostGreen>
 }
 const BoostGreen = styled.div`
