@@ -133,12 +133,12 @@ function Onboard(props){
     <Logo src="static/sphinx-white-logo.png" />
     {props.welcome && <>
       <Title>Welcome</Title>
-      <Msg>Paste the invitation text or scan the QR code</Msg>
+      <Msg data-testid={"onboardtext"}>Paste the invitation text or scan the QR code</Msg>
       <InputWrap>
-        <Input value={text} onChange={e=> setText(e.target.value)} 
+        <Input id={"onboard-enter-code"} value={text} onChange={e=> setText(e.target.value)} 
           placeholder="Enter Code..."
         />
-        <SendIcon onClick={checkCode}
+        <SendIcon id={"onboard-send-button"} onClick={checkCode}
           style={{color:text?'#6A8FFF':'#A5A5A5',fontSize:24,position:'absolute',right:16,top:20,cursor:'pointer'}} 
         />
       </InputWrap>
@@ -163,7 +163,7 @@ const Title=styled.h1`
   color:white;
   margin-top:64px;
 `
-const Msg=styled.div`
+export const Msg=styled.div`
   font-size:18px;
   max-width:200px;
   text-align:center;

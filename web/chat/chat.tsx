@@ -26,7 +26,7 @@ const headHeight = 65
 export type RouteStatus = 'active' | 'inactive' | null
 
 function Chat() {
-  const { chats, ui, msg } = useStores()
+  const { chats, ui, msg, details } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [status,setStatus] = useState<RouteStatus>(null)
   const [tribeParams, setTribeParams] = useState(null)
@@ -124,7 +124,7 @@ const Inner = styled.div`
 `
 
 function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messagePrice }) {
-  const { contacts, ui, chats, meme, msg, user } = useStores()
+  const { contacts, ui, chats, meme, msg, user, details } = useStores()
   const chat = ui.selectedChat
   const [alert, setAlert] = useState(``)
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -132,6 +132,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const [uploading, setUploading] = useState(false)
   const [msgCount, setMsgCount] = useState(20)
   const [customBoost, setCustomBoost] = useState(user.tipAmount||100)
+  const [insfBalance, setInsfBalance] = useState(false)
 
   async function dropzoneUpload(files) {
     const file = files[0]
@@ -155,8 +156,17 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   // boost an existing message
   function onMessageBoost(uuid){
     if(!uuid) return
-    console.log("CUSTOM BOOST in onMESSAGEBOOST", customBoost)
     const amount = (customBoost||user.tipAmount||100) + messagePrice
+    console.log("amount", amount)
+    console.log("detail.balance", details.balance)
+    if(amount>details.balance){
+      console.log("not enough balance")
+      setInsfBalance(true)
+      setTimeout(() => {
+        setInsfBalance(false)
+      }, 3500);
+      return
+    }
     msg.sendMessage({
       boost:true,
       contact_id:null,
@@ -245,6 +255,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
                   })}
                 </MsgList>
                 {alert && <Alert style={{ position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
+                {insfBalance && <Alert style={{ position: 'absolute', bottom: "50%", left: 'calc(50% - 105px)', opacity: 0.9 }} icon={false}>Insufficient Balance</Alert>}
                 <MsgMenu anchorEl={anchorEl} menuMessage={menuMessage} isMe={isMe(menuMessage)}
                   handleMenuClose={handleMenuClose} onCopy={onCopy} onBoost={onMessageBoost} 
                   customBoost={customBoost} setCustomBoost={setCustomBoost}

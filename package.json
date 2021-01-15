@@ -17,7 +17,8 @@
     "pack": "electron-builder --dir",
     "dist:linux": "./node_modules/.bin/electron-builder --linux",
     "dist:win": "./node_modules/.bin/electron-builder --win",
-    "postinstall": "jetify"
+    "postinstall": "jetify",
+    "test": "mocha"
   },
   "rnpm": {
     "assets": [
@@ -223,8 +224,10 @@
     "electron-builder": "^22.7.0",
     "jetifier": "~1.6.4",
     "metro-react-native-babel-preset": "^0.59.0",
+    "mocha": "^8.2.1",
     "react-dev-utils": "^10.2.1",
     "react-test-renderer": "16.13.1",
+    "spectron": "^11.1.0",
     "typescript": "~3.6.3"
   },
   "private": true,
