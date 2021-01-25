@@ -18,8 +18,16 @@ import { useDarkMode } from 'react-native-dynamic'
 import { is24HourFormat } from 'react-native-device-time-format'
 import TrackPlayer from 'react-native-track-player';
 import EE, {RESET_IP_FINISHED} from './src/components/utils/ee'
+import { I18nManager} from 'react-native';
 
 declare var global: {HermesInternal: null | {}}
+
+try { 
+  I18nManager.allowRTL(false);
+} 
+catch (e) {
+  console.log(e);
+}
 
 export default function Wrap(){
   const {ui,chats} = useStores()

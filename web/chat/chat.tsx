@@ -157,10 +157,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   function onMessageBoost(uuid){
     if(!uuid) return
     const amount = (customBoost||user.tipAmount||100) + messagePrice
-    console.log("amount", amount)
-    console.log("detail.balance", details.balance)
     if(amount>details.balance){
-      console.log("not enough balance")
       setInsfBalance(true)
       setTimeout(() => {
         setInsfBalance(false)

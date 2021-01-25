@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, hooks, useTheme } from '../../store'
-import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native'
+import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator, ToastAndroid } from 'react-native'
 import { Chat } from '../../store/chats'
 import { useMsgSender } from '../../store/hooks/msg'
 import Message from './msg'
@@ -15,17 +15,27 @@ const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pricePerMessage:number }) {
-  const { msg, ui, user, chats } = useStores()
+  const { msg, ui, user, chats, details } = useStores()
   const [limit, setLimit] = useState(40)
 
   function onLoadMoreMsgs() {
     setLimit(c => c + 40)
   }
 
-  async function onBoostMsg(m){
+  async function onBoostMsg(m, sliderValue){
     const {uuid} = m
     if(!uuid) return
-    const amount = (user.tipAmount||100) + pricePerMessage
+    const amount = (sliderValue || user.tipAmount || 100) + pricePerMessage
+    if(amount>details.balance){
+      ToastAndroid.showWithGravityAndOffset(
+        'Not Enough Balance',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+        0, 125
+      );
+      return
+    }
+
     msg.sendMessage({
       boost:true,
       contact_id:null,

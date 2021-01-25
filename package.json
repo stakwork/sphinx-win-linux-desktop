@@ -178,7 +178,7 @@
     "react-native-swipe-list-view": "^2.2.0",
     "react-native-tcp": "^3.3.2",
     "react-native-touch-id": "^4.4.1",
-    "react-native-track-player": "^1.1.4",
+    "react-native-track-player": "1.1.4",
     "react-native-translucent-modal": "^1.1.2",
     "react-native-udp": "^2.7.0",
     "react-native-url-preview": "^1.1.6",
