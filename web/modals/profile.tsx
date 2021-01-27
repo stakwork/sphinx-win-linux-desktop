@@ -37,6 +37,8 @@ export default function Profile() {
   const [advanced, setAdvanced] = useState(false)
   const [loading, setLoading] = useState(false)
   const [copied,setCopied] = useState(false)
+  console.log("USER AUTHTOKEN === ", user.authToken)
+  console.log("CURRENT IP === ", user.currentIP)
 
   async function updateMe(v) {
     setLoading(true)

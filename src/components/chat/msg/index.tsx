@@ -3,7 +3,7 @@ import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
-import { View, StyleSheet, Text, TouchableOpacity, TextInput, Slider } from 'react-native'
+import { View, StyleSheet, Text, TouchableOpacity, TextInput } from 'react-native'
 import { constantCodes, constants } from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
@@ -23,6 +23,8 @@ import {useTheme, useStores} from '../../../store'
 import EE, {CANCEL_REPLY_UUID, CLEAR_REPLY_UUID, REPLY_UUID} from '../../utils/ee'
 import { displayPartsToString } from 'typescript'
 import CustomIcon from '../../utils/customIcons'
+import Slider from '@react-native-community/slider';
+
 
 
 export default function MsgRow(props) {
@@ -208,7 +210,7 @@ function MsgBubble(props) {
             onPress={onBoostHandler}
           >
             <View 
-            style={{ padding: 10, minWidth:99, borderTopWidth: 1, borderTopColor: '#ddd', flexDirection: "row", alignContent:"center", justifyContent:"center" }}
+            style={{ padding: 10, minWidth:110, borderTopWidth: 1, borderTopColor: '#ddd', flexDirection: "row", alignContent:"center", justifyContent:"center" }}
               >
               <View style={{...styles.rocketWrap, backgroundColor:theme.accent}}>
                   <CustomIcon color="white" size={20} name="fireworks" />
@@ -230,7 +232,8 @@ function MsgBubble(props) {
                             step={250}
                             value={sliderValue}
                             onValueChange={(val) => nonZeroSlider(val)}  
-                            style={{marginBottom: 15, marginTop: 10, marginLeft: 10, transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }], width: 90}}
+                            minimumTrackTintColor={theme.secondary}
+                            style={{marginBottom: 15, marginTop: 10, width: 110}}
             
                         />}
           </View>

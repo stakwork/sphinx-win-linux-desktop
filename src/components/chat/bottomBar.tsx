@@ -322,6 +322,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
         </TouchableOpacity>}
         {!recordingStartTime && <TextInput textAlignVertical="top"
           accessibilityLabel="message-input"
+          
           numberOfLines={4}
           multiline={true} blurOnSubmit={true}
           onContentSizeChange={e=>{
