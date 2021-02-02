@@ -37,8 +37,6 @@ export default function Profile() {
   const [advanced, setAdvanced] = useState(false)
   const [loading, setLoading] = useState(false)
   const [copied,setCopied] = useState(false)
-  console.log("USER AUTHTOKEN === ", user.authToken)
-  console.log("CURRENT IP === ", user.currentIP)
 
   async function updateMe(v) {
     setLoading(true)
@@ -53,7 +51,6 @@ export default function Profile() {
   async function exportKeys(){
     if(copied) return
     const priv = await rsa.getPrivateKey()
-    console.log("PRIVATE KEY === ", priv)
     const me = contacts.contacts.find(c=>c.id===1)
     const pub = me && me.contact_key
     const ip = user.currentIP
