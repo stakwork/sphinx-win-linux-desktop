@@ -1,8 +1,8 @@
 var test = require('ava');
 var http = require('ava-http');
-var rsa = require('../public/electronjs/rsa')
-var nodes = require('./nodes.json')
-var f = require('./functions')
+var rsa = require('../../public/electronjs/rsa')
+var nodes = require('../nodes.json')
+var f = require('../functions')
 var node1 = nodes[0]
 var node2 = nodes[1]
 

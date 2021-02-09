@@ -5,6 +5,7 @@ const FormData = require('form-data')
 const fetch = require('node-fetch')
 
 async function uploadMeme(fileBase64, typ, host, token, filename, isPublic) {
+
   try {
 
     let imgBuf = dataURLtoBuf(fileBase64);

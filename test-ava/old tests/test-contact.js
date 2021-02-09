@@ -1,8 +1,8 @@
 var test = require('ava');
 var http = require('ava-http');
-var rsa = require('../public/electronjs/rsa')
-var nodes = require('./nodes.json')
-var f = require('./functions')
+var rsa = require('../../public/electronjs/rsa')
+var nodes = require('../nodes.json')
+var f = require('../functions')
 var node1 = nodes[0]
 var node2 = nodes[1]
 
@@ -24,7 +24,7 @@ test('add contact, send message, delete contact', async t => {
   t.true(typeof node2id === 'number')
 
   //await contact_key
-  await f.sleep(3000)
+  await f.sleep(1000)
   //node1 get all contacts
   let res = await http.get(node1.ip+'/contacts', f.makeArgs(node1));
   //find if contact_key of node2 exists (based on pubkey)

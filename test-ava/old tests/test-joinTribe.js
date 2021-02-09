@@ -1,12 +1,14 @@
 var test = require('ava');
 var http = require('ava-http');
-var rsa = require('../public/electronjs/rsa')
-var nodes = require('./nodes.json')
-var f = require('./functions')
+var rsa = require('../../public/electronjs/rsa')
+var nodes = require('../nodes.json')
+var f = require('../functions')
 var node1 = nodes[0]
 var node2 = nodes[1]
 
 test('join tribe, send message, exit tribe', async t => {
+
+//NODE1 CREATES NEW TRIBE ===>
 
     const name = "Node1 Test Tribe"
     const description = "A tribe for testing"
@@ -57,6 +59,8 @@ test('join tribe, send message, exit tribe', async t => {
         my_photo_url: ""
     }
 
+//NODE2 JOINS TRIBE ===>
+
     //node2 joins test tribe j
     const join = await http.post(node2.ip+'/tribe', f.makeArgs(node2, j))
     //check that join was successful
@@ -73,7 +77,6 @@ test('join tribe, send message, exit tribe', async t => {
     let contactJoinCheck = con.response.chats.find(chat => f.arraysEqual(chat.contact_ids, [1, parseInt(node2check.id)]))
     t.truthy(contactJoinCheck, "tribe should have contact ids for node1 and node2")
 
-
     //get list of contacts as node2
     con = await http.get(node2.ip+'/contacts', f.makeArgs(node2));
     // create node2 contact object
@@ -81,6 +84,8 @@ test('join tribe, send message, exit tribe', async t => {
     //get test tribe id as node2
     const oldTribe = con.response.chats.find(chat=> chat.uuid === c.response.uuid)
     var oldTribeId = oldTribe.id
+
+//NODE1 AND NODE2 POST MESSAGES TO TRIBE ===>
 
     //node1 create random string for message test
     const text1 = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
@@ -121,20 +126,45 @@ test('join tribe, send message, exit tribe', async t => {
     const msg1 = await http.post(node1.ip+'/messages', f.makeArgs(node1, v1))
     //make sure msg1 exists
     t.truthy(msg1, "msg1 should exist")
+    //wait for message to process
+    await f.sleep(1000)
+
+    //get list of messages from node2 perspective
+    const mess2 = await http.get(node2.ip+'/messages', f.makeArgs(node2))
+    //make sure that messages 2 exist
+    t.truthy(mess2.response.new_messages, 'node2 should have at least one message')
+    //extract the last message sent to node2
+    const lastMessage2 = mess2.response.new_messages[mess2.response.new_messages.length-1]
+    //decrypt the last message sent to node2 using node2 privat key and lastMessage content
+    const decrypt2 = rsa.decrypt(node2.privkey, lastMessage2.message_content)
+    //the decrypted message should equal the random string input before encryption
+    t.true(decrypt2 === text1, 'decrypted text2 should equal pre-encryption text1')
+
 
     //send message from node2 to test tribe
     const msg2 = await http.post(node2.ip+'/messages', f.makeArgs(node2, v2))
     //make sure msg2 exists
     t.truthy(msg2, "msg2 should exist")
-
     //wait for message to process
     await f.sleep(1000)
+
+    //get list of messages from node1 perspective
+    const mess1 = await http.get(node1.ip+'/messages', f.makeArgs(node1))
+    //make sure that messages 1 exist
+    t.truthy(mess1.response.new_messages, 'node1 should have at least one message')
+    //extract the last message sent to node1
+    const lastMessage1 = mess1.response.new_messages[mess1.response.new_messages.length-1]
+    //decrypt the last message sent to node1 using node1 privat key and lastMessage content
+    const decrypt1 = rsa.decrypt(node1.privkey, lastMessage1.message_content)
+    //the decrypted message should equal the random string input before encryption
+    t.true(decrypt1 === text2, 'decrypted text1 should equal pre-encryption text2')
+
+//NODE2 LEAVES THE TRIBE ===>
 
     //node2 leaves tribe
     const exit = await http.del(node2.ip+`/chat/${oldTribeId}`, f.makeArgs(node2))
     //check exit
     t.truthy(exit, "node2 should exit test tribe")
-
     //wait for node2 to leave tribe
     await f.sleep(1000)
 
@@ -145,12 +175,24 @@ test('join tribe, send message, exit tribe', async t => {
     //check that node2 has left the tribe
     t.truthy(contactLeaveCheck, "test tribe should only contain node1 id")
 
+//NODE1 AND NODE2 DELETE THE TRIBE ===>
+
     //node1 deletes the tribe
     let d1 = await http.del(node1.ip+'/chat/'+newTribeId, f.makeArgs(node1))
+    // d1 = await http.del(node1.ip+'/chat/261', f.makeArgs(node1)) //DELETE NODE BY ID
     t.true(d1.success, "node1 should delete the tribe")
 
     //node2 deletes the tribe
     let d2 = await http.del(node2.ip+'/chat/'+oldTribeId, f.makeArgs(node2))
+    // d2 = await http.del(node2.ip+'/chat/241', f.makeArgs(node2)) //DELETE NODE BY ID
     t.true(d2.success, "node2 should delete the tribe")
+
+    //final contacts check node1
+    let fin = await http.get(node1.ip+'/contacts', f.makeArgs(node1));
+    console.log(JSON.stringify(fin))
+
+    //final contacts check node2
+    let fin2 = await http.get(node2.ip+'/contacts', f.makeArgs(node2));
+    console.log(JSON.stringify(fin2))
 
 })
