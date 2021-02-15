@@ -57,13 +57,34 @@ async function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function runTest(t, testFunction, nodeArray){
-    await asyncForEach(nodeArray, async n1 => {
-        await asyncForEach(nodeArray, async n2 => {
-            if(n1===n2) return
-            await testFunction(t, n1, n2)
+async function runTest(t, testFunction, nodeArray, iterate){
+    if(iterate){
+        console.log("ITERATE")
+        await asyncForEach(nodeArray, async n1 => {
+            if(nodeArray.length === 1){
+                await testFunction(t, n1)
+            } else {
+                if(nodeArray.length === 2){
+                    await asyncForEach(nodeArray, async n2 => {
+                        if(n1===n2) return
+                        await testFunction(t, n1, n2)
+                    })
+                } else {
+                    await asyncForEach(nodeArray, async n2 => {
+                        await asyncForEach(nodeArray, async n3 => {
+                            var diff = {}
+                            diff[n1] = true; diff[n2] = true; diff[n3] = true;
+                            if(Object.keys(diff).length !== 3) return
+                            await testFunction(t, n1, n2, n3)
+                        })
+                    })
+                }
+            }
         })
-    })
+    } else {
+        console.log("NO ITERATE")
+        await testFunction(t, nodeArray[0], nodeArray[1], nodeArray[2])
+    }
 }
 
 module.exports = {getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest}

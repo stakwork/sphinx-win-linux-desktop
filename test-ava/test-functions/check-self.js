@@ -5,6 +5,7 @@ async function checkSelf(t, index1){
 //CHECK THAT NODE EXISTS AND IS ITS OWN FIRST CONTACT ===>
 
     const node = nodes[index1]
+    console.log(`${node.alias}`)
 
     //get list of contacts as node
     const me = await f.getSelf(t, node)

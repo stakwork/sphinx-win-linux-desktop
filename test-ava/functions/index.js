@@ -13,6 +13,9 @@ var leaveTribe = require('./leave-tribe')
 var sendImage = require('./send-image')
 var sendMessage = require('./send-message')
 var sendTribeMessage = require('./send-tribe-message')
+var sendPayment = require('./send-payment')
+var sendInvoice = require('./send-invoice')
+var payInvoice = require('./pay-invoice')
 
 module.exports = {
     addContact,
@@ -30,4 +33,7 @@ module.exports = {
     sendImage,
     sendMessage,
     sendTribeMessage,
+    sendPayment,
+    sendInvoice,
+    payInvoice
 }
