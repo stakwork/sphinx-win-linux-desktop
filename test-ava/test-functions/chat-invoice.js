@@ -2,8 +2,7 @@ var nodes = require('../nodes.json')
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
 
-
-async function chatPayment(t, index1, index2) {
+async function chatInvoice(t, index1, index2) {
 //TWO NODES SEND PAYMENTS TO EACH OTHER IN A CHAT ===>
 
     let node1 = nodes[index1]
@@ -18,30 +17,32 @@ async function chatPayment(t, index1, index2) {
     let messageSent = await f.sendMessage(t, node1, node2, text)
     t.true(messageSent, "node1 should send text message to node2")
 
-    //CHECK THAT NODE1'S DECRYPTED MESSAGE IS SAME AS INPUT
-    const check = await f.checkDecrypt(t, node2, text)
-    t.true(check, "node2 should have read and decrypted node1 message")
-
     //NODE2 SENDS A TEXT MESSAGE TO NODE1
     const text2 = h.randomText()
     let messageSent2 = await f.sendMessage(t, node2, node1, text2)
     t.true(messageSent2, "node2 should send text message to node1")
 
-    //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
-    const check2 = await f.checkDecrypt(t, node1, text2)
-    t.true(check2, "node1 should have read and decrypted node2 message")
-
     //NODE1 SENDS INVOICE TO NODE2
     const amount = 11
     const paymentText = "this invoice"
     const invoice = await f.sendInvoice(t, node1, node2, amount, paymentText)
-    t.true(invoice, 'invoice should be sent')
+    t.truthy(invoice, 'invoice should be sent')
+    const payReq = invoice.response.payment_request
+
+    const payInvoice = await f.payInvoice(t, node2, node1, amount, payReq)
+    t.true(payInvoice, "Node2 should have paid node1 invoice")
 
     //NODE2 SENDS INVOICE TO NODE1
     const amount2 = 12
     const paymentText2 = "that invoice"
     const invoice2 = await f.sendInvoice(t, node2, node1, amount2, paymentText2)
-    t.true(invoice2, 'invoice should be sent')
+    t.truthy(invoice2, 'invoice should be sent')
+    const payReq2 = invoice2.response.payment_request
+
+    const payInvoice2 = await f.payInvoice(t, node1, node2, amount2, payReq2)
+    t.true(payInvoice2, "Node1 should have paid node2 invoice")
+
+    h.sleep(1000)
 
     //NODE1 AND NODE2 DELETE EACH OTHER AS CONTACTS
     let deletion = await f.deleteContacts(t, node1, node2)
@@ -49,4 +50,4 @@ async function chatPayment(t, index1, index2) {
 
 }
 
-module.exports = chatPayment
+module.exports = chatInvoice

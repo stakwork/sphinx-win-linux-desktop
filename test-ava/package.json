@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"test": "ava --verbose --serial --timeout=2m"
+		"test": "ava --verbose --serial --timeout=5m"
 	},
 	"devDependencies": {
 		"ava": "^3.15.0",

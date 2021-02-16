@@ -43,7 +43,6 @@ async function sendPayment(t, node1, node2, amount, text){
         text: encryptedText,
         remote_text: remoteText
     }
-
     //post payment from node1 to node2
     const r = await http.post(node1.ip+'/payment', h.makeArgs(node1, v))
     t.true(r.success, 'payment should have been posted')

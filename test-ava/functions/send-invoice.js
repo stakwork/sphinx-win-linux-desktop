@@ -34,7 +34,7 @@ async function sendInvoice(t, node1, node2, amount, text){
     const r = await http.post(node1.ip+'/invoices', h.makeArgs(node1, v))
     t.true(r.success, 'invoice should have been posted')
 
-    return true
+    return r
 
 }
 
