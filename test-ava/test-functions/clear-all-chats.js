@@ -2,20 +2,29 @@ var nodes = require('../nodes.json')
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
 
-async function clearAllChats(t, index1){
+async function clearAllChats(t, index1, index2, index3){
 //DELETE ALL CHATS ===>
 
-    const node = nodes[index1]
+    const nodeArray = [index1, index2, index3]
 
-    //get all chats from node
-    const chats = await f.getChats(t, node)
-    if(chats.length === 0) return
+    await h.asyncForEach(nodeArray, async i => {
+        
+        const node = nodes[i]
+        if(!node) return
+        console.log(`${node.alias} deleted all chats`)
+    
+        //get all chats from node
+        const chats = await f.getChats(t, node)
+        if(chats.length === 0) return
+    
+        //delete any chat that node is a part of
+        await h.asyncForEach(chats, async c => {
+            const deletion = await f.deleteChat(t, node, c)
+            t.true(deletion, "node should delete chat")
+        })
 
-    //delete any chat that node is a part of
-    await h.asyncForEach(chats, async c => {
-        const deletion = await f.deleteChat(t, node, c)
-        t.true(deletion, "node should delete chat")
     })
+
 
     return true
 

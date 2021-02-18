@@ -4,6 +4,7 @@ var h = require('../helpers/helper-functions')
 async function getContacts(t, node1, node2){
 //GET CONTACT FOR NODE1 AND NODE2 FROM NODE1 PERSPECTIVE
 
+
       //get list of contacts from node1 perspective
       const res = await http.get(node1.ip+'/contacts', h.makeArgs(node1));
       //create node1 contact object from node1 perspective

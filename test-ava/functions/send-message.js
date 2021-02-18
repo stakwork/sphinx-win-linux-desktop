@@ -1,11 +1,12 @@
 var http = require('ava-http');
 var rsa = require('../../public/electronjs/rsa')
-var getContacts = require('./get-contacts')
 var h = require('../helpers/helper-functions')
+var getCheckContacts = require('./get-check-contacts')
 
 async function sendMessage(t, node1, node2, text, msgPrice){
 //NODE1 SENDS TEXT MESSAGE TO NODE2
-  const [node1contact, node2contact] = await getContacts(t, node1, node2)
+  const [node1contact, node2contact] = await getCheckContacts(t, node1, node2)
+
     //encrypt random string with node1 contact_key
     const encryptedText = rsa.encrypt(node1contact.contact_key, text)
     //encrypt random string with node2 contact_key
@@ -36,7 +37,7 @@ async function sendMessage(t, node1, node2, text, msgPrice){
     //make sure msg exists
     t.truthy(msg, "msg should exist")
     //wait for message to process
-    await h.sleep(1000)
+    await h.sleep(3000)
     //get list of messages from node2 perspective
     const msgRes = await http.get(node2.ip+'/messages', h.makeArgs(node2))
     //make sure that messages exist
@@ -51,5 +52,9 @@ async function sendMessage(t, node1, node2, text, msgPrice){
     return true
 
 }
+
+
+
+
 
 module.exports = sendMessage

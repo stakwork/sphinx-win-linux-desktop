@@ -1,8 +1,9 @@
 var test = require('ava');
 var h = require('../helpers/helper-functions')
 var i = require('../test-functions')
+var r = require('../run-ava')
 
 test('clear all chats from nodes', async t => {
-    const nodeArray = [0, 1]
-    await h.runTest(t, i.clearAllChats, nodeArray, true)
+    const nodeArray = r.threeNodes
+    await h.runTest(t, i.clearAllChats, nodeArray, false) //always iterate: false
 })

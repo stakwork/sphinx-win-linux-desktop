@@ -1,12 +1,16 @@
 var nodes = require('../nodes.json')
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
+var http = require('ava-http');
+
 
 async function contactTest(t, index1, index2) {
 //TWO NODES SEND TEXT MESSAGES TO EACH OTHER ===>
 
     let node1 = nodes[index1]
     let node2 = nodes[index2]
+
+    console.log(`${node1.alias} and ${node2.alias}`)
 
     //NODE1 ADDS NODE2 AS A CONTACT
     let added = await f.addContact(t, node1, node2)
