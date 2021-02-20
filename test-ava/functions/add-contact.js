@@ -9,7 +9,8 @@ async function addContact(t, node1, node2){
         const body = {
           alias: `${node2.alias}`,
           public_key: node2.pubkey,
-          status: 1
+          status: 1,
+          route_hint: node2.routeHint || ''
       }
     
       //node1 adds node2 as contact
