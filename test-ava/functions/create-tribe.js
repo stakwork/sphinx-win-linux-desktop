@@ -1,5 +1,6 @@
 var http = require('ava-http');
 var h = require('../helpers/helper-functions')
+var getCheckTribe = require('./get-check-tribe')
 
 async function createTribe(t, node) {
 //NODE CREATES TRIBE ===>
@@ -25,16 +26,15 @@ async function createTribe(t, node) {
   let c = await http.post(node.ip+'/group', h.makeArgs(node, newTribe))
   //check that new tribe was created successfully
   t.true(c.success, "create tribe should be successful")
-  //wait for post
-  await h.sleep(1000)
 
   //save id of test tribe
   const newTribeId = c.response.id
 
-  //node1 gets list of contacts and chats
-  let res = await http.get(node.ip+'/contacts', h.makeArgs(node));
-  //find the new tribe by id
-  let r = res.response.chats.find(chat => chat.id === newTribeId)
+  // //node1 gets list of contacts and chats
+  // let res = await http.get(node.ip+'/contacts', h.makeArgs(node));
+  // //find the new tribe by id
+  // let r = res.response.chats.find(chat => chat.id === newTribeId)
+  const r = await getCheckTribe(t, node, newTribeId)
   //check that the chat was found
   t.truthy(r, "the newly created chat should be found")
 

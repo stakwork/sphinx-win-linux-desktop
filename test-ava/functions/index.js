@@ -17,6 +17,9 @@ var sendPayment = require('./send-payment')
 var sendInvoice = require('./send-invoice')
 var payInvoice = require('./pay-invoice')
 var getCheckContacts = require('./get-check-contacts')
+var getCheckNewMsgs = require('./get-check-newMsgs')
+var getCheckNewPaidMsgs = require('./get-check-newPaidMsgs')
+var getCheckTribe = require('./get-check-tribe')
 
 module.exports = {
     addContact,
@@ -38,4 +41,7 @@ module.exports = {
     sendInvoice,
     payInvoice,
     getCheckContacts,
+    getCheckNewMsgs,
+    getCheckNewPaidMsgs,
+    getCheckTribe,
 }

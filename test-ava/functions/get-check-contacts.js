@@ -6,7 +6,6 @@ function getCheckContacts(t, node1, node2){
     return new Promise((resolve, reject) => {
       let i = 0
       const interval = setInterval(async() => {
-
         i++
         const [node1contact, node2contact] = await getContacts(t, node1, node2)
         if(node1contact.contact_key && node2contact.contact_key) {
@@ -17,7 +16,7 @@ function getCheckContacts(t, node1, node2){
           clearInterval(interval)
           reject([])
         } 
-      }, 3000)
+      }, 1000)
     })
   }
 

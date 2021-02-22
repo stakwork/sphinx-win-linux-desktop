@@ -8,6 +8,8 @@ async function tribeImages(t, index1, index2) {
     let node1 = nodes[index1]
     let node2 = nodes[index2]
 
+    console.log(`${node1.alias} and ${node2.alias}`)
+
     //NODE1 CREATES A TRIBE
     let tribe = await f.createTribe(t, node1)
     t.truthy(tribe, "tribe should have been created by node1")

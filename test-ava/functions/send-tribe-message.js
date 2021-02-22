@@ -31,11 +31,11 @@ async function sendTribeMessage(t, node, tribe, text){
     //send message from node to test tribe
     const msg = await http.post(node.ip+'/messages', h.makeArgs(node, v))
     //make sure msg1 exists
-    t.truthy(msg, "node should send message to tribe")
-    //wait for message to post
-    await h.sleep(1000)
+    t.true(msg.success, "node should send message to tribe")
+    // //wait for message to post
+    // await h.sleep(1000)
 
-    return true
+    return {success: true, message: msg.response}
 
 }
 

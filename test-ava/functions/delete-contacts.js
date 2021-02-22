@@ -1,5 +1,6 @@
 var http = require('ava-http');
 var h = require('../helpers/helper-functions')
+var getSelf = require('./get-self')
 
 async function deleteContacts(t, node1, node2){
 //NODE1 AND NODE2 DELETE EACH OTHER AS CONTACTS
@@ -11,7 +12,9 @@ async function deleteContacts(t, node1, node2){
   let node1id = node1contact.id
 
   //node2 find chat containing node2 id and node1 id
-  let node2chat = res.response.chats.find(chat => h.arraysEqual(chat.contact_ids, [1, parseInt(node1id)]))
+  const selfie = await getSelf(t, node2)
+  const selfId = selfie.id
+  let node2chat = res.response.chats.find(chat => h.arraysEqual(chat.contact_ids, [selfId, parseInt(node1id)]))
   //check that a chat exists with node1 from node2 perspective
   t.truthy(node2chat, 'node2 should have a chat with node1')
 

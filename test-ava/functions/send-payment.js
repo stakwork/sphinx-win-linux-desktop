@@ -3,6 +3,7 @@ var h = require('../helpers/helper-functions')
 var rsa = require('../../public/electronjs/rsa')
 var getContacts = require('./get-contacts')
 var getChats = require('./get-chats')
+var getSelf = require('./get-self')
 
 async function sendPayment(t, node1, node2, amount, text){
 //SEND PAYMENT FROM NODE1 TO NODE2 ===>
@@ -26,7 +27,9 @@ async function sendPayment(t, node1, node2, amount, text){
 
     //find chat id of shared chat
     const chats = await getChats(t, node1)
-    const sharedChat = chats.find(c => h.arraysEqual(c.contact_ids, [1, node2contact.id]))
+    const selfie = await getSelf(t, node1)
+    const selfId = selfie.id
+    const sharedChat = chats.find(c => h.arraysEqual(c.contact_ids, [selfId, node2contact.id]))
     const chat_id = sharedChat.id
 
     //create node2 contact id

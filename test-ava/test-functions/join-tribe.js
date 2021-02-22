@@ -8,6 +8,8 @@ async function joinTribe(t, index1, index2) {
     let node1 = nodes[index1]
     let node2 = nodes[index2]
 
+    console.log(`${node1.alias} and ${node2.alias}`)
+
     //NODE1 CREATES A TRIBE
     let tribe = await f.createTribe(t, node1)
     t.truthy(tribe, "tribe should have been created by node1")
@@ -19,19 +21,19 @@ async function joinTribe(t, index1, index2) {
     //NODE1 SENDS A TEXT MESSAGE IN TRIBE
     const text = h.randomText()
     let tribeMessage = await f.sendTribeMessage(t, node1, tribe, text)
-    t.true(tribeMessage, "node1 should send message to tribe")
+    t.true(tribeMessage.success, "node1 should send message to tribe")
 
     //CHECK THAT NODE1'S DECRYPTED MESSAGE IS SAME AS INPUT
-    const check = await f.checkDecrypt(t, node2, text)
+    const check = await f.checkDecrypt(t, node2, text, tribeMessage.message)
     t.true(check, "node2 should have read and decrypted node1 message")
 
     //NODE2 SENDS A TEXT MESSAGE IN TRIBE
     const text2 = h.randomText()
     let tribeMessage2 = await f.sendTribeMessage(t, node2, tribe, text2)
-    t.true(tribeMessage2, "node2 should send message to tribe")
+    t.true(tribeMessage2.success, "node2 should send message to tribe")
 
     //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
-    const check2 = await f.checkDecrypt(t, node1, text2)
+    const check2 = await f.checkDecrypt(t, node1, text2, tribeMessage2.message)
     t.true(check2, "node1 should have read and decrypted node2 message")
 
     //NODE2 LEAVES THE TRIBE

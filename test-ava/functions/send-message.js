@@ -2,6 +2,7 @@ var http = require('ava-http');
 var rsa = require('../../public/electronjs/rsa')
 var h = require('../helpers/helper-functions')
 var getCheckContacts = require('./get-check-contacts')
+var getCheckNewMsgs = require('./get-check-newMsgs')
 
 async function sendMessage(t, node1, node2, text, msgPrice){
 //NODE1 SENDS TEXT MESSAGE TO NODE2
@@ -35,21 +36,23 @@ async function sendMessage(t, node1, node2, text, msgPrice){
     //send message from node1 to node2
     const msg = await http.post(node1.ip+'/messages', h.makeArgs(node1, v))
     //make sure msg exists
-    t.truthy(msg, "msg should exist")
-    //wait for message to process
-    await h.sleep(3000)
-    //get list of messages from node2 perspective
-    const msgRes = await http.get(node2.ip+'/messages', h.makeArgs(node2))
-    //make sure that messages exist
-    t.truthy(msgRes.response.new_messages, 'node2 should have at least one message')
-    //extract the last message sent to node2
-    const lastMessage = msgRes.response.new_messages[msgRes.response.new_messages.length-1]
+    t.true(msg.success, "msg should exist")
+    const msgUuid = msg.response.uuid
+    // //wait for message to process
+    // await h.sleep(3000)
+    // //get list of messages from node2 perspective
+    // const msgRes = await http.get(node2.ip+'/messages', h.makeArgs(node2))
+    // //make sure that messages exist
+    // t.truthy(msgRes.response.new_messages, 'node2 should have at least one message')
+    // //extract the last message sent to node2
+    // const lastMessage = msgRes.response.new_messages[msgRes.response.new_messages.length-1]
+    const lastMessage = await getCheckNewMsgs(t, node2, msgUuid)
     //decrypt the last message sent to node2 using node2 private key and lastMessage content
     const decrypt = rsa.decrypt(node2.privkey, lastMessage.message_content)
     //the decrypted message should equal the random string input before encryption
     t.true(decrypt === text, 'decrypted text should equal pre-encryption text')
 
-    return true
+    return {success: true, message: msg.response}
 
 }
 

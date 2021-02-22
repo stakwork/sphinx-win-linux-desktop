@@ -8,6 +8,8 @@ async function chatInvoice(t, index1, index2) {
     let node1 = nodes[index1]
     let node2 = nodes[index2]
 
+    console.log(`${node1.alias} and ${node2.alias}`)
+
     //NODE1 ADDS NODE2 AS A CONTACT
     const added = await f.addContact(t, node1, node2)
     t.true(added, "n1 should add n2 as contact")
