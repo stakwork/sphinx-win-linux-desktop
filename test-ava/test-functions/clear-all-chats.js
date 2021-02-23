@@ -1,4 +1,6 @@
 var nodes = require('../nodes.json')
+var http = require('ava-http');
+
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
 
@@ -11,11 +13,16 @@ async function clearAllChats(t, index1, index2, index3){
         
         const node = nodes[i]
         if(!node) return
-        console.log(`${node.alias} deleted all chats`)
-    
+
+
         //get all chats from node
         const chats = await f.getChats(t, node)
-        if(chats.length === 0) return
+        t.truthy(chats, "should have fetched chats")
+        if(chats.length === 0) {
+            console.log(`${node.alias} had no chats`)
+            return
+        }
+
     
         //delete any chat that node is a part of
         await h.asyncForEach(chats, async c => {
@@ -23,8 +30,8 @@ async function clearAllChats(t, index1, index2, index3){
             t.true(deletion, "node should delete chat")
         })
 
+        console.log(`${node.alias} deleted all chats`)
     })
-
 
     return true
 

@@ -19,7 +19,7 @@ function getCheckNewPaidMsgs(t, node, imgMsg){
         }
         else if(i>10){
           clearInterval(interval)
-          reject([])
+          reject(["failed to getCheckNewPaidMsgs"])
         } 
       }, 1000)
     })

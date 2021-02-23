@@ -8,13 +8,14 @@ function getCheckContacts(t, node1, node2){
       const interval = setInterval(async() => {
         i++
         const [node1contact, node2contact] = await getContacts(t, node1, node2)
+
         if(node1contact.contact_key && node2contact.contact_key) {
           clearInterval(interval)
           resolve([node1contact, node2contact])
         }
         else if(i>10){
           clearInterval(interval)
-          reject([])
+          reject(["failed to getCheckContacts"])
         } 
       }, 1000)
     })

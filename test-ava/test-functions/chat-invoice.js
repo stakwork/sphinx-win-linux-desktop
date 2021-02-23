@@ -17,12 +17,12 @@ async function chatInvoice(t, index1, index2) {
     //NODE1 SENDS A TEXT MESSAGE TO NODE2
     const text = h.randomText()
     let messageSent = await f.sendMessage(t, node1, node2, text)
-    t.true(messageSent, "node1 should send text message to node2")
+    t.true(messageSent.success, "node1 should send text message to node2")
 
     //NODE2 SENDS A TEXT MESSAGE TO NODE1
     const text2 = h.randomText()
     let messageSent2 = await f.sendMessage(t, node2, node1, text2)
-    t.true(messageSent2, "node2 should send text message to node1")
+    t.true(messageSent2.success, "node2 should send text message to node1")
 
     //NODE1 SENDS INVOICE TO NODE2
     const amount = 11
@@ -43,8 +43,6 @@ async function chatInvoice(t, index1, index2) {
 
     const payInvoice2 = await f.payInvoice(t, node1, node2, amount2, payReq2)
     t.true(payInvoice2, "Node1 should have paid node2 invoice")
-
-    h.sleep(1000)
 
     //NODE1 AND NODE2 DELETE EACH OTHER AS CONTACTS
     let deletion = await f.deleteContacts(t, node1, node2)

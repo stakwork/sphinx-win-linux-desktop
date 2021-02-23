@@ -2,12 +2,13 @@ var http = require('ava-http');
 var h = require('../helpers/helper-functions')
 var rsa = require('../../public/electronjs/rsa')
 var getContacts = require('./get-contacts')
+var getCheckContacts = require('./get-check-contacts')
 var getChats = require('./get-chats')
 
 async function sendInvoice(t, node1, node2, amount, text){
 //SEND INVOICE FROM NODE1 TO NODE2 ===>
 
-    const [node1contact, node2contact] = await getContacts(t, node1, node2)
+    const [node1contact, node2contact] = await getCheckContacts(t, node1, node2)
     //encrypt random string with node1 contact_key
     const encryptedText = rsa.encrypt(node1contact.contact_key, text)
     //encrypt random string with node2 contact_key
