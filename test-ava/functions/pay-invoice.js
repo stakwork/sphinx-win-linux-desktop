@@ -16,7 +16,7 @@ async function payInvoice(t, node1, node2, amount, payment_request){
 
     const v = { payment_request }
     const r = await http.put(node1.ip+'/invoices', h.makeArgs(node1, v))
-    // console.log("INVOIE === ", JSON.stringify(r))
+    // console.log("INVOICE === ", JSON.stringify(r))
     t.true(r.success, "Put method should have succeeded")
 
     //wait for PUT method

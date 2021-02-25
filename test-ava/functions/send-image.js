@@ -30,7 +30,7 @@ async function sendImage(t, node1, node2, image, tribe, price){
     var n1contactP1 = {}
     var n2contactP1 = {}
     if(tribe){
-      [n1contactP1, n2contactP1] = await getContacts(t, node1, node2)
+      n1contactP1 = await getSelf(t, node1)
     } else {
       [n1contactP1, n2contactP1] = await getCheckContacts(t, node1, node2)
     }
@@ -157,23 +157,27 @@ async function sendImage(t, node1, node2, image, tribe, price){
         // t.truthy(res.response.new_messages, 'node2 should have at least one message')
         // //extract the last message sent to node2
         // const lastMessage2 = res.response.new_messages[res.response.new_messages.length-1]
-        const lastMessage2 = await getCheckNewMsgs(t, node2, imgUuid)
 
-        //get media key from message (Last message by token.media_key, type 8, purchase message)
-        const node2MediaKey = lastMessage2.media_key
-        const decryptMediaKey = rsa.decrypt(node2.privkey, node2MediaKey)
-    
-        //get media token
-        var token = await h.getToken(t, node2)
-        const url = `https://memes.sphinx.chat/file/${lastMessage2.media_token}` //also purchase accept message
-    
-        const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
-        const blob = await res2.buffer()
-        //media_key needs to be decrypted with your private key
-        const dec = RNCryptor.Decrypt(blob.toString("base64"), decryptMediaKey)
-        // const b64 = dec.toString('base64')
-        // //check equality b64 to b64
-        t.true(dec.toString("base64") === image)
+          const lastMessage2 = await getCheckNewMsgs(t, node2, imgUuid)
+          const node2MediaKey = lastMessage2.media_key
+          t.truthy(node2MediaKey, "node2MediaKey should exist")
+          const decryptMediaKey = rsa.decrypt(node2.privkey, node2MediaKey)
+          t.truthy(decryptMediaKey, "decryptMedaiKey should exist")
+      
+          //get media token
+          var token = await h.getToken(t, node2)
+          const url = `https://memes.sphinx.chat/file/${lastMessage2.media_token}` //also purchase accept message
+      
+          const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
+          t.truthy(res2, "res2 should exist")
+          const blob = await res2.buffer()
+          t.truthy(blob, "blob should exist")
+          //media_key needs to be decrypted with your private key
+          const dec = RNCryptor.Decrypt(blob.toString("base64"), decryptMediaKey)
+          // const b64 = dec.toString('base64')
+          // //check equality b64 to b64
+          t.true(dec.toString("base64") === image)
+
     
 
     return true
