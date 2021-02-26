@@ -1,8 +1,8 @@
 var http = require('ava-http');
-var rsa = require('../../public/electronjs/rsa')
-var h = require('../helpers/helper-functions')
-var getCheckContacts = require('./get-check-contacts')
-var getCheckNewMsgs = require('./get-check-newMsgs')
+var rsa = require('../../../public/electronjs/rsa')
+var h = require('../../helpers/helper-functions')
+var getCheckContacts = require('../get/get-check-contacts')
+var getCheckNewMsgs = require('../get/get-check-newMsgs')
 
 async function sendMessage(t, node1, node2, text, msgPrice){
 //NODE1 SENDS TEXT MESSAGE TO NODE2

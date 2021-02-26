@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
+var h = require('../../helpers/helper-functions')
 var getContacts = require('./get-contacts')
 
 function getCheckContacts(t, node1, node2){

@@ -1,6 +1,6 @@
 var http = require('ava-http');
 var h = require('../helpers/helper-functions')
-var getCheckContacts = require('./get-check-contacts')
+var getCheckContacts = require('./get/get-check-contacts')
 
 async function addContact(t, node1, node2){
     //NODE1 ADDS NODE2 AS A CONTACT

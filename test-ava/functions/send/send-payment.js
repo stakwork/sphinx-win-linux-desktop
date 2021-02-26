@@ -1,9 +1,9 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
-var rsa = require('../../public/electronjs/rsa')
-var getContacts = require('./get-contacts')
-var getChats = require('./get-chats')
-var getSelf = require('./get-self')
+var h = require('../../helpers/helper-functions')
+var rsa = require('../../../public/electronjs/rsa')
+var getContacts = require('../get/get-contacts')
+var getChats = require('../get/get-chats')
+var getSelf = require('../get/get-self')
 
 async function sendPayment(t, node1, node2, amount, text){
 //SEND PAYMENT FROM NODE1 TO NODE2 ===>

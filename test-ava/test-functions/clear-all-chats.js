@@ -1,6 +1,4 @@
 var nodes = require('../nodes.json')
-var http = require('ava-http');
-
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
 

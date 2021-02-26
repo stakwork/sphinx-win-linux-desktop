@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
+var h = require('../../helpers/helper-functions')
 
 async function getContacts(t, node1, node2){
 //GET CONTACT FOR NODE1 AND NODE2 FROM NODE1 PERSPECTIVE

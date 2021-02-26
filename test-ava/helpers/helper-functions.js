@@ -1,27 +1,27 @@
 var http = require('ava-http');
-var r = require('../run-ava')
+var ra = require('../run-ava')
 
 async function getToken(t, node){
 //A NODE GETS A SERVER TOKEN FOR POSTING TO MEME SERVER
 
     //get authentication challenge from meme server
-    const ask = await http.get(`https://${r.memeHost}/ask`)
-    t.truthy(ask, "ask should exist")
-    t.truthy(ask.challenge, "ask.challenge should exist")
+    const r = await http.get(`https://${ra.memeHost}/ask`)
+    t.truthy(r, "r should exist")
+    t.truthy(r.challenge, "r.challenge should exist")
 
     //call relay server with challenge
-    const signer = await http.get(node.ip+`/signer/${r.challenge}`, makeArgs(node))
-    t.true(signer.success, "signer should exist")
-    t.truthy(signer.response.sig, "signer.sig should exist")
+    const r2 = await http.get(node.ip+`/signer/${r.challenge}`, makeArgs(node))
+    t.true(r2.success, "r2 should exist")
+    t.truthy(r2.response.sig, "r2.sig should exist")
 
     //get server token
-    const verify = await http.post(`https://${r.memeHost}/verify`, {
-    form: {id: ask.id, sig: signer.response.sig, pubkey: node.pubkey}
+    const r3 = await http.post(`https://${ra.memeHost}/verify`, {
+    form: {id: r.id, sig: r2.response.sig, pubkey: node.pubkey}
     })
-    t.truthy(verify, "verify should exist")
-    t.truthy(verify.token, "verify.token should exist")
+    t.truthy(r3, "r3 should exist")
+    t.truthy(r3.token, "r3.token should exist")
 
-    return verify.token
+    return r3.token
 
 }
 

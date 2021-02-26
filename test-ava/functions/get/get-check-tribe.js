@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
+var h = require('../../helpers/helper-functions')
 
 function getCheckTribe(t, node, tribeId){
     return new Promise((resolve, reject) => {

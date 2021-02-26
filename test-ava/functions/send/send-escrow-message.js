@@ -1,11 +1,11 @@
 var http = require('ava-http');
-var rsa = require('../../public/electronjs/rsa')
-var getSelf = require('./get-self')
-var getTribeId = require('./get-tribe-id')
-var getCheckNewMsgs = require('./get-check-newMsgs')
-var getBalance = require('./get-balance')
-var h = require('../helpers/helper-functions')
-var r = require('../run-ava')
+var rsa = require('../../../public/electronjs/rsa')
+var getSelf = require('../get/get-self')
+var getTribeId = require('../get/get-tribe-id')
+var getCheckNewMsgs = require('../get/get-check-newMsgs')
+var getBalance = require('../get/get-balance')
+var h = require('../../helpers/helper-functions')
+var r = require('../../run-ava')
 
 async function sendEscrowMsg(t, node, admin, tribe, text){
 //NODE POSTS MESSAGE TO TRIBE ===>

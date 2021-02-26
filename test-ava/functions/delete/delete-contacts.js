@@ -1,6 +1,6 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
-var getSelf = require('./get-self')
+var h = require('../../helpers/helper-functions')
+var getSelf = require('../get/get-self')
 
 async function deleteContacts(t, node1, node2){
 //NODE1 AND NODE2 DELETE EACH OTHER AS CONTACTS

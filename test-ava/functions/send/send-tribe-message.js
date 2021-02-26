@@ -1,8 +1,8 @@
 var http = require('ava-http');
-var rsa = require('../../public/electronjs/rsa')
-var getSelf = require('./get-self')
-var getTribeId = require('./get-tribe-id')
-var h = require('../helpers/helper-functions')
+var rsa = require('../../../public/electronjs/rsa')
+var getSelf = require('../get/get-self')
+var getTribeId = require('../get/get-tribe-id')
+var h = require('../../helpers/helper-functions')
 
 async function sendTribeMessage(t, node, tribe, text){
 //NODE POSTS MESSAGE TO TRIBE ===>

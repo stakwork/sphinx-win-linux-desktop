@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var getTribeId = require('./get-tribe-id')
+var getTribeId = require('./get/get-tribe-id')
 var h = require('../helpers/helper-functions')
 
 async function leaveTribe(t, node, tribe){

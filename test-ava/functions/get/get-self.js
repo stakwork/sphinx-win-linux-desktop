@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
+var h = require('../../helpers/helper-functions')
 
 async function getSelf(t, node){
 //GET CONTACT FOR NODE FROM NODE PERSPECTIVE ===>

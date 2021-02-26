@@ -1,6 +1,6 @@
 var http = require('ava-http');
 var h = require('../helpers/helper-functions')
-var getCheckTribe = require('./get-check-tribe')
+var getCheckTribe = require('./get/get-check-tribe')
 
 async function createTribe(t, node, escrowAmount, escrowMillis, ppm) {
 //NODE CREATES TRIBE ===>

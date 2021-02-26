@@ -1,7 +1,7 @@
 var http = require('ava-http');
 var rsa = require('../../public/electronjs/rsa')
 var h = require('../helpers/helper-functions')
-var getCheckNewMsgs = require('./get-check-newMsgs')
+var getCheckNewMsgs = require('./get/get-check-newMsgs')
 
 async function checkDecrypt(t, node, text, msg){
 //CHECK THAT THE LAST MESSAGE NODE RECEIVED IS EQUAL TO TEXT ===>

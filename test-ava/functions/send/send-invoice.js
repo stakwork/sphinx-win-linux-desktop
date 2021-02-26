@@ -1,9 +1,8 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
-var rsa = require('../../public/electronjs/rsa')
-var getContacts = require('./get-contacts')
-var getCheckContacts = require('./get-check-contacts')
-var getChats = require('./get-chats')
+var h = require('../../helpers/helper-functions')
+var rsa = require('../../../public/electronjs/rsa')
+var getCheckContacts = require('../get/get-check-contacts')
+var getChats = require('../get/get-chats')
 
 async function sendInvoice(t, node1, node2, amount, text){
 //SEND INVOICE FROM NODE1 TO NODE2 ===>

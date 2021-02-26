@@ -1,6 +1,5 @@
 var nodes = require('../nodes.json')
 var http = require('ava-http');
-var f = require('../functions')
 var h = require('../helpers/helper-functions')
 
 async function clearAllContacts(t, index1, index2, index3){

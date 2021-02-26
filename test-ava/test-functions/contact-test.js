@@ -1,8 +1,6 @@
 var nodes = require('../nodes.json')
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
-var http = require('ava-http');
-
 
 async function contactTest(t, index1, index2) {
 //TWO NODES SEND TEXT MESSAGES TO EACH OTHER ===>

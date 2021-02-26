@@ -1,6 +1,6 @@
 var http = require('ava-http');
-var getTribeId = require('./get-tribe-id')
-var h = require('../helpers/helper-functions')
+var getTribeId = require('../get/get-tribe-id')
+var h = require('../../helpers/helper-functions')
 
 async function deleteTribe(t, node, tribe){
 //NODE DELETES THE TRIBE ===>

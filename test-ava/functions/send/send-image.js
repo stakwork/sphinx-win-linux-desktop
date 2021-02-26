@@ -1,17 +1,17 @@
 var http = require('ava-http');
-var rsa = require('../../public/electronjs/rsa')
-var meme = require('../../public/electronjs/meme')
+var rsa = require('../../../public/electronjs/rsa')
+var meme = require('../../../public/electronjs/meme')
 var fetch = require('node-fetch')
 var RNCryptor = require('jscryptor-2')
-var getContacts = require('./get-contacts')
-var getTribeId = require('./get-tribe-id')
-var getChats = require('./get-chats')
-var getCheckNewMsgs = require('./get-check-newMsgs')
-var getCheckContacts = require('./get-check-contacts')
-var getCheckNewPaidMsgs = require('./get-check-newPaidMsgs')
-var getSelf = require('./get-self')
-var h = require('../helpers/helper-functions')
-var r = require('../run-ava')
+var getContacts = require('../get/get-contacts')
+var getTribeId = require('../get/get-tribe-id')
+var getChats = require('../get/get-chats')
+var getCheckNewMsgs = require('../get/get-check-newMsgs')
+var getCheckContacts = require('../get/get-check-contacts')
+var getCheckNewPaidMsgs = require('../get/get-check-newPaidMsgs')
+var getSelf = require('../get/get-self')
+var h = require('../../helpers/helper-functions')
+var r = require('../../run-ava')
 
 async function sendImage(t, node1, node2, image, tribe, price){
 //NODE1 SENDS AN IMAGE TO NODE2
@@ -35,7 +35,6 @@ async function sendImage(t, node1, node2, image, tribe, price){
     } else {
       [n1contactP1, n2contactP1] = await getCheckContacts(t, node1, node2)
     }
-
 
     //encrypt media_key with node1 contact_key, node1 perspective
     let encrypted_media_key = rsa.encrypt(n1contactP1.contact_key, upload.media_key)
@@ -78,15 +77,13 @@ async function sendImage(t, node1, node2, image, tribe, price){
     t.true(img.success, "sent image should exist")
     const imgMsg = img.response
     var imgUuid = imgMsg.uuid
+    var url = ""
+    var node2MediaKey = ""
+    var decryptMediaKey = ""
+
 
     if(price){
       //IF IMAGE HAS A PRICE ===>
-      // //get messages from node2 perspective
-      // const prePurchMsgs = await http.get(node2.ip+'/messages', h.makeArgs(node2));
-      // //find last message
-      // t.truthy(prePurchMsgs.response.new_messages, 'node2 should have at least one message')
-      // //extract the last message sent to node2
-      // const lastPrePurchMsg = prePurchMsgs.response.new_messages[prePurchMsgs.response.new_messages.length-1]
       const lastPrePurchMsg = await getCheckNewMsgs(t, node2, imgUuid)
 
       //create contact_id for purchase message
@@ -126,60 +123,40 @@ async function sendImage(t, node1, node2, image, tribe, price){
       t.true(purchased.success, "purchase message should be posted " + purchased.error)
       //get payment accepted message
       var paymentMsg = await getCheckNewPaidMsgs(t, node2, imgMsg)
-  //CONFIRM AND DECRYPT IMAGE
 
         //get media key from payment accepted message
         //(Last message by token.media_key, type 8, purchase message)
-        const node2MediaKey = paymentMsg.media_key
-    
-        const decryptMediaKey = rsa.decrypt(node2.privkey, node2MediaKey)
-    
-        //get media token
-        var token = await h.getToken(t, node2)
-        const url = `https://${r.memeHost}/file/${paymentMsg.media_token}` //also purchase accept message
-    
-        const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
-        const blob = await res2.buffer()
-        //media_key needs to be decrypted with your private key
-        const dec = RNCryptor.Decrypt(blob.toString("base64"), decryptMediaKey)
-        // const b64 = dec.toString('base64')
-        // //check equality b64 to b64
-        t.true(dec.toString("base64") === image)
+        node2MediaKey = paymentMsg.media_key
+        t.truthy(node2MediaKey, "node2MediaKey should exist")
+        //create url with media_token
+        url = `https://${r.memeHost}/file/${paymentMsg.media_token}`
 
-        return true
+    } else {
+      //RECEIVE UNPAID IMAGE ===>
 
-    } 
+      //Check that image message was received
+      const lastMessage2 = await getCheckNewMsgs(t, node2, imgUuid)
+      //get media_key from received image message
+      node2MediaKey = lastMessage2.media_key
+      t.truthy(node2MediaKey, "node2MediaKey should exist")
+      //create url with media_token
+      url = `https://${r.memeHost}/file/${lastMessage2.media_token}`
+    }
 
-    //CONFIRM AND DECRYPT IMAGE
-
-        // //get messages from node2 perspective
-        // const res = await http.get(node2.ip+'/messages', h.makeArgs(node2));
-        // //find last message
-        // t.truthy(res.response.new_messages, 'node2 should have at least one message')
-        // //extract the last message sent to node2
-        // const lastMessage2 = res.response.new_messages[res.response.new_messages.length-1]
-
-          const lastMessage2 = await getCheckNewMsgs(t, node2, imgUuid)
-          const node2MediaKey = lastMessage2.media_key
-          t.truthy(node2MediaKey, "node2MediaKey should exist")
-          const decryptMediaKey = rsa.decrypt(node2.privkey, node2MediaKey)
-          t.truthy(decryptMediaKey, "decryptMedaiKey should exist")
-      
-          //get media token
+    //DECRYPT IMAGE
+          decryptMediaKey = rsa.decrypt(node2.privkey, node2MediaKey)
+          t.truthy(decryptMediaKey, "decryptMediaKey should exist")
           var token = await h.getToken(t, node2)
-          const url = `https://${r.memeHost}/file/${lastMessage2.media_token}` //also purchase accept message
-      
+          t.truthy(token, "should get media token")
           const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
           t.truthy(res2, "res2 should exist")
           const blob = await res2.buffer()
-          t.truthy(blob, "blob should exist")
+          t.true(blob.length > 0, "blob should exist")
           //media_key needs to be decrypted with your private key
           const dec = RNCryptor.Decrypt(blob.toString("base64"), decryptMediaKey)
           // const b64 = dec.toString('base64')
           // //check equality b64 to b64
           t.true(dec.toString("base64") === image)
-
-    
 
     return true
 

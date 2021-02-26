@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var h = require('../helpers/helper-functions')
+var h = require('../../helpers/helper-functions')
 
 async function deleteChat(t, node, chat){
 //NODE DELETES A CHAT GIVEN CHAT OBJECT ===>
