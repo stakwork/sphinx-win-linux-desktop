@@ -5,7 +5,9 @@ const run = {
     oneNode: [1],
     twoNodes: [1, 2],
     threeNodes: [0, 1, 2],
-    iterate: true
+    iterate: true,
+    memeHost: "memes.sphinx.chat",
+    allowedFee: 1,
 }
 
 module.exports = run

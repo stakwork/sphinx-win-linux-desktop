@@ -14,7 +14,7 @@ function getCheckNewMsgs(t, node, msgUuid){
             resolve(lastMessage)
           }
         }
-        else if(i>10){
+        if(i>10){
           clearInterval(interval)
           reject(["failed to getCheckNewMsgs"])
         } 

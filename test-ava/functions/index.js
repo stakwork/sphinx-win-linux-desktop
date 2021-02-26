@@ -20,6 +20,8 @@ var getCheckContacts = require('./get-check-contacts')
 var getCheckNewMsgs = require('./get-check-newMsgs')
 var getCheckNewPaidMsgs = require('./get-check-newPaidMsgs')
 var getCheckTribe = require('./get-check-tribe')
+var sendEscrowMsg = require('./send-escrow-message')
+var getBalance = require('./get-balance')
 
 module.exports = {
     addContact,
@@ -44,4 +46,6 @@ module.exports = {
     getCheckNewMsgs,
     getCheckNewPaidMsgs,
     getCheckTribe,
+    sendEscrowMsg,
+    getBalance,
 }

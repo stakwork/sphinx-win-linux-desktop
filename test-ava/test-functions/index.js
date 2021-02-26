@@ -10,6 +10,7 @@ var chatInvoice = require('./chat-invoice')
 var clearAllContacts = require('./clear-all-contacts')
 var tribe3Msgs = require('./tribe3-msgs')
 var tribe3Imgs = require('./tribe3-images')
+var tribe3Escrow = require('./tribe3-escrow')
 
 module.exports = {
     clearAllChats, 
@@ -24,4 +25,5 @@ module.exports = {
     clearAllContacts,
     tribe3Msgs,
     tribe3Imgs,
+    tribe3Escrow
 }

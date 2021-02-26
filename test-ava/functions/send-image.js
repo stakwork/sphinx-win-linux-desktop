@@ -11,12 +11,13 @@ var getCheckContacts = require('./get-check-contacts')
 var getCheckNewPaidMsgs = require('./get-check-newPaidMsgs')
 var getSelf = require('./get-self')
 var h = require('../helpers/helper-functions')
+var r = require('../run-ava')
 
 async function sendImage(t, node1, node2, image, tribe, price){
 //NODE1 SENDS AN IMAGE TO NODE2
 
     var token = await h.getToken(t, node1)
-    var host = "memes.sphinx.chat"
+    var host = r.memeHost
     var fileBase64 = "data:image/jpg;base64,"+image
     var typ = "image/jpg"
     var filename = "Image.jpg"
@@ -135,7 +136,7 @@ async function sendImage(t, node1, node2, image, tribe, price){
     
         //get media token
         var token = await h.getToken(t, node2)
-        const url = `https://memes.sphinx.chat/file/${paymentMsg.media_token}` //also purchase accept message
+        const url = `https://${r.memeHost}/file/${paymentMsg.media_token}` //also purchase accept message
     
         const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
         const blob = await res2.buffer()
@@ -166,7 +167,7 @@ async function sendImage(t, node1, node2, image, tribe, price){
       
           //get media token
           var token = await h.getToken(t, node2)
-          const url = `https://memes.sphinx.chat/file/${lastMessage2.media_token}` //also purchase accept message
+          const url = `https://${r.memeHost}/file/${lastMessage2.media_token}` //also purchase accept message
       
           const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
           t.truthy(res2, "res2 should exist")

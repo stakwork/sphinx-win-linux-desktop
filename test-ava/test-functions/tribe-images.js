@@ -15,6 +15,7 @@ async function tribeImages(t, index1, index2) {
     t.truthy(tribe, "tribe should have been created by node1")
 
     //NODE2 JOINS TRIBE CREATED BY NODE1
+    if(node1.routeHint) tribe.owner_route_hint = node1.routeHint
     let join = await f.joinTribe(t, node2, tribe)
     t.true(join, "node2 should join tribe")
 

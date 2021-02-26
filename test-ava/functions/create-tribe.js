@@ -2,7 +2,7 @@ var http = require('ava-http');
 var h = require('../helpers/helper-functions')
 var getCheckTribe = require('./get-check-tribe')
 
-async function createTribe(t, node) {
+async function createTribe(t, node, escrowAmount, escrowMillis, ppm) {
 //NODE CREATES TRIBE ===>
 
   const name = `Test Tribe: ${node.alias}`
@@ -11,10 +11,10 @@ async function createTribe(t, node) {
   const newTribe = {
       name, description, tags: [],
       is_tribe: true,
-      price_per_message: 0,
+      price_per_message: ppm || 0,
       price_to_join: 0,
-      escrow_amount: 0,
-      escrow_millis: 0,
+      escrow_amount: escrowAmount || 0,
+      escrow_millis: escrowMillis || 0,
       img: '',
       unlisted: true,
       private: false,
@@ -43,14 +43,17 @@ async function createTribe(t, node) {
       name: r.name,
       uuid: r.uuid,
       group_key: r.group_key,
-      amount: 0,
+      // amount: 0,
       host: r.host,
+      price_per_message: r.price_per_message || 0,
+      escrow_amount: r.escrow_amount || 0,
+      escrow_millis: r.escrow_millis || 0,
       img: r.img,
       owner_alias: r.owner_alias,
       owner_pubkey: r.owner_pubkey,
       private: r.private,
       my_alias: "",
-      my_photo_url: ""
+      my_photo_url: "",
   }
   t.truthy(tribe, "created tribe object should exist")
 

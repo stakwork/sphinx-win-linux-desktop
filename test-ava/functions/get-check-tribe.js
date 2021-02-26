@@ -14,7 +14,7 @@ function getCheckTribe(t, node, tribeId){
                 resolve(r)
             }         
         }
-        else if(i>10){
+        if(i>10){
           clearInterval(interval)
           reject(["failed to getCheckTribe"])
         } 
