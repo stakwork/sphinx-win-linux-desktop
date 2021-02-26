@@ -19,6 +19,7 @@ var payInvoice = require('./pay-invoice')
 var getCheckContacts = require('./get/get-check-contacts')
 var getCheckNewMsgs = require('./get/get-check-newMsgs')
 var getCheckNewPaidMsgs = require('./get/get-check-newPaidMsgs')
+var getCheckNewPaidInvoice = require('./get/get-check-newPaidInvoice')
 var getCheckTribe = require('./get/get-check-tribe')
 var sendEscrowMsg = require('./send/send-escrow-message')
 var getBalance = require('./get/get-balance')
@@ -45,6 +46,7 @@ module.exports = {
     getCheckContacts,
     getCheckNewMsgs,
     getCheckNewPaidMsgs,
+    getCheckNewPaidInvoice,
     getCheckTribe,
     sendEscrowMsg,
     getBalance,

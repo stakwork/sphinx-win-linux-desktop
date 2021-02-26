@@ -30,6 +30,7 @@ async function chatInvoice(t, index1, index2) {
     const invoice = await f.sendInvoice(t, node1, node2, amount, paymentText)
     t.truthy(invoice, 'invoice should be sent')
     const payReq = invoice.response.payment_request
+    t.truthy(payReq, "payment request should exist")
 
     const payInvoice = await f.payInvoice(t, node2, node1, amount, payReq)
     t.true(payInvoice, "Node2 should have paid node1 invoice")
@@ -40,6 +41,7 @@ async function chatInvoice(t, index1, index2) {
     const invoice2 = await f.sendInvoice(t, node2, node1, amount2, paymentText2)
     t.truthy(invoice2, 'invoice should be sent')
     const payReq2 = invoice2.response.payment_request
+    t.truthy(payReq2, "payment request should exist")
 
     const payInvoice2 = await f.payInvoice(t, node1, node2, amount2, payReq2)
     t.true(payInvoice2, "Node1 should have paid node2 invoice")
