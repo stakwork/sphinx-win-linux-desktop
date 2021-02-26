@@ -4,6 +4,6 @@ var i = require('../test-functions')
 var r = require('../run-ava')
 
 test('add contact, send images, delete contacts', async t => {
-    const nodeArray = r.threeNodes
-    await h.runTest(t, i.imageTest, nodeArray, true)
+    const nodeArray = r.twoNodes
+    await h.runTest(t, i.imageTest, nodeArray, false)
 })
