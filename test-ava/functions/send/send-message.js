@@ -39,14 +39,8 @@ async function sendMessage(t, node1, node2, text, msgPrice){
     t.true(msg.success, "msg should exist")
     const msgUuid = msg.response.uuid
     // //wait for message to process
-    // await h.sleep(3000)
-    // //get list of messages from node2 perspective
-    // const msgRes = await http.get(node2.ip+'/messages', h.makeArgs(node2))
-    // //make sure that messages exist
-    // t.truthy(msgRes.response.new_messages, 'node2 should have at least one message')
-    // //extract the last message sent to node2
-    // const lastMessage = msgRes.response.new_messages[msgRes.response.new_messages.length-1]
     const lastMessage = await getCheckNewMsgs(t, node2, msgUuid)
+    t.truthy(lastMessage, "await message post")
     //decrypt the last message sent to node2 using node2 private key and lastMessage content
     const decrypt = rsa.decrypt(node2.privkey, lastMessage.message_content)
     //the decrypted message should equal the random string input before encryption

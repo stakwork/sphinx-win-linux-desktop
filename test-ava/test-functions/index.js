@@ -12,6 +12,7 @@ var tribe3Msgs = require('./tribe3-msgs')
 var tribe3Imgs = require('./tribe3-images')
 var tribe3Escrow = require('./tribe3-escrow')
 var queryRoutes = require('./query-routes')
+var streamPayment = require('./stream-payment')
 
 module.exports = {
     clearAllChats, 
@@ -28,4 +29,5 @@ module.exports = {
     tribe3Imgs,
     tribe3Escrow,
     queryRoutes,
+    streamPayment,
 }

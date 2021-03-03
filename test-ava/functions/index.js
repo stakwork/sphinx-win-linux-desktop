@@ -23,6 +23,8 @@ var getCheckNewPaidInvoice = require('./get/get-check-newPaidInvoice')
 var getCheckTribe = require('./get/get-check-tribe')
 var sendEscrowMsg = require('./send/send-escrow-message')
 var getBalance = require('./get/get-balance')
+var payStream = require('./pay-stream')
+var getCheckNewStream = require('./get/get-check-newStream')
 
 module.exports = {
     addContact,
@@ -50,4 +52,6 @@ module.exports = {
     getCheckTribe,
     sendEscrowMsg,
     getBalance,
+    payStream,
+    getCheckNewStream,
 }
