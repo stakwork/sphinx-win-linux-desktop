@@ -12,15 +12,15 @@ async function sendEscrowMsg(t, node, admin, tribe, text){
 
     const escrowAmount = tribe.escrow_amount
     t.true(escrowAmount != 0, "escrow amount should not be zero")
-    console.log("escrowAmount === ", escrowAmount)
+    // console.log("escrowAmount === ", escrowAmount)
 
     const escrowMillis = tribe.escrow_millis
     t.true(escrowMillis != 0, "escrow time should not be zero")
-    console.log("escrowMillis === ", escrowMillis)
+    // console.log("escrowMillis === ", escrowMillis)
 
     var pricePerMessage = 0
     if(tribe.price_per_message) pricePerMessage = tribe.price_per_message
-    console.log("PPM === ", pricePerMessage)
+    // console.log("PPM === ", pricePerMessage)
 
     let nodeContact = await getSelf(t, node)
 

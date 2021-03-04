@@ -25,6 +25,7 @@ var sendEscrowMsg = require('./send/send-escrow-message')
 var getBalance = require('./get/get-balance')
 var payStream = require('./pay-stream')
 var getCheckNewStream = require('./get/get-check-newStream')
+var sendBoost = require('./send/send-boost')
 
 module.exports = {
     addContact,
@@ -54,4 +55,5 @@ module.exports = {
     getBalance,
     payStream,
     getCheckNewStream,
+    sendBoost,
 }

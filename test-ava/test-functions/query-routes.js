@@ -6,7 +6,7 @@ async function queryRoutes(t, index1, index2, index3){
 //CHECK THAT NODE EXISTS AND IS ITS OWN FIRST CONTACT ===>
 
     const nodeArray = [index1, index2]
-    if(index3) nodeArray.push(index3)
+    if(typeof(index3) === 'number') nodeArray.push(index3)
 
     await h.asyncForEach(nodeArray, async n => {
         await h.asyncForEach(nodeArray, async i => {

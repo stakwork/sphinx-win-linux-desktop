@@ -20,11 +20,11 @@ async function streamPayment(t, index1, index2, index3) {
     let messageSent = await f.sendMessage(t, node1, node2, text)
     t.true(messageSent.success, "node1 should send text message to node2")
 
-    //stream payment from node1 to node2
+    //STREAM PAYMENT FROM NODE1 TO NODE2
     var stream1 = await f.payStream(t, node1, node2, null, 14)
     t.true(stream1)
 
-    //stream split payment from node1 to node2 and node3 (50% split)
+    //STREAM SPLIT PAYMENT FROM NODE1 TO NODE2 AND NODE3 (50% SPLIT)
     var stream2 = await f.payStream(t, node1, node2, node3, 14)
     t.true(stream2)
 
