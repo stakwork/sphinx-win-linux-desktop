@@ -46,10 +46,10 @@ async function sendBoost(t, node1, node2, replyMessage, amount, tribe){
     //get balances of both nodes before boost
     const [boosterBalAfter, boosteeBalAfter] = await boostBalances(t, node1, node2)
 
-    console.log("boosterBalBefore === ", boosterBalBefore)
-    console.log("boosterBalAfter === ", boosterBalAfter)
-    console.log("boosteeBalBefore === ", boosteeBalBefore)
-    console.log("boosteeBalAfter === ", boosteeBalAfter)
+    // console.log("boosterBalBefore === ", boosterBalBefore)
+    // console.log("boosterBalAfter === ", boosterBalAfter)
+    // console.log("boosteeBalBefore === ", boosteeBalBefore)
+    // console.log("boosteeBalAfter === ", boosteeBalAfter)
 
     //check that node1 sent payment and node2 received payment based on balances
     t.true(Math.abs(((boosterBalBefore - boosterBalAfter) - amount)) <= r.allowedFee, "booster should have lost amount")

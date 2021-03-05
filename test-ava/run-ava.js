@@ -4,9 +4,9 @@
 const run = {
     oneNode: [0],
     twoNodes: [0, 1],
-    threeNodes: [0, 2, 1],
+    threeNodes: [0, 1, 2],
     active: "threeNodes",
-    iterate: false,
+    iterate: true,
     memeHost: "memes.sphinx.chat",
     allowedFee: 4,
 }
