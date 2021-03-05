@@ -13,7 +13,7 @@ function getCheckContacts(t, node1, node2){
           clearInterval(interval)
           resolve([node1contact, node2contact])
         }
-        if(i>10){
+        if(i>15){
           clearInterval(interval)
           reject(["failed to getCheckContacts"])
         } 
