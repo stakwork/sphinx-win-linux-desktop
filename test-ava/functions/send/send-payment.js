@@ -1,6 +1,7 @@
 var http = require('ava-http');
 var h = require('../../helpers/helper-functions')
 var rsa = require('../../../public/electronjs/rsa')
+var r = require('../../run-ava')
 var getContacts = require('../get/get-contacts')
 var getChats = require('../get/get-chats')
 var getSelf = require('../get/get-self')
@@ -47,8 +48,8 @@ async function sendPayment(t, node1, node2, amount, text){
         remote_text: remoteText
     }
     //post payment from node1 to node2
-    const r = await http.post(node1.ip+'/payment', h.makeArgs(node1, v))
-    t.true(r.success, 'payment should have been posted')
+    const pmnt = await http.post(node1.ip+'/payment', h.makeArgs(node1, v))
+    t.true(pmnt.success, 'payment should have been posted')
 
     //get node1 balance after payment
     node1bal = await http.get(node1.ip+'/balance', h.makeArgs(node1))
@@ -64,13 +65,12 @@ async function sendPayment(t, node1, node2, amount, text){
     // console.log("NODE1 AFTER BALANCE === ", node1afterBalance)
     // console.log("NODE2 BEFORE BALANCE === ", node2beforeBalance)
     // console.log("NODE2 AFTER BALANCE === ", node2afterBalance)
-
-    // console.log("NODE1 === ", (node1beforeBalance - node1afterBalance))
-    // console.log("NODE2 === ", (node2beforeBalance - node2afterBalance))
+    // console.log("NODE1 === ", (node1beforeBalance - node1afterBalance) - amount)
+    // console.log("NODE2 === ", (node2afterBalance - node2beforeBalance) -  amount)
 
     //check that node1 sent payment and node2 received payment based on balances
-    t.true((node1beforeBalance - node1afterBalance) >= amount, "node1 should have paid amount")
-    t.true((node2beforeBalance - node2afterBalance) <= amount, "node2 should have received amount")
+    t.true(Math.abs(((node1beforeBalance - node1afterBalance) - amount)) <= r.allowedFee, "node1 should have paid amount")
+    t.true(Math.abs(((node2afterBalance - node2beforeBalance) - amount)) <= r.allowedFee, "node2 should have received amount")
 
     return true
 

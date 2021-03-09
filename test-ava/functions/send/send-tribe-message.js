@@ -2,6 +2,7 @@ var http = require('ava-http');
 var rsa = require('../../../public/electronjs/rsa')
 var getSelf = require('../get/get-self')
 var getTribeId = require('../get/get-tribe-id')
+var getCheckNewMsgs = require('../get/get-check-newMsgs')
 var h = require('../../helpers/helper-functions')
 
 async function sendTribeMessage(t, node, tribe, text){
@@ -32,8 +33,10 @@ async function sendTribeMessage(t, node, tribe, text){
     const msg = await http.post(node.ip+'/messages', h.makeArgs(node, v))
     //make sure msg1 exists
     t.true(msg.success, "node should send message to tribe")
-    // //wait for message to post
-    // await h.sleep(1000)
+    //wait for message to post
+    const msgUuid = msg.response.uuid
+    const checkMsg = await getCheckNewMsgs(t, node, msgUuid)
+    t.truthy(checkMsg, "await new tribe message post")
 
     return {success: true, message: msg.response}
 

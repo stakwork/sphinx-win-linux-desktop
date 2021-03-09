@@ -2,12 +2,13 @@
 
 //enter index of nodes to test, and whether to iterate or not
 const run = {
-    oneNode: [1],
+    oneNode: [0],
     twoNodes: [0, 1],
     threeNodes: [0, 1, 2],
+    active: "threeNodes",
     iterate: true,
-    memeHost: "localhost:5000",
-    allowedFee: 1,
+    memeHost: "memes.sphinx.chat",
+    allowedFee: 4,
 }
 
 module.exports = run

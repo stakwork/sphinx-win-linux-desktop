@@ -12,7 +12,7 @@ async function tribe3Escrow(t, index1, index2, index3) {
     console.log(`${node1.alias} and ${node2.alias} and ${node3.alias}`)
 
     //NODE1 CREATES A TRIBE
-    let tribe = await f.createTribe(t, node1, 10, 1000, 5)
+    let tribe = await f.createTribe(t, node1, 10, 2000, 5)
     t.truthy(tribe, "tribe should have been created by node1")
 
     //NODE2 JOINS TRIBE CREATED BY NODE1
@@ -33,36 +33,6 @@ async function tribe3Escrow(t, index1, index2, index3) {
     //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
     const n3check = await f.checkDecrypt(t, node3, text, escrowMessage.message)
     t.true(n3check, "node3 (non-admin) should have read and decrypted node2's message")
-
-    // //CHECK THAT NODE1'S DECRYPTED MESSAGE IS SAME AS INPUT
-    // const n3check = await f.checkDecrypt(t, node3, text, tribeMessage.message)
-    // t.true(n3check, "node3 should have read and decrypted node1 message")
-
-    // //NODE2 SENDS A TEXT MESSAGE IN TRIBE
-    // const text2 = h.randomText()
-    // let tribeMessage2 = await f.sendTribeMessage(t, node2, tribe, text2)
-    // t.true(tribeMessage2.success, "node2 should send message to tribe")
-
-    // //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
-    // const n1check = await f.checkDecrypt(t, node1, text2, tribeMessage2.message)
-    // t.true(n1check, "node1 should have read and decrypted node2 message")
-
-    // //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
-    // const n3check2 = await f.checkDecrypt(t, node3, text2, tribeMessage2.message)
-    // t.true(n3check2, "node3 should have read and decrypted node2 message")
-
-    // //NODE3 SENDS A TEXT MESSAGE IN TRIBE
-    // const text3 = h.randomText()
-    // let tribeMessage3 = await f.sendTribeMessage(t, node3, tribe, text3)
-    // t.true(tribeMessage3.success, "node3 should send message to tribe")
-
-    // //CHECK THAT NODE3'S DECRYPTED MESSAGE IS SAME AS INPUT
-    // const n1check2 = await f.checkDecrypt(t, node1, text3, tribeMessage3.message)
-    // t.true(n1check2, "node1 should have read and decrypted node3 message")
-
-    // //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
-    // const n2check2 = await f.checkDecrypt(t, node2, text3, tribeMessage3.message)
-    // t.true(n2check2, "node2 should have read and decrypted node3 message")
 
     //NODE2 LEAVES THE TRIBE
     let n2left = await f.leaveTribe(t, node2, tribe)

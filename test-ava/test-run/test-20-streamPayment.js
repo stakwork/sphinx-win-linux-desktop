@@ -3,7 +3,7 @@ var h = require('../helpers/helper-functions')
 var i = require('../test-functions')
 var r = require('../run-ava')
 
-test('add contact, send invoices, pay invoices, delete contact', async t => {
+test('establish chat, node1 streams payment, node1 streams split payment, delete contacts', async t => {
     const nodeArray = r[r.active]
-    await h.runTest(t, i.chatInvoice, nodeArray, r.iterate)
+    await h.runTest(t, i.streamPayment, nodeArray, r.iterate)
 })
