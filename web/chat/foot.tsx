@@ -25,12 +25,13 @@ import ReactGiphySearchbox from 'react-giphy-searchbox'
 import {giphyIcon} from '../images'
 
 export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsgPrice }) {
-  const { ui, msg, meme, details, contacts } = useStores()
+  const { ui, msg, meme, details, user } = useStores()
   const [recording, setRecording] = useState(false)
   const [record, setRecord] = useState(false)
   const [uploading, setUploading] = useState(false)
-
+  
   return useObserver(() => {
+    const myid = user.myid
     const chat = ui.selectedChat
     let text = (chat ? ui.tribeText[chat.id] : "") || ""
 
@@ -50,7 +51,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
         text: text,
       })
       const b64 = btoa(gifJSON)
-      let contact_id = chat.contact_ids.find(cid => cid !== 1)
+      let contact_id = chat.contact_ids.find(cid => cid !== myid)
       await msg.sendMessage({
         contact_id, chat_id: chat.id,
         text: 'giphy::'+b64,
@@ -85,7 +86,7 @@ export default function Foot({ height, messagePrice, tribeBots, msgPrice, setMsg
       if (msgPrice){
         return sendPaidMsg()
       }
-      let contact_id = chat.contact_ids.find(cid => cid !== 1)
+      let contact_id = chat.contact_ids.find(cid => cid !== myid)
       let { price, failureMessage } = calcBotPrice(tribeBots, text)
       if (failureMessage) {
         return alert(failureMessage)

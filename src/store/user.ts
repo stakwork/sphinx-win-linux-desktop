@@ -8,6 +8,7 @@ interface Invite {
   inviterNickname: string,
   inviterPubkey: string,
   welcomeMessage: string,
+  inviterRouteHint: string,
   action: string,
 }
 
@@ -19,6 +20,7 @@ class UserStore {
     inviterNickname: '',
     inviterPubkey: '',
     welcomeMessage: '',
+    inviterRouteHint: '',
     action: '',
   }
 
@@ -59,6 +61,7 @@ class UserStore {
       inviterNickname: '',
       inviterPubkey: '',
       welcomeMessage: '',
+      inviterRouteHint: '',
       action: '',
     }
   }
@@ -105,6 +108,7 @@ class UserStore {
       inviterNickname: '',
       inviterPubkey: '',
       welcomeMessage: '',
+      inviterRouteHint: '',
       action: '',
     }
   }
@@ -162,9 +166,11 @@ class UserStore {
       this.invite = {
         inviterNickname: r.invite.nickname,
         inviterPubkey: r.invite.pubkey,
+        inviterRouteHint: r.invite.route_hint,
         welcomeMessage: r.invite.message,
         action: r.invite.action || '',
       }
+      this.setPublicKey(r.pubkey)
       api.instantiateRelay(r.ip) // no token
       return { ip: r.ip, password: r.password }
     } catch (e) {
@@ -191,10 +197,11 @@ class UserStore {
       await sleep(1)
     }
     try {
+      const pubkey = this.publicKey
       const token = await randString(20)
       console.log("OK GEN TOKEN!", this.currentIP, pwd)
       const r = await api.relay.post(`contacts/tokens?pwd=${pwd}`, {
-        token
+        token, pubkey,
       })
       if(!r) return console.log("=> FAILED TO REACH RELAY")
       this.authToken = token
@@ -251,5 +258,7 @@ const supportContact = {
   inviterNickname: 'Sphinx Support',
   inviterPubkey: '023d70f2f76d283c6c4e58109ee3a2816eb9d8feb40b23d62469060a2b2867b77f',
   welcomeMessage: 'Welcome to Sphinx!',
-  action: ''
+  action: '',
+  inviterRouteHint: '',
+  pubkey: '',
 }

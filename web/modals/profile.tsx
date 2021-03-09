@@ -33,7 +33,7 @@ const advSchema = [{
 export default function Profile() {
 
   const { ui, contacts, details, user } = useStores()
-  const me = contacts.contacts.find(c => c.id === 1)
+  const me = contacts.contacts.find(c => c.id === user.myid)
   const [advanced, setAdvanced] = useState(false)
   const [loading, setLoading] = useState(false)
   const [copied,setCopied] = useState(false)
@@ -51,7 +51,7 @@ export default function Profile() {
   async function exportKeys(){
     if(copied) return
     const priv = await rsa.getPrivateKey()
-    const me = contacts.contacts.find(c=>c.id===1)
+    const me = contacts.contacts.find(c=>c.id===user.myid)
     const pub = me && me.contact_key
     const ip = user.currentIP
     const token = user.authToken

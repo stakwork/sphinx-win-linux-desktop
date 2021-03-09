@@ -14,7 +14,7 @@ import ContactMsg from './contactMsg'
 
 export default function TextMsg(props) {
   const { message_content, sender, joinTribe } = props
-  const isMe = sender === 1
+  const isMe = sender === props.myid
   const link = useHasLink(props)
   const hasLink = message_content && link
   if (hasLink) {
@@ -82,8 +82,8 @@ export default function TextMsg(props) {
   return <Wrap {...props}>{message_content}</Wrap>
 }
 
-function Wrap(props:{children:any,style?:Object,boosts_total_sats:number,boosts:any,sender:number}){
-  const isMe = props.sender===1
+function Wrap(props:{children:any,style?:Object,boosts_total_sats:number,boosts:any,sender:number, myid:number}){
+  const isMe = props.sender===props.myid
   const {children,style,boosts_total_sats,boosts} = props
   return <WrapDiv style={style}>
     {children}

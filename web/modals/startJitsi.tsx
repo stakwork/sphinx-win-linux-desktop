@@ -8,9 +8,9 @@ import MicIcon from '@material-ui/icons/Mic'
 import VideoCallIcon from '@material-ui/icons/VideoCall'
 
 export default function StartJitsi() {
-  const { ui,msg } = useStores()
+  const { ui,msg,user } = useStores()
   const close = () => ui.setStartJitsiParams(null)
-
+  const myid = user.myid
   const chat = ui.selectedChat
   const params = ui.startJitsiParams
   function startCall(audioOnly:boolean){
@@ -18,7 +18,7 @@ export default function StartJitsi() {
     if(!params) return
     const time = new Date().getTime()
     const txt = `https://jitsi.sphinx.chat/sphinx.call.${time}${audioOnly?'#config.startAudioOnly=true':''}`
-    let contact_id = chat.contact_ids.length===2 && chat.contact_ids.find(cid => cid !== 1)
+    let contact_id = chat.contact_ids.length===2 && chat.contact_ids.find(cid => cid !== myid)
     msg.sendMessage({
       contact_id: contact_id || null,
       text:txt,

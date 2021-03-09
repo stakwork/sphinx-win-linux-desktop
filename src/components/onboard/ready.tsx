@@ -19,6 +19,7 @@ export default function Ready(props) {
         alias: user.invite.inviterNickname,
         public_key: user.invite.inviterPubkey,
         status: constants.contact_statuses.confirmed,
+        route_hint: user.invite.inviterRouteHint
       }),
       actions(user.invite.action),
       chats.joinDefaultTribe()

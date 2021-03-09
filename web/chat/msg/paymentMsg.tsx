@@ -6,7 +6,7 @@ import CallReceivedIcon from '@material-ui/icons/CallReceived';
 
 export default function PaymentMsg(props){
   const {amount, status, message_content} = props
-  const isMe = props.sender===1
+  const isMe = props.sender===props.myid
 
   let Icon, label, color
   if (isMe) {
@@ -17,7 +17,7 @@ export default function PaymentMsg(props){
     Icon = CallReceivedIcon
     // label = 'RECEIVED'
     color = '#74ABFF'
-  } 
+  }
 
   return <Wrap>
     <Row>

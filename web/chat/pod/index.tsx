@@ -17,6 +17,7 @@ export default function Pod({ url, chat, onBoost }) {
   const { chats, msg, feed, user, details } = useStores()
   const host = chat&&chat.host
   const chatID = chat&&chat.id
+  const myid = user.myid
 
   const [loading, setLoading] = useState(false)
   const [pod, setPod] = useState(null)
@@ -189,7 +190,7 @@ export default function Pod({ url, chat, onBoost }) {
     incomingPayments = msg.filterMessagesByContent(0, `"feedID":${pod.id}`)
     if (incomingPayments) {
       earned = incomingPayments.reduce((acc, m) => {
-        if (m.sender !== 1 && m.amount) {
+        if (m.sender !== myid && m.amount) {
           return acc + Number(m.amount)
         }
         return acc

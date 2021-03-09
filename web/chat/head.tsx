@@ -21,12 +21,13 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const [exit, setExit] = useState(false)
-  const { contacts, ui, msg, chats } = useStores()
+  const { contacts, ui, msg, chats, user } = useStores()
 
   return useObserver(() => {
+    const myid = user.myid
     const chat = ui.selectedChat
     const ownerPubkey = (chat && chat.owner_pubkey) || ''
-    const owner = contacts.contacts.find(c => c.id === 1)
+    const owner = contacts.contacts.find(c => c.id === myid)
     const isTribeOwner = owner && owner.public_key === ownerPubkey
 
     function goToURL() {
@@ -49,7 +50,7 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
 
     let photoURL = chat && chat.photo_url
     if (chat && chat.type === constants.chat_types.conversation) {
-      const cid = chat.contact_ids.find(id => id !== 1)
+      const cid = chat.contact_ids.find(id => id !== myid)
       const contact = contacts.contacts.find(c => c.id === cid)
       if (contact && contact.photo_url) {
         photoURL = contact.photo_url
@@ -58,7 +59,7 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
 
     function viewContact() {
       if (chat && chat.type === constants.chat_types.conversation) {
-        const cid = chat.contact_ids.find(id => id !== 1)
+        const cid = chat.contact_ids.find(id => id !== myid)
         const contact = contacts.contacts.find(c => c.id === cid)
         ui.setViewContact(contact)
       }

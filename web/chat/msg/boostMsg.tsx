@@ -8,7 +8,6 @@ export default function BoostMsg(props){
   const {sender, message_content} = props
   const params = useParsedJsonOrClipMsg(message_content)
   const {feedID, itemID, ts, amount} = params
-  // const isMe = sender === 1
   const theme = useTheme()
   return <Pad>
     <span>{`Boost ${amount}`}</span>
