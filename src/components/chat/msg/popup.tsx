@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
 export default function Popup(props) {
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   const sty: { [k: string]: any } = {
     top: props.showInfoBar ? -12 : -27
   }

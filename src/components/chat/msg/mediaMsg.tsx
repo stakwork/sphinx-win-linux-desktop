@@ -17,7 +17,7 @@ export default function MediaMsg(props) {
   const theme = useTheme()
   const [buying, setBuying] = useState(false)
   const { message_content, media_type, chat, media_token } = props
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
 
   const ldat = parseLDAT(media_token)
 
@@ -41,7 +41,7 @@ export default function MediaMsg(props) {
     setBuying(true)
     let contact_id = props.sender
     if (!contact_id) {
-      contact_id = chat.contact_ids && chat.contact_ids.find(cid => cid !== 1)
+      contact_id = chat.contact_ids && chat.contact_ids.find(cid => cid !== props.myid)
     }
     await msg.purchaseMedia({
       chat_id: chat.id,

@@ -24,6 +24,7 @@ import Slider from '@react-native-community/slider';
 
 export default function Profile() {
   const { details, user, contacts, meme, ui } = useStores()
+  const myid = user.myid
   const theme = useTheme()
   const [uploading, setUploading] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -79,7 +80,7 @@ export default function Profile() {
   }
 
   async function shareContactKey(){
-    const me = contacts.contacts.find(c=> c.id===1)
+    const me = contacts.contacts.find(c=> c.id===myid)
     const contact_key = me.contact_key
     if(!contact_key) return
     setSharing(true)
@@ -94,7 +95,7 @@ export default function Profile() {
     if(pin!==thePIN) return
     setExporting(true)
     const priv = await rsa.getPrivateKey()
-    const me = contacts.contacts.find(c=>c.id===1)
+    const me = contacts.contacts.find(c=>c.id===myid)
     const pub = me && me.contact_key
     const ip = user.currentIP
     const token = user.authToken
@@ -159,7 +160,7 @@ export default function Profile() {
   }
 
   return useObserver(()=> {
-    const meContact = contacts.contacts.find(c=> c.id===1)
+    const meContact = contacts.contacts.find(c=> c.id===myid)
     let imgURI = usePicSrc(meContact)
     if(photo_url) imgURI = photo_url
 

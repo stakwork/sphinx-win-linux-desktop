@@ -129,7 +129,8 @@ async function sendImage(t, node1, node2, image, tribe, price){
         node2MediaKey = paymentMsg.media_key
         t.truthy(node2MediaKey, "node2MediaKey should exist")
         //create url with media_token
-        url = `https://${r.memeHost}/file/${paymentMsg.media_token}`
+        const protocol = h.memeProtocol(r.memeHost)
+        url = `${protocol}://${r.memeHost}/file/${paymentMsg.media_token}`
 
     } else {
       //RECEIVE UNPAID IMAGE ===>
@@ -140,7 +141,8 @@ async function sendImage(t, node1, node2, image, tribe, price){
       node2MediaKey = lastMessage2.media_key
       t.truthy(node2MediaKey, "node2MediaKey should exist")
       //create url with media_token
-      url = `https://${r.memeHost}/file/${lastMessage2.media_token}`
+      const protocol = h.memeProtocol(r.memeHost)
+      url = `${protocol}://${r.memeHost}/file/${lastMessage2.media_token}`
     }
 
     //DECRYPT IMAGE

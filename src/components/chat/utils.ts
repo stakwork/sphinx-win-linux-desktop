@@ -2,16 +2,17 @@ import { Chat } from '../../store/chats'
 import { Contact } from '../../store/contacts'
 import { constants } from '../../constants'
 import moment from 'moment'
+import {useStores} from '../../store'
 
 const conversation = constants.chat_types.conversation
 const group = constants.chat_types.conversation
 const expiredInvite = constants.invite_statuses.expired
 
-export function allChats(chats: Chat[], contacts: Contact[]): Chat[] {
+export function allChats(chats: Chat[], contacts: Contact[], myid:number): Chat[] {
   const groupChats = chats.filter(c => c.type !== conversation).map(c => ({ ...c }))
   const conversations = []
   contacts.forEach(contact => {
-    if (contact.id !== 1 && !contact.from_group) {
+    if (contact.id !== myid && !contact.from_group) {
       const chatForContact = chats.find(c => {
         return c.type === conversation && c.contact_ids.includes(contact.id)
       })
@@ -35,8 +36,9 @@ export function allChats(chats: Chat[], contacts: Contact[]): Chat[] {
 }
 
 export function contactForConversation(chat: Chat, contacts: Contact[]) {
+  const {user} = useStores()
   if (chat && chat.type === conversation) {
-    const cid = chat.contact_ids.find(id => id !== 1)
+    const cid = chat.contact_ids.find(id => id !== user.myid)
     return contacts.find(c => c.id === cid)
   }
   return null

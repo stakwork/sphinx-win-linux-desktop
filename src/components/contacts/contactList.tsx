@@ -8,14 +8,15 @@ import {usePicSrc} from '../utils/picSrc'
 import FastImage from 'react-native-fast-image'
 
 export default function ContactList() {
-  const {ui, contacts} = useStores()
+  const {ui, contacts, user} = useStores()
+  const myid = user.myid
   const theme = useTheme()
   return useObserver(()=> {
     const contactsToShow = contacts.contacts.filter(c=> {
       if (!ui.contactsSearchTerm) return true
       return c.alias.toLowerCase().includes(ui.contactsSearchTerm.toLowerCase())
     })
-    const contactsNotMe = contactsToShow.filter(c=> c.id!==1).sort((a,b)=> a.alias>b.alias?1:-1)
+    const contactsNotMe = contactsToShow.filter(c=> c.id!==myid).sort((a,b)=> a.alias>b.alias?1:-1)
     const contactsNotFromGroups = contactsNotMe.filter(c=> !c.from_group)
     return <View style={{...styles.container,backgroundColor:theme.bg}}>
       <SectionList

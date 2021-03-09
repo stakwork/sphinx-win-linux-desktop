@@ -6,7 +6,7 @@ import AvatarsRow from './avatarsRow'
 
 export default function BoostRow(props) {
   const theme = useTheme()
-  const isMe = props.sender===1
+  const isMe = props.sender===props.myid
   // console.log(props.boosts_total_sats)
 
   let backgroundColor = isMe ? 
@@ -34,7 +34,7 @@ export default function BoostRow(props) {
     </View>
     <View style={{...styles.right,marginLeft:8,marginBottom:padn,marginRight:padn}}>
       {hasBoosts && <AvatarsRow aliases={theBoosts.map(b=>{
-        if(b.sender===1) return props.myAlias||'Me'
+        if(b.sender===props.myid) return props.myAlias||'Me'
         return b.sender_alias
       })} borderColor={backgroundColor} />}
     </View>

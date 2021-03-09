@@ -7,3 +7,4 @@ test('add contact, send messages, delete contacts', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, i.contactTest, nodeArray, r.iterate)
 })
+

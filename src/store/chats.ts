@@ -306,14 +306,14 @@ export class ChatStore {
   }
 
   @action
-  async checkRoute(cid) {
+  async checkRoute(cid, myid:number) {
     const chat = this.chats.find(ch => ch.id === cid)
     if (!chat) return
     let pubkey
     if (chat.type === constants.chat_types.tribe) {
       pubkey = chat.owner_pubkey
     } else if (chat.type === constants.chat_types.conversation) {
-      const contactid = chat.contact_ids.find(contid => contid != 1)
+      const contactid = chat.contact_ids.find(contid => contid !== myid)
       const contact = contactStore.contacts.find(con => con.id === contactid)
       if (contact) {
         pubkey = contact.public_key

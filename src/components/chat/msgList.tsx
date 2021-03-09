@@ -63,7 +63,7 @@ export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pri
       msgsLength={(msgs && msgs.length) || 0}
       chat={chat}
       onDelete={onDelete}
-      myPubkey={user.publicKey} myAlias={user.alias}
+      myPubkey={user.publicKey} myAlias={user.alias} myid={user.myid}
       onApproveOrDenyMember={onApproveOrDenyMember}
       onDeleteChat={onDeleteChat}
       onLoadMoreMsgs={onLoadMoreMsgs}
@@ -72,7 +72,7 @@ export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pri
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg }) {
+function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg, myid }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
   // const [viewableIds, setViewableIds] = useState({})
@@ -155,7 +155,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApprov
           m={item} chat={chat}
           senderAlias={senderAlias} senderPic={senderPic}
           isGroup={isGroup} isTribe={isTribe}
-          onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias}
+          onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} myid={myid}
           onApproveOrDenyMember={onApproveOrDenyMember}
           onDeleteChat={onDeleteChat}
           onBoostMsg={onBoostMsg}
@@ -189,7 +189,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPic, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPic, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg, myid }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -201,7 +201,7 @@ function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, send
   return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
     senderAlias={senderAlias} senderPic={senderPic}
-    onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} windowWidth={windowWidth}
+    onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} myid={myid} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
     onBoostMsg={onBoostMsg}
   />, [m.id, m.type, m.media_token, m.status, m.sold, m.boosts_total_sats])
