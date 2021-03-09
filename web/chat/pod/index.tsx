@@ -10,10 +10,11 @@ import Replay from './replay'
 import EE, { CLIP_PAYMENT, INITIAL_TS, EPISODE_SELECTED, PLAY_ANIMATION } from '../../utils/ee'
 import { StreamPayment, Destination } from '../../../src/store/feed'
 import Slider from '@material-ui/core/Slider';
+import Alert from '@material-ui/lab/Alert';
 import * as Audio from './audio'
 
 export default function Pod({ url, chat, onBoost }) {
-  const { chats, msg, feed, user } = useStores()
+  const { chats, msg, feed, user, details } = useStores()
   const host = chat&&chat.host
   const chatID = chat&&chat.id
 
@@ -21,6 +22,7 @@ export default function Pod({ url, chat, onBoost }) {
   const [pod, setPod] = useState(null)
   const [showStats, setShowStats] = useState(false)
   const [selectedEpisodeID, setSelectedEpisodeID] = useState(null)
+  const [insfBalance, setInsfBalance] = useState(false)
 
   const [ppm,setPpm] = useState<number>(5)
   
@@ -89,8 +91,18 @@ export default function Pod({ url, chat, onBoost }) {
   }
 
   function boost(pos: number) {
-    EE.emit(PLAY_ANIMATION)
     const amount = user.tipAmount || 100
+    console.log("amount", amount)
+    console.log("detail.balance", details.balance)
+    if(amount>details.balance){
+      console.log("not enough balance")
+      setInsfBalance(true)
+      setTimeout(() => {
+        setInsfBalance(false)
+      }, 3500);
+      return
+    }
+    EE.emit(PLAY_ANIMATION)
     const sp: StreamPayment = {
       feedID: pod.id,
       itemID: selectedEpisodeID,
@@ -250,6 +262,8 @@ export default function Pod({ url, chat, onBoost }) {
         </Price>} */}
       </PodText>
     </PodInfo> : <Center><CircularProgress /></Center>}
+
+     {insfBalance && <Alert style={{ position: 'absolute', bottom: "43%", left: 'calc(50% - 80px)', opacity: 0.9 }} icon={false}>Insufficient Balance</Alert>}
 
      <Player pod={pod} episode={episode}
       sendPayments={sendPayments} boost={boost} chat={chat} ppm={ppm}

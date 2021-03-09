@@ -47,7 +47,7 @@ export default function Main() {
       checkVersion()
     }
     if (appState.current.match(/active/) && nextAppState === "background") {
-      const count = msg.countUnseenMessages()
+      const count = msg.countUnseenMessages(user.myid)
       BadgeAndroid.setBadge(count);
     }
     appState.current = nextAppState;

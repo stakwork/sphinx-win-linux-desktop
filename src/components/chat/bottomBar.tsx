@@ -29,7 +29,7 @@ let nonStateRecordingStartTime = 0
 let dontRecordActually = false
 
 export default function BottomBar({chat,pricePerMessage,tribeBots}) {
-  const {ui,msg,meme} = useStores()
+  const {ui,msg,meme,user} = useStores()
   const theme = useTheme()
   const [text,setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
@@ -44,6 +44,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   const [showGiphyModal, setShowGiphyModal] = useState(false)
   const [replyUuid, setReplyUuid] = useState('')
   const [extraTextContent, setExtraTextContent] = useState(null)
+  const myid = user.myid
 
   const inputRef = useRef(null)
 
@@ -53,7 +54,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   function sendMessage(){
     if(!text) return
     if(waitingForAdminApproval) return
-    let contact_id=chat.contact_ids.find(cid=>cid!==1)
+    let contact_id=chat.contact_ids.find(cid=>cid!==myid)
     let {price, failureMessage} = calcBotPrice(tribeBots,text)
     if(failureMessage) {
       ToastAndroid.showWithGravityAndOffset(failureMessage, ToastAndroid.SHORT, ToastAndroid.TOP, 0, 125)
@@ -118,7 +119,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
   function openImgViewer(obj){
     let contact_id=null
     if(!chat.id){ // if no chat (new contact)
-      contact_id=chat.contact_ids.find(cid=>cid!==1)
+      contact_id=chat.contact_ids.find(cid=>cid!==myid)
     }
     ui.setImgViewerParams({
       contact_id,
@@ -322,6 +323,7 @@ export default function BottomBar({chat,pricePerMessage,tribeBots}) {
         </TouchableOpacity>}
         {!recordingStartTime && <TextInput textAlignVertical="top"
           accessibilityLabel="message-input"
+          
           numberOfLines={4}
           multiline={true} blurOnSubmit={true}
           onContentSizeChange={e=>{

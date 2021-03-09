@@ -50,8 +50,9 @@ function ChatList(){
 }
 
 export function contactForConversation(chat: Chat, contacts: Contact[]){
+  const {user} = useStores()
   if(chat && chat.type===constants.chat_types.conversation){
-    const cid = chat.contact_ids.find(id=>id!==1)
+    const cid = chat.contact_ids.find(id=>id!==user.myid)
     return contacts.find(c=> c.id===cid)
   }
   return null

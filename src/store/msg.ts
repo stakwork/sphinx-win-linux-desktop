@@ -439,14 +439,14 @@ class MsgStore {
   }
 
   @action
-  countUnseenMessages(): number {
+  countUnseenMessages(myid:number): number {
     const now = new Date().getTime()
     let unseenCount = 0
     const lastSeenObj = this.lastSeen
     Object.entries(this.messages).forEach(function ([id, msgs]) {
       const lastSeen = lastSeenObj[id || '_'] || now
       msgs.forEach(m => {
-        if (m.sender !== 1) {
+        if (m.sender !== myid) {
           const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
           if (unseen) unseenCount += 1
         }

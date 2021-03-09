@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, StyleSheet, Text, ActivityIndicator, AppState, Dimensions, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, ActivityIndicator, AppState, Dimensions, ScrollView, ToastAndroid } from 'react-native'
 import { useStores, useTheme } from '../../../store'
 import TrackPlayer from 'react-native-track-player';
 import { IconButton } from 'react-native-paper';
@@ -17,7 +17,8 @@ import { getPosition, setPosition } from './position'
 export default function Pod({ pod, show, chat, onBoost, podError }) {
   const theme = useTheme()
   const chatID = chat.id
-  const { feed, user, msg, chats } = useStores()
+  const { feed, user, msg, chats, details } = useStores()
+  const myid = user.myid
 
   const [loading, setLoading] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -252,7 +253,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
         if (dat) msgsforReplay.push({
           ...dat,
           type: arr[0],
-          alias: m.sender_alias || (m.sender === 1 ? user.alias : ''),
+          alias: m.sender_alias || (m.sender === myid ? user.alias : ''),
           date: m.date,
         })
       } catch (e) { }
@@ -275,8 +276,20 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   }
 
   function boost() {
-    EE.emit(PLAY_ANIMATION)
+    
     const amount = user.tipAmount || 100
+
+    if(amount>details.balance){
+      ToastAndroid.showWithGravityAndOffset(
+        'Not Enough Balance',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+        0, 125
+      );
+      return
+    }
+
+    EE.emit(PLAY_ANIMATION)
     requestAnimationFrame(async () => {
       const pos = getPosition()
       const sp: StreamPayment = {

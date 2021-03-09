@@ -22,6 +22,7 @@ export type RouteStatus = 'active' | 'inactive' | null
 export default function Chat() {
   const { contacts, user, chats, ui, msg } = useStores()
   const theme = useTheme()
+  const myid = user.myid
 
   const [show, setShow] = useState(false)
   const [pricePerMessage, setPricePerMessage] = useState(0)
@@ -104,7 +105,7 @@ export default function Chat() {
       setTribeParams(null)
     }
 
-    const r = await chats.checkRoute(chat.id)
+    const r = await chats.checkRoute(chat.id, myid)
     if(r && r.success_prob && r.success_prob>0) {
       setStatus('active')
     } else {
@@ -136,7 +137,7 @@ export default function Chat() {
   }
 
   const podID = pod&&pod.id
-  const {earned,spent} = useIncomingPayments(podID)
+  const {earned,spent} = useIncomingPayments(podID, myid)
 
   let pricePerMinute = 0
   if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
@@ -160,7 +161,7 @@ export default function Chat() {
 
       <Pod pod={pod} show={feedURL?true:false} chat={chat} onBoost={onBoost} podError={podError} />
 
-      <Anim dark={theme.dark} />
+      <Anim dark={theme.dark} myid={myid} />
 
       {theShow && <BottomBar chat={chat} pricePerMessage={pricePerMessage}
         tribeBots={tribeBots}

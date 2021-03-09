@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState, useCallback, useEffect } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, hooks, useTheme } from '../../store'
-import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator } from 'react-native'
+import { VirtualizedList, View, Text, StyleSheet, Keyboard, Dimensions, ActivityIndicator, ToastAndroid } from 'react-native'
 import { Chat } from '../../store/chats'
 import { useMsgSender } from '../../store/hooks/msg'
 import Message from './msg'
@@ -15,17 +15,27 @@ const group = constants.chat_types.group
 const tribe = constants.chat_types.tribe
 
 export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pricePerMessage:number }) {
-  const { msg, ui, user, chats } = useStores()
+  const { msg, ui, user, chats, details } = useStores()
   const [limit, setLimit] = useState(40)
 
   function onLoadMoreMsgs() {
     setLimit(c => c + 40)
   }
 
-  async function onBoostMsg(m){
+  async function onBoostMsg(m, sliderValue){
     const {uuid} = m
     if(!uuid) return
-    const amount = (user.tipAmount||100) + pricePerMessage
+    const amount = (sliderValue || user.tipAmount || 100) + pricePerMessage
+    if(amount>details.balance){
+      ToastAndroid.showWithGravityAndOffset(
+        'Not Enough Balance',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+        0, 125
+      );
+      return
+    }
+
     msg.sendMessage({
       boost:true,
       contact_id:null,
@@ -53,7 +63,7 @@ export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pri
       msgsLength={(msgs && msgs.length) || 0}
       chat={chat}
       onDelete={onDelete}
-      myPubkey={user.publicKey} myAlias={user.alias}
+      myPubkey={user.publicKey} myAlias={user.alias} myid={user.myid}
       onApproveOrDenyMember={onApproveOrDenyMember}
       onDeleteChat={onDeleteChat}
       onLoadMoreMsgs={onLoadMoreMsgs}
@@ -62,7 +72,7 @@ export default function MsgListWrap({ chat, pricePerMessage }: { chat: Chat, pri
   })
 }
 
-function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg }) {
+function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApproveOrDenyMember, onDeleteChat, onLoadMoreMsgs, onBoostMsg, myid }) {
   const scrollViewRef = useRef(null)
   const theme = useTheme()
   // const [viewableIds, setViewableIds] = useState({})
@@ -145,7 +155,7 @@ function MsgList({ msgs, msgsLength, chat, onDelete, myPubkey, myAlias, onApprov
           m={item} chat={chat}
           senderAlias={senderAlias} senderPic={senderPic}
           isGroup={isGroup} isTribe={isTribe}
-          onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias}
+          onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} myid={myid}
           onApproveOrDenyMember={onApproveOrDenyMember}
           onDeleteChat={onDeleteChat}
           onBoostMsg={onBoostMsg}
@@ -179,7 +189,7 @@ function Refresher(){
   </View>
 }
 
-function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPic, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg }) {
+function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, senderAlias, senderPic, windowWidth, onApproveOrDenyMember, onDeleteChat, onBoostMsg, myid }) {
   // if (!viewable) { /* THESE RENDER FIRST????? AND THEN THE ACTUAL MSGS DO */
   //   return <View style={{ height: 50, width: 1 }} />
   // }
@@ -191,7 +201,7 @@ function ListItem({ m, chat, isGroup, isTribe, onDelete, myPubkey, myAlias, send
   return useMemo(() => <Message {...msg}
     isGroup={isGroup} isTribe={isTribe}
     senderAlias={senderAlias} senderPic={senderPic}
-    onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} windowWidth={windowWidth}
+    onDelete={onDelete} myPubkey={myPubkey} myAlias={myAlias} myid={myid} windowWidth={windowWidth}
     onApproveOrDenyMember={onApproveOrDenyMember} onDeleteChat={onDeleteChat}
     onBoostMsg={onBoostMsg}
   />, [m.id, m.type, m.media_token, m.status, m.sold, m.boosts_total_sats])

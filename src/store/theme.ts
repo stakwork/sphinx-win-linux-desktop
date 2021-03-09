@@ -34,6 +34,7 @@ export class ThemeStore {
   @observable deep: string = '#ccc'
 
   primary: string = '#6289FD'
+  secondary: string = '#48c998'
   accent: string = '#48c998'
   active: string = '#49ca97'
   inactive: string = '#febd59'

@@ -14,7 +14,7 @@ const basex = require('bs58-rn');
 const base58 = basex(ALPHABET);
 
 export default function SendPayment({visible}) {
-  const {ui,msg,contacts} = useStores()
+  const {ui,msg,contacts,user} = useStores()
   
   const [main, setMain] = useState(false)
   const [next, setNext] = useState('')
@@ -30,7 +30,7 @@ export default function SendPayment({visible}) {
 
   const chat = ui.chatForPayModal
 
-  const contact_id = chat && chat.contact_ids && chat.contact_ids.find(cid=>cid!==1)
+  const contact_id = chat && chat.contact_ids && chat.contact_ids.find(cid=>cid!==user.myid)
 
   const contact = contact_id && contacts.contacts.find(c=> c.id===contact_id)
 

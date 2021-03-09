@@ -1,0 +1,12 @@
+{
+	"scripts": {
+		"test": "ava --verbose --serial --timeout=10m"
+	},
+	"devDependencies": {
+		"ava": "^3.15.0",
+		"ava-http": "^1.0.0"
+	},
+	"dependencies": {
+		"node-fetch": "^2.6.1"
+	}
+}

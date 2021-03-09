@@ -1,6 +1,7 @@
 import { contactStore } from './contacts'
 import * as e2e from '../crypto/e2e'
 import { chatStore } from './chats'
+import { userStore } from './user'
 import { constants } from '../constants'
 import { Msg, MAX_MSGS_PER_CHAT } from './msg'
 
@@ -16,12 +17,13 @@ export async function makeRemoteTextMap({ contact_id, text, chat_id }, includeSe
   const idToKeyMap = {}
   const remoteTextMap = {}
   const chat = chat_id && chatStore.chats.find(c => c.id === chat_id)
+  const myid = userStore.myid
   if (chat) {
     // TRIBE
     if (chat.type === constants.chat_types.tribe && chat.group_key) {
       idToKeyMap['chat'] = chat.group_key // "chat" is the key for tribes
       if (includeSelf) {
-        const me = contactStore.contacts.find(c => c.id === 1) // add in my own self (for media_key_map)
+        const me = contactStore.contacts.find(c => c.id === myid) // add in my own self (for media_key_map)
         if (me) idToKeyMap[1] = me.contact_key
       }
     } else { // NON TRIBE
@@ -29,7 +31,7 @@ export async function makeRemoteTextMap({ contact_id, text, chat_id }, includeSe
         if (includeSelf) {
           return chat.contact_ids.includes(c.id)
         } else {
-          return chat.contact_ids.includes(c.id) && c.id !== 1
+          return chat.contact_ids.includes(c.id) && c.id !== myid
         }
       })
       contactsInChat.forEach(c => idToKeyMap[c.id] = c.contact_key)

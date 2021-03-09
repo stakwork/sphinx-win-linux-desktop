@@ -15,11 +15,13 @@ import { SvgIcon } from '@material-ui/core';
 import Tooltip from '@material-ui/core/Tooltip';
 import PhoneIcon from '@material-ui/icons/Phone'
 import LockIcon from '@material-ui/icons/Lock';
+import Dialog from '@material-ui/core/Dialog';
 
 export default function Head({ height, appMode, appURL, setAppMode, messagePrice, status }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
-  const { contacts, ui, msg } = useStores()
+  const [exit, setExit] = useState(false)
+  const { contacts, ui, msg, chats } = useStores()
 
   return useObserver(() => {
     const chat = ui.selectedChat
@@ -62,6 +64,16 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
       }
     }
 
+    async function exitGroup(){
+      setExit(true)
+    }
+    async function actuallyExitGroup(){
+      const id = chat && chat.id
+      if(!id) return
+      await chats.exitGroup(id)
+      setExit(false)
+    }
+
     return <Wrap style={{ background: theme.bg, height }}>
       {!chat && !showURL && <Placeholder>
         Open a conversation to start using Sphinx
@@ -73,7 +85,7 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
           </AvatarWrap>
           <ChatInfo>
             <NameWrap>
-              <Name onClick={viewContact} style={{ cursor: (chat && chat.type === constants.chat_types.conversation) ? 'pointer' : 'auto' }}>{chat.name}</Name>
+              <Name onDoubleClick={exitGroup} onClick={viewContact} style={{ cursor: (chat && chat.type === constants.chat_types.conversation) ? 'pointer' : 'auto' }}>{chat.name}</Name>
               {status && chat.type !== constants.chat_types.group && <Tooltip title={status === 'active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
                 <LockIcon style={{ color: status === 'active' ? '#49ca97' : '#febd59', fontSize: 12, marginLeft: 8, marginBottom: 2 }} />
               </Tooltip>}
@@ -123,6 +135,15 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
         />}
 
       </Right>
+
+      <Dialog onClose={()=>setExit(false)} open={exit}>
+        <DialogContent>
+          <div style={{marginBottom:10}}>Exit the Group?</div>
+          <IconButton onClick={()=>setExit(false)}>Cancel</IconButton>
+          <IconButton onClick={()=>actuallyExitGroup()}>Yes</IconButton>
+        </DialogContent>
+      </Dialog>
+
     </Wrap>
   })
 }
@@ -143,6 +164,11 @@ const Wrap = styled.div`
   box-shadow: 5px 0px 17px 0px rgba(0,0,0,0.45);
   position:relative; 
   z-index:100;
+`
+const DialogContent = styled.div`
+  display:flex;
+  flex-direction:column;
+  padding:30px;
 `
 const Placeholder = styled.div`
   max-width:100%;

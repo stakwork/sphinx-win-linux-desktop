@@ -3,7 +3,7 @@ import TextMsg from './textMsg'
 import PaymentMessage from './paymentMsg'
 import MediaMsg from './mediaMsg'
 import Invoice from './invoice'
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, TouchableOpacity, TextInput } from 'react-native'
 import { constantCodes, constants } from '../../../constants'
 import InfoBar from './infoBar'
 import sharedStyles from './sharedStyles'
@@ -19,8 +19,13 @@ import Clipboard from "@react-native-community/clipboard";
 import BotResMsg from './botResMsg'
 import BoostMsg from './boostMsg'
 import Popover from 'react-native-popover-view';
-import {useTheme} from '../../../store'
+import {useTheme, useStores} from '../../../store'
 import EE, {CANCEL_REPLY_UUID, CLEAR_REPLY_UUID, REPLY_UUID} from '../../utils/ee'
+import { displayPartsToString } from 'typescript'
+import CustomIcon from '../../utils/customIcons'
+import Slider from '@react-native-community/slider';
+
+
 
 export default function MsgRow(props) {
   const theme = useTheme()
@@ -63,7 +68,7 @@ export default function MsgRow(props) {
     />
   }
 
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   const w = props.windowWidth
   // console.log("RERENDER MESG",props.id)
 
@@ -100,7 +105,7 @@ export default function MsgRow(props) {
             style={{ marginLeft: 0, marginRight: 15 }}
           />}
         </View>
-        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} myAlias={props.myAlias} />
+        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} myAlias={props.myAlias} myid={props.myid} />
       </SwipeRow>
     </View>
   </View>
@@ -108,11 +113,15 @@ export default function MsgRow(props) {
 
 function MsgBubble(props) {
   const theme = useTheme()
+  const { details, user } = useStores()
   const [deleting, setDeleting] = useState(false)
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   const isInvoice = props.type === constants.message_types.invoice
   const isPaid = props.status === constants.statuses.confirmed
   const [showPopover, setShowPopover] = useState(false)
+  const boostString = user.tipAmount.toString()
+  const [sliderValue, setSliderValue] = useState(user.tipAmount)
+  const [showSlider, setShowSlider] = useState(false)
 
   let dashed = false
   let backgroundColor = isMe ? 
@@ -126,7 +135,12 @@ function MsgBubble(props) {
     if (!isMe) borderColor = '#4AC998'
   }
   const isDeleted = props.status === constants.statuses.deleted
-  const onRequestCloseHandler = () => setShowPopover(false)
+  const onRequestCloseHandler = () => {
+    setShowPopover(false)
+    setShowSlider(false)
+    setTimeout(() => { setSliderValue(user.tipAmount); }, 1000);
+    
+  }
   const onLongPressHandler = () => {
     ReactNativeHapticFeedback.trigger("impactLight", {
       enableVibrateFallback: true,
@@ -139,7 +153,7 @@ function MsgBubble(props) {
     onRequestCloseHandler()
   }
   const onBoostHandler = async () => {
-    await props.onBoostMsg(props)
+    await props.onBoostMsg(props, sliderValue)
     onRequestCloseHandler()
   }
   const onDeleteHandler = async () => {
@@ -149,6 +163,14 @@ function MsgBubble(props) {
       setDeleting(false)
       onRequestCloseHandler()
     }
+  }
+  const customInputHandler = () => {
+    setShowSlider(true)
+  }
+
+  const nonZeroSlider = (val) => {
+    if(val<1){val=1}
+    setSliderValue(val)
   }
 
   const allowBoost = !isMe && !(props.message_content||'').startsWith('boost::')
@@ -171,7 +193,7 @@ function MsgBubble(props) {
               content={props.reply_message_content}
               senderAlias={props.reply_message_sender_alias}
             />}
-            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} myAlias={props.myAlias} />}
+            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} myAlias={props.myAlias} myid={props.myid} />}
           </View>
         )}
       >
@@ -181,12 +203,43 @@ function MsgBubble(props) {
           >
             <Text style={{ textAlign: 'center' }}>Copy</Text>
           </TouchableOpacity>
-          {allowBoost && <TouchableOpacity
+
+          {/* Jesse Current */}
+          {allowBoost && <View>
+          <TouchableOpacity
             onPress={onBoostHandler}
-            style={{ padding: 10, minWidth:99, borderTopWidth: 1, borderTopColor: '#ddd', }}
           >
-            <Text style={{ textAlign: 'center' }}>Boost</Text>
-          </TouchableOpacity>}
+            <View 
+            style={{ padding: 10, minWidth:110, borderTopWidth: 1, borderTopColor: '#ddd', flexDirection: "row", alignContent:"center", justifyContent:"center" }}
+              >
+              <View style={{...styles.rocketWrap, backgroundColor:theme.accent}}>
+                  <CustomIcon color="white" size={20} name="fireworks" />
+              </View>
+              <TextInput 
+                onFocus={() => customInputHandler()}
+                style={styles.boostInput}
+                // placeholder={boostString}
+                showSoftInputOnFocus={false}
+                value={sliderValue.toString()}
+                />
+            </View>
+
+          </TouchableOpacity>
+          {showSlider && 
+                        <Slider 
+                            maximumValue={9999}
+                            minimumValue={0}
+                            step={250}
+                            value={sliderValue}
+                            onValueChange={(val) => nonZeroSlider(val)}  
+                            minimumTrackTintColor={theme.secondary}
+                            style={{marginBottom: 15, marginTop: 10, width: 110}}
+            
+                        />}
+          </View>
+          }
+
+
           {(isMe || props.isTribeOwner) && <TouchableOpacity onPress={onDeleteHandler}
             style={{ padding: 10, borderTopWidth: 1, borderTopColor: '#ddd', display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center', minWidth:99 }}>
             {deleting && <ActivityIndicator color="#888" size={10} />}
@@ -247,5 +300,23 @@ const styles = StyleSheet.create({
   },
   background: {
     backgroundColor: 'rgba(0, 0, 0, 0.35)'
+  },
+  boostInput: {
+    marginLeft: 10,
+    fontSize: 16,
+    marginTop: -5,
+    paddingTop: 0, paddingBottom: 0,
+    paddingLeft: 10, paddingRight: 10,
+    borderBottomColor: "#ddd",
+    borderStyle: "solid",
+    borderBottomWidth: 1
+  },
+  rocketWrap:{
+    height:25,width:25,
+    backgroundColor:'white',
+    borderRadius:15,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center'
   },
 })
