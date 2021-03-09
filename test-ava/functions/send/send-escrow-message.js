@@ -52,39 +52,40 @@ async function sendEscrowMsg(t, node, admin, tribe, text){
     t.true(msg.success, "node should send message to tribe")
     const msgUuid = msg.response.uuid
     t.truthy(msgUuid, "message uuid should exist")
-    //await message to post
-    const escrowMsg = await getCheckNewMsgs(t, admin, msgUuid)
-    t.truthy(escrowMsg, "should find escrow message posted")
 
-    //get balances DURING escrow
-    const [nodeBalDuring, adminBalDuring] = await escrowBalances(t, node, admin)
-    //pause for escrow time
-    await h.sleep(escrowMillis + 1)
-    //get balances AFTER escrow
-    const [nodeBalAfter, adminBalAfter] = await escrowBalances(t, node, admin)
-
-    // console.log("adminBalBefore === ", adminBalBefore)
-    // console.log("nodeBalBefore === ", nodeBalBefore)
-    // console.log("adminBalDuring === ", adminBalDuring)
-    // console.log("nodeBalDuring === ", nodeBalDuring)
-    // console.log("adminBalAfter === ", adminBalAfter)
-    // console.log("nodeBalAfter === ", nodeBalAfter)
-
-    //ON VOLTAGE NODE:
-    //ADMIN LOSES r.allowedFee BETWEEN DURING AND AFTER
-    //NODE LOSES r.allowedFee BETWEEN BEFORE AND DURING
-
-    //Check admin balances throughout
-    t.true(Math.abs((adminBalBefore + pricePerMessage) - adminBalAfter) <= r.allowedFee, "admin end balance should increase by ppm")
-    t.true(Math.abs((adminBalBefore + pricePerMessage + escrowAmount) - adminBalDuring) <= r.allowedFee, "admin should hold escrowAmount and ppm during escrow")
-    t.true(Math.abs((adminBalDuring - escrowAmount) - adminBalAfter) <= r.allowedFee, "admin should lose escrowAmount after escrowMillis")
-
-    //Check node balances throughout
-    t.true(Math.abs((nodeBalBefore - pricePerMessage) - nodeBalAfter) <= r.allowedFee, "node end balance should decrease by ppm")
-    t.true(Math.abs((nodeBalBefore - pricePerMessage - escrowAmount) - nodeBalDuring) <= r.allowedFee, "node should lose escrowAmount and ppm during escrow")
-    t.true(Math.abs((nodeBalDuring + escrowAmount) - nodeBalAfter) <= r.allowedFee, "node should gain escrowAmount after escrowMillis")
-
-    return {success: true, message: msg.response}
+      //await message to post
+      const escrowMsg = await getCheckNewMsgs(t, admin, msgUuid)
+      t.truthy(escrowMsg, "should find escrow message posted")
+  
+      //get balances DURING escrow
+      const [nodeBalDuring, adminBalDuring] = await escrowBalances(t, node, admin)
+      //pause for escrow time
+      await h.sleep(escrowMillis + 1)
+      //get balances AFTER escrow
+      const [nodeBalAfter, adminBalAfter] = await escrowBalances(t, node, admin)
+  
+      // console.log("adminBalBefore === ", adminBalBefore)
+      // console.log("nodeBalBefore === ", nodeBalBefore)
+      // console.log("adminBalDuring === ", adminBalDuring)
+      // console.log("nodeBalDuring === ", nodeBalDuring)
+      // console.log("adminBalAfter === ", adminBalAfter)
+      // console.log("nodeBalAfter === ", nodeBalAfter)
+  
+      //ON VOLTAGE NODE:
+      //ADMIN LOSES r.allowedFee BETWEEN DURING AND AFTER
+      //NODE LOSES r.allowedFee BETWEEN BEFORE AND DURING
+  
+      //Check admin balances throughout
+      t.true(Math.abs((adminBalBefore + pricePerMessage) - adminBalAfter) <= r.allowedFee, "admin end balance should increase by ppm")
+      t.true(Math.abs((adminBalBefore + pricePerMessage + escrowAmount) - adminBalDuring) <= r.allowedFee, "admin should hold escrowAmount and ppm during escrow")
+      t.true(Math.abs((adminBalDuring - escrowAmount) - adminBalAfter) <= r.allowedFee, "admin should lose escrowAmount after escrowMillis")
+  
+      //Check node balances throughout
+      t.true(Math.abs((nodeBalBefore - pricePerMessage) - nodeBalAfter) <= r.allowedFee, "node end balance should decrease by ppm")
+      t.true(Math.abs((nodeBalBefore - pricePerMessage - escrowAmount) - nodeBalDuring) <= r.allowedFee, "node should lose escrowAmount and ppm during escrow")
+      t.true(Math.abs((nodeBalDuring + escrowAmount) - nodeBalAfter) <= r.allowedFee, "node should gain escrowAmount after escrowMillis")
+  
+      return {success: true, message: msg.response}
 
 }
 

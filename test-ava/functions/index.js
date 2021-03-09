@@ -26,6 +26,13 @@ var getBalance = require('./get/get-balance')
 var payStream = require('./pay-stream')
 var getCheckNewStream = require('./get/get-check-newStream')
 var sendBoost = require('./send/send-boost')
+var getNewMessages = require('./get/get-newMsgs')
+var botCreate = require('./bots/bot-create')
+var botDelete = require('./bots/bot-delete')
+var getTribeBots = require('./bots/get-tribe-bots')
+var getCheckBotMsg = require('./get/get-check-botMsg')
+var botDecrypt = require('./bots/bot-decrypt')
+var getBots = require('./bots/get-bots')
 
 module.exports = {
     addContact,
@@ -56,4 +63,11 @@ module.exports = {
     payStream,
     getCheckNewStream,
     sendBoost,
+    getNewMessages,
+    botCreate,
+    botDelete,
+    getTribeBots,
+    getCheckBotMsg,
+    botDecrypt,
+    getBots,
 }

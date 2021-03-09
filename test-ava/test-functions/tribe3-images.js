@@ -8,6 +8,7 @@ async function tribe3Imgs(t, index1, index2, index3) {
     let node1 = nodes[index1]
     let node2 = nodes[index2]
     let node3 = nodes[index3]
+    t.truthy(node3, "this test requires three nodes")
 
     console.log(`${node1.alias} and ${node2.alias} and ${node3.alias}`)
 

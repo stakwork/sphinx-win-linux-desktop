@@ -8,10 +8,11 @@ async function tribe3Escrow(t, index1, index2, index3) {
     let node1 = nodes[index1]
     let node2 = nodes[index2]
     let node3 = nodes[index3]
+    t.truthy(node3, "this test requires three nodes")
 
     console.log(`${node1.alias} and ${node2.alias} and ${node3.alias}`)
 
-    //NODE1 CREATES A TRIBE
+    //NODE1 CREATES A TRIBE WITH ESCROW AND PPM
     let tribe = await f.createTribe(t, node1, 10, 2000, 5)
     t.truthy(tribe, "tribe should have been created by node1")
 
@@ -25,7 +26,7 @@ async function tribe3Escrow(t, index1, index2, index3) {
     let join2 = await f.joinTribe(t, node3, tribe)
     t.true(join2, "node3 should join tribe")
 
-    //NODE2 (non-admin) SENDS A TEXT MESSAGE IN TRIBE
+    //NODE2 (non-admin) SENDS A PAID TEXT MESSAGE IN TRIBE
     const text = h.randomText()
     let escrowMessage = await f.sendEscrowMsg(t, node2, node1, tribe, text)
     t.true(escrowMessage.success, "node2 (non-admin) should send escrow message to tribe")
