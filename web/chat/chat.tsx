@@ -26,7 +26,7 @@ const headHeight = 65
 export type RouteStatus = 'active' | 'inactive' | null
 
 function Chat() {
-  const { chats, ui, msg, details } = useStores()
+  const { chats, ui, msg, details, user } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [status,setStatus] = useState<RouteStatus>(null)
   const [tribeParams, setTribeParams] = useState(null)
@@ -81,7 +81,7 @@ function Chat() {
           }
           ui.setLoadingChat(false)
         }
-        const r = await chats.checkRoute(chat.id)
+        const r = await chats.checkRoute(chat.id, user.myid)
         if(r && r.success_prob && r.success_prob>0.01) {
           setStatus('active')
         } else {

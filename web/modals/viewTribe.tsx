@@ -12,7 +12,7 @@ import {tentIcon, avatarIcon} from '../images'
 
 export default function ViewTribe() {
 
-    const { msg, ui, chats, meme } = useStores()
+    const { msg, ui, chats, meme, user } = useStores()
     const tribe = ui.viewTribe
     const [loading, setLoading] = useState(false)
     const [alias, setAlias] = useState('')
@@ -106,7 +106,7 @@ export default function ViewTribe() {
                         msg.seeChat(alreadyJoined.id)
                         ui.setSelectedChat(alreadyJoined)
                         ui.toggleBots(false)
-                        chats.checkRoute(alreadyJoined.id)
+                        chats.checkRoute(alreadyJoined.id, user.myid)
                         handleClose()
                     }}>
                     Already Joined!

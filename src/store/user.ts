@@ -127,7 +127,7 @@ class UserStore {
     api.instantiateRelay(ip, token,
       () => uiStore.setConnected(true),
       () => uiStore.setConnected(false),
-      this.resetIP
+      () => this.resetIP()
     )
     await sleep(650)
     return priv

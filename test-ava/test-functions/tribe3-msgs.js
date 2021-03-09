@@ -12,6 +12,11 @@ async function tribe3Msgs(t, index1, index2, index3) {
 
     console.log(`${node1.alias} and ${node2.alias} and ${node3.alias}`)
 
+    const node1bal = await f.getBalance(t, node1)
+    const node2bal = await f.getBalance(t, node2)
+    const node3bal = await f.getBalance(t, node3)
+console.log("balances === ", node1bal, node2bal, node3bal)
+
     //NODE1 CREATES A TRIBE
     let tribe = await f.createTribe(t, node1)
     t.truthy(tribe, "tribe should have been created by node1")

@@ -310,17 +310,21 @@ export class ChatStore {
     const chat = this.chats.find(ch => ch.id === cid)
     if (!chat) return
     let pubkey
+    let routeHint
     if (chat.type === constants.chat_types.tribe) {
       pubkey = chat.owner_pubkey
+      const owner = contactStore.contacts.find(c => c.public_key === chat.owner_pubkey)
+      if(owner&&owner.route_hint) routeHint = owner.route_hint
     } else if (chat.type === constants.chat_types.conversation) {
       const contactid = chat.contact_ids.find(contid => contid !== myid)
       const contact = contactStore.contacts.find(con => con.id === contactid)
       if (contact) {
         pubkey = contact.public_key
+        routeHint = contact.route_hint
       }
     }
     if (!pubkey) return
-    const r = await relay.get(`route?pubkey=${pubkey}`)
+    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint}`)
     if (r) return r
   }
 

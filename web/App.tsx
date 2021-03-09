@@ -67,7 +67,7 @@ function App(){
         }, function(){
           ui.setConnected(false)
         },
-          resetIP
+          ()=> resetIP()
         )
       }
 

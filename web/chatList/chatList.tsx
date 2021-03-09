@@ -12,7 +12,7 @@ import {useStores,hooks} from '../../src/store'
 const {useChats} = hooks
 
 function ChatList(){
-  const {msg,ui,contacts,chats} = useStores()
+  const {msg,ui,contacts,chats, user} = useStores()
   const maxWidth = 350
   const [width,setWidth] = useState(maxWidth)
   return useObserver(()=>{
@@ -24,7 +24,7 @@ function ChatList(){
         <Head setWidth={setWidth} width={width}/>
         <Chats>
           {theChats.map((c,i)=> {
-            const contact = contactForConversation(c, contacts.contacts)
+            const contact = contactForConversation(c, contacts.contacts, user.myid)
             let showInvite = false
             if (c.invite && c.invite.status !== 4) showInvite = true
             if (showInvite){
@@ -37,7 +37,7 @@ function ChatList(){
                 msg.seeChat(c.id)
                 ui.setSelectedChat(c)
                 ui.toggleBots(false)
-                chats.checkRoute(c.id)
+                chats.checkRoute(c.id, user.myid)
                 ui.setImgViewerParams(null)
               }}
             />
@@ -49,10 +49,9 @@ function ChatList(){
   })
 }
 
-export function contactForConversation(chat: Chat, contacts: Contact[]){
-  const {user} = useStores()
+export function contactForConversation(chat: Chat, contacts: Contact[], myid: number){
   if(chat && chat.type===constants.chat_types.conversation){
-    const cid = chat.contact_ids.find(id=>id!==user.myid)
+    const cid = chat.contact_ids.find(id=>id!==myid)
     return contacts.find(c=> c.id===cid)
   }
   return null

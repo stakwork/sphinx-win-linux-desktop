@@ -4,7 +4,7 @@ var ra = require('../run-ava')
 async function getToken(t, node){
 //A NODE GETS A SERVER TOKEN FOR POSTING TO MEME SERVER
 
-    const protocol = h.memeProtocol(ra.memeHost)
+    const protocol = memeProtocol(ra.memeHost)
     //get authentication challenge from meme server
     const r = await http.get(`${protocol}://${ra.memeHost}/ask`)
     t.truthy(r, "r should exist")
