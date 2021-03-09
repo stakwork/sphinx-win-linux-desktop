@@ -12,7 +12,7 @@ export default function Invoice(props) {
   const theme = useTheme()
 
   const { amount } = props
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   const isPaid = props.status === constants.statuses.confirmed
 
   const { isExpired } = calcExpiry(props)

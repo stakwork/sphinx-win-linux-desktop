@@ -11,8 +11,9 @@ import Avatar from './msg/avatar'
 const { useChats, useChatRow } = hooks
 
 export default function ChatList() {
-  const { ui, contacts, msg, details } = useStores()
-  
+  const { ui, contacts, msg, details, user } = useStores()
+  const myid = user.myid
+
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async () => {
     ReactNativeHapticFeedback.trigger("impactLight", {
@@ -68,7 +69,7 @@ export default function ChatList() {
         renderItem={renderItem}
         keyExtractor={(item) => {
           if(!item.id) {
-            const contact_id = item.contact_ids.find(id=>id!==1)
+            const contact_id = item.contact_ids.find(id=>id!==myid)
             return 'contact_'+String(contact_id)
           }
           return String(item.id)

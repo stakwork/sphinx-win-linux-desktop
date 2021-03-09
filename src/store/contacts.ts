@@ -58,8 +58,9 @@ class ContactStore {
       if (!r) return
       if (r.contacts) {
         this.contacts = r.contacts
-        const me = r.contacts.find(c => c.id === 1)
+        const me = r.contacts.find(c => c.is_owner)
         if (me) {
+          userStore.setMyID(me.id)
           userStore.setAlias(me.alias)
           userStore.setPublicKey(me.public_key)
           if(me.tip_amount || me.tip_amount===0) {

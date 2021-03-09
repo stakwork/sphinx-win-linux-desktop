@@ -6,7 +6,7 @@ import { constants } from '../../../constants'
 
 export default function PaymentMsg(props) {
   const { amount, status } = props
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
 
   let icon, label, color
   if (isMe) {

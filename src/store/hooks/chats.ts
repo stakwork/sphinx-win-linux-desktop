@@ -1,4 +1,3 @@
-import {useState} from 'react'
 import {useStores} from '../index'
 import {Chat} from '../chats'
 import {Contact} from '../contacts'
@@ -6,29 +5,30 @@ import { constants } from '../../constants'
 import moment from 'moment'
 
 export function useChats(){
-  const {chats,msg,contacts,ui} = useStores()
-  const theChats = allChats(chats.chats, contacts.contacts)
+  const {chats,msg,contacts,ui,user} = useStores()
+  const theChats = allChats(chats.chats, contacts.contacts, user.myid)
   const chatsToShow = filterChats(theChats, ui.searchTerm)
   sortChats(chatsToShow, msg.messages)
   return chatsToShow
 }
 
 export function useChatRow(id){
-  const {msg} = useStores()
+  const {msg,user} = useStores()
+  const myid = user.myid
   const msgs = msg.messages[id||'_']
   const lastMsg = msgs&&msgs[0]
-  const lastMsgText = lastMessageText(lastMsg)
+  const lastMsgText = lastMessageText(lastMsg, myid)
   const hasLastMsg = lastMsgText?true:false
 
   const now = new Date().getTime()
   const lastSeen = msg.lastSeen[id||'_'] || now
-  const unseenCount = countUnseen(msgs, lastSeen)
+  const unseenCount = countUnseen(msgs, lastSeen, myid)
   const hasUnseen = unseenCount>0?true:false
 
   return {lastMsgText,hasLastMsg,unseenCount,hasUnseen} 
 }
 
-function lastMessageText(msg){
+function lastMessageText(msg, myid){
   if(!msg) return ''
   if(msg.type===constants.message_types.bot_res) {
     return msg.sender_alias ? `${msg.sender_alias} says...` : 'Bot Response'
@@ -37,7 +37,7 @@ function lastMessageText(msg){
     return `Boost: ${msg.amount} sats`
   }
   if(msg.message_content) {
-    const verb = msg.sender===1 ? 'shared' : 'received'
+    const verb = msg.sender===myid ? 'shared' : 'received'
     if(msg.message_content.startsWith('giphy::')) return 'GIF '+verb
     if(msg.message_content.startsWith('clip::')) return 'Clip '+verb
     if(msg.message_content.startsWith('boost::')) return 'Boost '+verb
@@ -47,7 +47,7 @@ function lastMessageText(msg){
   }
   if(msg.amount) {
     const kind = msg.type===constants.message_types.invoice?'Invoice':'Payment'
-    if(msg.sender===1) return `${kind} Sent: ${msg.amount} sat`
+    if(msg.sender===myid) return `${kind} Sent: ${msg.amount} sat`
     return `${kind} Received: ${msg.amount} sat`
   }
   if(msg.media_token && msg.media_type) {
@@ -56,17 +56,17 @@ function lastMessageText(msg){
     if(mediaType.startsWith('video')) fileType='Video'
     if(mediaType.startsWith('image')) fileType='Picture'
     if(mediaType.startsWith('audio')) fileType='Audio'
-    if(msg.sender===1) return fileType+' Sent'
+    if(msg.sender===myid) return fileType+' Sent'
     return fileType+' Received'
   }
   return ''
 }
 
-function countUnseen(msgs, lastSeen:number):number{
+function countUnseen(msgs, lastSeen:number, myid:number):number{
   if(!msgs) return 0
   let unseenCount = 0
   msgs.forEach(m=>{
-    if(m.sender!==1){
+    if(m.sender!==myid){
       const unseen = moment(new Date(lastSeen)).isBefore(moment(m.date))
       if(unseen) unseenCount+=1
     }
@@ -78,11 +78,11 @@ const conversation = constants.chat_types.conversation
 const group = constants.chat_types.conversation
 const expiredInvite = constants.invite_statuses.expired
 
-export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
+export function allChats(chats: Chat[], contacts:Contact[], myid:number): Chat[] {
   const groupChats = chats.filter(c=> c.type!==conversation).map(c=> ({...c}))
   const conversations = []
   contacts.forEach(contact=>{
-    if(contact.id!==1 && !contact.from_group) {
+    if(contact.id!==myid && !contact.from_group) {
       const chatForContact = chats.find(c=>{
         return c.type===conversation && c.contact_ids.includes(contact.id)
       })
@@ -106,8 +106,9 @@ export function allChats(chats: Chat[], contacts:Contact[]): Chat[] {
 }
 
 export function contactForConversation(chat: Chat, contacts: Contact[]){
+  const {user} = useStores()
   if(chat && chat.type===conversation){
-    const cid = chat.contact_ids.find(id=>id!==1)
+    const cid = chat.contact_ids.find(id=>id!==user.myid)
     return contacts.find(c=> c.id===cid)
   }
   return null

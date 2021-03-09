@@ -68,7 +68,7 @@ export default function MsgRow(props) {
     />
   }
 
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   const w = props.windowWidth
   // console.log("RERENDER MESG",props.id)
 
@@ -105,7 +105,7 @@ export default function MsgRow(props) {
             style={{ marginLeft: 0, marginRight: 15 }}
           />}
         </View>
-        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} myAlias={props.myAlias} />
+        <MsgBubble {...props} isTribe={isTribe} isTribeOwner={isTribeOwner} myAlias={props.myAlias} myid={props.myid} />
       </SwipeRow>
     </View>
   </View>
@@ -115,7 +115,7 @@ function MsgBubble(props) {
   const theme = useTheme()
   const { details, user } = useStores()
   const [deleting, setDeleting] = useState(false)
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   const isInvoice = props.type === constants.message_types.invoice
   const isPaid = props.status === constants.statuses.confirmed
   const [showPopover, setShowPopover] = useState(false)
@@ -193,7 +193,7 @@ function MsgBubble(props) {
               content={props.reply_message_content}
               senderAlias={props.reply_message_sender_alias}
             />}
-            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} myAlias={props.myAlias} />}
+            {!isDeleted && <Message {...props} onLongPress={onLongPressHandler} myAlias={props.myAlias} myid={props.myid} />}
           </View>
         )}
       >

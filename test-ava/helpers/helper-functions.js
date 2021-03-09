@@ -4,8 +4,9 @@ var ra = require('../run-ava')
 async function getToken(t, node){
 //A NODE GETS A SERVER TOKEN FOR POSTING TO MEME SERVER
 
+    const protocol = h.memeProtocol(ra.memeHost)
     //get authentication challenge from meme server
-    const r = await http.get(`https://${ra.memeHost}/ask`)
+    const r = await http.get(`${protocol}://${ra.memeHost}/ask`)
     t.truthy(r, "r should exist")
     t.truthy(r.challenge, "r.challenge should exist")
 
@@ -15,14 +16,20 @@ async function getToken(t, node){
     t.truthy(r2.response.sig, "r2.sig should exist")
 
     //get server token
-    const r3 = await http.post(`https://${ra.memeHost}/verify`, {
-    form: {id: r.id, sig: r2.response.sig, pubkey: node.pubkey}
+    const r3 = await http.post(`${protocol}://${ra.memeHost}/verify`, {
+        form: {id: r.id, sig: r2.response.sig, pubkey: node.pubkey}
     })
     t.truthy(r3, "r3 should exist")
     t.truthy(r3.token, "r3.token should exist")
 
     return r3.token
 
+}
+
+function memeProtocol(host){
+    let p = 'https'
+    if(host.includes('localhost')) p='http'
+    return p
 }
 
 function randomText(){
@@ -88,4 +95,4 @@ async function runTest(t, testFunction, nodeArray, iterate){
     }
 }
 
-module.exports = {getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest}
+module.exports = {getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest, memeProtocol}

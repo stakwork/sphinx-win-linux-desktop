@@ -35,11 +35,11 @@ export function usePicSrc(contact: Contact){
 
 export function useChatPicSrc(chat: Chat){
   const [uri, setURI] = useState('')
-  const {contacts,chats} = useStores()
+  const {contacts,user} = useStores()
   const isConversation = chat && chat.type===conversation
   let s = ''
   if(isConversation) {
-    const cid = chat.contact_ids.find(id=>id!==1)
+    const cid = chat.contact_ids.find(id=>id!==user.myid)
     const contact = contacts.contacts.find(c=>c.id===cid)
     s = (contact&&contact.photo_url)||''
   } else {
@@ -59,7 +59,7 @@ export function useChatPicSrc(chat: Chat){
       }
       const isConversation = chat.type===conversation
       if(isConversation) {
-        const cid = chat.contact_ids.find(id=>id!==1)
+        const cid = chat.contact_ids.find(id=>id!==user.myid)
         const src = await contactPicSrc(cid)
         if(src&&src.uri) setURI('file://'+src.uri+rnd())
       } else {

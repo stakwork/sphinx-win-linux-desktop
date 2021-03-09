@@ -26,6 +26,9 @@ class UserStore {
   onboardStep: number = 0
 
   @persist @observable
+  myid: number = 0
+
+  @persist @observable
   alias: string = ''
 
   @persist @observable
@@ -46,6 +49,7 @@ class UserStore {
   @action reset() {
     this.code = ''
     this.alias = ''
+    this.myid = 0
     this.publicKey = ''
     this.currentIP = ''
     this.authToken = ''
@@ -67,6 +71,11 @@ class UserStore {
   @action
   setAlias(alias) {
     this.alias = alias
+  }
+
+  @action
+  setMyID(id) {
+    this.myid = id
   }
 
   @action

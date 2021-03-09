@@ -18,6 +18,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   const theme = useTheme()
   const chatID = chat.id
   const { feed, user, msg, chats, details } = useStores()
+  const myid = user.myid
 
   const [loading, setLoading] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -252,7 +253,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
         if (dat) msgsforReplay.push({
           ...dat,
           type: arr[0],
-          alias: m.sender_alias || (m.sender === 1 ? user.alias : ''),
+          alias: m.sender_alias || (m.sender === myid ? user.alias : ''),
           date: m.date,
         })
       } catch (e) { }

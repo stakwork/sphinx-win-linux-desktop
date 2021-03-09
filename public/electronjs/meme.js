@@ -27,7 +27,9 @@ async function uploadMeme(fileBase64, typ, host, token, filename, isPublic) {
       knownLength: finalImgBuffer.length,
     })
     const formHeaders = form.getHeaders()
-    const resp = await fetch(`https://${host}/${isPublic?'public':'file'}`, {
+    let protocol = 'https'
+    if(host.includes('localhost')) protocol='http'
+    const resp = await fetch(`${protocol}://${host}/${isPublic?'public':'file'}`, {
       method: 'POST',
       headers: {
         ...formHeaders, // THIS IS REQUIRED!!!
