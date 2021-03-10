@@ -35,6 +35,11 @@ const alreadySchema = [{
     type: 'textArea',
     label: 'Address',
     validator: Yup.string().required('Required'),
+}, {
+    name: 'route_hint',
+    type: 'textArea',
+    label: 'Route Hint (optional)',
+    validator: Yup.string()
 }]
 
 export default function NewContact() {

@@ -26,6 +26,7 @@ export default function ViewTribe() {
             group_key: tribe.group_key,
             owner_alias: tribe.owner_alias,
             owner_pubkey: tribe.owner_pubkey,
+            owner_route_hint: tribe.owner_route_hint,
             host: tribe.host || 'tribes.sphinx.chat',
             uuid: tribe.uuid,
             img: tribe.img,
