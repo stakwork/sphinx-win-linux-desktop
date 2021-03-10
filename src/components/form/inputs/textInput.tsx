@@ -11,6 +11,7 @@ export default function TheTextInput({name,label,required,error,handleChange,han
   }
   if(displayOnly) lab = label.en
   return <TextInput
+    disabled={displayOnly}
     accessibilityLabel={accessibilityLabel}
     error={error}
     label={lab}

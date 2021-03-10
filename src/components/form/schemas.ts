@@ -23,6 +23,13 @@ const contact = [
     label:{en:'Address',es:'Address'},
     required: true,
     validator: Yup.string().required(rq),
+  },
+  {
+    name:'route_hint',
+    type:'text',
+    label:{en:'Route Hint',es:'Route Hint'},
+    required: true,
+    validator: Yup.string(),
   }
 ]
 
@@ -40,6 +47,13 @@ const me = [
     label:{en:'Address',es:'Address'},
     required: true,
     validator: Yup.string().required(rq),
+  },
+  {
+    name:'route_hint',
+    type:'text',
+    label:{en:'Route Hint',es:'Route Hint'},
+    required: false,
+    validator: Yup.string(),
   },
   {
     name:'private_photo',

@@ -47,7 +47,7 @@ export default function Chat() {
   }
 
   useEffect(() => { // check for contact key, exchange if none
-    const contact = contactForConversation(chat, contacts.contacts)
+    const contact = contactForConversation(chat, contacts.contacts, myid)
     if (contact && !contact.contact_key) {
       contacts.exchangeKeys(contact.id)
     }

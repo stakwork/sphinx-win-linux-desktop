@@ -105,10 +105,9 @@ export function allChats(chats: Chat[], contacts:Contact[], myid:number): Chat[]
   return all
 }
 
-export function contactForConversation(chat: Chat, contacts: Contact[]){
-  const {user} = useStores()
+export function contactForConversation(chat: Chat, contacts: Contact[], myid:number){
   if(chat && chat.type===conversation){
-    const cid = chat.contact_ids.find(id=>id!==user.myid)
+    const cid = chat.contact_ids.find(id=>id!==myid)
     return contacts.find(c=> c.id===cid)
   }
   return null

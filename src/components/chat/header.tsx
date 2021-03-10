@@ -29,7 +29,7 @@ export default function Header(
     const theChat = chats.chats.find(c => c.id === chat.id)
     let contact
     if (chat && chat.type === conversation) {
-      contact = contactForConversation(chat, contacts.contacts)
+      contact = contactForConversation(chat, contacts.contacts, user.myid)
     }
 
     function clickTitle() {

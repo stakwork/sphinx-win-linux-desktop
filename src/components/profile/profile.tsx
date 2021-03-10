@@ -227,12 +227,13 @@ export default function Profile() {
         <View style={{...styles.formWrap,...cardStyles}}>
           <Form schema={me} loading={saving}
             buttonText="Save"
-            readOnlyFields={['public_key']}
+            readOnlyFields={['public_key','route_hint']}
             forceEnable={photo_url}
             initialValues={{
               alias: user.alias,
               public_key: user.publicKey,
-              private_photo: meContact.private_photo||false
+              private_photo: meContact.private_photo||false,
+              route_hint: meContact.route_hint||'',
             }}
             onSubmit={async values=> {
               setSaving(true)
@@ -404,8 +405,8 @@ const styles = StyleSheet.create({
   formWrap:{
     flex:1,
     paddingBottom:30,
-    maxHeight:365,
-    minHeight:365,
+    maxHeight:445,
+    minHeight:445,
     position:'relative',
     borderBottomWidth:1,
     borderTopWidth:1,

@@ -25,6 +25,7 @@ export default function JoinTribe({visible}) {
       group_key: params.group_key,
       owner_alias: params.owner_alias,
       owner_pubkey: params.owner_pubkey,
+      owner_route_hint: params.owner_route_hint,
       host: params.host || 'tribes.sphinx.chat',
       uuid: params.uuid,
       img: params.img,
