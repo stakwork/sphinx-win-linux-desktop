@@ -21,6 +21,11 @@ const schema = [{
   type: 'text',
   label: 'Address',
   readOnly: true
+}, {
+  name: 'route_hint',
+  type: 'text',
+  label: 'Route Hint',
+  readOnly: true
 }]
 
 const advSchema = [{
