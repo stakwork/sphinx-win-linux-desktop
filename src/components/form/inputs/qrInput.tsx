@@ -6,12 +6,16 @@ import QR from '../../utils/qr'
 import PubKey from '../../modals/pubkey'
 import { useTheme } from '../../../store'
 
-export default function QrInput({name,label,required,handleChange,handleBlur,setValue,value,displayOnly,accessibilityLabel}) {
+export default function QrInput({name,label,required,handleChange,handleBlur,setValue,value,displayOnly,accessibilityLabel,transform}) {
   const theme = useTheme()
   
   const [scanning,setScanning] = useState(false)
   function scan(data){
-    setValue(data)
+    if(data.includes(':') && transform) {
+      transform({[name]: data})
+    } else {
+      setValue(data)
+    }
     setScanning(false)
   }
 
@@ -22,7 +26,13 @@ export default function QrInput({name,label,required,handleChange,handleBlur,set
       accessibilityLabel={accessibilityLabel}
       disabled={displayOnly}
       label={lab}
-      onChangeText={handleChange(name)}
+      onChangeText={t=> {
+        if(t.includes(':') && transform) {
+          transform({[name]: t})
+        } else {
+          setValue(t)
+        }
+      }}
       onBlur={handleBlur(name)}
       value={value}
       style={{backgroundColor:theme.bg,paddingRight:32}}
