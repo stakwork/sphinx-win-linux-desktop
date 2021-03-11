@@ -82,7 +82,7 @@ export default function Main() {
       initPicSrc()
 
       if (pushToken && !user.deviceId || user.deviceId !== pushToken) {
-        user.registerMyDeviceId(pushToken)
+        user.registerMyDeviceId(pushToken, user.myid)
       }
 
       createPrivateKeyIfNotExists(contacts)

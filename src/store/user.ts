@@ -134,9 +134,9 @@ class UserStore {
   }
 
   @action
-  async registerMyDeviceId(device_id) {
+  async registerMyDeviceId(device_id, myid) {
     try {
-      const r = await api.relay.put(`contacts/1`, { device_id })
+      const r = await api.relay.put(`contacts/${myid}`, { device_id })
       if (!r) return
       if (r.device_id) {
         this.deviceId = r.device_id

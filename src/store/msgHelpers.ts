@@ -24,7 +24,7 @@ export async function makeRemoteTextMap({ contact_id, text, chat_id }, includeSe
       idToKeyMap['chat'] = chat.group_key // "chat" is the key for tribes
       if (includeSelf) {
         const me = contactStore.contacts.find(c => c.id === myid) // add in my own self (for media_key_map)
-        if (me) idToKeyMap[1] = me.contact_key
+        if (me) idToKeyMap[myid] = me.contact_key
       }
     } else { // NON TRIBE
       const contactsInChat = contactStore.contacts.filter(c => {

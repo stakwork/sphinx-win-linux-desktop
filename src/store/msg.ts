@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx'
 import { relay } from '../api'
 import { chatStore, Chat } from './chats'
+import { userStore } from './user'
 import { detailsStore } from './details'
 import { constants } from '../constants'
 import { persist } from 'mobx-persist'
@@ -130,6 +131,8 @@ class MsgStore {
         if(r.new_messages.length < 200) {
           done = true
         }
+      } else {
+        done = true
       }
       offset += 200
     }
@@ -159,7 +162,7 @@ class MsgStore {
     try {
       const r = await relay.get(route)
       if (!r) return
-      console.log("=> NEW MSGS LENGTH", r.new_messages.length)
+      console.log("=> NEW MSGS LENGTH", r.new_messages)
       if (r.new_messages && r.new_messages.length) {
         await this.batchDecodeMessages(r.new_messages)
       } else {
@@ -239,7 +242,8 @@ class MsgStore {
     { contact_id:number|null, text:string, chat_id:number|null, amount:number, reply_uuid:string, boost?:boolean, message_price?:number }
   ) {
     try {
-      const encryptedText = await encryptText({ contact_id: 1, text })
+      const myid = userStore.myid
+      const encryptedText = await encryptText({ contact_id: myid, text })
       const remote_text_map = await makeRemoteTextMap({ contact_id, text, chat_id })
       const v:{[k:string]:any} = {
         contact_id,
@@ -255,15 +259,13 @@ class MsgStore {
       // this.gotNewMessage(r)
       if (!chat_id) {
         const r = await relay.post('messages', v)
-        console.log("257 ==============", r)
         if (!r) return
         this.gotNewMessage(r)
       } else {
         const putInMsgType = boost?constants.message_types.boost:constants.message_types.message
         const amt = boost&&message_price&&message_price<amount ? amount-message_price : amount
-        putIn(this.messages, { ...v, id: -1, sender: 1, amount:amt, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
+        putIn(this.messages, { ...v, id: -1, sender: myid, amount:amt, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
         const r = await relay.post('messages', v)
-        console.log("266 ==============", r)
         if (!r) return
         // console.log("RESULT")
         this.messagePosted(r)
@@ -288,7 +290,8 @@ class MsgStore {
       }
       if (price) v.price = price
       if (text) {
-        const encryptedText = await encryptText({ contact_id: 1, text })
+        const myid = userStore.myid
+        const encryptedText = await encryptText({ contact_id: myid, text })
         const remote_text_map = await makeRemoteTextMap({ contact_id, text, chat_id })
         v.text = encryptedText
         v.remote_text_map = remote_text_map
@@ -317,7 +320,8 @@ class MsgStore {
   @action
   async sendPayment({ contact_id, amt, chat_id, destination_key, memo }) {
     try {
-      const myenc = await encryptText({ contact_id: 1, text: memo })
+      const myid = userStore.myid
+      const myenc = await encryptText({ contact_id: myid, text: memo })
       const encMemo = await encryptText({ contact_id, text: memo })
       const v = {
         contact_id: contact_id || null,
@@ -371,7 +375,8 @@ class MsgStore {
   @action
   async sendInvoice({ contact_id, amt, chat_id, memo }) {
     try {
-      const myenc = await encryptText({ contact_id: 1, text: memo })
+      const myid = userStore.myid
+      const myenc = await encryptText({ contact_id: myid, text: memo })
       const encMemo = await encryptText({ contact_id, text: memo })
       const v = {
         contact_id,

@@ -93,7 +93,7 @@ export function allChats(chats: Chat[], contacts:Contact[], myid:number): Chat[]
           name: contact.alias,
           photo_url: contact.photo_url,
           updated_at: new Date().toJSON(),
-          contact_ids: [1, contact.id],
+          contact_ids: [myid, contact.id],
           invite: contact.invite,
           type: conversation,
         })

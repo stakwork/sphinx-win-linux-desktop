@@ -325,7 +325,7 @@ export class ChatStore {
       }
     }
     if (!pubkey) return
-    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint}`)
+    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
     if (r) return r
   }
 
