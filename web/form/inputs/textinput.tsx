@@ -13,6 +13,7 @@ export default function TextInput({ name, label, error, required, readOnly, hand
             onFocus={handleFocus}
             error={error ? true : false}
             style={style||{marginTop:18,marginBottom:18}}
+            onPaste={e=> console.log(e)}
         />
 }
 

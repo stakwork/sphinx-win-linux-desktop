@@ -44,6 +44,7 @@ const advSchema = [
 export default function Profile() {
   const { ui, contacts, details, user } = useStores();
   const me = contacts.contacts.find((c) => c.id === user.myid);
+  if(!me.route_hint) me.route_hint=''
   const [advanced, setAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);

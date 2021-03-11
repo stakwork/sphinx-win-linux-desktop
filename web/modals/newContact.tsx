@@ -110,7 +110,7 @@ export default function NewContact() {
         </Content>
       ) : (
         <Content contactState={contactState} bg={theme.bg}>
-          <Title>{contactState === "new" ? "NEW CONTACT" : "ADD USER"}</Title>
+          <Title>{contactState === "new" ? "NEW CONTACT" : "ADD CONTACT"}</Title>
           {contactState === "new" ? (
             <div>
               <Form
@@ -156,6 +156,15 @@ export default function NewContact() {
                 schema={alreadySchema}
                 buttonText={"Save To Contacts"}
                 initialValues={{ public_key: ui.newContact.pubKey || "" }}
+                transform={v=>{
+                  if(v.public_key && v.public_key.includes(':')) {
+                    const arr = v.public_key.split(':')
+                    if(arr[0].length===66) {
+                      return ({public_key:arr[0], route_hint:arr[1]})
+                      // 022f593e7a2fb67a95688519f9ef005f45b019a0e0f6f543503ec2e77bfb4a8256:asdf
+                    }
+                  }
+                }}
               />
             </div>
           )}

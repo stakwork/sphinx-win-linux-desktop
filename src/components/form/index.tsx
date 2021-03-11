@@ -20,6 +20,14 @@ export default function Form(props) {
         // console.log('============================')
         // console.log("VALUES",values)
         // console.log("ERRORS",errors,isValid)
+        function transformer(vs){
+          if(props.transform) {
+              const ret = props.transform(vs)
+              ret && Object.entries(ret).forEach(([k,v])=>{
+                  setFieldValue(k,v)
+              })
+          } 
+        }
         return (<View style={styles.wrap}>
           <View style={{...styles.topper,padding:props.nopad?0:25}}>
             {props.schema.map(item=>{
@@ -32,6 +40,7 @@ export default function Form(props) {
                 handleBlur={handleBlur} 
                 setValue={data=> setFieldValue(item.name,data)} 
                 error={errors[item.name]}
+                transform={props.transform ? transformer : null}
               />
             })}
           </View>
