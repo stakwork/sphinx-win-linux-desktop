@@ -20,6 +20,18 @@ class DetailsStore {
   }
 
   @action
+  async getRelayVersion() {
+    try {
+      const r = await relay.get('relay_version')
+      if (!r) return
+      if (!r.version) return
+      return r.version
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  @action
   async addToBalance(x: number) {
     this.balance = this.balance + x
   }
