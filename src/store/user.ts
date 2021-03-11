@@ -204,6 +204,7 @@ class UserStore {
         token, pubkey,
       })
       if(!r) return console.log("=> FAILED TO REACH RELAY")
+      if(r.id) this.setMyID(r.id)
       this.authToken = token
       api.instantiateRelay(this.currentIP, token,
         () => uiStore.setConnected(true),
