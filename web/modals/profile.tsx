@@ -50,7 +50,7 @@ export default function Profile() {
 
   async function updateMe(v) {
     setLoading(true);
-    await contacts.updateContact(1, { alias: v.alias });
+    await contacts.updateContact(user.myid, { alias: v.alias });
     setLoading(false);
   }
 

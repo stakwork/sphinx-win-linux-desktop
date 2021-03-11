@@ -9,12 +9,12 @@ import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
 import {check, VersionDialog} from './checkVersion'
 
-async function createPrivateKeyIfNotExists(contacts) {
+async function createPrivateKeyIfNotExists(contacts, myid:number) {
   const priv = await rsa.getPrivateKey()
   if (priv) return // all good
 
   const keyPair = await rsa.generateKeyPair()
-  contacts.updateContact(1, {
+  contacts.updateContact(myid, {
     contact_key: keyPair.public
   })
 }
@@ -85,7 +85,7 @@ export default function Main() {
         user.registerMyDeviceId(pushToken, user.myid)
       }
 
-      createPrivateKeyIfNotExists(contacts)
+      createPrivateKeyIfNotExists(contacts, user.myid)
     })()
 
     EE.on(RESET_IP_FINISHED, loadHistory)

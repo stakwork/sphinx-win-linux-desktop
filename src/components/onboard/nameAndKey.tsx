@@ -16,7 +16,7 @@ export default function NameAndKey(props) {
   async function ok(){
     setUpdating(true)
     const keyPair = await rsa.generateKeyPair()
-    await contacts.updateContact(1, {
+    await contacts.updateContact(user.myid, {
       alias: text,
       contact_key: keyPair.public
     })

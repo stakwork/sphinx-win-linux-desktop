@@ -98,7 +98,7 @@ export default function Profile() {
     const contact_key = me.contact_key;
     if (!contact_key) return;
     setSharing(true);
-    await contacts.updateContact(1, { contact_key });
+    await contacts.updateContact(user.myid, { contact_key });
     setSharing(false);
   }
 
@@ -290,7 +290,7 @@ export default function Profile() {
                 }}
                 onSubmit={async (values) => {
                   setSaving(true);
-                  await contacts.updateContact(1, {
+                  await contacts.updateContact(user.myid, {
                     alias: values.alias,
                     private_photo: values.private_photo,
                     ...(photo_url && { photo_url }),
