@@ -109,7 +109,7 @@ function App(){
 }
 
 function Main(){
-  const {contacts,msg,ui,meme} = useStores()
+  const {details,msg,ui,meme} = useStores()
 
   useEffect(()=>{
     setTimeout(()=>{
@@ -118,6 +118,7 @@ function Main(){
     }, 1500)
     msg.initLastSeen()
     checkVersion()
+    details.getRelayVersion().then(v=>console.log("VERSION",v))
   },[])
 
   async function checkVersion(){
