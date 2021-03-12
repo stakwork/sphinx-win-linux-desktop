@@ -109,67 +109,69 @@ export default function NewContact() {
           </Button>
         </Content>
       ) : (
-        <Content contactState={contactState} bg={theme.bg}>
-          <Title>{contactState === "new" ? "NEW CONTACT" : "ADD CONTACT"}</Title>
-          {contactState === "new" ? (
-            <div>
-              <Form
-                onSubmit={async (values) => {
-                  setLoading(true);
-                  await contacts.createInvite(values.alias, values.message);
-                  setLoading(false);
-                  handleCloseModal();
-                }}
-                loading={loading}
-                schema={newSchema}
-                buttonColor={"secondary"}
-                buttonText={"Create Invitation"}
-                buttonStyle={{
-                  marginTop: 10,
-                }}
-              />
-              {price && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    color: "#6a7a8c",
-                    marginTop: 5,
+          <Content contactState={contactState} bg={theme.bg}>
+            <Title>{contactState === "new" ? "NEW CONTACT" : "ADD CONTACT"}</Title>
+            {contactState === "new" ? (
+              <div>
+                <Form
+                  onSubmit={async (values) => {
+                    setLoading(true);
+                    await contacts.createInvite(values.alias, values.message);
+                    setLoading(false);
+                    handleCloseModal();
                   }}
-                >
-                  Estimated Cost:&nbsp;{" "}
-                  <span style={{ color: "white" }}>{price}</span> &nbsp;SAT
+                  loading={loading}
+                  schema={newSchema}
+                  buttonColor={"secondary"}
+                  buttonText={"Create Invitation"}
+                  buttonStyle={{
+                    marginTop: 10,
+                  }}
+                />
+                {price && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      color: "#6a7a8c",
+                      marginTop: 5,
+                    }}
+                  >
+                    Estimated Cost:&nbsp;{" "}
+                    <span style={{ color: "white" }}>{price}</span> &nbsp;SAT
+                  </div>
+                )}
+              </div>
+            ) : (
+                <div>
+                  <Form
+                    onSubmit={async (values) => {
+                      setLoading(true);
+                      await contacts.addContact(values);
+                      setLoading(false);
+                      handleCloseModal();
+                    }}
+                    loading={loading}
+                    schema={alreadySchema}
+                    buttonText={"Save To Contacts"}
+                    initialValues={{ public_key: ui.newContact.pubKey || "" }}
+                    transform={v => {
+                      if (v.public_key && v.public_key.includes(':')) {
+                        const arr = v.public_key.split(':')
+                        if (arr[0].length === 66) {
+                          const pubkey = arr.shift()
+                          const hint = arr.join(':')
+                          return ({ public_key: pubkey, route_hint: hint })
+                          // 022f593e7a2fb67a95688519f9ef005f45b019a0e0f6f543503ec2e77bfb4a8256:asdf
+                        }
+                      }
+                    }}
+                  />
                 </div>
               )}
-            </div>
-          ) : (
-            <div>
-              <Form
-                onSubmit={async (values) => {
-                  setLoading(true);
-                  await contacts.addContact(values);
-                  setLoading(false);
-                  handleCloseModal();
-                }}
-                loading={loading}
-                schema={alreadySchema}
-                buttonText={"Save To Contacts"}
-                initialValues={{ public_key: ui.newContact.pubKey || "" }}
-                transform={v=>{
-                  if(v.public_key && v.public_key.includes(':')) {
-                    const arr = v.public_key.split(':')
-                    if(arr[0].length===66) {
-                      return ({public_key:arr[0], route_hint:arr[1]})
-                      // 022f593e7a2fb67a95688519f9ef005f45b019a0e0f6f543503ec2e77bfb4a8256:asdf
-                    }
-                  }
-                }}
-              />
-            </div>
-          )}
-        </Content>
-      )}
+          </Content>
+        )}
     </Modal>
   );
 }

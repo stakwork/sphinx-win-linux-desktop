@@ -9,7 +9,7 @@ module.exports = function(api) {
   // if(getEnv()!=='development') {
   //   config.plugins.push(['transform-remove-console'])
   // }
-  config.plugins.push(['transform-remove-console'])
+  // config.plugins.push(['transform-remove-console'])
   return config
 }
 

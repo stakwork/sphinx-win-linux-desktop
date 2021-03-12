@@ -90,7 +90,9 @@ export default function AddFriend({ visible }) {
                 if(v.public_key && v.public_key.includes(':')) {
                   const arr = v.public_key.split(':')
                   if(arr[0].length===66) {
-                    return ({public_key:arr[0], route_hint:arr[1]})
+                    const pubkey = arr.shift()
+                    const hint = arr.join(':')
+                    return ({public_key:pubkey, route_hint:hint})
                   }
                 }
               }}

@@ -7,15 +7,15 @@ import { ChatRouteProp } from '../../types'
 import { useRoute } from '@react-navigation/native'
 import { useStores, useTheme } from '../../store'
 import { contactForConversation } from './utils'
-import EE, {LEFT_GROUP,LEFT_IMAGE_VIEWER} from '../utils/ee'
+import EE, { LEFT_GROUP, LEFT_IMAGE_VIEWER } from '../utils/ee'
 import { useNavigation } from '@react-navigation/native'
 import { ActivityIndicator } from 'react-native-paper'
 import { constants } from '../../constants'
 import Frame from './frame'
 import Pod from './pod'
-import {StreamPayment} from '../../store/feed'
+import { StreamPayment } from '../../store/feed'
 import Anim from './pod/anim'
-import {useIncomingPayments} from '../../store/hooks/pod'
+import { useIncomingPayments } from '../../store/hooks/pod'
 
 export type RouteStatus = 'active' | 'inactive' | null
 
@@ -84,18 +84,18 @@ export default function Chat() {
         const price = params.price_per_message + params.escrow_amount
         setPricePerMessage(price)
         ToastAndroid.showWithGravityAndOffset(
-          'Price Per Message: '+price+' sat',
+          'Price Per Message: ' + price + ' sat',
           ToastAndroid.SHORT,
           ToastAndroid.TOP,
           0, 125
         );
-        if(!isTribeAdmin) {
-          if(chat.name!==params.name || chat.photo_url!==params.img) {
+        if (!isTribeAdmin) {
+          if (chat.name !== params.name || chat.photo_url !== params.img) {
             chats.updateTribeAsNonAdmin(chat.id, params.name, params.img)
           }
         }
         setTribeParams(params)
-        if(params.feed_url) {
+        if (params.feed_url) {
           loadPod(params)
         }
       }
@@ -105,18 +105,29 @@ export default function Chat() {
       setTribeParams(null)
     }
 
-    const r = await chats.checkRoute(chat.id, myid)
-    if(r && r.success_prob && r.success_prob>0) {
-      setStatus('active')
+    if (!chat.id) {
+      const othersID = chat.contact_ids.find(cid => cid !== myid)
+      const r = await chats.checkRouteByContactID(othersID)
+      if (r && r.success_prob && r.success_prob > 0) {
+        setStatus('active')
+      } else {
+        setStatus('inactive')
+      }
     } else {
-      setStatus('inactive')
+      const r = await chats.checkRoute(chat.id, myid)
+      if (r && r.success_prob && r.success_prob > 0) {
+        setStatus('active')
+      } else {
+        setStatus('inactive')
+      }
     }
+
   }
 
   async function loadPod(tr) {
     const params = await chats.loadFeed(chat.host, chat.uuid, tr.feed_url)
     if (params) setPod(params)
-    if(!params) setPodError('no podcast found')
+    if (!params) setPodError('no podcast found')
     // if (params) initialSelect(params)
   }
 
@@ -125,27 +136,27 @@ export default function Chat() {
   const tribeBots = tribeParams && tribeParams.bots
   const theShow = show
 
-  function onBoost(sp:StreamPayment){
-    if(!(chat && chat.id)) return
+  function onBoost(sp: StreamPayment) {
+    if (!(chat && chat.id)) return
     msg.sendMessage({
-      contact_id:null,
-      text:`boost::${JSON.stringify(sp)}`,
-      chat_id: chat.id||null,
+      contact_id: null,
+      text: `boost::${JSON.stringify(sp)}`,
+      chat_id: chat.id || null,
       amount: pricePerMessage,
-      reply_uuid:''
+      reply_uuid: ''
     })
   }
 
-  const podID = pod&&pod.id
-  const {earned,spent} = useIncomingPayments(podID, myid)
+  const podID = pod && pod.id
+  const { earned, spent } = useIncomingPayments(podID, myid)
 
   let pricePerMinute = 0
-  if(pod && pod.value && pod.value.model && pod.value.model.suggested) {
+  if (pod && pod.value && pod.value.model && pod.value.model.suggested) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
-  return <View style={{...styles.main,backgroundColor:theme.bg}} accessibilityLabel="chat">
+  return <View style={{ ...styles.main, backgroundColor: theme.bg }} accessibilityLabel="chat">
 
-    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} tribeParams={tribeParams} 
+    <Header chat={chat} appMode={appMode} setAppMode={setAppMode} status={status} tribeParams={tribeParams}
       earned={earned} spent={spent} pricePerMinute={pricePerMinute}
     />
 
@@ -153,13 +164,13 @@ export default function Chat() {
       <Frame url={appURL} />
     </View>}
 
-    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor:theme.dark?theme.bg:'white' }} accessibilityLabel="chat-content">
-      {!theShow && <View style={{...styles.loadWrap,backgroundColor:theme.bg}}>
+    <View style={{ ...styles.layer, zIndex: appMode ? 99 : 100, backgroundColor: theme.dark ? theme.bg : 'white' }} accessibilityLabel="chat-content">
+      {!theShow && <View style={{ ...styles.loadWrap, backgroundColor: theme.bg }}>
         <ActivityIndicator animating={true} color={theme.subtitle} />
       </View>}
       {theShow && <MsgList chat={chat} pricePerMessage={pricePerMessage} />}
 
-      <Pod pod={pod} show={feedURL?true:false} chat={chat} onBoost={onBoost} podError={podError} />
+      <Pod pod={pod} show={feedURL ? true : false} chat={chat} onBoost={onBoost} podError={podError} />
 
       <Anim dark={theme.dark} myid={myid} />
 

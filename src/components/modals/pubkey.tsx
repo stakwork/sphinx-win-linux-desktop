@@ -1,7 +1,7 @@
 import React from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { useStores, useTheme } from '../../store'
-import {View, Text, StyleSheet, ToastAndroid} from 'react-native'
+import { View, Text, StyleSheet, ToastAndroid } from 'react-native'
 import Modal from "./modalWrap"
 import { Button } from 'react-native-paper'
 import QRCode from '../utils/qrcode'
@@ -9,11 +9,11 @@ import Header from './modalHeader'
 import Share from 'react-native-share'
 import Clipboard from "@react-native-community/clipboard";
 
-export default function PubKey({visible, pubkey, onClose}) {
+export default function PubKey({ visible, pubkey, onClose, extraCopySuffix }) {
   const { ui } = useStores()
   const theme = useTheme()
-  function copy(){
-    Clipboard.setString(pubkey)
+  function copy() {
+    Clipboard.setString(extraCopySuffix ? pubkey + extraCopySuffix : pubkey)
     ToastAndroid.showWithGravityAndOffset(
       'Public Key Copied!',
       ToastAndroid.SHORT,
@@ -21,10 +21,10 @@ export default function PubKey({visible, pubkey, onClose}) {
       0, 125
     );
   }
-  async function share(){
-    try{
-      await Share.open({message:pubkey})
-    } catch(e){}
+  async function share() {
+    try {
+      await Share.open({ message: pubkey })
+    } catch (e) { }
   }
 
   return useObserver(() =>
@@ -33,16 +33,16 @@ export default function PubKey({visible, pubkey, onClose}) {
       <View style={styles.qrWrap}>
         <QRCode value={pubkey} size={250} />
       </View>
-      <Text style={{...styles.pubkeyText,color:theme.title}}>{pubkey}</Text>
+      <Text style={{ ...styles.pubkeyText, color: theme.title }}>{pubkey}</Text>
       <View style={styles.buttonsWrap}>
-        <Button mode="contained" dark={true} 
-          onPress={()=> share()}
+        <Button mode="contained" dark={true}
+          onPress={() => share()}
           style={styles.button}>
           Share
         </Button>
         <Button mode="contained" dark={true}
           style={styles.button}
-          onPress={()=> copy()}>
+          onPress={() => copy()}>
           Copy
         </Button>
       </View>
@@ -51,31 +51,31 @@ export default function PubKey({visible, pubkey, onClose}) {
 }
 
 const styles = StyleSheet.create({
-  qrWrap:{
-    display:'flex',
-    flexDirection:'column',
-    padding:20,
-    width:'100%',
-    alignItems:'center',
-    marginTop:50,
+  qrWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 20,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 50,
   },
-  pubkeyText:{
-    padding:20,
-    width:'100%'
+  pubkeyText: {
+    padding: 20,
+    width: '100%'
   },
-  buttonsWrap:{
-    marginTop:40,
-    display:'flex',
-    flexDirection:'row',
-    width:'100%',
-    justifyContent:'space-around'
+  buttonsWrap: {
+    marginTop: 40,
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-around'
   },
-  button:{
-    height:46,
-    borderRadius:23,
-    width:120,
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center'
+  button: {
+    height: 46,
+    borderRadius: 23,
+    width: 120,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 })

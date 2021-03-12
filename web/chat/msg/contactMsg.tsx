@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useStores } from '../../../src/store'
 import styled from 'styled-components'
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { addContact } from '../../images'
-import { qrTrans } from '../../images'
-import theme from '../../theme'
 import Button from '../../utils/button'
 
 export default function ContactMsg(props) {
@@ -27,19 +24,19 @@ export default function ContactMsg(props) {
                 </div>
             </KnownWrap> :
             <UnknownWrap>
-                <div style={{display: 'flex', flexDirection: 'row'}}>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
                     <ImageWrapper src={addContact}></ImageWrapper>
-                    <div style={{paddingTop: 10}}>
+                    <div style={{ paddingTop: 10 }}>
                         <Name>New Contact</Name>
                         <MsgCont>{props.message_content}</MsgCont>
                     </div>
                 </div>
-                    <Button 
-                    onClick={() => ui.setNewContact({pubKey: props.message_content})} 
+                <Button
+                    onClick={() => ui.setNewContact({ pubKey: props.message_content })}
                     color={"primary"}
-                    style={{marginLeft: 50}}
-                    >
-                        Add Contact
+                    style={{ marginLeft: 50 }}
+                >
+                    Add Contact
                         </Button>
             </UnknownWrap>}
 

@@ -2,13 +2,12 @@ import { Chat } from '../../store/chats'
 import { Contact } from '../../store/contacts'
 import { constants } from '../../constants'
 import moment from 'moment'
-import {useStores} from '../../store'
 
 const conversation = constants.chat_types.conversation
 const group = constants.chat_types.conversation
 const expiredInvite = constants.invite_statuses.expired
 
-export function allChats(chats: Chat[], contacts: Contact[], myid:number): Chat[] {
+export function allChats(chats: Chat[], contacts: Contact[], myid: number): Chat[] {
   const groupChats = chats.filter(c => c.type !== conversation).map(c => ({ ...c }))
   const conversations = []
   contacts.forEach(contact => {
@@ -23,7 +22,7 @@ export function allChats(chats: Chat[], contacts: Contact[], myid:number): Chat[
           name: contact.alias,
           photo_url: contact.photo_url,
           updated_at: new Date().toJSON(),
-          contact_ids: [1, contact.id],
+          contact_ids: [myid, contact.id],
           invite: contact.invite,
           type: conversation,
         })
@@ -35,7 +34,7 @@ export function allChats(chats: Chat[], contacts: Contact[], myid:number): Chat[
   return all
 }
 
-export function contactForConversation(chat: Chat, contacts: Contact[], myid:number) {
+export function contactForConversation(chat: Chat, contacts: Contact[], myid: number) {
   if (chat && chat.type === conversation) {
     const cid = chat.contact_ids.find(id => id !== myid)
     return contacts.find(c => c.id === cid)

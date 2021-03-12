@@ -254,8 +254,8 @@ export default function Profile() {
                     />
                   </View>
                 ) : (
-                  <Icon name="wallet" color="#d0d0d0" size={20} />
-                )}
+                    <Icon name="wallet" color="#d0d0d0" size={20} />
+                  )}
               </TouchableOpacity>
             </View>
           </View>
@@ -287,6 +287,10 @@ export default function Profile() {
                   public_key: user.publicKey,
                   private_photo: meContact.private_photo || false,
                   route_hint: meContact.route_hint || "",
+                }}
+                extraCopySuffixes={{
+                  // so that route hint is appended when copy
+                  public_key: meContact.route_hint ? ':' + meContact.route_hint : ""
                 }}
                 onSubmit={async (values) => {
                   setSaving(true);

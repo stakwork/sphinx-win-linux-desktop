@@ -330,6 +330,20 @@ export class ChatStore {
   }
 
   @action
+  async checkRouteByContactID(contactID:number) {
+    let pubkey
+    let routeHint
+    const contact = contactStore.contacts.find(con => con.id === contactID)
+    if (contact) {
+      pubkey = contact.public_key
+      routeHint = contact.route_hint
+    }
+    if (!pubkey) return
+    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
+    if (r) return r
+  }
+
+  @action
   async loadFeed(host: string, uuid: string, url: string) {
     if (!host || !url) return
     const theHost = host.includes('localhost') ? 'tribes.sphinx.chat' : host
