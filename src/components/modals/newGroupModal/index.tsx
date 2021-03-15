@@ -13,7 +13,7 @@ import NewTribe from './newTribe'
 const GROUP_SIZE_LIMIT = 20
 
 export default function NewGroup({ visible }) {
-  const { ui, contacts } = useStores()
+  const { ui, contacts, user } = useStores()
   const [selected, setSelected] = useState([])
   const [next, setNext] = useState(false)
   const [theMode, setMode] = useState('tribe')
@@ -27,7 +27,7 @@ export default function NewGroup({ visible }) {
     //   setSelected([])
     // }, 200)
   }
-  const contactsToShow = contacts.contacts.filter(c => c.id > 1)
+  const contactsToShow = contacts.contacts.filter(c => c.id !== user.myid)
   const selectedContacts = contactsToShow.filter(c => selected.includes(c.id))
   const showSelectedContacts = selectedContacts.length > 0
 

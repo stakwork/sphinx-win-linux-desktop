@@ -19,7 +19,7 @@ const lottieOptions = {
 };
 
 export default function BoostRow(props){
-  const {boosts,boosts_total_sats,isMe} = props
+  const {boosts,boosts_total_sats,isMe,myid} = props
 
   const bg = isMe ? theme.highlight : theme.extraDeep
 
@@ -38,7 +38,7 @@ export default function BoostRow(props){
   if(showAvatars) {
     if(boosts.length>3) fromText = `+${boosts.length-3}`
   } else {
-    fromText = boosts && boosts.length && (boosts[0].sender===1?'Me':boosts[0].sender_alias)
+    fromText = boosts && boosts.length && (boosts[0].sender===myid?'Me':boosts[0].sender_alias)
   }
   return <Wrap onClick={play}>
     <LottieWrap>

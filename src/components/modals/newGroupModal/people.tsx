@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from '
 import { Contact, SelectedContact } from './items'
 
 export default function People(props) {
-  const { contacts } = useStores()
+  const { contacts, user } = useStores()
   const [selected, setTheSelected] = useState([])
 
   function setSelected(a) {
@@ -30,7 +30,7 @@ export default function People(props) {
   })
   const noInitials = !(props.initialContactIds && props.initialContactIds.length)
 
-  const contactsToShow = contacts.contacts.filter(c => c.id > 1 && !initialContactIds.includes(c.id))
+  const contactsToShow = contacts.contacts.filter(c => c.id !== user.myid && !initialContactIds.includes(c.id))
   const selectedContacts = contactsToShow.filter(c => selected.includes(c.id))
 
   const showSelectedContacts = selectedContacts.length + initialContactsToShow.length > 0

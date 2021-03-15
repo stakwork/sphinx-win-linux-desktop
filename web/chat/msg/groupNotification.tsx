@@ -4,7 +4,7 @@ import {constants} from '../../../src/constants'
 import theme from '../../theme'
 
 export default function GroupNotification(props){
-  const isMe = props.contact===1
+  const isMe = props.contact===props.myid
   let senderAlias = props.senderAlias
   const isJoin = props.type===constants.message_types.group_join
   return <Wrap style={{flexDirection: isMe?'row-reverse':'row'}}>

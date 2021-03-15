@@ -25,7 +25,7 @@ export default function ProfilePic({z,show,onDone,onBack}) {
       setUploading(true)
       const url = await uploadSync(img.uri)
       if(url){
-        await contacts.updateContact(1, {
+        await contacts.updateContact(user.myid, {
           photo_url: url,
         })
       }

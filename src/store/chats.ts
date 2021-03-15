@@ -182,12 +182,12 @@ export class ChatStore {
 
   @action
   async joinTribe({ 
-    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias, my_photo_url,
+    name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias, my_photo_url, owner_route_hint,
   } : {
-    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string, my_photo_url?:string,
+    name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string, my_photo_url?:string, owner_route_hint:string
   }) {
     const r = await relay.post('tribe', {
-      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias:my_alias||'', my_photo_url:my_photo_url||''
+      name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias:my_alias||'', my_photo_url:my_photo_url||'', owner_route_hint:owner_route_hint||''
     })
     if (!r) return
     this.gotChat(r)
@@ -211,6 +211,7 @@ export class ChatStore {
       img: params.img,
       amount: params.price_to_join || 0,
       is_private: params.private,
+      owner_route_hint:'',
     })
   }
 
@@ -310,17 +311,35 @@ export class ChatStore {
     const chat = this.chats.find(ch => ch.id === cid)
     if (!chat) return
     let pubkey
+    let routeHint
     if (chat.type === constants.chat_types.tribe) {
       pubkey = chat.owner_pubkey
+      const owner = contactStore.contacts.find(c => c.public_key === chat.owner_pubkey)
+      if(owner&&owner.route_hint) routeHint = owner.route_hint
     } else if (chat.type === constants.chat_types.conversation) {
       const contactid = chat.contact_ids.find(contid => contid !== myid)
       const contact = contactStore.contacts.find(con => con.id === contactid)
       if (contact) {
         pubkey = contact.public_key
+        routeHint = contact.route_hint
       }
     }
     if (!pubkey) return
-    const r = await relay.get(`route?pubkey=${pubkey}`)
+    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
+    if (r) return r
+  }
+
+  @action
+  async checkRouteByContactID(contactID:number) {
+    let pubkey
+    let routeHint
+    const contact = contactStore.contacts.find(con => con.id === contactID)
+    if (contact) {
+      pubkey = contact.public_key
+      routeHint = contact.route_hint
+    }
+    if (!pubkey) return
+    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
     if (r) return r
   }
 

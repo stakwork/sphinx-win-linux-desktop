@@ -13,6 +13,8 @@ const { useChats, useChatRow } = hooks
 export default function ChatList() {
   const { ui, contacts, msg, details, user } = useStores()
   const myid = user.myid
+  const meContact = contacts.contacts.find(c => c.id === myid)
+  const myRouteHint = meContact.route_hint
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async () => {
@@ -51,12 +53,12 @@ export default function ChatList() {
         style={{ ...moreStyles.button, backgroundColor: '#55D1A9' }}>
         Friend
       </Button>
-      <Button mode="contained" dark={true} icon="plus"
-        accessibilityLabel="new-group-button" 
+      {!myRouteHint && <Button mode="contained" dark={true} icon="plus"
+        accessibilityLabel="new-group-button"
         style={moreStyles.button}
         onPress={setNewGroupModalHandler}>
         Tribe
-      </Button>
+      </Button>}
     </View>
   )
 
@@ -68,9 +70,9 @@ export default function ChatList() {
         data={chatsToShow}
         renderItem={renderItem}
         keyExtractor={(item) => {
-          if(!item.id) {
-            const contact_id = item.contact_ids.find(id=>id!==myid)
-            return 'contact_'+String(contact_id)
+          if (!item.id) {
+            const contact_id = item.contact_ids.find(id => id !== myid)
+            return 'contact_' + String(contact_id)
           }
           return String(item.id)
         }}
@@ -107,8 +109,8 @@ function ChatRow(props) {
     const w = Math.round(Dimensions.get('window').width)
     return <TouchableOpacity style={{
       ...styles.chatRow,
-      backgroundColor:theme.main,
-      borderBottomColor: theme.dark?'#0d1319':'#e5e5e5',
+      backgroundColor: theme.main,
+      borderBottomColor: theme.dark ? '#0d1319' : '#e5e5e5',
     }} activeOpacity={0.5}
       onPress={onSeeChatHandler}>
       <View style={styles.avatarWrap}>
@@ -120,13 +122,13 @@ function ChatRow(props) {
         </View>}
       </View>
       <View style={styles.chatContent}>
-        <Text style={{...styles.chatName,color:theme.dark?'#ddd':'#666'}}>{name}</Text>
+        <Text style={{ ...styles.chatName, color: theme.dark ? '#ddd' : '#666' }}>{name}</Text>
         {hasLastMsg && <Text numberOfLines={1}
           style={{
             ...styles.chatMsg,
             fontWeight: hasUnseen ? 'bold' : 'normal',
             maxWidth: w - 105,
-            color: theme.dark?'#8b98b4':'#7e7e7e',
+            color: theme.dark ? '#8b98b4' : '#7e7e7e',
           }}>
           {lastMsgText}
         </Text>}

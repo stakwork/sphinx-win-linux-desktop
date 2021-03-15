@@ -12,10 +12,10 @@ const lens = { // min 1000
 }
 
 export default function Animation(){
-  const {contacts} = useStores()
+  const {contacts,user} = useStores()
   const [show,setShow] = useState(false)
 
-  const meContact = contacts.contacts.find(c => c.id === 1)
+  const meContact = contacts.contacts.find(c => c.id === user.myid)
   let meIMG = meContact && meContact.photo_url
 
   function play() {

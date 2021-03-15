@@ -14,7 +14,7 @@ interface Tribe {
 }
 
 export default function TribeMsg(props) {
-  const { ui, chats, msg } = useStores()
+  const { ui, chats, msg, user } = useStores()
   const [tribe, setTribe] = useState<Tribe>()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -56,7 +56,7 @@ export default function TribeMsg(props) {
           console.log("SELECTD THIS CHAT", alreadyJoined)
           msg.seeChat(alreadyJoined.id)
           ui.setSelectedChat(alreadyJoined)
-          chats.checkRoute(alreadyJoined.id)
+          chats.checkRoute(alreadyJoined.id, user.myid)
         } :
         () => props.joinTribe(tribe)
       }

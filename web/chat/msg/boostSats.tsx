@@ -81,7 +81,7 @@ export default function BoostSats(props){
       <InnerPop>
         <PopTitle>Boosters:</PopTitle>
         {props.boosts && props.boosts.map(b=>{
-          const name = b.sender===1?'Me':b.sender_alias
+          const name = b.sender===props.myid?'Me':b.sender_alias
           return <Booster>
             <span>{`${name}: ${b.amount}`}</span>
             <span>{moment(b.date).format('ddd hh:mm')}</span>

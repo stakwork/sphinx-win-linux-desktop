@@ -9,15 +9,26 @@ export default function Form(props){
 
     return <Formik initialValues={props.initialValues || {}} onSubmit={props.onSubmit} validationSchema={validator(props.schema)}>
         {({ setFieldTouched, handleSubmit, values, setFieldValue, errors, dirty, isValid}) => {
+            function transformer(vs){
+                if(props.transform) {
+                    const ret = props.transform(vs)
+                    ret && Object.entries(ret).forEach(([k,v])=>{
+                        setFieldValue(k,v)
+                    })
+                } 
+            }
             return <Wrap>
                 {props.schema && props.schema.map(item=>{
                     return <Input {...item}
                         key={item.name}
                         value={values[item.name]}
                         error={errors[item.name]}
-                        handleChange={e=>setFieldValue(item.name, e)}
+                        handleChange={e=>{
+                            setFieldValue(item.name, e)
+                        }}
                         handleBlur={()=>setFieldTouched(item.name, false)}
                         handleFocus={()=>setFieldTouched(item.name, true)}
+                        transform={transformer}
                     />
                 })}
                 <Button style={props.buttonStyle} color={props.buttonColor || 'primary'} loading={props.loading} onClick={handleSubmit} disabled={!isValid || !dirty}>{props.buttonText || "Save Changes"}</Button>

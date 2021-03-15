@@ -17,6 +17,7 @@ SOCKET when payment pending invite:{status=6, price:50, invite_string}
 export interface Contact {
   id: number
   public_key: string
+  route_hint: string
   node_alias: string
   alias: string
   photo_url: string

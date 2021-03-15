@@ -16,7 +16,7 @@ const encryptedTypes = [
 ]
 
 export default function InfoBar(props){
-  const isMe = props.sender===1
+  const isMe = props.sender===props.myid
   const isReceived = props.status===received
   const showLock = encryptedTypes.includes(props.type)
   let senderAlias = props.senderAlias

@@ -20,7 +20,7 @@ import {useAvatarColor, useParsedGiphyMsg, useParsedClipMsg} from '../../../src/
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
 
 export default function Msg(props) {
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
 
   const isGroupNotification = props.type === constants.message_types.group_join || props.type === constants.message_types.group_leave
   if (isGroupNotification) {
@@ -49,14 +49,13 @@ export default function Msg(props) {
               reply_message_sender_alias={props.reply_message_sender_alias}
               reply_message_sender={props.reply_message_sender} 
               sender = {props.sender}
+              myid={props.myid}
             />}
           <Message {...props} />
         </Bubble>
         <MoreVertButton aria-controls="simple-menu" aria-haspopup="true" onClick={e => props.handleClick(e)}
           style={{ color: '#7f7f7f', cursor: 'pointer', fontSize: 17, marginLeft: -3, marginRight: -3 }} />
       </BubbleWrap>
-
-      {/* {props.boosts_total_sats && <BoostSats {...props} />} */}
 
     </InnerBox>
   </MsgRow>
@@ -85,7 +84,7 @@ function Message(props) {
 }
 
 function DeletedMessage(props) {
-  const isMe = props.sender === 1
+  const isMe = props.sender === props.myid
   return <DeletedMsgRow style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
     <DeletedInnerBox style={{ justifyContent: isMe ? 'end' : 'start' }}>
       <Time style={{ alignSelf: isMe ? 'flex-end' : 'flex-start' }}>{moment(props.date).format(timeFormat)}</Time>
@@ -94,9 +93,9 @@ function DeletedMessage(props) {
   </DeletedMsgRow>
 }
 
-function ReplyContent({ reply_message_content, reply_message_sender_alias, sender, reply_message_sender }) {
-  const replyMe = reply_message_sender === 1
-  const isMe = sender === 1
+function ReplyContent({ reply_message_content, reply_message_sender_alias, sender, reply_message_sender, myid }) {
+  const replyMe = reply_message_sender === myid
+  const isMe = sender === myid
   const color = useAvatarColor(reply_message_sender_alias)
 
   let txt = reply_message_content

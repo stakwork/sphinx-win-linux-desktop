@@ -26,7 +26,7 @@ const headHeight = 65
 export type RouteStatus = 'active' | 'inactive' | null
 
 function Chat() {
-  const { chats, ui, msg, details } = useStores()
+  const { chats, ui, msg, details, user } = useStores()
   const [appMode, setAppMode] = useState(true)
   const [status,setStatus] = useState<RouteStatus>(null)
   const [tribeParams, setTribeParams] = useState(null)
@@ -81,7 +81,7 @@ function Chat() {
           }
           ui.setLoadingChat(false)
         }
-        const r = await chats.checkRoute(chat.id)
+        const r = await chats.checkRoute(chat.id, user.myid)
         if(r && r.success_prob && r.success_prob>0.01) {
           setStatus('active')
         } else {
@@ -133,6 +133,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
   const [msgCount, setMsgCount] = useState(20)
   const [customBoost, setCustomBoost] = useState(user.tipAmount||100)
   const [insfBalance, setInsfBalance] = useState(false)
+  const myid = user.myid
 
   async function dropzoneUpload(files) {
     const file = files[0]
@@ -252,13 +253,13 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
                     if(!m.chat) m.chat = chat
                     return <Msg joinTribe={joinTribe} key={m.id} {...m} senderAlias={senderAlias} senderPic={senderPic} 
                       handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
-                      onCopy={onCopy}
+                      onCopy={onCopy} myid={myid}
                     />
                   })}
                 </MsgList>
                 {alert && <Alert style={{ position: 'absolute', bottom: 20, left: 'calc(50% - 90px)', opacity: 0.7, height: 35, padding: `0px 8px 4px 8px` }} icon={false}>{alert}</Alert>}
                 {insfBalance && <Alert style={{ position: 'absolute', bottom: "50%", left: 'calc(50% - 105px)', opacity: 0.9 }} icon={false}>Insufficient Balance</Alert>}
-                <MsgMenu anchorEl={anchorEl} menuMessage={menuMessage} isMe={isMe(menuMessage)}
+                <MsgMenu anchorEl={anchorEl} menuMessage={menuMessage} isMe={menuMessage&&menuMessage.sender===myid}
                   handleMenuClose={handleMenuClose} onCopy={onCopy} onBoost={onMessageBoost} 
                   customBoost={customBoost} setCustomBoost={setCustomBoost}
                 />
@@ -385,6 +386,3 @@ const LoadingWrap = styled.div`
 
 export default Chat
 
-function isMe(menuMessage) {
-  return menuMessage && menuMessage.sender === 1
-}

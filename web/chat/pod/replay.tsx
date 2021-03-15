@@ -16,6 +16,7 @@ export default function Replay(props) {
     const chatID = chat.id
     const [msgsForReplay, setMsgsForReplay] = useState(null)
     const [position, setPosition] = useState(0)
+    const myid = user.myid
 
     useInterval(() => {
         tick()
@@ -51,9 +52,9 @@ export default function Replay(props) {
                 if (dat) msgArray.push({
                     ...dat,
                     type: type,
-                    alias: m.sender_alias || (m.sender === 1 ? user.alias : ''),
+                    alias: m.sender_alias || (m.sender === myid ? user.alias : ''),
                     date: m.date,
-                    isMe: (m.sender === 1 ? true : false)
+                    isMe: (m.sender === myid ? true : false)
                 })
             } catch (e) { console.log("error", e) }
         })

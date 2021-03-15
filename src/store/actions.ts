@@ -44,6 +44,7 @@ export default async function actions(action: string) {
       owner_alias: r.owner_alias,
       owner_pubkey: r.owner_pubkey,
       is_private: false,
+      owner_route_hint: r.owner_route_hint,
     })
   }
 }

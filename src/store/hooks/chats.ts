@@ -93,7 +93,7 @@ export function allChats(chats: Chat[], contacts:Contact[], myid:number): Chat[]
           name: contact.alias,
           photo_url: contact.photo_url,
           updated_at: new Date().toJSON(),
-          contact_ids: [1, contact.id],
+          contact_ids: [myid, contact.id],
           invite: contact.invite,
           type: conversation,
         })
@@ -105,10 +105,9 @@ export function allChats(chats: Chat[], contacts:Contact[], myid:number): Chat[]
   return all
 }
 
-export function contactForConversation(chat: Chat, contacts: Contact[]){
-  const {user} = useStores()
+export function contactForConversation(chat: Chat, contacts: Contact[], myid:number){
   if(chat && chat.type===conversation){
-    const cid = chat.contact_ids.find(id=>id!==user.myid)
+    const cid = chat.contact_ids.find(id=>id!==myid)
     return contacts.find(c=> c.id===cid)
   }
   return null
