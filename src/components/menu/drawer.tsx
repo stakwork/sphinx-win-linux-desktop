@@ -16,7 +16,7 @@ export default function TheDrawer(props) {
   const { ui, details, user, contacts } = useStores()
   const theme = useTheme()
   const me = contacts.contacts.find(c => c.id === user.myid)
-  const myRouteHint = me.route_hint
+  const myRouteHint = me && me.route_hint
   const uri = usePicSrc(me)
   const height = Math.round(Dimensions.get('window').height)
   const hasImg = uri ? true : false

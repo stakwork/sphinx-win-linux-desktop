@@ -119,6 +119,7 @@ class MsgStore {
   }
 
   @action async restoreMessages() {
+    console.log('=> restoreMessages')
     let done = false
     let offset = 0
     const dateq = moment.utc(0).format('YYYY-MM-DD%20HH:mm:ss')
@@ -129,12 +130,15 @@ class MsgStore {
         const decodedMsgs = await decodeMessages(r.new_messages)
         msgs = orgMsgsFromExisting(msgs, decodedMsgs)
         if(r.new_messages.length < 200) {
+          console.log('=> restore, done = true 1')
           done = true
         }
       } else {
+        console.log('=> restore, done = true 2')
         done = true
       }
       offset += 200
+      if (offset>=5000) done = true // force finish after 5k
     }
     console.log("RESTORE DONE!")
     this.sortAllMsgs(msgs)

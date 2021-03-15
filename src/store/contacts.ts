@@ -109,6 +109,7 @@ class ContactStore {
 
   @action
   async updateContact(id, v) {
+    console.log('updateContact', id, v)
     try {
       const r = await relay.put(`contacts/${id}`, v)
       if (!r) return

@@ -14,7 +14,7 @@ export default function ChatList() {
   const { ui, contacts, msg, details, user } = useStores()
   const myid = user.myid
   const meContact = contacts.contacts.find(c => c.id === myid)
-  const myRouteHint = meContact.route_hint
+  const myRouteHint = meContact && meContact.route_hint
 
   const [refreshing, setRefreshing] = useState(false)
   const onRefresh = useCallback(async () => {
