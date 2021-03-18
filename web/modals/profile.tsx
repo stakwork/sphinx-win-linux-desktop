@@ -66,11 +66,11 @@ export default function Profile() {
     const pub = me && me.contact_key;
     const ip = user.currentIP;
     const token = user.authToken;
-    console.log("ME === ", me);
-    console.log("PRIV === ", priv);
-    console.log("PUB === ", pub);
-    console.log("IP === ", ip);
-    console.log("TOKEN === ", token);
+    // console.log("ME === ", me);
+    // console.log("PRIV === ", priv);
+    // console.log("PUB === ", pub);
+    // console.log("IP === ", ip);
+    // console.log("TOKEN === ", token);
     if (!priv || !pub || !ip || !token) return;
     const str = `${priv}::${pub}::${ip}::${token}`;
     const pin = await userPinCode();

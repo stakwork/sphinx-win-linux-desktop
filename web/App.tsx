@@ -7,7 +7,7 @@ import theme from './theme'
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {useObserver} from 'mobx-react-lite'
 import styled from 'styled-components'
-import PIN, {wasEnteredRecently} from './modals/pin'
+import PIN, {wasEnteredRecently, userPinCode} from './modals/pin'
 import Onboard from './onboard'
 import {instantiateRelay} from '../src/api'
 import ChatList from './chatList/chatList'
@@ -97,7 +97,8 @@ function App(){
     return <Onboard welcome={welcome} onRestore={async()=>{
       await sleep(240)
       setSignedUp(true)
-      setPinned(true)
+      const isPin = await userPinCode()
+      if(isPin) setPinned(true)
     }}/>
   }
   if(!pinned) {

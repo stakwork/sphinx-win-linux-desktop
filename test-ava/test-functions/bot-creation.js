@@ -75,7 +75,7 @@ async function botCreation(t, index1, index2, index3) {
     t.true(newBot.success, "new bot should have been created")
 
     const checkBots = await f.getBots(t, node1)
-    console.log('CHECK BOTS === ', JSON.stringify(checkBots.bots))
+    // console.log('CHECK BOTS === ', JSON.stringify(checkBots.bots))
 
         //NODE1 SENDS A BOT HELP MESSAGE IN TRIBE
         const text8 = "/bot search TestBot"
@@ -99,10 +99,10 @@ async function botCreation(t, index1, index2, index3) {
 
 
     const delBot = await f.botDelete(t, node1, newBot.bot.id)
-    console.log("BOT DELETE === ", delBot.bot)
+    // console.log("BOT DELETE === ", delBot.bot)
 
     const checkBots2 = await f.getBots(t, node1)
-    console.log('CHECK BOTS === ', JSON.stringify(checkBots2.bots))
+    // console.log('CHECK BOTS === ', JSON.stringify(checkBots2.bots))
 
 
     await h.sleep(5000)
