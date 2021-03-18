@@ -28,7 +28,7 @@ const contact = [
     name: "route_hint",
     type: "text",
     label: { en: "Route Hint", es: "Route Hint" },
-    required: true,
+    required: false,
     validator: Yup.string(),
   },
 ];

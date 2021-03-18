@@ -13,6 +13,7 @@ import {persistMsgLocalForage} from './storage'
 
 const DAYS = Platform.OS === 'android' ? 7 : 7
 export const MAX_MSGS_PER_CHAT = Platform.OS === 'android' ? 100 : 1000
+export const MAX_MSGS_RESTORE = Platform.OS === 'android' ? 5000 : 50000
 
 export interface Msg {
   id: number
@@ -138,7 +139,8 @@ class MsgStore {
         done = true
       }
       offset += 200
-      if (offset>=5000) done = true // force finish after 5k
+      console.log('=> restore offset', offset)
+      if (offset>=MAX_MSGS_RESTORE) done = true // force finish after 5k
     }
     console.log("RESTORE DONE!")
     this.sortAllMsgs(msgs)
@@ -166,7 +168,7 @@ class MsgStore {
     try {
       const r = await relay.get(route)
       if (!r) return
-      console.log("=> NEW MSGS LENGTH", r.new_messages)
+      console.log("=> NEW MSGS LENGTH", r.new_messages&&r.new_messages.length)
       if (r.new_messages && r.new_messages.length) {
         await this.batchDecodeMessages(r.new_messages)
       } else {

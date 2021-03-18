@@ -79,6 +79,7 @@ class ContactStore {
 
   @action
   async deleteContact(id) {
+    if(!id) return
     try {
       await relay.del(`contacts/${id}`)
       this.contacts = this.contacts.filter(c => c.id !== id)
@@ -110,6 +111,7 @@ class ContactStore {
   @action
   async updateContact(id, v) {
     console.log('updateContact', id, v)
+    if(!id) return
     try {
       const r = await relay.put(`contacts/${id}`, v)
       if (!r) return
@@ -161,6 +163,7 @@ class ContactStore {
 
   @action
   async exchangeKeys(id) {
+    if(!id) return
     try {
       await relay.post(`contacts/${id}/keys`, {})
     } catch (e) {
