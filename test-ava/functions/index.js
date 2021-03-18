@@ -33,6 +33,7 @@ var getTribeBots = require('./bots/get-tribe-bots')
 var getCheckBotMsg = require('./get/get-check-botMsg')
 var botDecrypt = require('./bots/bot-decrypt')
 var getBots = require('./bots/get-bots')
+var updateProfile = require('./update-profile')
 
 module.exports = {
     addContact,
@@ -70,4 +71,5 @@ module.exports = {
     getCheckBotMsg,
     botDecrypt,
     getBots,
+    updateProfile,
 }
