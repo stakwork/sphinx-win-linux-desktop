@@ -31,6 +31,9 @@ export default function InfoBar(props) {
   const nameColor = useAvatarColor(senderAlias)
 
   const timeFormat = ui.is24HourFormat ? 'HH:mm A' : 'hh:mm A'
+  const showSenderAlias = (senderAlias && !isMe) ? true : false
+  const showFlash = isMe && isReceived
+  const showExpiry = hasExpiry && !isExpired
   return <View style={styles.wrap}>
     <View style={{
       ...styles.content,
@@ -38,7 +41,7 @@ export default function InfoBar(props) {
       flexDirection: isMe ? 'row-reverse' : 'row',
     }}>
       <View style={{ ...styles.innerContent, flexDirection: isMe ? 'row-reverse' : 'row' }}>
-        {senderAlias && !isMe && <Text style={{...styles.sender,color:nameColor}}>
+        {showSenderAlias && <Text style={{...styles.sender,color:nameColor}}>
           {senderAlias}
         </Text>}
         <Text style={styles.time}>
@@ -48,12 +51,12 @@ export default function InfoBar(props) {
           name="lock" size={14} color="#AFB6BC"
           style={{ marginRight: 4, marginLeft: 4 }}
         />}
-        {isMe && isReceived && <Icon
+        {showFlash && <Icon
           name="flash" size={14} color="#64C684"
           style={{ marginRight: showLock ? 0 : 4 }}
         />}
       </View>
-      {hasExpiry && !isExpired && <Text style={styles.exp}>
+      {showExpiry && <Text style={styles.exp}>
         {`Expires in ${expiry} minutes`}
       </Text>}
     </View>
