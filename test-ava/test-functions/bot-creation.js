@@ -102,7 +102,6 @@ async function botCreation(t, index1, index2, index3) {
     // console.log("BOT DELETE === ", delBot.bot)
 
     const checkBots2 = await f.getBots(t, node1)
-    // console.log('CHECK BOTS === ', JSON.stringify(checkBots2.bots))
 
 
     await h.sleep(5000)

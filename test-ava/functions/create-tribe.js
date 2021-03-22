@@ -2,7 +2,7 @@ var http = require('ava-http');
 var h = require('../helpers/helper-functions')
 var getCheckTribe = require('./get/get-check-tribe')
 
-async function createTribe(t, node, escrowAmount, escrowMillis, ppm) {
+async function createTribe(t, node, escrowAmount, escrowMillis, ppm, privacy) {
 //NODE CREATES TRIBE ===>
 
   const name = `Test Tribe: ${node.alias}`
@@ -17,7 +17,7 @@ async function createTribe(t, node, escrowAmount, escrowMillis, ppm) {
       escrow_millis: escrowMillis || 0,
       img: '',
       unlisted: true,
-      private: false,
+      private: privacy || false,
       app_url: '',
       feed_url: ''
     }

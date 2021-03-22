@@ -34,6 +34,9 @@ var getCheckBotMsg = require('./get/get-check-botMsg')
 var botDecrypt = require('./bots/bot-decrypt')
 var getBots = require('./bots/get-bots')
 var updateProfile = require('./update-profile')
+var getFailNewMsgs = require('./get/get-fail-newMsgs')
+var getCheckNewJoin = require('./get/get-check-newJoin')
+var appRejMember = require('./approve-member')
 
 module.exports = {
     addContact,
@@ -72,4 +75,7 @@ module.exports = {
     botDecrypt,
     getBots,
     updateProfile,
+    getFailNewMsgs,
+    getCheckNewJoin,
+    appRejMember,
 }
