@@ -9,14 +9,38 @@ import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
 import {check, VersionDialog} from './checkVersion'
 
-async function createPrivateKeyIfNotExists(contacts, myid:number) {
+async function createPrivateKeyIfNotExists(contacts, user) {
   const priv = await rsa.getPrivateKey()
-  if (priv) return // all good
+  const me = contacts.contacts.find(c=> c.id===user.myid)
+  if (priv && me.contact_key) {
+    // ok
+    if(!user.contactKey) {
+      console.log('=> set contact key')
+      user.setContactKey(me.contact_key)
+    }
+    return
+  } 
 
-  const keyPair = await rsa.generateKeyPair()
-  contacts.updateContact(myid, {
-    contact_key: keyPair.public
-  })
+  if (!priv) {
+    const keyPair = await rsa.generateKeyPair()
+    contacts.updateContact(user.myid, {
+      contact_key: keyPair.public
+    })
+    user.setContactKey(keyPair.public)
+  } else if(!me.contact_key) {
+    if (user.contactKey) {
+      contacts.updateContact(user.myid, {
+        contact_key: user.contactKey
+      })
+    } else {
+      const keyPair = await rsa.generateKeyPair()
+      contacts.updateContact(user.myid, {
+        contact_key: keyPair.public
+      })
+      user.setContactKey(keyPair.public)
+    }
+  }
+    
 }
 
 let pushToken = ''
@@ -85,7 +109,7 @@ export default function Main() {
         user.registerMyDeviceId(pushToken, user.myid)
       }
 
-      createPrivateKeyIfNotExists(contacts, user.myid)
+      createPrivateKeyIfNotExists(contacts, user)
     })()
 
     EE.on(RESET_IP_FINISHED, loadHistory)
