@@ -4,7 +4,7 @@
 const run = {
     oneNode: [0],
     twoNodes: [0, 1],
-    threeNodes: [0, 1, 3],
+    threeNodes: [1, 0, 3],
     active: "threeNodes",
     iterate: false,
     memeHost: "memes.sphinx.chat",

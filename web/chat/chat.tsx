@@ -199,6 +199,10 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
     }, 2000);
   }
 
+  async function onApproveOrDenyMember(contactId, status, msgId) {
+    await msg.approveOrRejectMember(contactId, status, msgId)
+  }
+
   return useObserver(() => {
     const chat = ui.selectedChat
 
@@ -253,7 +257,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
                     if(!m.chat) m.chat = chat
                     return <Msg joinTribe={joinTribe} key={m.id} {...m} senderAlias={senderAlias} senderPic={senderPic} 
                       handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
-                      onCopy={onCopy} myid={myid}
+                      onCopy={onCopy} myid={myid} onApproveOrDenyMember={onApproveOrDenyMember}
                     />
                   })}
                 </MsgList>
