@@ -39,19 +39,19 @@ async function createPrivateKeyIfNotExists(contacts, user) {
     } else {
       // need to regen :(
       const keyPair = await rsa.generateKeyPair()
+      user.setContactKey(keyPair.public)
       contacts.updateContact(user.myid, {
         contact_key: keyPair.public
       })
-      user.setContactKey(keyPair.public)
       showToast('generated new keypair')
     }
   // no private key!! 
   } else {
     const keyPair = await rsa.generateKeyPair()
+    user.setContactKey(keyPair.public)
     contacts.updateContact(user.myid, {
       contact_key: keyPair.public
     })
-    user.setContactKey(keyPair.public)
     showToast('generated key pair')
   } 
 }
