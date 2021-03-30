@@ -102,32 +102,6 @@ export default function Profile() {
     setSharing(false);
   }
 
-  async function exportKeys(pin) {
-    setShowPIN(false);
-    if (!pin) return;
-    const thePIN = await userPinCode();
-    if (pin !== thePIN) return;
-    setExporting(true);
-    const priv = await rsa.getPrivateKey();
-    const me = contacts.contacts.find((c) => c.id === myid);
-    const pub = me && me.contact_key;
-    const ip = user.currentIP;
-    const token = user.authToken;
-    if (!priv || !pub || !ip || !token) return;
-    const str = `${priv}::${pub}::${ip}::${token}`;
-    const enc = await e2e.encrypt(str, pin);
-    const final = btoa(`keys::${enc}`);
-    Clipboard.setString(final);
-    ToastAndroid.showWithGravityAndOffset(
-      "Export Keys Copied",
-      ToastAndroid.SHORT,
-      ToastAndroid.TOP,
-      0,
-      125
-    );
-    setExporting(false);
-  }
-
   async function tookPic(img) {
     setDialogOpen(false);
     setTakingPhoto(false);
@@ -182,6 +156,46 @@ export default function Profile() {
 
   return useObserver(() => {
     const meContact = contacts.contacts.find((c) => c.id === myid);
+
+    function showError(err) {
+      ToastAndroid.showWithGravityAndOffset(
+        err,
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+        0,
+        125
+      );
+    }
+
+    async function exportKeys(pin) {
+      try {
+        setShowPIN(false);
+        if (!pin) return showError('NO PIN');
+        const thePIN = await userPinCode();
+        if (pin !== thePIN) return showError('NO USER PIN');
+        setExporting(true);
+        const priv = await rsa.getPrivateKey();
+        const pub = meContact && meContact.contact_key;
+        const ip = user.currentIP;
+        const token = user.authToken;
+        if (!priv || !pub || !ip || !token) return showError('MISSING A VAR');;
+        const str = `${priv}::${pub}::${ip}::${token}`;
+        const enc = await e2e.encrypt(str, pin);
+        const final = btoa(`keys::${enc}`);
+        Clipboard.setString(final);
+        ToastAndroid.showWithGravityAndOffset(
+          "Export Keys Copied",
+          ToastAndroid.SHORT,
+          ToastAndroid.TOP,
+          0,
+          125
+        );
+        setExporting(false);
+      } catch(e) {
+        showError(e.message || e)
+      }
+    }
+
     let imgURI = usePicSrc(meContact);
     if (photo_url) imgURI = photo_url;
 
