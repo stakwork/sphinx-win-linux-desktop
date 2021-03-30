@@ -12,35 +12,34 @@ import {check, VersionDialog} from './checkVersion'
 async function createPrivateKeyIfNotExists(contacts, user) {
   const priv = await rsa.getPrivateKey()
   const me = contacts.contacts.find(c=> c.id===user.myid)
-  if (priv && me.contact_key) {
-    // ok
-    if(!user.contactKey) {
-      console.log('=> set contact key')
-      user.setContactKey(me.contact_key)
-    }
-    return
-  } 
-
-  if (!priv) {
-    const keyPair = await rsa.generateKeyPair()
-    contacts.updateContact(user.myid, {
-      contact_key: keyPair.public
-    })
-    user.setContactKey(keyPair.public)
-  } else if(!me.contact_key) {
-    if (user.contactKey) {
+  // private key has been made
+  if (priv) {
+    // set into user.contactKey
+    if(me && me.contact_key) {
+      if(!user.contactKey) {
+        user.setContactKey(me.contact_key)
+      }
+      // set into me Contact
+    } else if(user.contactKey) {
       contacts.updateContact(user.myid, {
         contact_key: user.contactKey
       })
     } else {
+      // need to regen :(
       const keyPair = await rsa.generateKeyPair()
       contacts.updateContact(user.myid, {
         contact_key: keyPair.public
       })
       user.setContactKey(keyPair.public)
     }
-  }
-    
+  // no private key!! 
+  } else {
+    const keyPair = await rsa.generateKeyPair()
+    contacts.updateContact(user.myid, {
+      contact_key: keyPair.public
+    })
+    user.setContactKey(keyPair.public)
+  } 
 }
 
 let pushToken = ''
