@@ -17,6 +17,8 @@ import com.brentvatne.react.ReactVideoPackage;
 import io.sua.RNDeviceTimeFormatPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import org.linusu.RNGetRandomValuesPackage;
+
+import com.sphinx.tor.TOPLAndroidPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.mkuczera.RNReactNativeHapticFeedbackPackage;
@@ -94,7 +96,8 @@ public class MainApplication extends Application implements ReactApplication {
           new SafeAreaContextPackage(),
           new ReanimatedPackage(),
           new RNScreensPackage(),
-          new RNSecureStoragePackage()
+          new RNSecureStoragePackage(),
+          new TOPLAndroidPackage()
       );
     }
 
