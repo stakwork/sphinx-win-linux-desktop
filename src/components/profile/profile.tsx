@@ -38,7 +38,7 @@ import Slider from "@react-native-community/slider";
 
 export default function Profile() {
   const { details, user, contacts, meme, ui } = useStores();
-  const myid = user.myid;
+  
   const theme = useTheme();
   const [uploading, setUploading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -155,6 +155,7 @@ export default function Profile() {
   }
 
   return useObserver(() => {
+    const myid = user.myid;
     const meContact = contacts.contacts.find((c) => c.id === myid);
 
     function showError(err) {
@@ -175,10 +176,14 @@ export default function Profile() {
         if (pin !== thePIN) return showError('NO USER PIN');
         setExporting(true);
         const priv = await rsa.getPrivateKey();
+        if(!priv) return showError('CANT READ PRIVATE KEY');
         const pub = meContact && meContact.contact_key;
+        if(!pub) return showError('CANT FIND CONTACT KEY');;
         const ip = user.currentIP;
+        if(!ip) return showError('CANT FIND IP');
         const token = user.authToken;
-        if (!priv || !pub || !ip || !token) return showError('MISSING A VAR');;
+        if(!token) return showError('CANT FIND TOKEN');
+        if (!priv || !pub || !ip || !token) return showError('MISSING A VAR');
         const str = `${priv}::${pub}::${ip}::${token}`;
         const enc = await e2e.encrypt(str, pin);
         const final = btoa(`keys::${enc}`);
