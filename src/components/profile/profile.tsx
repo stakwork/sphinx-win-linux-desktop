@@ -177,7 +177,10 @@ export default function Profile() {
         setExporting(true);
         const priv = await rsa.getPrivateKey();
         if(!priv) return showError('CANT READ PRIVATE KEY');
-        const pub = meContact && meContact.contact_key;
+        let pub = meContact && meContact.contact_key;
+        if(!pub) {
+          pub = user.contactKey
+        }
         if(!pub) return showError('CANT FIND CONTACT KEY');;
         const ip = user.currentIP;
         if(!ip) return showError('CANT FIND IP');
