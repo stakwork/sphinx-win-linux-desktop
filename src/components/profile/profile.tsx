@@ -157,6 +157,7 @@ export default function Profile() {
   return useObserver(() => {
     const myid = user.myid;
     const meContact = contacts.contacts.find((c) => c.id === myid);
+    const myContactKey = user.contactKey
 
     function showError(err) {
       ToastAndroid.showWithGravityAndOffset(
@@ -177,9 +178,10 @@ export default function Profile() {
         setExporting(true);
         const priv = await rsa.getPrivateKey();
         if(!priv) return showError('CANT READ PRIVATE KEY');
-        let pub = meContact && meContact.contact_key;
+        let pub = myContactKey
         if(!pub) {
-          pub = user.contactKey
+          // showError('myContactKey is not found');
+          pub = meContact && meContact.contact_key;
         }
         if(!pub) return showError('CANT FIND CONTACT KEY');;
         const ip = user.currentIP;
