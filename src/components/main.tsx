@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { AppState } from 'react-native'
+import { AppState, ToastAndroid } from 'react-native'
 import MainNav from './mainnav'
 import { useStores } from '../store'
 import { initPicSrc } from './utils/picSrc'
@@ -8,6 +8,16 @@ import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
 import {check, VersionDialog} from './checkVersion'
+
+function showToast(msg) {
+  ToastAndroid.showWithGravityAndOffset(
+    msg,
+    ToastAndroid.SHORT,
+    ToastAndroid.TOP,
+    0,
+    125
+  );
+}
 
 async function createPrivateKeyIfNotExists(contacts, user) {
   const priv = await rsa.getPrivateKey()
@@ -19,11 +29,13 @@ async function createPrivateKeyIfNotExists(contacts, user) {
       if(!user.contactKey) {
         user.setContactKey(me.contact_key)
       }
+      showToast('updated user.contactKey')
       // set into me Contact
     } else if(user.contactKey) {
       contacts.updateContact(user.myid, {
         contact_key: user.contactKey
       })
+      showToast('updated me.contact_key')
     } else {
       // need to regen :(
       const keyPair = await rsa.generateKeyPair()
@@ -31,6 +43,7 @@ async function createPrivateKeyIfNotExists(contacts, user) {
         contact_key: keyPair.public
       })
       user.setContactKey(keyPair.public)
+      showToast('generated new keypair')
     }
   // no private key!! 
   } else {
@@ -39,6 +52,7 @@ async function createPrivateKeyIfNotExists(contacts, user) {
       contact_key: keyPair.public
     })
     user.setContactKey(keyPair.public)
+    showToast('generated key pair')
   } 
 }
 
