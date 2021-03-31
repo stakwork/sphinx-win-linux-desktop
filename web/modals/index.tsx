@@ -11,6 +11,7 @@ import Profile from './profile'
 import NewContact from './newContact'
 import ShareInvite from './shareInvite'
 import ViewTribe from './viewTribe'
+import TribeInfo from './tribeInfo'
 import Onchain from './onchain'
 import {uiStore} from '../../src/store/ui'
 import VersionModal from './versionModal'
@@ -40,6 +41,7 @@ export default function Modals(){
       {ui.viewTribe && <ViewTribe />}
       {ui.onchain && <Onchain />}
       {ui.showVersionDialog && <VersionModal />}
+      {ui.tribeInfo && <TribeInfo />}
     </Wrap>
   })
 }

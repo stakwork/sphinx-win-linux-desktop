@@ -13,14 +13,17 @@ import InvoiceMsg from './invoiceMsg'
 import MoreVertButton from '@material-ui/icons/MoreVert';
 import BotResMsg from './botRes'
 import BoostMsg from './boostMsg'
+import MemberRequest from './memberRequest'
 import moment from 'moment'
 import {useAvatarColor, useParsedGiphyMsg, useParsedClipMsg} from '../../../src/store/hooks/msg'
 // import BoostSats from './boostSats'
 
 const timeFormat = 'hh:mm A' //ui.is24HourFormat?'HH:mm A':'hh:mm A'
+const joinMessage = [constants.message_types.member_request, constants.message_types.member_approve, constants.message_types.member_reject]
 
 export default function Msg(props) {
   const isMe = props.sender === props.myid
+  const isJoinMsg = joinMessage.includes(props.type)
 
   const isGroupNotification = props.type === constants.message_types.group_join || props.type === constants.message_types.group_leave
   if (isGroupNotification) {
@@ -32,16 +35,16 @@ export default function Msg(props) {
     return <DeletedMessage {...props} />
   }
 
-  return <MsgRow showInfoBar={props.showInfoBar}>
-    <Avatar alias={props.senderAlias}
+  return <MsgRow showInfoBar={props.showInfoBar} isJoinMsg={isJoinMsg}>
+    {!isJoinMsg && <Avatar alias={props.senderAlias}
       photo={props.senderPic}
       hide={!props.showInfoBar || isMe}
-    />
+    />}
     <InnerBox>
       
       {props.showInfoBar && <InfoBar {...props} senderAlias={props.senderAlias} />}
 
-      <BubbleWrap style={{ flexDirection: isMe ? 'row-reverse' : 'row' }}>
+      <BubbleWrap isJoinMsg={isJoinMsg} style={{ flexDirection: isMe ? 'row-reverse' : 'row', justifyContent: isJoinMsg && 'center' }}>
         <Bubble style={{ background: isMe ? theme.highlight : theme.extraDeep }}>
           {(props.reply_message_content ? true : false) &&
             <ReplyContent
@@ -53,8 +56,8 @@ export default function Msg(props) {
             />}
           <Message {...props} />
         </Bubble>
-        <MoreVertButton aria-controls="simple-menu" aria-haspopup="true" onClick={e => props.handleClick(e)}
-          style={{ color: '#7f7f7f', cursor: 'pointer', fontSize: 17, marginLeft: -3, marginRight: -3 }} />
+        {!joinMessage.includes(props.type) && <MoreVertButton aria-controls="simple-menu" aria-haspopup="true" onClick={e => props.handleClick(e)}
+          style={{ color: '#7f7f7f', cursor: 'pointer', fontSize: 17, marginLeft: -3, marginRight: -3 }} />}
       </BubbleWrap>
 
     </InnerBox>
@@ -78,6 +81,10 @@ function Message(props) {
       return <BotResMsg {...props} />
     case 'boost':
       return <BoostMsg {...props} />
+    case 'member_request':
+    case 'member_approve':
+    case 'member_reject':
+      return <MemberRequest {...props} />
     default:
       return <></>
   }
@@ -146,7 +153,7 @@ const DeletedMsgRow = styled.div`
 `
 
 const MsgRow = styled.div`
-  min-height:50px;
+  min-height:${p=>p.isJoinMsg?'30px':'50px'};
   flex-shrink:0;
   display:flex;
   padding-left:8px;
@@ -159,7 +166,7 @@ const InnerBox = styled.div`
   margin:0px 9px;
 `
 const BubbleWrap = styled.div`
-  min-height:50px;
+  min-height:${p=>p.isJoinMsg?'30px':'50px'};
   flex-shrink:0;
   display:flex;
   flex:1;

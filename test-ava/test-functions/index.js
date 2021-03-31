@@ -15,6 +15,8 @@ var queryRoutes = require('./query-routes')
 var streamPayment = require('./stream-payment')
 var boostPayment = require('./boost-payment')
 var botCreation = require('./bot-creation')
+var tribe3Private = require('./tribe3-private')
+var tribe3Profile = require('./tribe3-profile')
 
 module.exports = {
     clearAllChats, 
@@ -34,4 +36,6 @@ module.exports = {
     streamPayment,
     boostPayment,
     botCreation,
+    tribe3Private,
+    tribe3Profile
 }
