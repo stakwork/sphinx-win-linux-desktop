@@ -28,8 +28,8 @@ private inline val TorManager.generateServiceNotificationBuilder: ServiceNotific
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
 
             // notification buttons (New ID is always present)
-            .enableTorRestartButton(true)
-            .enableTorStopButton(true)
+            .enableTorRestartButton(false)
+            .enableTorStopButton(false)
 
             // enable/disable showing of notification
             .showNotification(true)
