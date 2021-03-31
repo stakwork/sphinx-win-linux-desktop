@@ -108,6 +108,10 @@ class TorManager private constructor(
             // just cast it as TorEventBroadcaster
             .setEventBroadcaster(broadcaster)
 
+            // ServiceExecutionHooks allow for synchronous code execution at key events
+            // in TorService's operation.
+            .setServiceExecutionHooks(SphinxTorServiceExecutionHooks())
+
             .build();
     }
 }
