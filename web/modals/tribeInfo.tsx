@@ -1,58 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "@material-ui/core/Modal";
 import { useStores } from "../../src/store";
 import theme from "../theme";
 import styled from "styled-components";
 import Button from "../utils/button";
 import { CircularProgress } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-import Dropzone from "react-dropzone";
-import { uploadFile } from "../utils/meme";
 import { tentIcon, avatarIcon } from "../images";
+import ClearIcon from '@material-ui/icons/Clear';
+import Dialog from '@material-ui/core/Dialog';
+
 
 export default function TribeInfo() {
-  const { msg, ui, chats, meme, user } = useStores();
-  const tribe = ui.viewTribe;
+  const { ui, chats} = useStores();
+  const tribe = ui.tribeInfo;
+  const tribeId = ui.tribeInfo.id
+  const tribeParams = ui.tribeInfoParams
   const [loading, setLoading] = useState(false);
-  const [alias, setAlias] = useState("");
-  const [picsrc, setPicsrc] = useState("");
-  const [tribeId, setTribeId] = useState(null)
-  const [uploading, setUploading] = useState(false);
-
-  async function leaveTribe() {
-    setLoading(true);
-    await chats.exitGroup(tribeId);
-    setLoading(false);
-    handleClose();
-  }
+  const [exit, setExit] = useState(false)
 
   function handleClose() {
-    ui.setViewTribe(null);
+    ui.setTribeInfo(null, null);
   }
 
   function millisToHours(millis) {
     return Math.floor((millis / (1000 * 60 * 60)) % 24);
   }
 
-  const alreadyJoined = chats.chats.find((c) => c.uuid === tribe.uuid);
-
-  async function dropzoneUpload(files) {
-    const file = files[0];
-    const server = meme.getDefaultServer();
-    setUploading(true);
-    const r = await uploadFile(
-      file,
-      file.type,
-      server.host,
-      server.token,
-      "Image.jpg",
-      true
-    );
-    if (r && r.muid) {
-      // console.log(`https://${server.host}/public/${r.muid}`)
-      setPicsrc(`https://${server.host}/public/${r.muid}`);
+      async function exitGroup(){
+      setExit(true)
     }
-  }
+    async function actuallyExitGroup(){
+      if(!tribeId) return
+      await chats.exitGroup(tribeId)
+      setExit(false)
+      ui.setTribeInfo(null, null)
+      ui.setSelectedChat(null)
+    }
 
   if (!tribe) {
     return <div></div>;
@@ -68,80 +51,42 @@ export default function TribeInfo() {
       }}
     >
       <Content bg={theme.bg}>
-        <Header>JOIN TRIBE</Header>
+        <ClearIcon onClick={handleClose} style={{cursor: "pointer", position: "absolute", top: 4, right: 4 }}/>
+        <Header>Tribe Info</Header>
         <Image
-          style={{ backgroundImage: `url(${tribe.img || tentIcon})` }}
+          style={{ backgroundImage: `url(${tribeParams.img || tentIcon})` }}
         ></Image>
-        <Title>{tribe.name}</Title>
-        <Description grey={theme.greyText}>{tribe.description}</Description>
+        <Title>{tribeParams.name}</Title>
+        <Description grey={theme.greyText}>{tribeParams.description}</Description>
         <Details grey={theme.greyText}>
-          <Row name={"Price to Join:"} value={tribe.price_to_join} />
-          <Row name={"Price per Message:"} value={tribe.price_per_message} />
-          <Row name={"Amount to Stake:"} value={tribe.escrow_amount} />
+          <Row name={"Price per Message:"} value={tribeParams.price_per_message} />
+          <Row name={"Amount to Stake:"} value={tribeParams.escrow_amount} />
           <DetailRow style={{ border: "none" }}>
             <RowTitle>Time to Stake (hours):</RowTitle>
-            <RowContent>{millisToHours(tribe.escrow_millis)}</RowContent>
+            <RowContent>{millisToHours(tribeParams.escrow_millis)}</RowContent>
           </DetailRow>
         </Details>
-        {!alreadyJoined && (
-          <AliasWrap>
-            <TextField
-              variant="outlined"
-              style={{ marginBottom: 5, width: "100%" }}
-              label="My Name for this Tribe"
-              type="text"
-              value={alias}
-              inputProps={{ style: { textAlign: "center" } }}
-              onChange={(e) => setAlias(e.target.value)}
-            />
-          </AliasWrap>
-        )}
-        {!alreadyJoined && (
-          <PicWrap>
-            <Dropzone multiple={false} onDrop={dropzoneUpload}>
-              {({ getRootProps, getInputProps, isDragActive }) => (
-                <PicDropWrap {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <Pic
-                    style={{
-                      backgroundImage: `url(${
-                        picsrc ? picsrc + "?thumb=true" : avatarIcon
-                      })`,
-                    }}
-                  />
-                </PicDropWrap>
-              )}
-            </Dropzone>
-            <Text style={{ color: theme.greyText }}>
-              My Picture for this Tribe
-            </Text>
-          </PicWrap>
-        )}
-        {alreadyJoined ? (
-          <Button
-            color={"secondary"}
-            style={{ marginTop: 20 }}
-            onClick={async () => {
-              console.log("SELECTD THIS CHAT", alreadyJoined);
-              msg.seeChat(alreadyJoined.id);
-              ui.setSelectedChat(alreadyJoined);
-              ui.toggleBots(false);
-              chats.checkRoute(alreadyJoined.id, user.myid);
-              handleClose();
-            }}
-          >
-            Already Joined!
-          </Button>
-        ) : (
-          <Button
-            disabled={loading}
-            onClick={leaveTribe}
-            color={"primary"}
-            style={{ marginTop: 20 }}
-          >
-            {loading && <CircularProgress size={14} />} Join Tribe
-          </Button>
-        )}
+
+          <ButtonWrap>
+
+            <Button
+              disabled={loading}
+              onClick={exitGroup}
+              color={"primary"}
+              style={{ marginTop: 20 }}
+            >
+              {loading && <CircularProgress size={14} />} Leave Tribe
+            </Button>
+          </ButtonWrap>
+
+      <Dialog onClose={()=>setExit(false)} open={exit}>
+        <DialogContent>
+          <div style={{marginBottom:10}}>Leave this Tribe?</div>
+          <Button color={"primary"} onClick={()=>setExit(false)}>Cancel</Button>
+          <Button color={"secondary"} onClick={()=>actuallyExitGroup()}>Yes</Button>
+        </DialogContent>
+      </Dialog>
+
       </Content>
     </Modal>
   );
@@ -157,6 +102,7 @@ function Row({ name, value }) {
 }
 
 const Content = styled.div`
+  position: relative;
   padding: 40px 20px;
   border-radius: 8px;
   width: 400px;
@@ -176,14 +122,6 @@ const Header = styled.div`
 const Image = styled.div`
   height: 100px;
   width: 100px;
-  border-radius: 50%;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-`;
-const Pic = styled.div`
-  height: 50px;
-  width: 50px;
   border-radius: 50%;
   background-position: center;
   background-size: cover;
@@ -230,17 +168,18 @@ const RowContent = styled.div`
   color: ${(p) => p.grey};
 `;
 
-const AliasWrap = styled.div`
-  width: 80%;
-`;
-const PicWrap = styled.div`
-  width: 80%;
+const ButtonWrap = styled.div`
+  width: 100%;
   display: flex;
+  flex-direction: row;
   align-items: center;
-`;
-const PicDropWrap = styled.div`
-  cursor: pointer;
-`;
-const Text = styled.div`
-  margin-left: 15px;
-`;
+  justify-content: space-evenly;
+`
+
+const DialogContent = styled.div`
+  display:flex;
+  flex-direction:column;
+  justify-content: space-between;
+  padding:30px;
+  height: 200px;
+`

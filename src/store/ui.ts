@@ -273,8 +273,10 @@ export class UiStore {
   }
 
   @observable tribeInfo: { [k: string]: any } = null
-  @action setTribeInfo(obj: { [k: string]: any }) {
-    this.tribeInfo = obj
+  @observable tribeInfoParams: { [k: string]: any } = null
+  @action setTribeInfo(chat, params) {
+    this.tribeInfo = chat,
+    this.tribeInfoParams = params
   }
 
   @observable tribeText: { [k: number]: string } = {}

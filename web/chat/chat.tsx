@@ -101,7 +101,7 @@ function Chat() {
     return <Section style={{ background: theme.deep }}>
       <Inner>
         <Head height={headHeight} appURL={appURL} setAppMode={setAppMode} appMode={appMode} 
-          messagePrice={messagePrice} status={status}
+          messagePrice={messagePrice} status={status} tribeParams={tribeParams}
         />
         <ChatContent msgPrice={msgPrice} setMsgPrice={setMsgPrice} appMode={appMode} appURL={appURL} footHeight={footHeight} 
            messagePrice={messagePrice} 
@@ -140,11 +140,11 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
     const server = meme.getDefaultServer()
     setUploading(true)
     const typ = file.type||'text/plain'
-    console.log("type === ", typ)
-    console.log("host === ", server.host)
-    console.log("token === ", server.token)
-    console.log("filename === ", file.name)
-    console.log("file === ", file)
+    // console.log("type === ", typ)
+    // console.log("host === ", server.host)
+    // console.log("token === ", server.token)
+    // console.log("filename === ", file.name)
+    // console.log("file === ", file)
     const r = await uploadFile(file, typ, server.host, server.token, file.name || 'Image.jpg')
     await msg.sendAttachment({
       contact_id: null, chat_id: chat.id,
@@ -233,6 +233,10 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
 
     async function joinTribe (tribeParams) {
       if (tribeParams) ui.setViewTribe(tribeParams)
+    }
+
+    if (chat && chat.status === constants.chat_statuses.pending) {
+      return <Wrap h={h} style={{alignItems: "center", justifyContent: "center"}}>Waiting for admin approval</Wrap>
     }
 
     return (
