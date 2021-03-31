@@ -18,7 +18,7 @@ class SphinxTorSettings: ApplicationDefaultTorSettings() {
 
     override val dnsPortIsolationFlags: List<String>
         get() = listOf(
-                IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
         )
 
     override val dormantClientTimeout: Int
@@ -64,13 +64,12 @@ class SphinxTorSettings: ApplicationDefaultTorSettings() {
         get() = DEFAULT__HAS_TEST_SOCKS
 
     override val httpTunnelPort: String
-        //        get() = PortOption.AUTO
-        get() = PortOption.DISABLED
+        get() = "8318"
 
     override val httpTunnelPortIsolationFlags: List<String>
         get() = listOf(
-                IsolationFlag.ISOLATE_CLIENT_PROTOCOL
-//                IsolationFlag.ONION_TRAFFIC_ONLY
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+//            IsolationFlag.ONION_TRAFFIC_ONLY
         )
 
     override val isAutoMapHostsOnResolve: Boolean
@@ -120,9 +119,9 @@ class SphinxTorSettings: ApplicationDefaultTorSettings() {
 
     override val socksPortIsolationFlags: List<String>
         get() = listOf(
-                IsolationFlag.KEEP_ALIVE_ISOLATE_SOCKS_AUTH,
-                IsolationFlag.ISOLATE_CLIENT_PROTOCOL
-//                IsolationFlag.ONION_TRAFFIC_ONLY
+            IsolationFlag.KEEP_ALIVE_ISOLATE_SOCKS_AUTH,
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+//            IsolationFlag.ONION_TRAFFIC_ONLY
         )
 
     override val transPort: String
@@ -130,7 +129,7 @@ class SphinxTorSettings: ApplicationDefaultTorSettings() {
 
     override val transPortIsolationFlags: List<String>
         get() = listOf(
-                IsolationFlag.ISOLATE_CLIENT_PROTOCOL
+            IsolationFlag.ISOLATE_CLIENT_PROTOCOL
         )
 
     override val useSocks5: Boolean
