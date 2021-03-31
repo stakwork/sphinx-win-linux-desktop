@@ -32,10 +32,10 @@ async function createPrivateKeyIfNotExists(contacts, user) {
       showToast('updated user.contactKey')
       // set into me Contact
     } else if(user.contactKey) {
-      contacts.updateContact(user.myid, {
-        contact_key: user.contactKey
-      })
-      showToast('updated me.contact_key')
+      // contacts.updateContact(user.myid, {
+      //   contact_key: user.contactKey
+      // })
+      // showToast('updated me.contact_key')
     } else {
       // need to regen :(
       const keyPair = await rsa.generateKeyPair()
