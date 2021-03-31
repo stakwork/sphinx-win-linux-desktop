@@ -2,12 +2,20 @@ package com.sphinx.tor
 
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import io.matthewnelson.topl_core_base.BaseConsts
+import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service_base.TorPortInfo
 import io.matthewnelson.topl_service_base.TorServiceEventBroadcaster
 
+/**
+ * Events that emitted via the [RCTDeviceEventEmitter]:
+ *
+ *  - [TOR_PORT_CHANGE_EVENT]: See [SphinxTorEventBroadcaster.broadcastPortInformation]
+ *  - [TOR_SERVICE_EXCEPTION_EVENT]
+ *  - [TOR_SERVICE_LIFECYCLE_EVENT]: See [SphinxTorEventBroadcaster.broadcastServiceLifecycleEvent]
+ *  - [TOR_STATE_CHANGE_EVENT]: See [SphinxTorEventBroadcaster.broadcastPortInformation]
+ * */
 class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJavaModule(reactContext) {
 
     override fun getName(): String {
@@ -17,19 +25,25 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
     companion object {
         const val NAME = "TorRNModule"
 
+        // TOR_PORT_CHANGE_EVENT Keys
         const val CONTROL_PORT_INFO = "CONTROL_PORT_INFO"
         const val DNS_PORT_INFO = "DNS_PORT_INFO"
         const val HTTP_PORT_INFO = "HTTP_PORT_INFO"
         const val SOCKS_PORT_INFO = "SOCKS_PORT_INFO"
         const val TRANS_PORT_INFO = "TRANS_PORT_INFO"
 
-        const val TOR_SERVICE_EXCEPTION_EVENT = "TorServiceExceptionEvent"
-        const val TOR_PORT_CHANGE_EVENT = "TorPortChangeEvent"
-
+        // TOR_STATE_CHANGE_EVENT Keys
         const val TOR_STATE = "TOR_STATE"
         const val TOR_NETWORK_STATE = "TOR_NETWORK_STATE"
 
-        const val TOR_STATE_CHANGE_EVENT = "TorStateChangeEvent"
+        // TOR_SERVICE_LIFECYCLE_EVENT Key
+        const val TOR_SERVICE_LIFECYCLE = "TOR_SERVICE_LIFECYCLE"
+
+        // RN Event Keys
+        const val TOR_PORT_CHANGE_EVENT = "TOR_PORT_CHANGE_EVENT"
+        const val TOR_SERVICE_EXCEPTION_EVENT = "TOR_SERVICE_EXCEPTION_EVENT"
+        const val TOR_SERVICE_LIFECYCLE_EVENT = "TOR_SERVICE_LIFECYCLE_EVENT"
+        const val TOR_STATE_CHANGE_EVENT = "TOR_STATE_CHANGE_EVENT"
     }
 
     @ReactMethod
@@ -120,6 +134,16 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
     val eventBroadcaster = SphinxTorEventBroadcaster()
 
     inner class SphinxTorEventBroadcaster: TorServiceEventBroadcaster() {
+
+        /**
+         * See [ServiceLifecycleEvent] for literal string values that are emitted.
+         * */
+        override fun broadcastServiceLifecycleEvent(@ServiceLifecycleEvent event: String, hashCode: Int) {
+            val params = Arguments.createMap()
+            params.putString(TOR_SERVICE_LIFECYCLE, event)
+            sendEvent(TOR_SERVICE_LIFECYCLE_EVENT, params)
+        }
+
         override fun broadcastBandwidth(bytesRead: String, bytesWritten: String) {}
 
         override fun broadcastDebug(msg: String) {
@@ -148,7 +172,10 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
             sendEvent(TOR_PORT_CHANGE_EVENT, params)
         }
 
-        override fun broadcastTorState(state: String, networkState: String) {
+        /**
+         * See [TorState] and [TorNetworkState] for literal string values that are emitted.
+         * */
+        override fun broadcastTorState(@TorState state: String, @TorNetworkState networkState: String) {
             torState = state
             torNetworkState = networkState
             val params = Arguments.createMap()
