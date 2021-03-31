@@ -1,6 +1,7 @@
 package com.sphinx.tor
 
 import android.app.Application
+import android.app.PendingIntent
 import androidx.core.app.NotificationCompat
 import com.sphinx.BuildConfig
 import com.sphinx.R
@@ -83,7 +84,17 @@ class TorManager private constructor(
     init {
         TorServiceController.Builder(
             application = application,
-            torServiceNotificationBuilder = generateServiceNotificationBuilder,
+            torServiceNotificationBuilder = generateServiceNotificationBuilder
+//                .also { builder ->
+//                    application.applicationContext.packageManager
+//                        ?.getLaunchIntentForPackage(application.applicationContext.packageName)
+//                        ?.let { intent ->
+//                            builder.setContentIntent(
+//                                    PendingIntent.getActivity(application.applicationContext, 0, intent, 0)
+//                            )
+//                        }
+//                }
+            ,
             backgroundManagerPolicy = generateBackgroundManagerPolicy,
             buildConfigVersionCode = BuildConfig.VERSION_CODE,
             defaultTorSettings = SphinxTorSettings(),
@@ -112,6 +123,6 @@ class TorManager private constructor(
             // in TorService's operation.
             .setServiceExecutionHooks(SphinxTorServiceExecutionHooks())
 
-            .build();
+            .build()
     }
 }
