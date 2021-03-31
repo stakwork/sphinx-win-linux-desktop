@@ -58,8 +58,19 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
         const val TOR_SERVICE_EXCEPTION_EVENT = "TOR_SERVICE_EXCEPTION_EVENT"
         const val TOR_SERVICE_LIFECYCLE_EVENT = "TOR_SERVICE_LIFECYCLE_EVENT"
         const val TOR_STATE_CHANGE_EVENT = "TOR_STATE_CHANGE_EVENT"
+
+        @Volatile
+        private var portInfo: TorPortInfo = TorPortInfo(null, null, null, null, null)
+
+        @Volatile
+        private var torState: String = TorState.OFF
+        @Volatile
+        private var torNetworkState: String = TorNetworkState.DISABLED
     }
 
+    //////////////////
+    /// Controller ///
+    //////////////////
     @ReactMethod
     fun newTorIdentity() {
         TorManager.getInstance(this).newIdentity()
@@ -83,9 +94,6 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
     ///////////////////
     /// TorPortInfo ///
     ///////////////////
-    @Volatile
-    private var portInfo: TorPortInfo = TorPortInfo(null, null, null, null, null)
-
     @ReactMethod
     fun getControlPortAddress(promise: Promise) {
         promise.resolve(portInfo.controlPort)
@@ -115,12 +123,6 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
     /////////////////
     /// Tor State ///
     /////////////////
-    @Volatile
-    private var torState: String? = TorState.OFF
-
-    @Volatile
-    private var torNetworkState: String? = TorNetworkState.DISABLED
-
     @ReactMethod
     fun getTorState(promise: Promise) {
         promise.resolve(torState)
