@@ -8,6 +8,20 @@ import io.matthewnelson.topl_core_base.BaseConsts.TorState
 import io.matthewnelson.topl_service_base.TorPortInfo
 import io.matthewnelson.topl_service_base.TorServiceEventBroadcaster
 
+@Suppress("NOTHING_TO_INLINE")
+private inline fun TorRNModule.sendEvent(eventName: String, params: WritableMap) {
+    try {
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java).emit(eventName, params)
+    } catch (e: Exception) {}
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun TorRNModule.sendEvent(eventName: String, string: String) {
+    try {
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java).emit(eventName, string)
+    } catch (e: Exception) {}
+}
+
 /**
  * Events that emitted via the [RCTDeviceEventEmitter]:
  *
@@ -117,22 +131,15 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
         promise.resolve(torNetworkState)
     }
 
-    private fun sendEvent(eventName: String, params: WritableMap?) {
-        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit(eventName, params)
-    }
-
-    @Suppress("SameParameterValue")
-    private fun sendEvent(eventName: String, string: String?) {
-        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit(eventName, string)
-    }
-
     ////////////////////////
     /// EventBroadcaster ///
     ////////////////////////
     val eventBroadcaster = SphinxTorEventBroadcaster()
 
+    /**
+     * See [io.matthewnelson.topl_core_base.EventBroadcaster]
+     * See [io.matthewnelson.topl_service_base.TorServiceEventBroadcaster]
+     * */
     inner class SphinxTorEventBroadcaster: TorServiceEventBroadcaster() {
 
         /**
