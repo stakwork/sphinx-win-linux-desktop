@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react'
-import { AppState } from 'react-native'
+import { AppState, ToastAndroid } from 'react-native'
 import MainNav from './mainnav'
 import { useStores } from '../store'
 import { initPicSrc } from './utils/picSrc'
@@ -9,38 +9,51 @@ import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
 import {check, VersionDialog} from './checkVersion'
 
+function showToast(msg) {
+  ToastAndroid.showWithGravityAndOffset(
+    msg,
+    ToastAndroid.SHORT,
+    ToastAndroid.TOP,
+    0,
+    125
+  );
+}
+
 async function createPrivateKeyIfNotExists(contacts, user) {
   const priv = await rsa.getPrivateKey()
   const me = contacts.contacts.find(c=> c.id===user.myid)
-  if (priv && me.contact_key) {
-    // ok
-    if(!user.contactKey) {
-      console.log('=> set contact key')
-      user.setContactKey(me.contact_key)
-    }
-    return
-  } 
-
-  if (!priv) {
-    const keyPair = await rsa.generateKeyPair()
-    contacts.updateContact(user.myid, {
-      contact_key: keyPair.public
-    })
-    user.setContactKey(keyPair.public)
-  } else if(!me.contact_key) {
-    if (user.contactKey) {
-      contacts.updateContact(user.myid, {
-        contact_key: user.contactKey
-      })
+  // private key has been made
+  if (priv) {
+    // set into user.contactKey
+    if(me && me.contact_key) {
+      if(!user.contactKey) {
+        user.setContactKey(me.contact_key)
+      }
+      showToast('updated user.contactKey')
+      // set into me Contact
+    } else if(user.contactKey) {
+      // contacts.updateContact(user.myid, {
+      //   contact_key: user.contactKey
+      // })
+      // showToast('updated me.contact_key')
     } else {
+      // need to regen :(
       const keyPair = await rsa.generateKeyPair()
+      user.setContactKey(keyPair.public)
       contacts.updateContact(user.myid, {
         contact_key: keyPair.public
       })
-      user.setContactKey(keyPair.public)
+      showToast('generated new keypair')
     }
-  }
-    
+  // no private key!! 
+  } else {
+    const keyPair = await rsa.generateKeyPair()
+    user.setContactKey(keyPair.public)
+    contacts.updateContact(user.myid, {
+      contact_key: keyPair.public
+    })
+    showToast('generated key pair')
+  } 
 }
 
 let pushToken = ''

@@ -10,6 +10,7 @@ import * as Yup from "yup";
 import * as rsa from "../crypto/rsa";
 import * as aes from "../crypto/aes";
 import { userPinCode } from "./pin";
+import { useObserver } from "mobx-react-lite";
 
 const schema = [
   {
@@ -43,100 +44,99 @@ const advSchema = [
 
 export default function Profile() {
   const { ui, contacts, details, user } = useStores();
-  const me = contacts.contacts.find((c) => c.id === user.myid);
-  if(!me.route_hint) me.route_hint=''
   const [advanced, setAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  async function updateMe(v) {
-    setLoading(true);
-    await contacts.updateContact(user.myid, { alias: v.alias });
-    setLoading(false);
-  }
+  return useObserver(()=>{
+    let me:any = contacts.contacts.find((c) => c.id === user.myid);
+    if(!me) me = {route_hint:'',alias:'',photo_url:''}
+    if(!me.route_hint) me.route_hint=''
+    
+    async function updateMe(v) {
+      setLoading(true);
+      await contacts.updateContact(user.myid, { alias: v.alias });
+      setLoading(false);
+    }
 
-  function handleCloseModal() {
-    ui.setShowProfile(false);
-  }
+    function handleCloseModal() {
+      ui.setShowProfile(false);
+    }
 
-  async function exportKeys() {
-    if (copied) return;
-    const priv = await rsa.getPrivateKey();
-    const me = contacts.contacts.find((c) => c.id === user.myid);
-    const pub = me && me.contact_key;
-    const ip = user.currentIP;
-    const token = user.authToken;
-    // console.log("ME === ", me);
-    // console.log("PRIV === ", priv);
-    // console.log("PUB === ", pub);
-    // console.log("IP === ", ip);
-    // console.log("TOKEN === ", token);
-    if (!priv || !pub || !ip || !token) return;
-    const str = `${priv}::${pub}::${ip}::${token}`;
-    const pin = await userPinCode();
-    const enc = await aes.encryptSymmetric(str, pin);
-    const final = btoa(`keys::${enc}`);
-    navigator.clipboard.writeText(final);
-    setCopied(true);
-    await sleep(4000);
-    setCopied(false);
-  }
+    async function exportKeys() {
+      if (copied) return;
+      const priv = await rsa.getPrivateKey();
+      const me = contacts.contacts.find((c) => c.id === user.myid);
+      const pub = me && me.contact_key;
+      const ip = user.currentIP;
+      const token = user.authToken;
+      if (!priv || !pub || !ip || !token) return;
+      const str = `${priv}::${pub}::${ip}::${token}`;
+      const pin = await userPinCode();
+      const enc = await aes.encryptSymmetric(str, pin);
+      const final = btoa(`keys::${enc}`);
+      navigator.clipboard.writeText(final);
+      setCopied(true);
+      await sleep(4000);
+      setCopied(false);
+    }
 
-  return (
-    <Modal
-      open={true}
-      onClose={handleCloseModal}
-      aria-labelledby="simple-modal-title"
-      aria-describedby="simple-modal-description"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Content bg={theme.bg}>
-        <TopWrapper>
-          <Avatar
-            xx-large
-            photo={me.photo_url}
-            alias={me.alias}
-            style={{ size: "50px" }}
+    return (
+      <Modal
+        open={true}
+        onClose={handleCloseModal}
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Content bg={theme.bg}>
+          <TopWrapper>
+            <Avatar
+              xx-large
+              photo={me.photo_url}
+              alias={me.alias}
+              style={{ size: "50px" }}
+            />
+            <InnerTopWrapper>
+              <Name>{me.alias.toUpperCase()}</Name>
+              <Sat>
+                {details.balance} <span style={{ color: "#6b7b8d" }}>sat</span>
+              </Sat>
+            </InnerTopWrapper>
+          </TopWrapper>
+          <Toggle
+            onChange={(e) => setAdvanced(e === "Advanced")}
+            items={["Basic", "Advanced"]}
+            value={advanced ? "Advanced" : "Basic"}
           />
-          <InnerTopWrapper>
-            <Name>{me.alias.toUpperCase()}</Name>
-            <Sat>
-              {details.balance} <span style={{ color: "#6b7b8d" }}>sat</span>
-            </Sat>
-          </InnerTopWrapper>
-        </TopWrapper>
-        <Toggle
-          onChange={(e) => setAdvanced(e === "Advanced")}
-          items={["Basic", "Advanced"]}
-          value={advanced ? "Advanced" : "Basic"}
-        />
-        {advanced ? (
-          <Form
-            key={"adv"}
-            onSubmit={(v) => user.setCurrentIP(v.currentIP)}
-            schema={advSchema}
-            initialValues={{ currentIP: user.currentIP }}
-          />
-        ) : (
-          <Form
-            key={"basic"}
-            onSubmit={updateMe}
-            schema={schema}
-            initialValues={me}
-            loading={loading}
-          />
-        )}
+          {advanced ? (
+            <Form
+              key={"adv"}
+              onSubmit={(v) => user.setCurrentIP(v.currentIP)}
+              schema={advSchema}
+              initialValues={{ currentIP: user.currentIP }}
+            />
+          ) : (
+            <Form
+              key={"basic"}
+              onSubmit={updateMe}
+              schema={schema}
+              initialValues={me}
+              loading={loading}
+            />
+          )}
 
-        <ExportKeysWrap style={{ color: theme.primary }} onClick={exportKeys}>
-          {copied ? "Keys Copied!" : "Export Keys"}
-        </ExportKeysWrap>
-      </Content>
-    </Modal>
-  );
+          <ExportKeysWrap style={{ color: theme.primary }} onClick={exportKeys}>
+            {copied ? "Keys Copied!" : "Export Keys"}
+          </ExportKeysWrap>
+        </Content>
+      </Modal>
+    );
+  })
 }
 
 const Content = styled.div`

@@ -38,7 +38,7 @@ import Slider from "@react-native-community/slider";
 
 export default function Profile() {
   const { details, user, contacts, meme, ui } = useStores();
-  const myid = user.myid;
+  
   const theme = useTheme();
   const [uploading, setUploading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -94,38 +94,12 @@ export default function Profile() {
   }
 
   async function shareContactKey() {
-    const me = contacts.contacts.find((c) => c.id === myid);
+    const me = contacts.contacts.find((c) => c.id === user.myid);
     const contact_key = me.contact_key;
     if (!contact_key) return;
     setSharing(true);
     await contacts.updateContact(user.myid, { contact_key });
     setSharing(false);
-  }
-
-  async function exportKeys(pin) {
-    setShowPIN(false);
-    if (!pin) return;
-    const thePIN = await userPinCode();
-    if (pin !== thePIN) return;
-    setExporting(true);
-    const priv = await rsa.getPrivateKey();
-    const me = contacts.contacts.find((c) => c.id === myid);
-    const pub = me && me.contact_key;
-    const ip = user.currentIP;
-    const token = user.authToken;
-    if (!priv || !pub || !ip || !token) return;
-    const str = `${priv}::${pub}::${ip}::${token}`;
-    const enc = await e2e.encrypt(str, pin);
-    const final = btoa(`keys::${enc}`);
-    Clipboard.setString(final);
-    ToastAndroid.showWithGravityAndOffset(
-      "Export Keys Copied",
-      ToastAndroid.SHORT,
-      ToastAndroid.TOP,
-      0,
-      125
-    );
-    setExporting(false);
   }
 
   async function tookPic(img) {
@@ -181,7 +155,61 @@ export default function Profile() {
   }
 
   return useObserver(() => {
-    const meContact = contacts.contacts.find((c) => c.id === myid);
+    const myid = user.myid;
+    const myContactKey = user.contactKey
+    const meContact = contacts.contacts.find((c) => c.id === myid) || {
+      contact_key:myContactKey,
+      private_photo:false,
+      route_hint:'',
+    };
+
+    function showError(err) {
+      ToastAndroid.showWithGravityAndOffset(
+        err,
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+        0,
+        125
+      );
+    }
+
+    async function exportKeys(pin) {
+      try {
+        setShowPIN(false);
+        if (!pin) return showError('NO PIN');
+        const thePIN = await userPinCode();
+        if (pin !== thePIN) return showError('NO USER PIN');
+        setExporting(true);
+        const priv = await rsa.getPrivateKey();
+        if(!priv) return showError('CANT READ PRIVATE KEY');
+        let pub = myContactKey
+        if(!pub) {
+          // showError('myContactKey is not found');
+          pub = meContact && meContact.contact_key;
+        }
+        if(!pub) return showError('CANT FIND CONTACT KEY');;
+        const ip = user.currentIP;
+        if(!ip) return showError('CANT FIND IP');
+        const token = user.authToken;
+        if(!token) return showError('CANT FIND TOKEN');
+        if (!priv || !pub || !ip || !token) return showError('MISSING A VAR');
+        const str = `${priv}::${pub}::${ip}::${token}`;
+        const enc = await e2e.encrypt(str, pin);
+        const final = btoa(`keys::${enc}`);
+        Clipboard.setString(final);
+        ToastAndroid.showWithGravityAndOffset(
+          "Export Keys Copied",
+          ToastAndroid.SHORT,
+          ToastAndroid.TOP,
+          0,
+          125
+        );
+        setExporting(false);
+      } catch(e) {
+        showError(e.message || e)
+      }
+    }
+
     let imgURI = usePicSrc(meContact);
     if (photo_url) imgURI = photo_url;
 

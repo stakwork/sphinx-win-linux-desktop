@@ -4,35 +4,53 @@
 
 React-Native Android and Web client for Sphinx network
 
-### verify APK signature
+## Verify APK signature
 
 1. Download [sig file](https://sphinx-apk.s3.amazonaws.com/app-release.apk.sig)
 
 2. `gpg --verify app-release.apk.sig app-release.apk`
 
-### contributing
+## Contributing
 
-1. clone the repo
-2. `npm install`
-3. Rename `android/app/build.copy.gradle` to `android/app/build.gradle`
-4. `react-native run-android`
+1. Clone the repo.
+2. Install dependencies.
 
-- Each merge request should include documentation:
+```sh
+ `npm install`
+```
+
+3. Make a copy of `android/app/build.copy.gradle` and rename it to `android/app/build.gradle`.
+
+```sh
+cp android/app/build.copy.gradle android/app/build.gradle
+```
+
+4. Start the app.
+
+```sh
+npm run android
+```
+
+### Pull Requests
+- Each pull request should include documentation:
   - purpose of changes
   - any libraries added & if they need linking
   - any changes in Android manifest, etc
 
-**development**
+
+### Development
 
 - Android dev:
-  - uncomment the `"include": ["src"]` line in `tsconfig.json`
+  - Uncomment the `"include": ["src"]` line in `tsconfig.json`.
+    - Comment out the other `"include"` line that's intended for Desktop development.
   - `react-native run-android`
   - package.json script: `"postinstall":"jetify"`
   - switching from desktop->android dev? run `npm rebuild` and also `npm i` so that "jetify" runs
 
 - Desktop dev:
-  - swithing from android->desktop dev? run `npm run install-app-deps`
+  - switching from android->desktop dev? run `npm run install-app-deps`
   - uncomment the `"include": ["src/index.web.tsx","web"]` line in `tsconfig.json`
+      - Comment out the other `"include"` line that's intended for Android development.
   - `npm run web`
   - in another terminal `npm run electron`
   - if you are developing on a windows machine, change the `electron` script in `package.json` to start with the word `set` (`set ELECTRON_DEV_URL=...`)
