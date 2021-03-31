@@ -16,7 +16,7 @@ public class TOPLAndroidPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new TorRNModule(reactContext));
+        modules.add(TorRNModule.getInstance(reactContext));
         return modules;
     }
 

@@ -31,13 +31,25 @@ private inline fun TorRNModule.sendEvent(eventName: String, string: String) {
  *  - [TOR_SERVICE_LIFECYCLE_EVENT]: See [SphinxTorEventBroadcaster.broadcastServiceLifecycleEvent]
  *  - [TOR_STATE_CHANGE_EVENT]: See [SphinxTorEventBroadcaster.broadcastPortInformation]
  * */
-class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJavaModule(reactContext) {
+class TorRNModule private constructor(
+    val reactContext: ReactApplicationContext
+): ReactContextBaseJavaModule(reactContext) {
 
     override fun getName(): String {
         return NAME
     }
 
     companion object {
+        @Volatile
+        private var instance: TorRNModule? = null
+
+        @JvmStatic
+        fun getInstance(reactContext: ReactApplicationContext): TorRNModule =
+            instance ?: synchronized(this) {
+                instance ?: TorRNModule(reactContext)
+                    .also { instance = it }
+            }
+
         const val NAME = "TorRNModule"
 
         // TOR_PORT_CHANGE_EVENT Keys
