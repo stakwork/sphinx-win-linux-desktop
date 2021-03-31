@@ -2,6 +2,7 @@ package com.sphinx.tor
 
 import android.app.Application
 import androidx.core.app.NotificationCompat
+import com.sphinx.BuildConfig
 import com.sphinx.R
 import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service.lifecycle.BackgroundManager
