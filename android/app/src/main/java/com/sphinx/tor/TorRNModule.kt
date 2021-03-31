@@ -5,6 +5,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
 import io.matthewnelson.topl_core_base.BaseConsts.TorNetworkState
 import io.matthewnelson.topl_core_base.BaseConsts.TorState
+import io.matthewnelson.topl_service.TorServiceController
 import io.matthewnelson.topl_service_base.TorPortInfo
 import io.matthewnelson.topl_service_base.TorServiceEventBroadcaster
 
@@ -136,7 +137,9 @@ class TorRNModule(val reactContext: ReactApplicationContext): ReactContextBaseJa
     ////////////////////////
     /// EventBroadcaster ///
     ////////////////////////
-    val eventBroadcaster = SphinxTorEventBroadcaster()
+    val eventBroadcaster: SphinxTorEventBroadcaster = TorServiceController.appEventBroadcaster?.let {
+        it as SphinxTorEventBroadcaster
+    } ?: SphinxTorEventBroadcaster()
 
     /**
      * See [io.matthewnelson.topl_core_base.EventBroadcaster]
