@@ -23,7 +23,7 @@ private inline val TorManager.generateServiceNotificationBuilder: ServiceNotific
             .setImageTorErrors(R.drawable.tor_stat_notifyerr)
 
             // choose a color that you like more
-//                .setCustomColor(R.color.tor_purple)
+            .setCustomColor(R.color.tor_purple)
 
             // lock screen visibility
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)

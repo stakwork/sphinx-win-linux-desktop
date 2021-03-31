@@ -43,7 +43,7 @@ npm run android
 - Android dev:
   - Uncomment the `"include": ["src"]` line in `tsconfig.json`.
     - Comment out the other `"include"` line that's intended for Desktop development.
-  - `react-native run-android`
+  - `npm run android`
   - package.json script: `"postinstall":"jetify"`
   - switching from desktop->android dev? run `npm rebuild` and also `npm i` so that "jetify" runs
 

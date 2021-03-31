@@ -11,14 +11,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class TOPLAndroidPackage implements ReactPackage {
+
     @NonNull
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
+
         modules.add(TorRNModule.getInstance(reactContext));
+
         return modules;
     }
+
 
     @NonNull
     @Override

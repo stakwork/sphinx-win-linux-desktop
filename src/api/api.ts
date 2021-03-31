@@ -24,7 +24,7 @@ const TIMEOUT = 20000
 function addMethod(m: string, rootUrl: string): Function {
   return async function (url: string, data: any, encoding?: string) {
     if(!data) data={}
-    
+
     try {
       const skip = isPublic(rootUrl + url)
       if (this.tokenKey && !this.tokenValue && !skip) {
@@ -81,7 +81,7 @@ function addMethod(m: string, rootUrl: string): Function {
           return res.object
         }
         if (res.success && res.response) { // relay
-          return res.response 
+          return res.response
         }
         return res
       }
@@ -119,7 +119,11 @@ function makeSearchParams(params){
 
 const fetchTimeout = (url, ms, options = {}) => {
   const controller = new AbortController();
+
+  // TODO: Modify the call here based upon whether or not tor is enabled.
   const promise = fetch(url, { signal: controller.signal, ...options });
+
+
   const timeout = setTimeout(() => controller.abort(), ms);
   return promise.finally(() => clearTimeout(timeout));
 };

@@ -18,13 +18,15 @@ import { useDarkMode } from 'react-native-dynamic'
 import { is24HourFormat } from 'react-native-device-time-format'
 import TrackPlayer from 'react-native-track-player';
 import EE, {RESET_IP_FINISHED} from './src/components/utils/ee'
-import { I18nManager} from 'react-native';
+import { I18nManager, NativeModules } from 'react-native';
+
+const { TorRNModule } = NativeModules
 
 declare var global: {HermesInternal: null | {}}
 
-try { 
+try {
   I18nManager.allowRTL(false);
-} 
+}
 catch (e) {
   console.log(e);
 }
@@ -79,6 +81,7 @@ function App() {
   }
 
   const isDarkMode = useDarkMode()
+
   useEffect(()=>{
     if(theme.mode==='System') {
       theme.setDark(isDarkMode);
@@ -87,30 +90,46 @@ function App() {
     }
 
     check24Hour();
-
     TrackPlayer.setupPlayer();
-
-    (async () => {
-      console.log("=> USER",user)
-      const isSignedUp = (user.currentIP && user.authToken && !user.onboardStep)?true:false
-      setSignedUp(isSignedUp)
-      if(isSignedUp){
-        instantiateRelay(user.currentIP, user.authToken, connectedHandler, disconnectedHandler, resetIP)
-      }
-      const pinWasEnteredRecently = await wasEnteredRecently()
-      if(pinWasEnteredRecently) setPinned(true)
-
-      setLoading(false)
-
-      user.testinit()
-    })()
+    bootstrapTor();
+    setupRelay()
   },[])
+
+
+  async function setupRelay() {
+    console.log("=> USER", user)
+
+    const isSignedUp = (user.currentIP && user.authToken && !user.onboardStep) ? true : false
+
+    setSignedUp(isSignedUp)
+
+    if (isSignedUp) {
+      instantiateRelay(user.currentIP, user.authToken, connectedHandler, disconnectedHandler, resetIP)
+    }
+
+    const pinWasEnteredRecently = await wasEnteredRecently()
+
+    if (pinWasEnteredRecently) setPinned(true)
+
+    setLoading(false)
+  }
+
 
   async function resetIP(){
     ui.setLoadingHistory(true)
     const newIP = await user.resetIP()
     instantiateRelay(newIP, user.authToken, connectedHandler, disconnectedHandler)
     EE.emit(RESET_IP_FINISHED)
+  }
+
+  async function bootstrapTor() {
+    const currentTorState = await TorRNModule.getTorState()
+
+    console.log(currentTorState);
+
+    if (currentTorState !== "Tor: On") {
+      await TorRNModule.startTor()
+    }
   }
 
   return useObserver(()=>{
@@ -148,7 +167,7 @@ function App() {
           {!signedUp && <Onboard onFinish={()=>{
             user.finishOnboard() // clear out things
             setSignedUp(true) // signed up w key export
-            setPinned(true)   // also PIN has been set 
+            setPinned(true)   // also PIN has been set
           }} />}
         </PaperProvider>
       </NavigationContainer>

@@ -40,6 +40,9 @@ class UserStore {
   currentIP: string = ''
 
   @persist @observable
+  isTorEnabled: boolean = false
+
+  @persist @observable
   authToken: string = ''
 
   @persist @observable
@@ -57,6 +60,7 @@ class UserStore {
     this.myid = 0
     this.publicKey = ''
     this.currentIP = ''
+    this.isTorEnabled = false
     this.authToken = ''
     this.deviceId = ''
     this.onboardStep = 0
@@ -90,7 +94,7 @@ class UserStore {
   }
 
   @action
-  setContactKey(ck:string) {
+  setContactKey(ck: string) {
     this.contactKey = ck
   }
 
@@ -105,7 +109,7 @@ class UserStore {
   }
 
   @action
-  setTipAmount(s:number) {
+  setTipAmount(s: number) {
     this.tipAmount = s
   }
 
@@ -143,7 +147,7 @@ class UserStore {
 
   @action
   async registerMyDeviceId(device_id, myid) {
-    if(!myid) return
+    if (!myid) return
     try {
       const r = await api.relay.put(`contacts/${myid}`, { device_id })
       if (!r) return
@@ -201,7 +205,7 @@ class UserStore {
 
   @action
   async generateToken(pwd: string) {
-    if(api.relay===null && this.currentIP) {
+    if (api.relay === null && this.currentIP) {
       api.instantiateRelay(this.currentIP)
       await sleep(1)
     }
@@ -212,8 +216,8 @@ class UserStore {
       const r = await api.relay.post(`contacts/tokens?pwd=${pwd}`, {
         token, pubkey,
       })
-      if(!r) return console.log("=> FAILED TO REACH RELAY")
-      if(r.id) this.setMyID(r.id)
+      if (!r) return console.log("=> FAILED TO REACH RELAY")
+      if (r.id) this.setMyID(r.id)
       this.authToken = token
       api.instantiateRelay(this.currentIP, token,
         () => uiStore.setConnected(true),
@@ -251,11 +255,6 @@ class UserStore {
       console.log("Error:", e)
     }
   }
-
-  @action
-  async testinit() {
-  }
-
 }
 
 export const userStore = new UserStore()

@@ -17,20 +17,20 @@ export function instantiateRelay(ip:string, authToken?:string, connectedCallback
     protocol='https://'
   }
   if(ip.endsWith('nodes.sphinx.chat')) {
-    protocol='https://' 
+    protocol='https://'
   }
 
   if(ip.startsWith('https://') || ip.startsWith('http://')) {
     protocol=''
   }
-  
+
   if(authToken){
     relay = new API(`${protocol}${ip}/`, 'x-user-token', authToken, resetIPCallback)
   } else {
     relay = new API(`${protocol}${ip}/`)
   }
   console.log('=> instantiated relay!', `${protocol}${ip}/`, 'authToken?', authToken?true:false)
-  
+
   if(authToken) { // only connect here (to avoid double) if auth token means for real
     connectWebSocket(`${protocol}${ip}`, authToken, connectedCallback, disconnectCallback)
     registerWsHandlers(wsHandlers)
