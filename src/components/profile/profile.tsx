@@ -94,7 +94,7 @@ export default function Profile() {
   }
 
   async function shareContactKey() {
-    const me = contacts.contacts.find((c) => c.id === myid);
+    const me = contacts.contacts.find((c) => c.id === user.myid);
     const contact_key = me.contact_key;
     if (!contact_key) return;
     setSharing(true);
@@ -156,8 +156,12 @@ export default function Profile() {
 
   return useObserver(() => {
     const myid = user.myid;
-    const meContact = contacts.contacts.find((c) => c.id === myid);
     const myContactKey = user.contactKey
+    const meContact = contacts.contacts.find((c) => c.id === myid) || {
+      contact_key:myContactKey,
+      private_photo:false,
+      route_hint:'',
+    };
 
     function showError(err) {
       ToastAndroid.showWithGravityAndOffset(
