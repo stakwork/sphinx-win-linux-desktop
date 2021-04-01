@@ -28,8 +28,8 @@ async function createPrivateKeyIfNotExists(contacts, user) {
     if(me && me.contact_key) {
       if(!user.contactKey) {
         user.setContactKey(me.contact_key)
+        // showToast('set user.contactKey')
       }
-      showToast('updated user.contactKey')
       // set into me Contact
     } else if(user.contactKey) {
       // contacts.updateContact(user.myid, {
@@ -43,7 +43,7 @@ async function createPrivateKeyIfNotExists(contacts, user) {
       contacts.updateContact(user.myid, {
         contact_key: keyPair.public
       })
-      showToast('generated new keypair')
+      showToast('generated new keypair!!!')
     }
   // no private key!! 
   } else {
@@ -95,13 +95,13 @@ export default function Main() {
     if(showDialog) setShowVersionDialog(true)
   }
 
-  async function loadHistory() {
+  async function loadHistory(skipLoadingContacts?:boolean) {
     console.log("============> LOAD HISTORY", user.currentIP)
     ui.setLoadingHistory(true)
-    await Promise.all([
-      contacts.getContacts(),
-      msg.getMessages()
-    ])
+    if(!skipLoadingContacts) {
+      await contacts.getContacts()
+    }
+    await msg.getMessages()
     ui.setLoadingHistory(false)
     // msg.initLastSeen()
     await sleep(500)
@@ -113,7 +113,9 @@ export default function Main() {
   useEffect(() => {
     (async () => {
 
-      loadHistory()
+      await contacts.getContacts()
+
+      loadHistory(true)
       checkVersion()
 
       initPicSrc()
@@ -123,6 +125,7 @@ export default function Main() {
       }
 
       createPrivateKeyIfNotExists(contacts, user)
+      
     })()
 
     EE.on(RESET_IP_FINISHED, loadHistory)
