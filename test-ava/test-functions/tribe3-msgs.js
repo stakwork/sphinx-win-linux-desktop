@@ -3,7 +3,7 @@ var f = require('../functions')
 var h = require('../helpers/helper-functions')
 
 async function tribe3Msgs(t, index1, index2, index3) {
-//TWO NODES SEND TEXT MESSAGES WITHIN A TRIBE ===>
+//THREE NODES SEND TEXT MESSAGES WITHIN A TRIBE ===>
 
     let node1 = nodes[index1]
     let node2 = nodes[index2]
@@ -15,7 +15,7 @@ async function tribe3Msgs(t, index1, index2, index3) {
     const node1bal = await f.getBalance(t, node1)
     const node2bal = await f.getBalance(t, node2)
     const node3bal = await f.getBalance(t, node3)
-console.log("balances === ", node1bal, node2bal, node3bal)
+    // console.log("balances === ", node1bal, node2bal, node3bal)
 
     //NODE1 CREATES A TRIBE
     let tribe = await f.createTribe(t, node1)

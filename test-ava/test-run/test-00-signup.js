@@ -7,7 +7,7 @@ var rsa = require('../../public/electronjs/rsa')
 const path = '../_nodes.json'
 const pathToWrite = './_nodes.json'
 
-const CLEAR = true
+const CLEAR = false
 
 /*
 npx ava test-00-signup.js --verbose --serial --timeout=2m

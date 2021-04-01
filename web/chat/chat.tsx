@@ -101,7 +101,7 @@ function Chat() {
     return <Section style={{ background: theme.deep }}>
       <Inner>
         <Head height={headHeight} appURL={appURL} setAppMode={setAppMode} appMode={appMode} 
-          messagePrice={messagePrice} status={status}
+          messagePrice={messagePrice} status={status} tribeParams={tribeParams}
         />
         <ChatContent msgPrice={msgPrice} setMsgPrice={setMsgPrice} appMode={appMode} appURL={appURL} footHeight={footHeight} 
            messagePrice={messagePrice} 
@@ -140,11 +140,11 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
     const server = meme.getDefaultServer()
     setUploading(true)
     const typ = file.type||'text/plain'
-    console.log("type === ", typ)
-    console.log("host === ", server.host)
-    console.log("token === ", server.token)
-    console.log("filename === ", file.name)
-    console.log("file === ", file)
+    // console.log("type === ", typ)
+    // console.log("host === ", server.host)
+    // console.log("token === ", server.token)
+    // console.log("filename === ", file.name)
+    // console.log("file === ", file)
     const r = await uploadFile(file, typ, server.host, server.token, file.name || 'Image.jpg')
     await msg.sendAttachment({
       contact_id: null, chat_id: chat.id,
@@ -199,6 +199,10 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
     }, 2000);
   }
 
+  async function onApproveOrDenyMember(contactId, status, msgId) {
+    await msg.approveOrRejectMember(contactId, status, msgId)
+  }
+
   return useObserver(() => {
     const chat = ui.selectedChat
 
@@ -231,6 +235,10 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
       if (tribeParams) ui.setViewTribe(tribeParams)
     }
 
+    if (chat && chat.status === constants.chat_statuses.pending) {
+      return <Wrap h={h} style={{alignItems: "center", justifyContent: "center"}}>Waiting for admin approval</Wrap>
+    }
+
     return (
       <Wrap h={h}>
         <Dropzone disabled={!chat} noClick={true} multiple={false} onDrop={dropzoneUpload}>
@@ -253,7 +261,7 @@ function ChatContent({ appMode, appURL, footHeight, msgPrice, setMsgPrice, messa
                     if(!m.chat) m.chat = chat
                     return <Msg joinTribe={joinTribe} key={m.id} {...m} senderAlias={senderAlias} senderPic={senderPic} 
                       handleClick={e => handleMenuClick(e, m)} handleClose={handleMenuClose} 
-                      onCopy={onCopy} myid={myid}
+                      onCopy={onCopy} myid={myid} onApproveOrDenyMember={onApproveOrDenyMember}
                     />
                   })}
                 </MsgList>

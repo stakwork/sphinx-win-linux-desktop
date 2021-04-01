@@ -17,7 +17,7 @@ import PhoneIcon from '@material-ui/icons/Phone'
 import LockIcon from '@material-ui/icons/Lock';
 import Dialog from '@material-ui/core/Dialog';
 
-export default function Head({ height, appMode, appURL, setAppMode, messagePrice, status }) {
+export default function Head({ height, appMode, appURL, setAppMode, messagePrice, status, tribeParams }) {
   const [showURL, setShowURL] = useState(false)
   const [URL, setURL] = useState('')
   const [exit, setExit] = useState(false)
@@ -65,15 +65,20 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
       }
     }
 
-    async function exitGroup(){
-      setExit(true)
+    // async function exitGroup(){
+    //   setExit(true)
+    // }
+    // async function actuallyExitGroup(){
+    //   const id = chat && chat.id
+    //   if(!id) return
+    //   await chats.exitGroup(id)
+    //   setExit(false)
+    // }
+    function openTribeInfo(){
+      if(chat && chat.status === constants.chat_statuses.pending) return
+      ui.setTribeInfo(chat, tribeParams)
     }
-    async function actuallyExitGroup(){
-      const id = chat && chat.id
-      if(!id) return
-      await chats.exitGroup(id)
-      setExit(false)
-    }
+
 
     return <Wrap style={{ background: theme.bg, height }}>
       {!chat && !showURL && <Placeholder>
@@ -86,12 +91,15 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
           </AvatarWrap>
           <ChatInfo>
             <NameWrap>
-              <Name onDoubleClick={exitGroup} onClick={viewContact} style={{ cursor: (chat && chat.type === constants.chat_types.conversation) ? 'pointer' : 'auto' }}>{chat.name}</Name>
+              <Name onClick={chat && chat.type === constants.chat_types.conversation ? viewContact : openTribeInfo} style={{ cursor: 'pointer' }}>{chat.name}</Name>
               {status && chat.type !== constants.chat_types.group && <Tooltip title={status === 'active' ? 'Route Confirmed' : 'Cant Find Route'} placement="right">
                 <LockIcon style={{ color: status === 'active' ? '#49ca97' : '#febd59', fontSize: 12, marginLeft: 8, marginBottom: 2 }} />
               </Tooltip>}
             </NameWrap>
-            {(messagePrice ? true : false) && <Price>{`Price per Message: ${messagePrice}`}</Price>}
+            <SatWrap>
+              {(messagePrice ? true : false) && <Price>{`Price per Message: ${messagePrice} sat `}</Price>}
+              {(tribeParams && tribeParams.escrow_amount ? true : false) && <Price>&nbsp;{` - Amount to Stake: ${tribeParams.escrow_amount} sat`}</Price>}
+            </SatWrap>
           </ChatInfo>
         </Left>
       </Inner>}
@@ -137,13 +145,13 @@ export default function Head({ height, appMode, appURL, setAppMode, messagePrice
 
       </Right>
 
-      <Dialog onClose={()=>setExit(false)} open={exit}>
+      {/* <Dialog onClose={()=>setExit(false)} open={exit}>
         <DialogContent>
           <div style={{marginBottom:10}}>Exit the Group?</div>
           <IconButton onClick={()=>setExit(false)}>Cancel</IconButton>
           <IconButton onClick={()=>actuallyExitGroup()}>Yes</IconButton>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
     </Wrap>
   })
@@ -166,10 +174,9 @@ const Wrap = styled.div`
   position:relative; 
   z-index:100;
 `
-const DialogContent = styled.div`
+const SatWrap = styled.div`
   display:flex;
-  flex-direction:column;
-  padding:30px;
+  flex-direction:row;
 `
 const Placeholder = styled.div`
   max-width:100%;
@@ -210,6 +217,7 @@ const NameWrap = styled.div`
 const Price = styled.div`
   font-size:12px;
   margin-top:4px;
+  font-weight:bold;
 `
 const IconzWrap = styled.div`
   display:flex;
