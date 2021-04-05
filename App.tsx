@@ -10,17 +10,14 @@ import StatusBar from './src/components/utils/statusBar'
 import * as utils from './src/components/utils/utils'
 import {Linking} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
-// import * as RNWebRTC from 'react-native-webrtc'
 import {qrActions} from './src/qrActions'
-// import AsyncStorage from '@react-native-community/async-storage'
 import PINCode, {wasEnteredRecently} from './src/components/utils/pin'
 import { useDarkMode } from 'react-native-dynamic'
 import { is24HourFormat } from 'react-native-device-time-format'
 import TrackPlayer from 'react-native-track-player';
 import EE, {RESET_IP_FINISHED} from './src/components/utils/ee'
-import { I18nManager, NativeModules } from 'react-native';
+import { I18nManager } from 'react-native';
 
-const { TorRNModule } = NativeModules
 
 declare var global: {HermesInternal: null | {}}
 
@@ -91,7 +88,6 @@ function App() {
 
     check24Hour();
     TrackPlayer.setupPlayer();
-    bootstrapTor();
     setupRelay()
   },[])
 
@@ -122,18 +118,8 @@ function App() {
     EE.emit(RESET_IP_FINISHED)
   }
 
-  async function bootstrapTor() {
-    const currentTorState = await TorRNModule.getTorState()
-
-    console.log(currentTorState);
-
-    if (currentTorState !== "Tor: On") {
-      await TorRNModule.startTor()
-    }
-  }
 
   return useObserver(()=>{
-
     if(loading) return <Loading />
     if(signedUp && !pinned) { // checking if the pin was entered recently
       return <PINCode

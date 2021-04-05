@@ -12,7 +12,7 @@ interface Invite {
   action: string,
 }
 
-class UserStore {
+export default class UserStore {
 
   @observable code: string = ''
 
