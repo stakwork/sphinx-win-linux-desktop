@@ -23,7 +23,7 @@ export default function ShareTribe({visible}) {
   }
   async function share(){
     try{
-      await Share.open({message:uuid})
+      await Share.open({message:qr})
     } catch(e){}
   }
 
