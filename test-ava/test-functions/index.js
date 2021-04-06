@@ -17,6 +17,7 @@ var boostPayment = require('./boost-payment')
 var botCreation = require('./bot-creation')
 var tribe3Private = require('./tribe3-private')
 var tribe3Profile = require('./tribe3-profile')
+var paidMsgs = require('./paid-msgs')
 
 module.exports = {
     clearAllChats, 
@@ -37,5 +38,6 @@ module.exports = {
     boostPayment,
     botCreation,
     tribe3Private,
-    tribe3Profile
+    tribe3Profile,
+    paidMsgs,
 }

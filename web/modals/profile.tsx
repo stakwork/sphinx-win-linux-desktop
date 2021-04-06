@@ -93,6 +93,7 @@ export default function Profile() {
           justifyContent: "center",
         }}
       >
+        {me ? 
         <Content bg={theme.bg}>
           <TopWrapper>
             <Avatar
@@ -102,7 +103,7 @@ export default function Profile() {
               style={{ size: "50px" }}
             />
             <InnerTopWrapper>
-              <Name>{me.alias.toUpperCase()}</Name>
+              <Name>{me.alias && me.alias.toUpperCase()}</Name>
               <Sat>
                 {details.balance} <span style={{ color: "#6b7b8d" }}>sat</span>
               </Sat>
@@ -134,6 +135,7 @@ export default function Profile() {
             {copied ? "Keys Copied!" : "Export Keys"}
           </ExportKeysWrap>
         </Content>
+        : <Content bg={theme.bg}></Content>}
       </Modal>
     );
   })

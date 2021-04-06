@@ -70,41 +70,52 @@ async function botCreation(t, index1, index2, index3) {
     const n3check = await f.botDecrypt(t, node3, newWelcomeMessage, botReply4)
     t.true(n3check, "node3 should have read and decrypted bot's message")
 
-    //CREATE NEW BOT
-    const newBot = await f.botCreate(t, node1, "TestBot", "https://sphinx-random.herokuapp.com/")
-    t.true(newBot.success, "new bot should have been created")
 
-    const checkBots = await f.getBots(t, node1)
+
+
+    // //CREATE NEW BOT
+    // const newBot = await f.botCreate(t, node1, "TestBot", "https://sphinx-random.herokuapp.com/")
+    // t.true(newBot.success, "new bot should have been created")
+
+    // const checkBots = await f.getBots(t, node1)
     // console.log('CHECK BOTS === ', JSON.stringify(checkBots.bots))
 
-        //NODE1 SENDS A BOT HELP MESSAGE IN TRIBE
-        const text8 = "/bot search TestBot"
-        let tribeMessage8 = await f.sendTribeMessage(t, node1, tribe, text8)
-        t.true(tribeMessage8.success, "node1 should seach for new bot")
+    //     //NODE1 SENDS A BOT SEARCH MESSAGE IN TRIBE
+    //     const text8 = "/bot search TestBot"
+    //     let tribeMessage8 = await f.sendTribeMessage(t, node1, tribe, text8)
+    //     t.true(tribeMessage8.success, "node1 should seach for new bot")
 
-                //NODE1 SENDS A BOT HELP MESSAGE IN TRIBE
-                const text9 = "/bot install testbot"
-                let tribeMessage9 = await f.sendTribeMessage(t, node1, tribe, text9)
-                t.true(tribeMessage9.success, "node1 should seach for new bot")
+    //             //NODE1 SENDS A BOT INSTALL MESSAGE IN TRIBE
+    //             const text9 = "/bot install testbot"
+    //             let tribeMessage9 = await f.sendTribeMessage(t, node1, tribe, text9)
+    //             t.true(tribeMessage9.success, "node1 should install the new bot")
 
-                    await h.sleep(5000)
-
-
-                                //NODE1 SENDS A BOT HELP MESSAGE IN TRIBE
-                                const text10 = "/testbot 8"
-                                let tribeMessage10 = await f.sendTribeMessage(t, node1, tribe, text10)
-                                t.true(tribeMessage10.success, "node1 should seach for new bot")
-
-                                await h.sleep(5000)
+    //                 await h.sleep(5000)
 
 
-    const delBot = await f.botDelete(t, node1, newBot.bot.id)
+    //                             //NODE1 SENDS A TESTBOT MESSAGE IN TRIBE
+    //                             const text10 = "/testbot 8"
+    //                             let tribeMessage10 = await f.sendTribeMessage(t, node1, tribe, text10)
+    //                             t.true(tribeMessage10.success, "node1 should send a message to new bot")
+
+    //                             await h.sleep(5000)
+
+
+    // const delBot = await f.botDelete(t, node1, newBot.bot.id)
     // console.log("BOT DELETE === ", delBot.bot)
 
-    const checkBots2 = await f.getBots(t, node1)
+    //                                 //NODE1 SENDS A TESTBOT MESSAGE IN TRIBE
+    //                                 const text11 = "/bot uninstall testbot"
+    //                                 let tribeMessage11 = await f.sendTribeMessage(t, node1, tribe, text11)
+    //                                 t.true(tribeMessage11.success, "node1 should send a message to new bot")
+
+    // const checkBots2 = await f.getBots(t, node1)
+    // console.log("CHECK BOTS === ", JSON.stringify(checkBots2))
 
 
-    await h.sleep(5000)
+    // await h.sleep(5000)
+
+    // return
 
     //NODE2 LEAVES THE TRIBE
     let left = await f.leaveTribe(t, node2, tribe)

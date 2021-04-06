@@ -8,15 +8,23 @@ import { CircularProgress } from "@material-ui/core";
 import { tentIcon, avatarIcon } from "../images";
 import ClearIcon from '@material-ui/icons/Clear';
 import Dialog from '@material-ui/core/Dialog';
-
+import Dropzone from "react-dropzone";
+import { uploadFile } from "../utils/meme";
+import TextField from "@material-ui/core/TextField";
 
 export default function TribeInfo() {
-  const { ui, chats} = useStores();
+  const { ui, chats, meme, user, contacts } = useStores();
   const tribe = ui.tribeInfo;
   const tribeId = ui.tribeInfo.id
   const tribeParams = ui.tribeInfoParams
   const [loading, setLoading] = useState(false);
   const [exit, setExit] = useState(false)
+  const [uploading, setUploading] = useState(false);
+  const [updateDisable, setUpdateDisable] = useState(true)
+
+  const me = contacts.contacts.find((c) => c.id === user.myid);
+  const [picsrc, setPicsrc] = useState(tribe.my_photo_url || me.photo_url || "");
+  const [alias, setAlias] = useState(tribe.my_alias || me.alias || "");
 
   function handleClose() {
     ui.setTribeInfo(null, null);
@@ -25,6 +33,25 @@ export default function TribeInfo() {
   function millisToHours(millis) {
     return Math.floor((millis / (1000 * 60 * 60)) % 24);
   }
+
+  // async function dropzoneUpload(files) {
+  //   const file = files[0];
+  //   const server = meme.getDefaultServer();
+  //   setUploading(true);
+  //   const r = await uploadFile(
+  //     file,
+  //     file.type,
+  //     server.host,
+  //     server.token,
+  //     "Image.jpg",
+  //     true
+  //   );
+  //   if (r && r.muid) {
+  //     // console.log(`https://${server.host}/public/${r.muid}`)
+  //     setPicsrc(`https://${server.host}/public/${r.muid}`);
+  //     setUploading(false)
+  //   }
+  // }
 
       async function exitGroup(){
       setExit(true)
@@ -36,6 +63,15 @@ export default function TribeInfo() {
       ui.setTribeInfo(null, null)
       ui.setSelectedChat(null)
     }
+
+
+  async function updateTribeProf(){
+    if(!alias && !picsrc) return
+    console.log("alias == ", alias)
+    console.log("picsrc == ", picsrc)
+    chats.updateMyInfoInChat(tribeId, alias, picsrc);
+    ui.setTribeInfo(null, null)
+  }
 
   if (!tribe) {
     return <div></div>;
@@ -67,8 +103,47 @@ export default function TribeInfo() {
           </DetailRow>
         </Details>
 
-          <ButtonWrap>
+        <AliasWrap>
+            <TextField
+              variant="outlined"
+              style={{ marginBottom: 5, width: "100%" }}
+              label="My Name in this Tribe"
+              type="text"
+              value={alias}
+              inputProps={{ style: { textAlign: "center" } }}
+              onChange={(e) => {setAlias(e.target.value); setUpdateDisable(false)}}
+            />
+          </AliasWrap>
 
+        {/* <PicWrap>
+            <Dropzone multiple={false} onDrop={dropzoneUpload}>
+              {({ getRootProps, getInputProps, isDragActive }) => (
+                <PicDropWrap {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <Pic
+                    style={{
+                      backgroundImage: `url(${
+                        picsrc ? picsrc + "?thumb=true" : avatarIcon
+                      })`,
+                    }}
+                  />
+                </PicDropWrap>
+              )}
+            </Dropzone>
+            <Text style={{ color: theme.greyText }}>
+              My Picture in this Tribe
+            </Text>
+          </PicWrap> */}
+
+          <ButtonWrap>
+            <Button
+              disabled={uploading || loading || updateDisable}
+              onClick={updateTribeProf}
+              color={"secondary"}
+              style={{ marginTop: 20 }}
+            >
+              {loading && <CircularProgress size={14} />} Update Name
+            </Button>
             <Button
               disabled={loading}
               onClick={exitGroup}
@@ -183,3 +258,27 @@ const DialogContent = styled.div`
   padding:30px;
   height: 200px;
 `
+
+const Pic = styled.div`
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+`;
+
+const AliasWrap = styled.div`
+  width: 80%;
+`;
+const PicWrap = styled.div`
+  width: 80%;
+  display: flex;
+  align-items: center;
+`;
+const PicDropWrap = styled.div`
+  cursor: pointer;
+`;
+const Text = styled.div`
+  margin-left: 15px;
+`;
