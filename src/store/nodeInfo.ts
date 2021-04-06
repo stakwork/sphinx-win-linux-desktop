@@ -7,21 +7,36 @@ import UserStore from './user'
 const { TorRNModule } = NativeModules
 
 
-// interface Node {
-//   host?: string;
-//   port?: string;
-//   urlPath?: string;
-//   isTorEnabled?: boolean;
-// }
+
+enum TorModuleEvent {
+  PORT_CHANGE = 'TOR_PORT_CHANGE_EVENT',
+  STATE_CHANGE = 'TOR_STATE_CHANGE_EVENT',
+  SERVICE_LIFECYCLE = 'TOR_SERVICE_LIFECYCLE_EVENT',
+  SERVICE_EXCEPTION = 'TOR_SERVICE_EXCEPTION_EVENT',
+}
+
+enum TorModulePortChangeEvent {
+  CONTROL_PORT_INFO = "CONTROL_PORT_INFO",
+  DNS_PORT_INFO = "DNS_PORT_INFO",
+  HTTP_PORT_INFO = "HTTP_PORT_INFO",
+  SOCKS_PORT_INFO = "SOCKS_PORT_INFO",
+  TRANS_PORT_INFO = "TRANS_PORT_INFO",
+}
+
+enum TorModuleStateChangeEvent {
+  TOR_STATE = "TOR_STATE",
+  TOR_NETWORK_STATE = "TOR_NETWORK_STATE",
+}
 
 
 export default class NodeInfoStore {
   userStore: UserStore;
-  torStateListener: EmitterSubscription;
+  torStateListeners: EmitterSubscription[];
 
 
   constructor(userStore: UserStore) {
     this.userStore = userStore;
+    this.torStateListeners = [];
 
     reaction(
       () => this.userStore.isTorEnabled,
@@ -46,18 +61,27 @@ export default class NodeInfoStore {
   }
 
 
+  @action handleTorModuleEvent(event) {
+    console.log(`Handling Tor Module Event`)
+  }
+
+
   setupListeners = () => {
     const eventEmitter = new NativeEventEmitter(TorRNModule);
 
-    this.torStateListener = eventEmitter.addListener(
-      'TOR_SERVICE_LIFECYCLE_EVENT',
-      (event) => {
-        console.log(event.eventProperty) // "someValue"
-      }
-    );
+    Object.values(TorModuleEvent).forEach(eventName => {
+      this.torStateListeners.push(eventEmitter.addListener(
+        eventName,
+        // this.handleTorModuleEvent
+        (event) => {
+          console.log(`Tor Module Event (${eventName}): ${event}`);
+          this.handleTorModuleEvent(event)
+        }
+      ));
+    })
   }
 
   tearDownListeners = () => {
-    this.torStateListener.remove()
+    this.torStateListeners.forEach(listener => listener.remove())
   }
 }
