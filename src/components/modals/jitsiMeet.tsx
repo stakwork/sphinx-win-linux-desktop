@@ -5,7 +5,7 @@ import {View, Text, StyleSheet} from 'react-native'
 import Modal from "./modalWrap"
 import { Button } from 'react-native-paper'
 import Header from './modalHeader'
-import JitsiMeet, { JitsiMeetView } from '../../jitsi';
+import JitsiMeet, { JitsiMeetView } from '../../native-module-wrappers/jitsi';
 
 console.log("ASDF",JitsiMeet, JitsiMeetView)
 
@@ -49,11 +49,11 @@ export default function Jitsi() {
   return useObserver(() =>
     <View style={styles.wrap}>
       <View style={{ backgroundColor: 'black',flex: 1 }}>
-        {showJitsi && <JitsiMeetView 
+        {showJitsi && <JitsiMeetView
           onConferenceTerminated={jitsiDone}
-          onConferenceJoined={jitsiJoined} 
-          onConferenceWillJoin={jitsiWillJoin} 
-          style={{ flex: 1, height: '100%', width: '100%' }} 
+          onConferenceJoined={jitsiJoined}
+          onConferenceWillJoin={jitsiWillJoin}
+          style={{ flex: 1, height: '100%', width: '100%' }}
         />}
       </View>
       <View style={styles.buttonsWrap}>

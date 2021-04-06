@@ -78,6 +78,7 @@ async function hydrateMessageStoreFromRealm(){
     updateRealmMsg(msgStore)
   }
 }
+
 function initAndroid(){
   console.log('=> initialize store')
   Promise.all([
