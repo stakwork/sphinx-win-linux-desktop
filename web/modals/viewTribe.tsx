@@ -101,7 +101,7 @@ export default function ViewTribe() {
             <TextField
               variant="outlined"
               style={{ marginBottom: 5, width: "100%" }}
-              label="My Name for this Tribe"
+              label="My Name in this Tribe"
               type="text"
               value={alias}
               inputProps={{ style: { textAlign: "center" } }}
@@ -126,7 +126,7 @@ export default function ViewTribe() {
               )}
             </Dropzone>
             <Text style={{ color: theme.greyText }}>
-              My Picture for this Tribe
+              My Picture in this Tribe
             </Text>
           </PicWrap>
         )}

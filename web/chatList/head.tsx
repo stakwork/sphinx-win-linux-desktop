@@ -15,17 +15,54 @@ import EE, {RESET_IP, RESET_IP_FINISHED} from '../utils/ee'
 import { urlBase64FromAscii } from '../../src/store/utils/ldat';
 import Button from '../utils/button'
 import {whiteBitcoinIcon} from '../images'
+import * as rsa from '../crypto/rsa'
+
+async function createPrivateKeyIfNotExists(contacts, user) {
+
+  const priv = await rsa.getPrivateKey()
+  const me = contacts.contacts.find(c=> c.is_owner)
+  // private key has been made
+  if (priv) {
+    // set into user.contactKey
+    if(me && me.contact_key) {
+      if(!user.contactKey) {
+        user.setContactKey(me.contact_key)
+      }
+    } else if(user.contactKey) {
+      // contacts.updateContact(user.myid, {
+      //   contact_key: user.contactKey
+      // })
+      // showToast('updated me.contact_key')
+    } else {
+      // need to regen :(
+      const contactKey = await rsa.genKeys()
+      user.setContactKey(contactKey)
+      contacts.updateContact(me.id, {
+        contact_key: contactKey
+      })
+    }
+  // no private key!! 
+  } else {
+    const contactKey = await rsa.genKeys()
+    user.setContactKey(contactKey)
+    contacts.updateContact(me.id, {
+      contact_key: contactKey
+    })
+  } 
+}
 
 export default function Head({ setWidth, width }) {
-  const { contacts, details, msg, ui, chats } = useStores()
+  const { contacts, details, msg, ui, chats, user } = useStores()
   const [refreshing, setRefreshing] = useState(false)
   // const [snap, setSnap] = useState(false) =
   const snap = width < 250
 
   async function refresh(forceMore?:boolean) {
     setRefreshing(true)
+    const conts = await contacts.getContacts()
+    createPrivateKeyIfNotExists(contacts, user)
+
     await Promise.all([
-      contacts.getContacts(),
       details.getBalance(),
       msg.getMessages(forceMore?true:false),
       // chats.getChats(),
