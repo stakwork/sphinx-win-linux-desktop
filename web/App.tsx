@@ -9,7 +9,7 @@ import {useObserver} from 'mobx-react-lite'
 import styled from 'styled-components'
 import PIN, {wasEnteredRecently, userPinCode} from './modals/pin'
 import Onboard from './onboard'
-import {instantiateRelay} from '../src/api'
+import {instantiateRelayAPI} from '../src/api'
 import ChatList from './chatList/chatList'
 import Chat from './chat/chat'
 import * as localForage from 'localforage'
@@ -45,7 +45,7 @@ function Wrap(){
 }
 
 function App(){
-  const {user,ui,chats} = useStores()
+  const {user,ui,torConnection} = useStores()
   const [pinned,setPinned] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
   const [welcome, setWelcome] = useState(false)
@@ -61,34 +61,41 @@ function App(){
     (async () => {
       const isSignedUp = (user.currentIP && user.authToken)?true:false
       setSignedUp(isSignedUp)
-      if(isSignedUp){
-        instantiateRelay(user.currentIP, user.authToken, function(){
-          ui.setConnected(true)
-        }, function(){
-          ui.setConnected(false)
-        },
-          ()=> resetIP()
-        )
+
+      if (isSignedUp) {
+        instantiateRelayAPI({
+          ip: user.currentIP,
+          authToken: user.authToken,
+          connectedCallback: function() {
+            ui.setConnected(true)
+          },
+          disconnectCallback: function() {
+            ui.setConnected(false)
+          },
+          resetIPCallback: ()=> resetIP(),
+          torConnectionStore: torConnection,
+        })
       }
 
       const pinWasEnteredRecently = await wasEnteredRecently()
       if(pinWasEnteredRecently) setPinned(true)
       setWelcome(true)
-
-      // setTimeout(()=>{
-      //   localForage.clear()
-      //   console.log('localForage.clear()')
-      // },1000)
     })()
   },[])
 
   async function resetIP(){
     EE.emit(RESET_IP)
     const newIP = await user.resetIP()
-    instantiateRelay(newIP, user.authToken, function(){
-      ui.setConnected(true)
-    }, function(){
-      ui.setConnected(false)
+    instantiateRelayAPI({
+      ip: newIP,
+      authToken: user.authToken,
+      connectedCallback: function(){
+        ui.setConnected(true)
+      },
+      disconnectCallback: function(){
+        ui.setConnected(false)
+      },
+      torConnectionStore: torConnection,
     })
     EE.emit(RESET_IP_FINISHED)
   }
@@ -140,7 +147,7 @@ const Loading=styled.div`
   display:flex;
   align-items:center;
   justify-content:center;
-  background:linear-gradient(145deg, #A68CFF 0%, #6A8FFF) 0% 0% / cover; 
+  background:linear-gradient(145deg, #A68CFF 0%, #6A8FFF) 0% 0% / cover;
 `
 
 export default Wrap

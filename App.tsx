@@ -3,7 +3,7 @@ import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper'
 import Main from './src/components/main'
 import Onboard from './src/components/onboard'
 import {useStores, useTheme} from './src/store'
-import {instantiateRelay} from './src/api'
+import {instantiateRelayAPI} from './src/api'
 import {useObserver} from 'mobx-react-lite'
 import Loading from './src/components/loading'
 import StatusBar from './src/components/utils/statusBar'
@@ -60,8 +60,10 @@ export default function Wrap(){
 }
 
 function App() {
-  const {user,ui} = useStores()
+  const { user, ui, torConnection } = useStores()
   const theme = useTheme()
+  const isDarkMode = useDarkMode()
+
   const [loading, setLoading] = useState(true) // default
   const [signedUp, setSignedUp] = useState(false) // <=
   const [pinned, setPinned] = useState(false)
@@ -72,25 +74,19 @@ function App() {
   function disconnectedHandler() {
     ui.setConnected(false)
   }
+
   async function check24Hour(){
     const is24Hour = await is24HourFormat()
     ui.setIs24HourFormat(is24Hour)
   }
 
-  const isDarkMode = useDarkMode()
-
-  useEffect(()=>{
-    if(theme.mode==='System') {
+  function setupColorTheme() {
+    if (theme.mode === 'System') {
       theme.setDark(isDarkMode);
     } else {
-      theme.setDark(theme.mode==='Dark');
+      theme.setDark(theme.mode === 'Dark');
     }
-
-    check24Hour();
-    TrackPlayer.setupPlayer();
-    setupRelay()
-  },[])
-
+  }
 
   async function setupRelay() {
     console.log("=> USER", user)
@@ -100,23 +96,45 @@ function App() {
     setSignedUp(isSignedUp)
 
     if (isSignedUp) {
-      instantiateRelay(user.currentIP, user.authToken, connectedHandler, disconnectedHandler, resetIP)
+      instantiateRelayAPI({
+        ip: user.currentIP,
+        authToken: user.authToken,
+        connectedCallback: connectedHandler,
+        disconnectCallback: disconnectedHandler,
+        resetIPCallback: resetIP,
+        torConnectionStore: torConnection,
+      })
     }
 
     const pinWasEnteredRecently = await wasEnteredRecently()
 
     if (pinWasEnteredRecently) setPinned(true)
-
-    setLoading(false)
   }
-
 
   async function resetIP(){
     ui.setLoadingHistory(true)
     const newIP = await user.resetIP()
-    instantiateRelay(newIP, user.authToken, connectedHandler, disconnectedHandler)
+    instantiateRelayAPI({
+      ip: newIP,
+      authToken: user.authToken,
+      connectedCallback: connectedHandler,
+      disconnectCallback: disconnectedHandler,
+      torConnectionStore: torConnection,
+    })
     EE.emit(RESET_IP_FINISHED)
   }
+
+  useEffect(() => {
+    setupColorTheme();
+    check24Hour();
+    TrackPlayer.setupPlayer();
+
+    (async () => {
+      await setupRelay()
+      user.currentIP = 'http://foo.onion'
+      setLoading(false)
+    })()
+  }, [])
 
 
   return useObserver(()=>{

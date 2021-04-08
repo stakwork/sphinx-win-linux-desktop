@@ -2,15 +2,34 @@
 import API from './api'
 import {connectWebSocket, registerWsHandlers} from './ws'
 import * as wsHandlers from '../store/websocketHandlers'
+import TorConnectionStore from '../store/torConnection'
 
-const invite = new API('https://hub.sphinx.chat/api/v1/','','')
+const invite = new API({
+  baseURLPath: 'https://hub.sphinx.chat/api/v1/',
+})
+
 
 let relay = null
 
-export function instantiateRelay(ip:string, authToken?:string, connectedCallback?:Function, disconnectCallback?:Function, resetIPCallback?: Function){
-  if(!ip) return console.log("cant instantiate Relay, no IP")
 
-  if(relay) relay = null
+type RelayAPIOptions = {
+  ip: string;
+  authToken?: string;
+  connectedCallback?: Function;
+  disconnectCallback?: Function;
+  resetIPCallback?: Function;
+  torConnectionStore?: TorConnectionStore;
+}
+
+export function instantiateRelayAPI({
+  ip,
+  authToken,
+  connectedCallback = () => { },
+  disconnectCallback = () => { },
+  resetIPCallback = () => { },
+  torConnectionStore,
+}: RelayAPIOptions) {
+  if(!ip) return console.log("cant instantiate Relay, no IP")
 
   let protocol = 'http://'
   if(ip.endsWith('nodl.it')) {
@@ -24,12 +43,22 @@ export function instantiateRelay(ip:string, authToken?:string, connectedCallback
     protocol=''
   }
 
-  if(authToken){
-    relay = new API(`${protocol}${ip}/`, 'x-user-token', authToken, resetIPCallback)
+  if (authToken) {
+    relay = new API({
+      baseURLPath: `${protocol}${ip}/`,
+      authTokenKey: 'x-user-token',
+      authToken,
+      resetIPCallback,
+      torConnectionStore,
+    })
   } else {
-    relay = new API(`${protocol}${ip}/`)
+    relay = new API({
+      baseURLPath: `${protocol}${ip}/`,
+      torConnectionStore,
+    })
   }
-  console.log('=> instantiated relay!', `${protocol}${ip}/`, 'authToken?', authToken?true:false)
+
+  console.log('=> instantiated relay!', `${protocol}${ip}/`, 'authToken?', Boolean(authToken))
 
   if(authToken) { // only connect here (to avoid double) if auth token means for real
     connectWebSocket(`${protocol}${ip}`, authToken, connectedCallback, disconnectCallback)
@@ -40,14 +69,20 @@ export function instantiateRelay(ip:string, authToken?:string, connectedCallback
   // or just one?
 }
 
-export function composeAPI(host:string, authToken?:string) {
-  let api = null
-  if(authToken) {
-    api = new API(`https://${host}/`, 'Authorization', `Bearer ${authToken}`)
+export function composeAPI(host:string, authTokenValue?:string) {
+  const baseURLPath = `https://${host}/`
+
+  if (authTokenValue) {
+    return new API({
+      baseURLPath,
+      authTokenKey: 'Authorization',
+      authToken: `Bearer ${authTokenValue}`
+    })
   } else {
-    api = new API(`https://${host}/`)
+    return new API({
+      baseURLPath,
+    })
   }
-  return api
 }
 
 export {

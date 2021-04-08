@@ -36,11 +36,11 @@ export default class UserStore {
   @persist @observable
   publicKey: string = ''
 
+  /**
+   * URL path for connecting to Sphinx Relay
+   */
   @persist @observable
   currentIP: string = ''
-
-  @persist @observable
-  isTorEnabled: boolean = false
 
   @persist @observable
   authToken: string = ''
@@ -60,7 +60,6 @@ export default class UserStore {
     this.myid = 0
     this.publicKey = ''
     this.currentIP = ''
-    this.isTorEnabled = false
     this.authToken = ''
     this.deviceId = ''
     this.onboardStep = 0
@@ -136,11 +135,15 @@ export default class UserStore {
     this.setCurrentIP(ip)
     this.setAuthToken(token)
     console.log("RESTORE NOW!")
-    api.instantiateRelay(ip, token,
-      () => uiStore.setConnected(true),
-      () => uiStore.setConnected(false),
-      () => this.resetIP()
-    )
+
+    api.instantiateRelayAPI({
+      ip,
+      authToken: token,
+      connectedCallback: () => uiStore.setConnected(true),
+      disconnectCallback: () => uiStore.setConnected(false),
+      resetIPCallback: () => this.resetIP(),
+    })
+
     await sleep(650)
     return priv
   }
@@ -184,7 +187,7 @@ export default class UserStore {
         action: r.invite.action || '',
       }
       this.setPublicKey(r.pubkey)
-      api.instantiateRelay(r.ip) // no token
+      api.instantiateRelayAPI({ ip: r.ip }) // no token
       return { ip: r.ip, password: r.password }
     } catch (e) {
       console.log("Error:", e)
@@ -196,7 +199,7 @@ export default class UserStore {
     try {
       this.currentIP = ip
       this.invite = supportContact
-      api.instantiateRelay(ip) // no token
+      api.instantiateRelayAPI({ ip }) // no token
       return ip
     } catch (e) {
       console.log("Error:", e)
@@ -206,7 +209,7 @@ export default class UserStore {
   @action
   async generateToken(pwd: string) {
     if (api.relay === null && this.currentIP) {
-      api.instantiateRelay(this.currentIP)
+      api.instantiateRelayAPI({ ip: this.currentIP })
       await sleep(1)
     }
     try {
@@ -218,11 +221,16 @@ export default class UserStore {
       })
       if (!r) return console.log("=> FAILED TO REACH RELAY")
       if (r.id) this.setMyID(r.id)
+
       this.authToken = token
-      api.instantiateRelay(this.currentIP, token,
-        () => uiStore.setConnected(true),
-        () => uiStore.setConnected(false),
-      )
+
+      api.instantiateRelayAPI({
+        ip: this.currentIP,
+        authToken: token,
+        connectedCallback: () => uiStore.setConnected(true),
+        disconnectCallback: () => uiStore.setConnected(false),
+      })
+
       return token
     } catch (e) {
       console.log(e)

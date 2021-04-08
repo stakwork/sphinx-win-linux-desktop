@@ -1,12 +1,24 @@
 import { NativeModule, NativeModules } from 'react-native'
 const { TorRNModule: TorRNAndroid } = NativeModules
 
-interface TorPortInfo {
+export interface TorPortInfo {
   controlPort: string;
   dnsPort: string;
   httpPort: string;
   socksPort: string;
   transPort: string;
+}
+
+export enum TorNetworkState {
+  DISABLED = "Network: disabled",
+  ENABLED = "Network: enabled",
+}
+
+export enum TorDaemonState {
+  OFF = "Tor: Off",
+  ON = "Tor: On",
+  STARTING = "Tor: Starting",
+  STOPPING = "Tor: Stopping",
 }
 
 interface TorRNAndroidInterface extends NativeModule {
@@ -20,8 +32,8 @@ interface TorRNAndroidInterface extends NativeModule {
   getHttpPortAddress: () => Promise<TorPortInfo["httpPort"]>;
   getSocksPortAddress: () => Promise<TorPortInfo["socksPort"]>;
   getTransPortAddress: () => Promise<TorPortInfo["transPort"]>;
-  getTorState: () => Promise<string>;
-  getTorNetworkState: () => Promise<string>;
+  getTorState: () => Promise<TorDaemonState>;
+  getTorNetworkState: () => Promise<TorNetworkState>;
 }
 
 
@@ -32,7 +44,7 @@ export enum TorModuleEvent {
   SERVICE_EXCEPTION = 'TOR_SERVICE_EXCEPTION_EVENT',
 }
 
-export enum TorModulePortChangeEvent {
+export enum TorModulePortChangeEventKey {
   CONTROL_PORT_INFO = "CONTROL_PORT_INFO",
   DNS_PORT_INFO = "DNS_PORT_INFO",
   HTTP_PORT_INFO = "HTTP_PORT_INFO",
@@ -40,11 +52,14 @@ export enum TorModulePortChangeEvent {
   TRANS_PORT_INFO = "TRANS_PORT_INFO",
 }
 
-export enum TorModuleStateChangeEvent {
+export enum TorModuleStateChangeEventKey {
   TOR_STATE = "TOR_STATE",
   TOR_NETWORK_STATE = "TOR_NETWORK_STATE",
 }
 
+export enum TorModuleServiceLifecycleEventKey {
+  TOR_SERVICE_LIFECYCLE = "TOR_SERVICE_LIFECYCLE",
+}
 
 
 export default TorRNAndroid as TorRNAndroidInterface

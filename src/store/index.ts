@@ -20,9 +20,9 @@ import * as localForage from 'localforage'
 import {getRealmMessages,updateRealmMsg} from '../realm/exports'
 import {hasData} from '../realm/exports'
 import {DEBOUNCE_TIME, persistMsgLocalForage} from './storage'
-import NodeInfoStore from './nodeInfo'
+import TorConnectionStore from './torConnection'
 
-const nodeInfoStore = new NodeInfoStore(userStore)
+const torConnectionStore = new TorConnectionStore(userStore)
 
 const strg = {
   ios: AsyncStorage,
@@ -87,7 +87,6 @@ function initAndroid(){
     hydrate('contacts', contactStore),
     hydrate('chats', chatStore),
     hydrate('meme', memeStore),
-    // hydrate('nodeInfo', nodeInfoStore),
   ]).then(()=> {
     console.log('=> store initialized')
     uiStore.setReady(true)
@@ -134,7 +133,7 @@ const storeContext = React.createContext({
   bots: botStore,
   feed: feedStore,
   queries: queryStore,
-  nodeInfo: nodeInfoStore,
+  torConnection: torConnectionStore,
 })
 
 export const useStores = () => React.useContext(storeContext)
