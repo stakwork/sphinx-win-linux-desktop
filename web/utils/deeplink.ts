@@ -22,15 +22,7 @@ async function runAction(url) {
     case "tokens":
       console.log(j);
       if (j.challenge && j.host) {
-        const ts = await authStore.externalTokens();
-        const protocol = j.host.includes("localhost") ? "http" : "https";
-        fetch(`${protocol}://${j.host}/verify/${j.challenge}`, {
-          method: "POST",
-          body: JSON.stringify(ts),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        uiStore.setTribesAuthParams(j)
       }
   }
 }
