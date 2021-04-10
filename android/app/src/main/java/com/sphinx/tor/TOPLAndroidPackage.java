@@ -20,7 +20,7 @@ public class TOPLAndroidPackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
 
         modules.add(TorRNModule.getInstance(reactContext));
-
+        modules.add(OkHttpRNModule.getInstance(reactContext));
         return modules;
     }
 
