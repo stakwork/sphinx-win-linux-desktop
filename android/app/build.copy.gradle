@@ -200,6 +200,8 @@ dependencies {
     implementation "io.matthewnelson.topl-android:topl-service:2.1.0"
     implementation "io.matthewnelson.topl-android:tor-binary:0.4.5.6"
 
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3"
+
     compile project(':react-native-track-player')
     
     // fixes memory leak related crash
