@@ -1,10 +1,11 @@
 
-import { observable, action, reaction, computed, autorun } from 'mobx'
-import { persist } from 'mobx-persist'
+import { action, reaction, computed, observable } from 'mobx'
 import { NativeEventEmitter } from 'react-native';
 import { EmitterSubscription } from 'react-native-track-player';
 import UserStore from './user'
-import TorRNAndroid, { TorModuleEvent, TorPortInfo } from '../native-module-wrappers/TorRNAndroid'
+import TorRNAndroid, { TorModuleEvent, TorModulePortChangeEventKey, TorPortInfo } from '../native-module-wrappers/TorRNAndroid'
+import KotlinTorHTTP from '../native-module-wrappers/KotlinTorHTTP';
+import { startTorHTTPClientIfNotStarted } from '../api/tor-request-utils';
 
 
 export default class TorConnectionStore {
@@ -12,7 +13,16 @@ export default class TorConnectionStore {
   torModuleEventListeners: EmitterSubscription[];
 
   torModuleEventHandlingMap: Record<TorModuleEvent, Function>;
-  torPortInfo: TorPortInfo
+
+  @observable
+  torPortInfo: TorPortInfo = {
+    controlAddress: '',
+    dnsPort: '',
+    httpAddress: '',
+    socksAddress: '',
+    transPort: '',
+  };
+
 
   constructor(userStore: UserStore) {
     this.userStore = userStore;
@@ -27,47 +37,86 @@ export default class TorConnectionStore {
 
     reaction(
       () => this.userStore.currentIP,
-      () => this.handleTorIPChange()
+      () => this.handleUserIPChange()
     );
 
-    this.handleTorIPChange()
+    reaction(
+      () => this.torPortInfo,
+      () => this.handlePortInfoChange(),
+    );
+
     this.setupListeners()
   }
 
-
   @computed
-  public get isTorEnabled(): boolean {
+  public get userHasOnionServerURL(): boolean {
     return this.userStore.currentIP.includes('.onion')
   }
 
+  @computed
+  public get isTorServiceActive(): boolean {
+    return this.torPortInfo.socksAddress?.length != 0
+  }
 
-  @action async handleTorIPChange() {
-    console.log(`handleTorIPChange`)
+  @action
+  async handleUserIPChange() {
+    console.log(`handleUserIPChange`)
+    console.log(`new IP: ${this.userStore.currentIP}`)
 
-    if (this.isTorEnabled) {
-      // TODO: Be smarter about starting vs restarting here
-      await TorRNAndroid.startTor()
+    if (this.userHasOnionServerURL == false && this.isTorServiceActive) {
+      await TorRNAndroid.stopTor();
+      await KotlinTorHTTP.clearClient()
+
+      return
+    }
+
+    if (this.isTorServiceActive) {
+      await startTorHTTPClientIfNotStarted(this.torPortInfo.socksAddress)
     } else {
-      await TorRNAndroid.stopTor()
+      await TorRNAndroid.startTor()
     }
   }
 
-  @action handleTorPortChangeEvent(event) {
-    console.log(`handleTorPortChangeEvent`)
-    console.log(event);
+  @action
+  async handlePortInfoChange() {
+    console.log('Reacting to torPortInfo Change');
+    if (this.isTorServiceActive) {
+      await KotlinTorHTTP.clearClient()
+      await KotlinTorHTTP.buildClient(this.torPortInfo.socksAddress)
+    }
   }
 
-  @action handleTorStateChangeEvent(event) {
+  @action
+  async handleTorPortChangeEvent(payload: Record<TorModulePortChangeEventKey, string>) {
+    console.log(`handleTorPortChangeEvent`)
+    console.log(payload);
+
+    this.torPortInfo.controlAddress = payload.CONTROL_PORT_INFO || '';
+    this.torPortInfo.dnsPort = payload.DNS_PORT_INFO || '';
+    this.torPortInfo.httpAddress = payload.HTTP_PORT_INFO || '';
+    this.torPortInfo.socksAddress = payload.SOCKS_PORT_INFO || '';
+    this.torPortInfo.transPort = payload.TRANS_PORT_INFO || '';
+
+    // TODO: Call this here instead of in the `reaction` method?
+    // if (this.isTorServiceActive) {
+    //   await KotlinTorHTTP.buildClient(this.torPortInfo.socksAddress)
+    // }
+  }
+
+  @action
+  handleTorStateChangeEvent(event) {
     console.log("handleTorStateChangeEvent");
     console.log(event);
   }
 
-  @action handleTorServiceLifecycleEvent(event) {
+  @action
+  handleTorServiceLifecycleEvent(event) {
     console.log("handleTorServiceLifecycleEvent");
     console.log(event);
   }
 
-  @action handleTorServiceLifecycleException(event) {
+  @action
+  handleTorServiceLifecycleException(event) {
     console.log("handleTorServiceLifecycleException");
     console.log(event);
   }
@@ -80,7 +129,7 @@ export default class TorConnectionStore {
       this.torModuleEventListeners.push(
         eventEmitter.addListener(
           eventName,
-          this.torModuleEventHandlingMap[eventName]
+          this.torModuleEventHandlingMap[eventName].bind(this)
       ));
     })
   }

@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { relay } from '../api'
+import { relayAPIClient } from '../api'
 import { chatStore, Chat } from './chats'
 import { userStore } from './user'
 import { detailsStore } from './details'
@@ -126,7 +126,7 @@ class MsgStore {
     const dateq = moment.utc(0).format('YYYY-MM-DD%20HH:mm:ss')
     let msgs: { [k: number]: Msg[] } = {} = {}
     while (!done) {
-      const r = await relay.get(`msgs?limit=200&offset=${offset}&date=${dateq}`)
+      const r = await relayAPIClient.get(`msgs?limit=200&offset=${offset}&date=${dateq}`)
       if (r && r.new_messages && r.new_messages.length) {
         const decodedMsgs = await decodeMessages(r.new_messages)
         msgs = orgMsgsFromExisting(msgs, decodedMsgs)
@@ -166,7 +166,7 @@ class MsgStore {
       route += `?date=${start}`
     }
     try {
-      const r = await relay.get(route)
+      const r = await relayAPIClient.get(route)
       if (!r) return
       console.log("=> NEW MSGS LENGTH", r.new_messages&&r.new_messages.length)
       if (r.new_messages && r.new_messages.length) {
@@ -264,14 +264,14 @@ class MsgStore {
       // const r = await relay.post('messages', v)
       // this.gotNewMessage(r)
       if (!chat_id) {
-        const r = await relay.post('messages', v)
+        const r = await relayAPIClient.post('messages', v)
         if (!r) return
         this.gotNewMessage(r)
       } else {
         const putInMsgType = boost?constants.message_types.boost:constants.message_types.message
         const amt = boost&&message_price&&message_price<amount ? amount-message_price : amount
         putIn(this.messages, { ...v, id: -1, sender: myid, amount:amt, date: moment().toISOString(), type: putInMsgType, message_content: text }, chat_id)
-        const r = await relay.post('messages', v)
+        const r = await relayAPIClient.post('messages', v)
         if (!r) return
         // console.log("RESULT")
         this.messagePosted(r)
@@ -303,7 +303,7 @@ class MsgStore {
         v.remote_text_map = remote_text_map
       }
       // return
-      const r = await relay.post('attachment', v)
+      const r = await relayAPIClient.post('attachment', v)
       if (!r) return
       this.gotNewMessage(r)
     } catch (e) {
@@ -337,7 +337,7 @@ class MsgStore {
         text: myenc,
         remote_text: encMemo
       }
-      const r = await relay.post('payment', v)
+      const r = await relayAPIClient.post('payment', v)
       if (!r) return
       if (contact_id || chat_id) this.gotNewMessage(r)
       if (r.amount) detailsStore.addToBalance(r.amount * -1)
@@ -354,7 +354,7 @@ class MsgStore {
         destination_key: dest,
         text: memo,
       }
-      const r = await relay.post('payment', v)
+      const r = await relayAPIClient.post('payment', v)
       if (!r) return
       if (r.amount) detailsStore.addToBalance(r.amount * -1)
     } catch (e) {
@@ -371,7 +371,7 @@ class MsgStore {
         amount: amount,
         media_token: media_token
       }
-      const r = await relay.post('purchase', v)
+      const r = await relayAPIClient.post('purchase', v)
       console.log(r)
     } catch (e) {
       console.log(e)
@@ -391,7 +391,7 @@ class MsgStore {
         memo: myenc,
         remote_memo: encMemo,
       }
-      const r = await relay.post('invoices', v) // raw invoice: 
+      const r = await relayAPIClient.post('invoices', v) // raw invoice:
       if (!r) return
       this.gotNewMessage(r)
     } catch (e) {
@@ -403,7 +403,7 @@ class MsgStore {
   async createRawInvoice({ amt, memo }) {
     try {
       const v = { amount: amt, memo }
-      const r = await relay.post('invoices', v)
+      const r = await relayAPIClient.post('invoices', v)
       return r
       // r = {invoice: payment_request}
     } catch (e) {
@@ -422,7 +422,7 @@ class MsgStore {
   async payInvoice({ payment_request, amount }) {
     try {
       const v = { payment_request }
-      const r = await relay.put('invoices', v)
+      const r = await relayAPIClient.put('invoices', v)
       if (!r) return
       this.invoicePaid({ ...r, amount })
     } catch (e) {
@@ -433,7 +433,7 @@ class MsgStore {
   @action
   async deleteMessage(id) {
     if (!id) return console.log("NO ID!")
-    const r = await relay.del(`message/${id}`)
+    const r = await relayAPIClient.del(`message/${id}`)
     if (!r) return
     if (r.chat_id) {
       putIn(this.messages, r, r.chat_id)
@@ -445,7 +445,7 @@ class MsgStore {
   seeChat(id) {
     if (!id) return
     this.lastSeen[id] = new Date().getTime()
-    relay.post(`messages/${id}/read`)
+    relayAPIClient.post(`messages/${id}/read`)
     this.persister()
   }
 
@@ -477,7 +477,7 @@ class MsgStore {
 
   @action
   async approveOrRejectMember(contactID, status, msgId) {
-    const r = await relay.put(`member/${contactID}/${status}/${msgId}`)
+    const r = await relayAPIClient.put(`member/${contactID}/${status}/${msgId}`)
     if (r && r.chat && r.chat.id) {
       const msgs = this.messages[r.chat.id]
       const msg = msgs.find(m => m.id === msgId)

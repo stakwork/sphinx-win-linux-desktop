@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { relay, composeAPI } from '../api'
+import { relayAPIClient } from '../api'
 import { persist } from 'mobx-persist'
 import { userStore } from './user'
 import { Linking } from 'react-native'
@@ -28,7 +28,7 @@ class AuthStore {
 
     const authServer = this.getDefaultServer()
 
-    const r = await relay.get(`signer/${challenge}`)
+    const r = await relayAPIClient.get(`signer/${challenge}`)
     if (!(r && r.sig)) return
 
     var q = new URLSearchParams({
@@ -49,14 +49,14 @@ class AuthStore {
 
   @action
   async sign(challenge: string): Promise<string> {
-    const r = await relay.get(`signer/${challenge}`)
+    const r = await relayAPIClient.get(`signer/${challenge}`)
     if (!(r && r.sig)) return ''
     return r.sig
   }
 
   @action
   async externalTokens(): Promise<Object> {
-    const r = await relay.get(`external_tokens`)
+    const r = await relayAPIClient.get(`external_tokens`)
     return r
   }
 

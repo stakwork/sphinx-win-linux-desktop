@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { relay, invite } from '../api'
+import { relayAPIClient, invite } from '../api'
 import { chatStore } from './chats'
 import { subStore } from './subs'
 import { persist } from 'mobx-persist'
@@ -55,7 +55,7 @@ class ContactStore {
   @action
   async getContacts() {
     try {
-      const r = await relay.get('contacts')
+      const r = await relayAPIClient.get('contacts')
       if (!r) return
       if (r.contacts) {
         this.contacts = r.contacts
@@ -81,7 +81,7 @@ class ContactStore {
   async deleteContact(id) {
     if(!id) return
     try {
-      await relay.del(`contacts/${id}`)
+      await relayAPIClient.del(`contacts/${id}`)
       this.contacts = this.contacts.filter(c => c.id !== id)
     } catch (e) {
       console.log(e)
@@ -92,7 +92,7 @@ class ContactStore {
   async addContact(v) {
     try {
       if (!v.public_key) return console.log('no pub key')
-      const r = await relay.post('contacts', { ...v, status: 1 })
+      const r = await relayAPIClient.post('contacts', { ...v, status: 1 })
       if (!r) return
       const existingContact = this.contacts.find(c => c.id === r.id)
       if (existingContact) {
@@ -113,7 +113,7 @@ class ContactStore {
     console.log('updateContact', id, v)
     if(!id) return
     try {
-      const r = await relay.put(`contacts/${id}`, v)
+      const r = await relayAPIClient.put(`contacts/${id}`, v)
       if (!r) return
       const cs = [...this.contacts]
       console.log('updated contact:', r)
@@ -153,7 +153,7 @@ class ContactStore {
   async uploadProfilePic(file, params: { [k: string]: any }) {
     try {
       const data = createFormData(file, params)
-      const r = await relay.upload(`upload`, data)
+      const r = await relayAPIClient.upload(`upload`, data)
       if (!r) return
       console.log(r)
     } catch (e) {
@@ -165,7 +165,7 @@ class ContactStore {
   async exchangeKeys(id) {
     if(!id) return
     try {
-      await relay.post(`contacts/${id}/keys`, {})
+      await relayAPIClient.post(`contacts/${id}/keys`, {})
     } catch (e) {
       console.log(e)
     }
@@ -174,7 +174,7 @@ class ContactStore {
   @action
   async createInvite(nickname, welcome_message) {
     try {
-      await relay.post('invites', {
+      await relayAPIClient.post('invites', {
         nickname,
         welcome_message: welcome_message || 'Welcome to Sphinx!'
       })
@@ -198,7 +198,7 @@ class ContactStore {
   @action
   async payInvite(invite_string) {
     try {
-      const inv = await relay.post(`invites/${invite_string}/pay`, {})
+      const inv = await relayAPIClient.post(`invites/${invite_string}/pay`, {})
       if (!inv) return
       this.updateInvite(inv.invite)
     } catch (e) {
@@ -221,7 +221,7 @@ class ContactStore {
       return console.log('createSubscription: missing param')
     }
     try {
-      const s = await relay.post('subscriptions', v)
+      const s = await relayAPIClient.post('subscriptions', v)
       console.log(s)
       return s
     } catch (e) {
@@ -231,7 +231,7 @@ class ContactStore {
 
   @action async deleteSubscription(id) {
     try {
-      const s = await relay.del(`subscription/${id}`)
+      const s = await relayAPIClient.del(`subscription/${id}`)
       console.log(s)
     } catch (e) {
       console.log(e)
@@ -240,7 +240,7 @@ class ContactStore {
 
   @action async getSubscriptionForContact(contactID) {
     try {
-      const s = await relay.get(`subscriptions/contact/${contactID}`)
+      const s = await relayAPIClient.get(`subscriptions/contact/${contactID}`)
       return s
     } catch (e) {
       console.log(e)
@@ -252,7 +252,7 @@ class ContactStore {
       return console.log('editSubscription: missing param')
     }
     try {
-      const s = await relay.put(`subscription/${id}`, v)
+      const s = await relayAPIClient.put(`subscription/${id}`, v)
       return s
     } catch (e) {
       console.log(e)
@@ -261,7 +261,7 @@ class ContactStore {
 
   @action async toggleSubscription(sid, paused) {
     try {
-      const s = await relay.put(`subscription/${sid}/${paused ? 'restart' : 'pause'}`)
+      const s = await relayAPIClient.put(`subscription/${sid}/${paused ? 'restart' : 'pause'}`)
       if (s) return true
     } catch (e) {
       console.log(e)

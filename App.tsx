@@ -64,8 +64,14 @@ function App() {
   const theme = useTheme()
   const isDarkMode = useDarkMode()
 
-  const [loading, setLoading] = useState(true) // default
-  const [signedUp, setSignedUp] = useState(false) // <=
+  const [loading, setLoading] = useState(true)
+
+  const [isUserSignedUp, setIsUserSignedUp] = useState(
+    user.currentIP &&
+    user.authToken &&
+    !user.onboardStep
+  )
+
   const [pinned, setPinned] = useState(false)
 
   function connectedHandler() {
@@ -89,13 +95,7 @@ function App() {
   }
 
   async function setupRelay() {
-    console.log("=> USER", user)
-
-    const isSignedUp = (user.currentIP && user.authToken && !user.onboardStep) ? true : false
-
-    setSignedUp(isSignedUp)
-
-    if (isSignedUp) {
+    if (isUserSignedUp) {
       instantiateRelayAPI({
         ip: user.currentIP,
         authToken: user.authToken,
@@ -131,7 +131,9 @@ function App() {
 
     (async () => {
       await setupRelay()
-      user.currentIP = 'http://foo.onion'
+      // user.currentIP = 'https://foo.onion'
+      // user.currentIP = 'https://proxy.sphinx.chat'
+      // user.currentIP = "";
       setLoading(false)
     })()
   }, [])
@@ -139,7 +141,7 @@ function App() {
 
   return useObserver(()=>{
     if(loading) return <Loading />
-    if(signedUp && !pinned) { // checking if the pin was entered recently
+    if(isUserSignedUp && !pinned) { // checking if the pin was entered recently
       return <PINCode
         onFinish={async() => {
           await sleep(240)
@@ -167,10 +169,10 @@ function App() {
       <NavigationContainer>
         <PaperProvider theme={paperTheme}>
           {/* <StatusBar /> */}
-          {signedUp && <Main />}
-          {!signedUp && <Onboard onFinish={()=>{
+          {isUserSignedUp && <Main />}
+          {!isUserSignedUp && <Onboard onFinish={()=>{
             user.finishOnboard() // clear out things
-            setSignedUp(true) // signed up w key export
+            setIsUserSignedUp(true) // signed up w key export
             setPinned(true)   // also PIN has been set
           }} />}
         </PaperProvider>

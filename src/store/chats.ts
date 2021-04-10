@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx'
 import { persist } from 'mobx-persist'
 import { Invite, contactStore } from './contacts'
-import { relay } from '../api'
+import { relayAPIClient } from '../api'
 import { constants } from '../constants'
 import { detailsStore } from './details'
 
@@ -89,7 +89,7 @@ export class ChatStore {
 
   @action
   async muteChat(chatID: number, muted: boolean) {
-    relay.post(`chats/${chatID}/${muted ? 'mute' : 'unmute'}`)
+    relayAPIClient.post(`chats/${chatID}/${muted ? 'mute' : 'unmute'}`)
     const chats = this.chats.map(c => {
       if (c.id === chatID) {
         return { ...c, is_muted: muted }
@@ -112,7 +112,7 @@ export class ChatStore {
 
   @action
   async getChats() {
-    const chats = await relay.get('chats')
+    const chats = await relayAPIClient.get('chats')
     if(!(chats && chats.length)) return
     this.chats = this.chats.map(c=> this.parseChat(c))
   }
@@ -130,7 +130,7 @@ export class ChatStore {
 
   @action
   async createGroup(contact_ids: number[], name: string) {
-    const r = await relay.post('group', {
+    const r = await relayAPIClient.post('group', {
       name, contact_ids
     })
     if (!r) return
@@ -142,7 +142,7 @@ export class ChatStore {
   async createTribe({ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url }) {
     console.log('======>',{ name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url })
     await sleep(1);
-    const r = await relay.post('group', {
+    const r = await relayAPIClient.post('group', {
       name, description, tags: tags || [],
       is_tribe: true, is_listed: true,
       price_per_message: price_per_message || 0,
@@ -162,7 +162,7 @@ export class ChatStore {
 
   @action
   async editTribe({ id, name, description, tags, img, price_per_message, price_to_join, escrow_amount, escrow_time, unlisted, is_private, app_url, feed_url }) {
-    const r = await relay.put(`group/${id}`, {
+    const r = await relayAPIClient.put(`group/${id}`, {
       name, description, tags: tags || [],
       is_listed: true,
       price_per_message: price_per_message || 0,
@@ -181,12 +181,12 @@ export class ChatStore {
   }
 
   @action
-  async joinTribe({ 
+  async joinTribe({
     name, uuid, group_key, host, amount, img, owner_alias, owner_pubkey, is_private, my_alias, my_photo_url, owner_route_hint,
   } : {
     name:string, uuid:string, group_key:string, host:string, amount:number, img:string, owner_alias:string, owner_pubkey:string, is_private:boolean, my_alias?:string, my_photo_url?:string, owner_route_hint:string
   }) {
-    const r = await relay.post('tribe', {
+    const r = await relayAPIClient.post('tribe', {
       name, uuid, group_key, amount, host, img, owner_alias, owner_pubkey, private: is_private, my_alias:my_alias||'', my_photo_url:my_photo_url||'', owner_route_hint:owner_route_hint||''
     })
     if (!r) return
@@ -217,21 +217,21 @@ export class ChatStore {
 
   @action
   async addGroupMembers(chatID: number, contact_ids: number[]) {
-    await relay.put(`chat/${chatID}`, {
+    await relayAPIClient.put(`chat/${chatID}`, {
       contact_ids
     })
   }
 
   @action
   async exitGroup(chatID: number) {
-    await relay.del(`chat/${chatID}`)
+    await relayAPIClient.del(`chat/${chatID}`)
     const chats = [...this.chats]
     this.chats = chats.filter(c => c.id !== chatID)
   }
 
   @action
   async kick(chatID, contactID) {
-    const r = await relay.put(`kick/${chatID}/${contactID}`)
+    const r = await relayAPIClient.put(`kick/${chatID}/${contactID}`)
     if (r === true) { // success
       const chat = this.chats.find(c => c.id === chatID)
       if (chat) chat.contact_ids = chat.contact_ids.filter(cid => cid !== contactID)
@@ -240,7 +240,7 @@ export class ChatStore {
 
   @action
   async updateMyInfoInChat(tribeID: number, my_alias: string, my_photo_url: string) {
-    const r = await relay.put(`chats/${tribeID}`, { my_alias, my_photo_url })
+    const r = await relayAPIClient.put(`chats/${tribeID}`, { my_alias, my_photo_url })
     if (r) {
       const cs = [...this.chats]
       this.chats = cs.map(c => {
@@ -254,7 +254,7 @@ export class ChatStore {
 
   @action
   async updateTribeAsNonAdmin(tribeID: number, name: string, img: string) {
-    const r = await relay.put(`group/${tribeID}`, { name, img })
+    const r = await relayAPIClient.put(`group/${tribeID}`, { name, img })
     if (r) {
       const cs = [...this.chats]
       this.chats = cs.map(c => {
@@ -325,7 +325,7 @@ export class ChatStore {
       }
     }
     if (!pubkey) return
-    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
+    const r = await relayAPIClient.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
     if (r) return r
   }
 
@@ -339,7 +339,7 @@ export class ChatStore {
       routeHint = contact.route_hint
     }
     if (!pubkey) return
-    const r = await relay.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
+    const r = await relayAPIClient.get(`route?pubkey=${pubkey}&route_hint=${routeHint||''}`)
     if (r) return r
   }
 

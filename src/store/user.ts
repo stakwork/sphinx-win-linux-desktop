@@ -152,7 +152,7 @@ export default class UserStore {
   async registerMyDeviceId(device_id, myid) {
     if (!myid) return
     try {
-      const r = await api.relay.put(`contacts/${myid}`, { device_id })
+      const r = await api.relayAPIClient.put(`contacts/${myid}`, { device_id })
       if (!r) return
       if (r.device_id) {
         this.deviceId = r.device_id
@@ -208,7 +208,7 @@ export default class UserStore {
 
   @action
   async generateToken(pwd: string) {
-    if (api.relay === null && this.currentIP) {
+    if (api.relayAPIClient === null && this.currentIP) {
       api.instantiateRelayAPI({ ip: this.currentIP })
       await sleep(1)
     }
@@ -216,7 +216,7 @@ export default class UserStore {
       const pubkey = this.publicKey
       const token = await randString(20)
       console.log("OK GEN TOKEN!", this.currentIP, pwd)
-      const r = await api.relay.post(`contacts/tokens?pwd=${pwd}`, {
+      const r = await api.relayAPIClient.post(`contacts/tokens?pwd=${pwd}`, {
         token, pubkey,
       })
       if (!r) return console.log("=> FAILED TO REACH RELAY")
@@ -240,7 +240,7 @@ export default class UserStore {
   @action
   async finishInvite() {
     try {
-      await api.relay.post('invites/finish', {
+      await api.relayAPIClient.post('invites/finish', {
         invite_string: this.code
       })
     } catch (e) {

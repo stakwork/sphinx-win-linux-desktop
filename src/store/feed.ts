@@ -1,6 +1,6 @@
 import { action } from 'mobx'
 import { chatStore } from './chats'
-import { relay } from '../api'
+import { relayAPIClient } from '../api'
 import {detailsStore} from './details'
 
 export const NUM_SECONDS = 60
@@ -29,7 +29,7 @@ export interface StreamPayment {
 export class FeedStore {
 
   @action async sendPayments(destinations: Destination[], text: string, amount: number, chat_id: number, update_meta: boolean) {
-    await relay.post('stream', {
+    await relayAPIClient.post('stream', {
       destinations,
       text,
       amount,

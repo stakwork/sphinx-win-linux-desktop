@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { relay, composeAPI } from '../api'
+import { relayAPIClient, composeAPI } from '../api'
 import { persist } from 'mobx-persist'
 import { userStore } from './user'
 import moment from 'moment'
@@ -48,7 +48,7 @@ class MemeStore {
     const r = await meme.get('ask')
     if (!(r && r.challenge)) return
 
-    const r2 = await relay.get(`signer/${r.challenge}`)
+    const r2 = await relayAPIClient.get(`signer/${r.challenge}`)
     if (!(r2 && r2.sig)) return
 
     const r3 = await meme.post('verify', {

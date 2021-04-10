@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { relay } from '../api'
+import { relayAPIClient } from '../api'
 
 interface Sub {
   id: number
@@ -26,7 +26,7 @@ class SubStore {
   @action
   async getSubs() {
     try {
-      const r = await relay.get('subscriptions')
+      const r = await relayAPIClient.get('subscriptions')
       if (!r) return
       this.subs = r
     } catch (e) {

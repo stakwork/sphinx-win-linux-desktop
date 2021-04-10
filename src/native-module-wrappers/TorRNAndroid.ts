@@ -2,10 +2,10 @@ import { NativeModule, NativeModules } from 'react-native'
 const { TorRNModule: TorRNAndroid } = NativeModules
 
 export interface TorPortInfo {
-  controlPort: string;
+  controlAddress: string;
   dnsPort: string;
-  httpPort: string;
-  socksPort: string;
+  httpAddress: string;
+  socksAddress: string;
   transPort: string;
 }
 
@@ -24,13 +24,24 @@ export enum TorDaemonState {
 interface TorRNAndroidInterface extends NativeModule {
   newTorIdentity: () => string;
   restartTor: () => void;
+
+  /**
+   * Starts the Android Tor service, then starts up Tor.
+   *
+   * You can call this as much as you want. If
+   * the Tor process is already running, it will do nothing.
+   */
   startTor: () => void;
+
+  /**
+   * Stops the Android Tor service.
+   */
   stopTor: () => void;
 
-  getControlPortAddress: () => Promise<TorPortInfo["controlPort"]>;
+  getControlPortAddress: () => Promise<TorPortInfo["controlAddress"]>;
   getDnsPortAddress: () => Promise<TorPortInfo["dnsPort"]>;
-  getHttpPortAddress: () => Promise<TorPortInfo["httpPort"]>;
-  getSocksPortAddress: () => Promise<TorPortInfo["socksPort"]>;
+  getHttpPortAddress: () => Promise<TorPortInfo["httpAddress"]>;
+  getSocksPortAddress: () => Promise<TorPortInfo["socksAddress"]>;
   getTransPortAddress: () => Promise<TorPortInfo["transPort"]>;
   getTorState: () => Promise<TorDaemonState>;
   getTorNetworkState: () => Promise<TorNetworkState>;

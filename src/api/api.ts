@@ -1,5 +1,5 @@
+import { errorMonitor } from "events"
 import TorConnectionStore from "../store/torConnection"
-import { userStore } from "../store/user"
 import { performTorRequest, RequestMethod as RNTORRequestMethod } from "./tor-request-utils"
 
 type ConstructorProps = {
@@ -7,7 +7,18 @@ type ConstructorProps = {
   authTokenKey?: string;
   authToken?: string;
   resetIPCallback?: Function;
-  torConnectionStore?: TorConnectionStore;
+  torConnectionStore?: TorConnectionStore | null;
+}
+
+type FetchWithTimeoutOptions = {
+  headers: Headers,
+  mode: RequestMode;
+  method: string;
+}
+
+type TorRequestOptions = {
+  headers: string[][];
+  method: string;
 }
 
 export default class API {
@@ -16,7 +27,7 @@ export default class API {
     authTokenKey = '',
     authToken = '',
     resetIPCallback = () => {},
-    torConnectionStore,
+    torConnectionStore = null,
   }: ConstructorProps) {
     this.torConnectionStore = torConnectionStore
 
@@ -31,7 +42,7 @@ export default class API {
     this.upload = addMethod('UPLOAD', baseURLPath)
   }
 
-  torConnectionStore: TorConnectionStore
+  torConnectionStore?: TorConnectionStore
   tokenKey: string
   tokenValue: string
   get: Function
@@ -41,78 +52,39 @@ export default class API {
   upload: Function
   resetIPCallback: Function
 
-  fetchWithTimeout = (url, timeoutMS, options = {}) => {
+
+  fetchWithTimeout = async (
+    url,
+    timeoutMS,
+    options: FetchWithTimeoutOptions
+  ) => {
     const controller = new AbortController();
 
-    let promise;
+    const promise = fetch(url, { signal: controller.signal, ...options });
+    const timeout = setTimeout(() => controller.abort(), timeoutMS);
 
-    if (this.torConnectionStore.isTorEnabled) {
-      promise = performTorRequest({
+    return promise.finally(() => clearTimeout(timeout));
+  };
+
+
+  performRequestUsingTor = async (
+    url,
+    options: TorRequestOptions,
+  ) => {
+    try {
+      return await performTorRequest({
         url,
+        socksAddress: this.torConnectionStore.torPortInfo.socksAddress,
         method: options.method as RNTORRequestMethod,
         headers: options.headers,
       })
-    } else {
-      promise = fetch(url, { signal: controller.signal, ...options });
+    } catch (error) {
+      throw error
     }
+  }
 
-    const timeout = setTimeout(() => controller.abort(), timeoutMS);
-    return promise.finally(() => clearTimeout(timeout));
-  };
-}
-
-const TIMEOUT = 20000
-
-
-function addMethod(
-  methodName: string,
-  baseURLPath: string,
-): Function {
-  return async function (url: string, data: any, encoding?: string) {
-    data = data || {}
-
+  handleResultFromFetchRequest = async (result: Response, url: string, methodName: string) => {
     try {
-      const skip = isPublic(baseURLPath + url)
-
-      if (this.tokenKey && !this.tokenValue && !skip) {
-        // throw new Error("no token")
-        return
-      }
-
-      const headers: { [key: string]: string } = {}
-
-      if (this.tokenKey && this.tokenValue) {
-        headers[this.tokenKey] = this.tokenValue
-      }
-
-      const opts: { [key: string]: any } = { mode: 'cors' }
-
-      if (methodName === 'POST' || methodName === 'PUT') {
-        if (encoding) {
-          headers['Content-Type'] = encoding
-          if (encoding === 'application/x-www-form-urlencoded') {
-            opts.body = makeSearchParams(data)
-          } else {
-            opts.body = data
-          }
-        } else {
-          headers['Content-Type'] = 'application/json'
-          opts.body = JSON.stringify(data)
-        }
-      }
-      if (methodName === 'UPLOAD') {
-        headers['Content-Type'] = 'multipart/form-data'
-        opts.body = data
-        console.log("UPLOAD DATA:", data)
-      }
-      opts.headers = new Headers(headers)
-
-      opts.method = methodName === 'UPLOAD' ? 'POST' : methodName
-
-      if (methodName === 'BLOB') opts.method = 'GET'
-
-      const result = await this.fetchWithTimeout(baseURLPath + url, TIMEOUT, opts)
-
       if (!result.ok) {
         console.log('Not OK!', result.status, url)
         return
@@ -123,6 +95,7 @@ function addMethod(
         resultPayload = await result.blob()
       } else {
         resultPayload = await result.json()
+        debugger;
         if (resultPayload.token) {
           // localStorage.setItem(tokenName, res.token)
         }
@@ -143,6 +116,82 @@ function addMethod(
       const isWebAbort = e.code === 20
       const isRNAbort = e.message === 'Aborted'
       if (isWebAbort || isRNAbort) reportTimeout(this.resetIPCallback)
+    }
+  }
+
+
+  // TODO: How can we unify this with the deserialization that the fetchResult handler
+  // is doing?
+  handleResultFromTorRequest = async (resultPayload: Record<string, unknown>) => {
+    if (resultPayload.status && resultPayload.status === 'ok') { // invite server
+      return resultPayload.object
+    }
+    if (resultPayload.success && resultPayload.response) { // relay
+      return resultPayload.response
+    }
+
+    return resultPayload
+  }
+}
+
+const TIMEOUT = 20000
+
+
+function addMethod(
+  methodName: string,
+  baseURLPath: string,
+): Function {
+  return async function (url: string, data: any, encoding?: string) {
+    data = data || {}
+
+    const skip = isPublic(baseURLPath + url)
+
+    if (this.tokenKey && !this.tokenValue && !skip) {
+      // throw new Error("no token")
+      return
+    }
+
+    const headers: { [key: string]: string } = {}
+
+    if (this.tokenKey && this.tokenValue) {
+      headers[this.tokenKey] = this.tokenValue
+    }
+
+    const opts: { [key: string]: any } = { mode: 'cors' }
+
+    if (methodName === 'POST' || methodName === 'PUT') {
+      if (encoding) {
+        headers['Content-Type'] = encoding
+        if (encoding === 'application/x-www-form-urlencoded') {
+          opts.body = makeSearchParams(data)
+        } else {
+          opts.body = data
+        }
+      } else {
+        headers['Content-Type'] = 'application/json'
+        opts.body = JSON.stringify(data)
+      }
+    }
+    if (methodName === 'UPLOAD') {
+      headers['Content-Type'] = 'multipart/form-data'
+      opts.body = data
+      console.log("UPLOAD DATA:", data)
+    }
+
+    opts.headers = headers
+    opts.method = methodName === 'UPLOAD' ? 'POST' : methodName
+
+    if (methodName === 'BLOB') opts.method = 'GET'
+
+    if (this.torConnectionStore?.isTorServiceActive) {
+      const result = await this.performRequestUsingTor(baseURLPath + url, opts)
+
+      return await this.handleResultFromTorRequest(result)
+    } else {
+      opts.headers = new Headers(opts.headers)
+      const result = await this.fetchWithTimeout(baseURLPath + url, TIMEOUT, opts)
+
+      return await this.handleResultFromFetchRequest(result, url, methodName)
     }
   }
 }

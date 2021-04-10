@@ -1,5 +1,6 @@
 package com.sphinx.tor
 
+import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.matthewnelson.topl_service_base.BaseServiceConsts.ServiceLifecycleEvent
@@ -181,9 +182,13 @@ class TorRNModule private constructor(
             e.printStackTrace()
         }
 
-        override fun broadcastLogMessage(logMessage: String?) {}
+        override fun broadcastLogMessage(logMessage: String?) {
+          logMessage?.let { Log.d("TorRNModule", it) }
+        }
 
-        override fun broadcastNotice(msg: String) {}
+        override fun broadcastNotice(msg: String) {
+          broadcastLogMessage(msg)
+        }
 
         override fun broadcastPortInformation(torPortInfo: TorPortInfo) {
             portInfo = torPortInfo

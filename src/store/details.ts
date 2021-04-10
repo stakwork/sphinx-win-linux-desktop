@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import { relay } from '../api'
+import { relayAPIClient } from '../api'
 import { persist } from 'mobx-persist'
 
 class DetailsStore {
@@ -9,7 +9,7 @@ class DetailsStore {
   @action
   async getBalance() {
     try {
-      const r = await relay.get('balance')
+      const r = await relayAPIClient.get('balance')
       // console.log("===========>",r)
       if (!r) return
       const b = r.balance && parseInt(r.balance)
@@ -22,7 +22,7 @@ class DetailsStore {
   @action
   async getRelayVersion() {
     try {
-      const r = await relay.get('relay_version')
+      const r = await relayAPIClient.get('relay_version')
       if (!r) return
       if (!r.version) return
       return r.version
@@ -39,7 +39,7 @@ class DetailsStore {
   @action
   async getPayments() {
     try {
-      const r = await relay.get('payments')
+      const r = await relayAPIClient.get('payments')
       return r
     } catch (e) {
       console.log(e)
@@ -50,7 +50,7 @@ class DetailsStore {
   @action
   async getLogs() {
     try {
-      const r = await relay.get('logs')
+      const r = await relayAPIClient.get('logs')
       if (r) this.logs = r
     } catch (e) {
       console.log(e)
@@ -64,7 +64,7 @@ class DetailsStore {
   @action
   async getVersions() {
     try {
-      const r = await relay.get('app_versions')
+      const r = await relayAPIClient.get('app_versions')
       if (r) return r
     } catch (e) {
       console.log(e)

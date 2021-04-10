@@ -1,11 +1,11 @@
 import { action } from 'mobx'
-import { relay } from '../api'
+import { relayAPIClient } from '../api'
 import * as api from '../api'
 
 export class QueryStore {
 
   @action async onchainAddress(app:string) {
-    const r = await relay.get(`query/onchain_address/${app}`)
+    const r = await relayAPIClient.get(`query/onchain_address/${app}`)
     return r
   }
 

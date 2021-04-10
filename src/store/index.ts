@@ -94,6 +94,7 @@ function initAndroid(){
     hydrateMessageStoreFromRealm()
   })
   hydrate('theme', themeStore)
+  // hydrate('torConnection', torConnectionStore)
 }
 
 function initWeb(){

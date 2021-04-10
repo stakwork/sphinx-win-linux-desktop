@@ -1,4 +1,3 @@
-
 import API from './api'
 import {connectWebSocket, registerWsHandlers} from './ws'
 import * as wsHandlers from '../store/websocketHandlers'
@@ -9,7 +8,7 @@ const invite = new API({
 })
 
 
-let relay = null
+let relayAPIClient = null
 
 
 type RelayAPIOptions = {
@@ -29,6 +28,8 @@ export function instantiateRelayAPI({
   resetIPCallback = () => { },
   torConnectionStore,
 }: RelayAPIOptions) {
+  console.log("instantiateRelayAPI");
+
   if(!ip) return console.log("cant instantiate Relay, no IP")
 
   let protocol = 'http://'
@@ -44,7 +45,7 @@ export function instantiateRelayAPI({
   }
 
   if (authToken) {
-    relay = new API({
+    relayAPIClient = new API({
       baseURLPath: `${protocol}${ip}/`,
       authTokenKey: 'x-user-token',
       authToken,
@@ -52,7 +53,7 @@ export function instantiateRelayAPI({
       torConnectionStore,
     })
   } else {
-    relay = new API({
+    relayAPIClient = new API({
       baseURLPath: `${protocol}${ip}/`,
       torConnectionStore,
     })
@@ -87,5 +88,5 @@ export function composeAPI(host:string, authTokenValue?:string) {
 
 export {
   invite,
-  relay,
+  relayAPIClient,
 }
