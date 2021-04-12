@@ -1,5 +1,5 @@
 import { NativeModule, NativeModules } from 'react-native'
-const { TorRNModule: TorRNAndroid } = NativeModules
+const { TorRNModule: KotlinTorService } = NativeModules
 
 export interface TorPortInfo {
   controlAddress: string;
@@ -21,7 +21,7 @@ export enum TorDaemonState {
   STOPPING = "Tor: Stopping",
 }
 
-interface TorRNAndroidInterface extends NativeModule {
+interface KotlinTorServiceInterface extends NativeModule {
   newTorIdentity: () => string;
   restartTor: () => void;
 
@@ -73,4 +73,4 @@ export enum TorModuleServiceLifecycleEventKey {
 }
 
 
-export default TorRNAndroid as TorRNAndroidInterface
+export default KotlinTorService as KotlinTorServiceInterface

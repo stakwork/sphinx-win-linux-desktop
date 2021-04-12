@@ -13,7 +13,7 @@ import {isLN, parseLightningInvoice} from '../utils/ln'
 export default function Code(props) {
   const {onDone,z,onRestore} = props
   const {user,contacts} = useStores()
-  
+
   const [scanning, setScanning] = useState(false)
   const [code, setCode] = useState('')
   const [checking, setChecking] = useState(false)
@@ -24,20 +24,24 @@ export default function Code(props) {
     setCode(data)
     setScanning(false)
     setTimeout(()=>{
-      checkInvite(data)
-    }, 333)   
+      checkCodeInput(data)
+    }, 333)
   }
 
-  // from relay QR code
-  async function signupWithIP(s){
-    const a = s.split('::')
-    if(a.length===1) return
+  async function signUpWithIPFromRelayQR(codeString: string){
+    const a = codeString.split('::')
+    if (a.length===1) return
+
     setChecking(true)
+
     const ip = a[1]
-    const pwd = a.length>2?a[2]:''
+    const pwd = a.length > 2 ? a[2] : ''
     await user.signupWithIP(ip)
+
     await sleep(200)
+
     const token = await user.generateToken(pwd)
+
     if(token) {
       onDone()
     } else {
@@ -63,28 +67,27 @@ export default function Code(props) {
     setTimeout(()=> setWrong(''), 10000)
     return correct
   }
-  
-  // sign up from invitation code (or restore)
-  async function checkInvite(theCode){
-    if(!theCode || checking) return
 
-    const correct = detectCorrectString(theCode)
+  async function checkCodeInput(invitationCode: string){
+    if(!invitationCode || checking) return
+
+    const correct = detectCorrectString(invitationCode)
     if(!correct) return
 
     setChecking(true)
     try {
-      const codeString = atob(theCode)
+      const codeString = atob(invitationCode)
       if(codeString.startsWith('keys::')) {
         setShowPin(true)
         return
       }
       if(codeString.startsWith('ip::')){
-        signupWithIP(codeString)
+        signUpWithIPFromRelayQR(codeString)
         return
       }
     } catch(e) {}
 
-    const isCorrect = theCode.length===40 && theCode.match(/[0-9a-fA-F]+/g)
+    const isCorrect = invitationCode.length===40 && invitationCode.match(/[0-9a-fA-F]+/g)
     if(!isCorrect) {
       setWrong( "We don't recognize this code, to sign up you'll need an invite code from:")
       setTimeout(()=> setWrong(''), 10000)
@@ -95,7 +98,7 @@ export default function Code(props) {
     let theIP = user.currentIP
     let thePassword = ''
     if(!theIP) {
-      const codeR = await user.signupWithCode(theCode)
+      const codeR = await user.signupWithCode(invitationCode)
       if(!codeR) {
         setChecking(false)
         return
@@ -137,7 +140,7 @@ export default function Code(props) {
   }
 
   if(showPin) {
-    return <PINCode 
+    return <PINCode
       forceEnterMode
       onFinish={async(pin) => {
         await sleep(240)
@@ -151,7 +154,7 @@ export default function Code(props) {
       stops={[0.1,1]}
       center={[80,40]}
       radius={400}>
-      <Image source={require('../../../android_assets/sphinx-white-logo.png')} 
+      <Image source={require('../../../android_assets/sphinx-white-logo.png')}
         style={{width:120,height:120}} resizeMode={'cover'}
       />
       <Title style={styles.welcome}>Welcome</Title>
@@ -164,7 +167,7 @@ export default function Code(props) {
           placeholder="Enter Code ..."
           style={styles.input}
           onChangeText={text => setCode(text)}
-          onBlur={()=> checkInvite(code)}
+          onBlur={()=> checkCodeInput(code)}
           onFocus={()=> {
             if(wrong) setWrong('')
           }}

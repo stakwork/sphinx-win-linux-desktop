@@ -18,16 +18,16 @@ export default function BottomTabs() {
       borderColor:theme.bg
     }}>
       <IconButton icon="arrow-bottom-left" size={32} color={theme.title}
-        onPress={()=> ui.setPayMode('invoice', null)}  // chat here   
+        onPress={()=> ui.setPayMode('invoice', null)}  // chat here
       />
       <IconButton icon="format-list-bulleted" size={29} color={theme.title}
-        onPress={()=> ui.setPaymentHistory(true)} 
+        onPress={()=> ui.setPaymentHistory(true)}
       />
       <IconButton icon="qrcode-scan" size={25} color={theme.title}
         onPress={()=> setScanning(true)} // after scan, set {amount,payment_request}
       />
       <IconButton icon="arrow-top-right" size={32} color={theme.title}
-        onPress={()=> ui.setPayMode('payment', null)}  // chat here   
+        onPress={()=> ui.setPayMode('payment', null)}  // chat here
       />
 
       <Portal>
@@ -36,8 +36,9 @@ export default function BottomTabs() {
             showPaster
             onCancel={()=>setScanning(false)}
             onScan={async data=>{
-              console.log(data)
-              if(isLN(data)) {
+              console.log(`Scanned QR Data: ${data}`)
+
+              if (isLN(data)) {
                 const theData = removeLightningPrefix(data)
                 const inv = parseLightningInvoice(data)
                 if(!(inv&&inv.human_readable_part&&inv.human_readable_part.amount)) return

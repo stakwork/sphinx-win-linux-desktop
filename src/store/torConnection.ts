@@ -2,11 +2,11 @@
 import { action, reaction, computed, observable } from 'mobx'
 import { NativeEventEmitter } from 'react-native';
 import { EmitterSubscription } from 'react-native-track-player';
-import UserStore from './user'
-import TorRNAndroid, { TorModuleEvent, TorModulePortChangeEventKey, TorPortInfo } from '../native-module-wrappers/TorRNAndroid'
+import UserStore, { userStore as defaultUserStore } from './user'
+import KotlinTorService, { TorDaemonState, TorModuleEvent, TorModulePortChangeEventKey, TorModuleStateChangeEventKey, TorNetworkState, TorPortInfo } from '../native-module-wrappers/KotlinTorService'
 import KotlinTorHTTP from '../native-module-wrappers/KotlinTorHTTP';
 import { startTorHTTPClientIfNotStarted } from '../api/tor-request-utils';
-
+import { persist } from 'mobx-persist';
 
 export default class TorConnectionStore {
   userStore: UserStore;
@@ -14,7 +14,7 @@ export default class TorConnectionStore {
 
   torModuleEventHandlingMap: Record<TorModuleEvent, Function>;
 
-  @observable
+  @persist @observable
   torPortInfo: TorPortInfo = {
     controlAddress: '',
     dnsPort: '',
@@ -22,6 +22,9 @@ export default class TorConnectionStore {
     socksAddress: '',
     transPort: '',
   };
+
+  @persist @observable
+  isTorClientBuilt: boolean = false;
 
 
   constructor(userStore: UserStore) {
@@ -41,72 +44,93 @@ export default class TorConnectionStore {
     );
 
     reaction(
-      () => this.torPortInfo,
-      () => this.handlePortInfoChange(),
+      () => this.torPortInfo.socksAddress,
+      () => this.handleTorSocksAddressChange(),
     );
 
     this.setupListeners()
   }
 
   @computed
-  public get userHasOnionServerURL(): boolean {
-    return this.userStore.currentIP.includes('.onion')
+  public get isTorServiceActive(): boolean {
+    return Boolean(this.torPortInfo.socksAddress)
   }
 
-  @computed
-  public get isTorServiceActive(): boolean {
-    return this.torPortInfo.socksAddress?.length != 0
+
+  public async getTorDaemonState(): Promise<TorDaemonState> {
+    return await KotlinTorService.getTorState()
   }
+
+  public async getTorNetworkState(): Promise<TorNetworkState> {
+    return await KotlinTorService.getTorNetworkState()
+  }
+
+  public async activateTorConnection() {
+    await KotlinTorService.startTor()
+    await startTorHTTPClientIfNotStarted(this.torPortInfo.socksAddress)
+  }
+
 
   @action
   async handleUserIPChange() {
     console.log(`handleUserIPChange`)
     console.log(`new IP: ${this.userStore.currentIP}`)
 
-    if (this.userHasOnionServerURL == false && this.isTorServiceActive) {
-      await TorRNAndroid.stopTor();
-      await KotlinTorHTTP.clearClient()
+    const daemonState = await this.getTorDaemonState()
 
-      return
-    }
-
-    if (this.isTorServiceActive) {
-      await startTorHTTPClientIfNotStarted(this.torPortInfo.socksAddress)
+    if (this.userStore.isIPAnOnionRoute == false) {
+      if (daemonState == TorDaemonState.ON) {
+        await KotlinTorService.stopTor();
+        await KotlinTorHTTP.clearClient()
+      }
     } else {
-      await TorRNAndroid.startTor()
+      if (daemonState == TorDaemonState.OFF) {
+        await KotlinTorService.startTor()
+      } else if (daemonState == TorDaemonState.ON) {
+        await startTorHTTPClientIfNotStarted(this.torPortInfo.socksAddress)
+        this.isTorClientBuilt = true
+      }
     }
   }
 
   @action
-  async handlePortInfoChange() {
-    console.log('Reacting to torPortInfo Change');
-    if (this.isTorServiceActive) {
-      await KotlinTorHTTP.clearClient()
+  async handleTorSocksAddressChange() {
+    console.log('Reacting to torPortInfo Socks address change', this.torPortInfo.socksAddress);
+
+    const daemonState = await this.getTorDaemonState()
+    const networkState = await this.getTorNetworkState()
+
+    if (daemonState == TorDaemonState.ON && networkState == TorNetworkState.ENABLED) {
+      if (this.isTorClientBuilt) {
+        await KotlinTorHTTP.clearClient()
+      }
+
       await KotlinTorHTTP.buildClient(this.torPortInfo.socksAddress)
     }
   }
 
   @action
-  async handleTorPortChangeEvent(payload: Record<TorModulePortChangeEventKey, string>) {
+  handleTorPortChangeEvent(payload: Record<TorModulePortChangeEventKey, string>) {
     console.log(`handleTorPortChangeEvent`)
     console.log(payload);
 
-    this.torPortInfo.controlAddress = payload.CONTROL_PORT_INFO || '';
-    this.torPortInfo.dnsPort = payload.DNS_PORT_INFO || '';
-    this.torPortInfo.httpAddress = payload.HTTP_PORT_INFO || '';
-    this.torPortInfo.socksAddress = payload.SOCKS_PORT_INFO || '';
-    this.torPortInfo.transPort = payload.TRANS_PORT_INFO || '';
-
-    // TODO: Call this here instead of in the `reaction` method?
-    // if (this.isTorServiceActive) {
-    //   await KotlinTorHTTP.buildClient(this.torPortInfo.socksAddress)
-    // }
+    this.torPortInfo.controlAddress = payload.CONTROL_PORT_INFO;
+    this.torPortInfo.dnsPort = payload.DNS_PORT_INFO;
+    this.torPortInfo.httpAddress = payload.HTTP_PORT_INFO;
+    this.torPortInfo.socksAddress = payload.SOCKS_PORT_INFO;
+    this.torPortInfo.transPort = payload.TRANS_PORT_INFO;
   }
 
+
   @action
-  handleTorStateChangeEvent(event) {
+  async handleTorStateChangeEvent(payload: Record<TorModuleStateChangeEventKey, string>) {
     console.log("handleTorStateChangeEvent");
-    console.log(event);
+
+    const daemonState = payload[TorModuleStateChangeEventKey.TOR_STATE]
+    const networkState = payload[TorModuleStateChangeEventKey.TOR_NETWORK_STATE]
+
+    console.log(daemonState);
+    console.log(networkState);
   }
 
   @action
@@ -123,7 +147,7 @@ export default class TorConnectionStore {
 
 
   setupListeners = () => {
-    const eventEmitter = new NativeEventEmitter(TorRNAndroid);
+    const eventEmitter = new NativeEventEmitter(KotlinTorService);
 
     Object.keys(this.torModuleEventHandlingMap).forEach(eventName => {
       this.torModuleEventListeners.push(
@@ -138,3 +162,5 @@ export default class TorConnectionStore {
     this.torModuleEventListeners.forEach(listener => listener.remove())
   }
 }
+
+export const torConnectionStore = new TorConnectionStore(defaultUserStore)

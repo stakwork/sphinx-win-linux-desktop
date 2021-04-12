@@ -2,6 +2,7 @@ import API from './api'
 import {connectWebSocket, registerWsHandlers} from './ws'
 import * as wsHandlers from '../store/websocketHandlers'
 import TorConnectionStore from '../store/torConnection'
+import { userStore } from '../store/user'
 
 const invite = new API({
   baseURLPath: 'https://hub.sphinx.chat/api/v1/',
@@ -20,7 +21,7 @@ type RelayAPIOptions = {
   torConnectionStore?: TorConnectionStore;
 }
 
-export function instantiateRelayAPI({
+export async function instantiateRelayAPI({
   ip,
   authToken,
   connectedCallback = () => { },
@@ -30,7 +31,10 @@ export function instantiateRelayAPI({
 }: RelayAPIOptions) {
   console.log("instantiateRelayAPI");
 
-  if(!ip) return console.log("cant instantiate Relay, no IP")
+  if(!ip) {
+    console.warn("cant instantiate Relay, no IP")
+    return
+  }
 
   let protocol = 'http://'
   if(ip.endsWith('nodl.it')) {

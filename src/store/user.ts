@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import * as api from '../api'
 import { randString } from '../crypto/rand'
 import { persist } from 'mobx-persist'
@@ -53,6 +53,11 @@ export default class UserStore {
 
   @persist @observable
   contactKey: string = ''
+
+  @computed
+  public get isIPAnOnionRoute(): boolean {
+    return this.currentIP.includes('.onion')
+  }
 
   @action reset() {
     this.code = ''
@@ -199,10 +204,10 @@ export default class UserStore {
     try {
       this.currentIP = ip
       this.invite = supportContact
-      api.instantiateRelayAPI({ ip }) // no token
-      return ip
+
+      await api.instantiateRelayAPI({ ip })
     } catch (e) {
-      console.log("Error:", e)
+      console.log("Error during signupWithIP:", e)
     }
   }
 
@@ -212,13 +217,18 @@ export default class UserStore {
       api.instantiateRelayAPI({ ip: this.currentIP })
       await sleep(1)
     }
+
     try {
       const pubkey = this.publicKey
       const token = await randString(20)
       console.log("OK GEN TOKEN!", this.currentIP, pwd)
+
+      debugger;
       const r = await api.relayAPIClient.post(`contacts/tokens?pwd=${pwd}`, {
         token, pubkey,
       })
+      debugger;
+
       if (!r) return console.log("=> FAILED TO REACH RELAY")
       if (r.id) this.setMyID(r.id)
 

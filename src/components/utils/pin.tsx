@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {View, StyleSheet, Text} from 'react-native'
 import NumKey from './numkey'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { ActivityIndicator, Colors } from 'react-native-paper'
+import { ActivityIndicator } from 'react-native-paper'
 import SecureStorage from 'react-native-secure-storage'
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import AsyncStorage from '@react-native-community/async-storage'
@@ -69,7 +69,7 @@ export default function PIN(props) {
           setChecking(false)
         }
       } catch(e){}
-    } 
+    }
   }
   function go(v){
     const newPin = pin+v
@@ -109,7 +109,7 @@ export default function PIN(props) {
         {checking && <ActivityIndicator animating={true} color="white" />}
       </View>
     </View>
-    <NumKey onKeyPress={v=> go(v)} dark={true} 
+    <NumKey onKeyPress={v=> go(v)} dark={true}
       onBackspace={()=> backspace()}
     />
   </View>
@@ -152,7 +152,7 @@ export async function wasEnteredRecently(): Promise<boolean> {
   if(!enteredAt){
     return false
   }
-  if(now < enteredAt+(60*60*hours)) { 
+  if(now < enteredAt+(60*60*hours)) {
     return true
   }
   return false

@@ -1,5 +1,5 @@
-import { errorMonitor } from "events"
-import TorConnectionStore from "../store/torConnection"
+import TorConnectionStore, { torConnectionStore as defaultTorConnectionStore} from "../store/torConnection"
+import { userStore } from "../store/user"
 import { performTorRequest, RequestMethod as RNTORRequestMethod } from "./tor-request-utils"
 
 type ConstructorProps = {
@@ -27,7 +27,7 @@ export default class API {
     authTokenKey = '',
     authToken = '',
     resetIPCallback = () => {},
-    torConnectionStore = null,
+    torConnectionStore = defaultTorConnectionStore
   }: ConstructorProps) {
     this.torConnectionStore = torConnectionStore
 
@@ -42,7 +42,7 @@ export default class API {
     this.upload = addMethod('UPLOAD', baseURLPath)
   }
 
-  torConnectionStore?: TorConnectionStore
+  torConnectionStore: TorConnectionStore
   tokenKey: string
   tokenValue: string
   get: Function
@@ -127,10 +127,13 @@ export default class API {
   // TODO: How can we unify this with the deserialization that
   // `handleResultFromFetchRequest` is doing?
   handleResultFromTorRequest = async (resultPayload: Record<string, unknown>) => {
-    if (resultPayload.status && resultPayload.status === 'ok') { // invite server
+    // parse invite payload structure
+    if (resultPayload.status && resultPayload.status === 'ok') {
       return resultPayload.object
     }
-    if (resultPayload.success && resultPayload.response) { // relay
+
+    // parse relay payload structure
+    if (resultPayload.success && resultPayload.response) {
       return resultPayload.response
     }
 
@@ -195,7 +198,7 @@ function addMethod(
 
     if (methodName === 'BLOB') opts.method = 'GET'
 
-    if (this.torConnectionStore?.isTorServiceActive) {
+    if (userStore.isIPAnOnionRoute) {
       try {
         const result = await this.performRequestUsingTor(baseURLPath + url, opts)
 

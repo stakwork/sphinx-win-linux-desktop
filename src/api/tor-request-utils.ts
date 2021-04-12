@@ -52,10 +52,11 @@ export const performTorRequest = async ({
   await startTorHTTPClientIfNotStarted(socksAddress)
 
   let response: KotlinTorHTTPResponse;
+  let responseBody: Record<string, unknown>;
 
   switch (method.toLowerCase()) {
     case RequestMethod.GET:
-      debugger;
+      console.log('Performing GET through Tor client to ' + url)
       response = await KotlinTorHTTP.requestGet(url, headers);
       debugger;
 
@@ -66,7 +67,6 @@ export const performTorRequest = async ({
       throw Error(`Unknown result from performing Tor GET Request: ${response}`)
 
     case RequestMethod.PUT:
-      debugger;
       response = await KotlinTorHTTP.requestPut(
         url,
         headers,
@@ -77,7 +77,8 @@ export const performTorRequest = async ({
       return JSON.parse(response[KotlinTorHTTPResponseKey.BODY])
 
     case RequestMethod.POST:
-      debugger;
+      console.log('Performing POST through Tor client to ' + url)
+
       response = await KotlinTorHTTP.requestPost(
         url,
         headers,
@@ -85,10 +86,15 @@ export const performTorRequest = async ({
       );
       debugger;
 
-      return JSON.parse(response[KotlinTorHTTPResponseKey.BODY])
+      responseBody = JSON.parse(response[KotlinTorHTTPResponseKey.BODY])
+
+      if (responseBody.success) {
+        return responseBody
+      } else {
+        throw responseBody.error
+      }
 
     case RequestMethod.DELETE:
-      debugger;
       response = await KotlinTorHTTP.requestDelete(url, headers, data);
       debugger;
 

@@ -6,6 +6,7 @@ import { contactStore } from './contacts'
 import { chatStore } from './chats'
 import { subStore } from './subs'
 import { userStore } from './user'
+import { torConnectionStore } from './torConnection'
 import { memeStore } from './meme'
 import { authStore } from './auth'
 import { botStore } from './bots'
@@ -20,9 +21,6 @@ import * as localForage from 'localforage'
 import {getRealmMessages,updateRealmMsg} from '../realm/exports'
 import {hasData} from '../realm/exports'
 import {DEBOUNCE_TIME, persistMsgLocalForage} from './storage'
-import TorConnectionStore from './torConnection'
-
-const torConnectionStore = new TorConnectionStore(userStore)
 
 const strg = {
   ios: AsyncStorage,
