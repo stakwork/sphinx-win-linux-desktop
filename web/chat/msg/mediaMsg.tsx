@@ -13,10 +13,15 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import ReactAudioPlayer from 'react-audio-player'
 import { Player } from 'video-react';
 import BoostRow from './boostRow'
+import Dialog from '@material-ui/core/Dialog';
+import Button from "../../utils/button";
+
 
 export default function MediaMsg(props) {
   const { msg, ui } = useStores()
   const [buying, setBuying] = useState(false)
+  const [confirm, setConfirm] = useState(false)
+
   const { message_content, chat, media_token, media_type, boosts_total_sats } = props
   const isMe = props.sender === props.myid
 
@@ -50,6 +55,7 @@ export default function MediaMsg(props) {
     if (!contact_id) {
       contact_id = chat.contact_ids && chat.contact_ids.find(cid => cid !== props.myid)
     }
+    setConfirm(false)
     await msg.purchaseMedia({
       chat_id: chat.id,
       media_token,
@@ -101,10 +107,18 @@ export default function MediaMsg(props) {
     </>}
 
     {showPurchaseButton && <BuyButton style={{ background: theme.primary }}
-      onClick={() => buy(amt)} purchased={purchased}>
+      onClick={() => setConfirm(true)} purchased={purchased}>
       <BuyIcon purchased={purchased} loading={buying} />
       <BuyText>{purchased ? 'Purchased' : `Pay ${amt} sat`}</BuyText>
     </BuyButton>}
+
+    <Dialog onClose={()=>setConfirm(false)} open={confirm}>
+        <DialogContent>
+          <div style={{marginBottom:10}}>Confirm Purchase?</div>
+          <Button color={"primary"} onClick={()=>setConfirm(false)}>Cancel</Button>
+          <Button color={"secondary"} onClick={()=>buy(amt)}>Yes</Button>
+        </DialogContent>
+      </Dialog>
 
     {boosts_total_sats && <BoostRowWrap>
       <BoostRow {...props} isMe={isMe} />
@@ -280,4 +294,12 @@ const PriceIcon = styled.div`
 
 const BoostRowWrap = styled.div`
   padding:4px 12px 10px 12px;
+`
+
+const DialogContent = styled.div`
+  display:flex;
+  flex-direction:column;
+  justify-content: space-between;
+  padding:30px;
+  height: 200px;
 `
