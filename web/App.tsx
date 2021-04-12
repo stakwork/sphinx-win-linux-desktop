@@ -110,7 +110,7 @@ function App(){
 }
 
 function Main(){
-  const {details,msg,ui,meme} = useStores()
+  const {details,msg,ui,meme,auth} = useStores()
 
   useEffect(()=>{
     setTimeout(()=>{

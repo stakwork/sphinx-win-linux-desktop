@@ -54,6 +54,12 @@ class AuthStore {
     return r.sig
   }
 
+  @action
+  async externalTokens(): Promise<Object> {
+    const r = await relay.get(`external_tokens`)
+    return r
+  }
+
 }
 
 export const authStore = new AuthStore()

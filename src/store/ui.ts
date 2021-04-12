@@ -293,6 +293,11 @@ export class UiStore {
   @action setShowVersionDialog(b: boolean) {
     this.showVersionDialog = b
   }
+
+  @observable tribesAuthParams: { [k: string]: any } = null
+  @action setTribesAuthParams(o) {
+    this.tribesAuthParams = o
+  }
 }
 
 export const uiStore = new UiStore()
