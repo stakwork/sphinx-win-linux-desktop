@@ -111,17 +111,21 @@ export default class API {
         }
         return resultPayload
       }
-    } catch (e) { // 20 is an "abort" i guess
-      console.warn(e)
-      const isWebAbort = e.code === 20
-      const isRNAbort = e.message === 'Aborted'
-      if (isWebAbort || isRNAbort) reportTimeout(this.resetIPCallback)
+    } catch (error) {
+      console.warn(`\`handleResultFromFetchRequest\` Error: ${error}`)
+
+      const isWebAbort = error.code === 20 // 20 is an "abort" i guess
+      const isRNAbort = error.message === 'Aborted'
+
+      if (isWebAbort || isRNAbort) {
+        reportTimeout(this.resetIPCallback)
+      }
     }
   }
 
 
-  // TODO: How can we unify this with the deserialization that the fetchResult handler
-  // is doing?
+  // TODO: How can we unify this with the deserialization that
+  // `handleResultFromFetchRequest` is doing?
   handleResultFromTorRequest = async (resultPayload: Record<string, unknown>) => {
     if (resultPayload.status && resultPayload.status === 'ok') { // invite server
       return resultPayload.object
@@ -131,6 +135,14 @@ export default class API {
     }
 
     return resultPayload
+  }
+
+  // TODO: How can we unify this with the error handling that
+  // `handleResultFromFetchRequest` is doing?
+  handleErrorFromTorRequest = (error: Error) => {
+    console.warn(`\`handleErrorFromTorRequest\` Error:\n${error}`)
+
+    reportTimeout(this.resetIPCallback)
   }
 }
 
@@ -184,9 +196,13 @@ function addMethod(
     if (methodName === 'BLOB') opts.method = 'GET'
 
     if (this.torConnectionStore?.isTorServiceActive) {
-      const result = await this.performRequestUsingTor(baseURLPath + url, opts)
+      try {
+        const result = await this.performRequestUsingTor(baseURLPath + url, opts)
 
-      return await this.handleResultFromTorRequest(result)
+        return await this.handleResultFromTorRequest(result)
+      } catch (error) {
+        return this.handleErrorFromTorRequest(error)
+      }
     } else {
       opts.headers = new Headers(opts.headers)
       const result = await this.fetchWithTimeout(baseURLPath + url, TIMEOUT, opts)
