@@ -16,7 +16,6 @@ import BoostRow from './boostRow'
 import Dialog from '@material-ui/core/Dialog';
 import Button from "../../utils/button";
 
-
 export default function MediaMsg(props) {
   const { msg, ui } = useStores()
   const [buying, setBuying] = useState(false)
