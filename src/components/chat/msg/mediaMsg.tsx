@@ -11,7 +11,6 @@ import Video from 'react-native-video';
 import FileMsg from './fileMsg'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import BoostRow from './boostRow'
-import confirmDialog from '../../utils/confirmDialog'
 
 export default function MediaMsg(props) {
   const { meme, ui, msg } = useStores()

@@ -29,6 +29,8 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   const [queuedTrackID, setQueuedTrackID] = useState(null)
   const [speed, setSpeed] = useState('1')
 
+  const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
+
   function getAndSetDuration() {
     setTimeout(async () => {
       const dur = await TrackPlayer.getDuration()
@@ -37,12 +39,20 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   }
 
   async function onToggle() {
-    // const trackID = await TrackPlayer.getCurrentTrack()
-    // if(episode && trackID && trackID!==episode.id) {
-    //   console.log("RESET HERE")
-    //   TrackPlayer.reset()
-    // }
-    if (playing) TrackPlayer.pause()
+    // console.log("SEID === ", selectedEpisodeID)
+    // console.log("EPIDOSE === ", JSON.stringify(episode))
+
+    const trackID = await TrackPlayer.getCurrentTrack()
+    if(trackID && parseInt(trackID)!==selectedEpisodeID) {
+      console.log("RESET HERE FOR TRACK")
+      await TrackPlayer.reset()
+      await addEpisodeToQueue(episode)
+    }
+    if (playing && trackID && parseInt(trackID)===selectedEpisodeID) TrackPlayer.pause()
+    else if (playing && trackID && parseInt(trackID)!==selectedEpisodeID){
+      console.log("PLAY NEW!")
+      selectEpisode(episode)
+    }
     else {
       console.log("PLAY!")
       TrackPlayer.play()
@@ -52,6 +62,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   }
 
   async function addEpisodeToQueue(episode) {
+    console.log("ADDING! = ", episode.title)
     await TrackPlayer.add({
       id: episode.id,
       url: episode.enclosureUrl,
@@ -80,29 +91,42 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     TrackPlayer.setRate(1)
   }
 
-  async function initialSelect(ps) {
-
+  async function initialSelect(ps) {    
+    console.log("IM INITIAL SELECTING!")
     let theID = queuedTrackID
+    console.log("the first ID === ", theID)
     if (chat.meta && chat.meta.itemID) {
       theID = chat.meta.itemID
     }
+    console.log("the secondID === ", theID)
     let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
+    console.log("EP === ", JSON.stringify(episode))
+    console.log("THEID === ", theID)
     if (theID) {
       const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e => e.id == theID)
+      console.log("QE === ", JSON.stringify(qe))
       if (qe) episode = qe
       else {
+        console.log("INITIAL RESETTING")
         TrackPlayer.reset()
       }
     }
     if (!episode) return
 
+    console.log("QUEUED === ", queuedTrackID)
+    console.log("EPISODE === ", episode.id)
+    
     setSelectedEpisodeID(episode.id)
 
     await addEpisodeToQueue(episode)
     if (!duration) getAndSetDuration()
 
     // if its the same, dont seek
-    if (queuedTrackID && queuedTrackID !== episode.id) {
+    console.log("QUEDTRACKID === ", queuedTrackID)
+    console.log("EP ID === ", episode.id)
+
+    if (!playing && queuedTrackID && parseInt(queuedTrackID) !== episode.id) {
+      console.log("IM IN THE SAME")
       const ts = chat.meta && chat.meta.ts
       if (!playing && ts || ts === 0) {
         await TrackPlayer.seekTo(ts);
@@ -233,7 +257,6 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     }
   }, [pod])
 
-  const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
 
   const replayMsgs = useRef([])
   function closeFull() {

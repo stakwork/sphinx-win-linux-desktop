@@ -17,15 +17,29 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 export default function Controls(props) {
   const [pos, setPos] = useState(0)
   const [selectSpeed, setSelectSpeed] = useState(false)
+  const [isItSame, setIsItSame] = useState(null)
 
-  useEffect(() => {
+  async function isSame(){
+    const episodeId = props.episode && props.episode.id
+    const trackID = await TrackPlayer.getCurrentTrack()
+    // console.log(episodeId, "----", trackID)
+    return episodeId === parseInt(trackID)
+  }
+
+  async function positionSet(){
+    const same = await isSame()
+    setIsItSame(same)
+    if (!same) return
     const p = getPosition()
     if (p !== pos) setPos(p)
+  }
+
+  useEffect(() => {
+    positionSet()
   }, [])
 
   useInterval(() => {
-    const p = getPosition()
-    if (p !== pos) setPos(p)
+    positionSet()
   }, 1000)
 
   async function fastForward() {
@@ -75,6 +89,8 @@ export default function Controls(props) {
   }
 
   const { theme, onToggle, playing, duration } = props
+
+  // console.log("PLAYING? === ", playing)
 
   const ratez = ['0.5', '0.8', '1', '1.2', '1.5', '2.1']
 
@@ -141,7 +157,7 @@ export default function Controls(props) {
             <CustomIcon name="back-15" color={theme.title} size={28} />
           </TouchableIcon>
           <TouchableOpacity onPress={onToggle} style={{ marginLeft: 18, marginRight: 18 }}>
-            <Icon name={playing ? 'pause-circle' : 'play-circle'} size={52} color={theme.primary} />
+            <Icon name={playing && isItSame ? 'pause-circle' : 'play-circle'} size={52} color={theme.primary} />
           </TouchableOpacity>
           <TouchableIcon
             rippleColor={theme.title} size={48}
