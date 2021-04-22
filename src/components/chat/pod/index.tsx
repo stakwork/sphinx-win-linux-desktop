@@ -92,25 +92,33 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   }
 
   async function initialSelect(ps) {    
-    console.log("IM INITIAL SELECTING!")
-    let theID = queuedTrackID
-    console.log("the first ID === ", theID)
-    if (chat.meta && chat.meta.itemID) {
-      theID = chat.meta.itemID
-    }
-    console.log("the secondID === ", theID)
-    let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
-    console.log("EP === ", JSON.stringify(episode))
-    console.log("THEID === ", theID)
-    if (theID) {
-      const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e => e.id == theID)
-      console.log("QE === ", JSON.stringify(qe))
-      if (qe) episode = qe
-      else {
-        console.log("INITIAL RESETTING")
-        TrackPlayer.reset()
+
+      console.log("IM INITIAL SELECTING!")
+      let theID = queuedTrackID
+      console.log("the first ID === ", theID)
+      if (chat.meta && chat.meta.itemID) {
+        theID = chat.meta.itemID
       }
-    }
+      console.log("the secondID === ", theID)
+      if(playing){
+        theID = await TrackPlayer.getCurrentTrack()
+      }
+      console.log("the thirdID === ", theID)
+      let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
+      // console.log("EP === ", JSON.stringify(episode.id))
+      console.log("THEID === ", theID)
+      if (theID) {
+        const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e => e.id == theID)
+        // console.log("QE === ", JSON.stringify(qe.id))
+        if (qe) episode = qe
+        else {
+          if(!playing){
+            console.log("INITIAL RESETTING")
+            TrackPlayer.reset()
+          }
+        }
+      }
+
     if (!episode) return
 
     console.log("QUEUED === ", queuedTrackID)
