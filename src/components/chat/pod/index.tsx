@@ -28,8 +28,12 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   const [full, setFull] = useState(false)
   const [queuedTrackID, setQueuedTrackID] = useState(null)
   const [speed, setSpeed] = useState('1')
+  const [currentlyPlayingPod, setCurrentlyPlayingPod] = useState(null)
 
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
+  // console.log("OG EPISODE === ", JSON.stringify(episode))
+  // console.log("POD === ", pod)
+  console.log("selectedEpisodeID === ", selectedEpisodeID)
 
   function getAndSetDuration() {
     setTimeout(async () => {
@@ -39,8 +43,6 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   }
 
   async function onToggle() {
-    // console.log("SEID === ", selectedEpisodeID)
-    // console.log("EPIDOSE === ", JSON.stringify(episode))
 
     const trackID = await TrackPlayer.getCurrentTrack()
     if(trackID && parseInt(trackID)!==selectedEpisodeID) {
@@ -48,14 +50,19 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
       await TrackPlayer.reset()
       await addEpisodeToQueue(episode)
     }
-    if (playing && trackID && parseInt(trackID)===selectedEpisodeID) TrackPlayer.pause()
+    if (playing && trackID && parseInt(trackID)===selectedEpisodeID) {
+      TrackPlayer.pause()
+      setCurrentlyPlayingPod(null)
+    }
     else if (playing && trackID && parseInt(trackID)!==selectedEpisodeID){
       console.log("PLAY NEW!")
       selectEpisode(episode)
+      setCurrentlyPlayingPod(pod)
     }
     else {
       console.log("PLAY!")
       TrackPlayer.play()
+      setCurrentlyPlayingPod(pod)
       if (!duration) getAndSetDuration()
     }
     setPlaying(!playing)
@@ -102,14 +109,14 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
       console.log("the secondID === ", theID)
       if(playing){
         theID = await TrackPlayer.getCurrentTrack()
+        console.log("the thirdID === ", theID)
       }
-      console.log("the thirdID === ", theID)
       let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
-      // console.log("EP === ", JSON.stringify(episode.id))
+      console.log("EP === ", JSON.stringify(episode))
       console.log("THEID === ", theID)
       if (theID) {
         const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e => e.id == theID)
-        // console.log("QE === ", JSON.stringify(qe.id))
+        console.log("QE === ", JSON.stringify(qe))
         if (qe) episode = qe
         else {
           if(!playing){
@@ -125,6 +132,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     console.log("EPISODE === ", episode.id)
     
     setSelectedEpisodeID(episode.id)
+    setCurrentlyPlayingPod(ps)
 
     await addEpisodeToQueue(episode)
     if (!duration) getAndSetDuration()
@@ -181,12 +189,14 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     if (!pricePerMinute) return
     console.log('=> sendPayments!')
     const pos = await TrackPlayer.getPosition()
-    const dests = pod && pod.value && pod.value.destinations
+    const dests = currentlyPlayingPod && currentlyPlayingPod.value && currentlyPlayingPod.value.destinations
+    const trackID = await TrackPlayer.getCurrentTrack()
     if (!dests) return
-    if (!pod.id || !selectedEpisodeID) return
+    if (!currentlyPlayingPod.id || !trackID) return
+    console.log("Episode Paid === ", trackID)
     const sp: StreamPayment = {
-      feedID: pod.id,
-      itemID: selectedEpisodeID,
+      feedID: currentlyPlayingPod.id,
+      itemID: parseInt(trackID),
       ts: Math.round(pos) || 0,
       speed: speed,
     }
@@ -196,15 +206,18 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
 
   const count = useRef(0)
   const storedTime = useRef(0)
-  useInterval(() => {
-    if (playing) {
-      setPosition()
+  useInterval(async() => {
+    console.log("playing? === ", playing)
+    const state = await TrackPlayer.getState()
+    console.log("state === ", state)
+    if (state === TrackPlayer.STATE_PLAYING) {
       const c = count.current
       if (c && c % NUM_SECONDS === 0) {
         sendPayments(1)
       }
       count.current += 1
     }
+    if(playing) setPosition()
   }, 1000)
 
   const appState = useRef(AppState.currentState);
