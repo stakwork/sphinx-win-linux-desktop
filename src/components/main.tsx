@@ -8,6 +8,7 @@ import * as rsa from '../crypto/rsa'
 import * as BadgeAndroid from 'react-native-android-badge'
 import EE, { RESET_IP, RESET_IP_FINISHED } from './utils/ee'
 import {check, VersionDialog} from './checkVersion'
+import './interval.ts'
 
 function showToast(msg) {
   ToastAndroid.showWithGravityAndOffset(

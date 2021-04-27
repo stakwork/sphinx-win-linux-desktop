@@ -26,26 +26,32 @@ export interface StreamPayment {
   amount?: number
 }
 
+export interface SendPaymentArgs {
+  destinations: Destination[],
+  text: string,
+  amount: number,
+  chat_id: number,
+  update_meta: boolean
+}
+
 export class FeedStore {
 
-  @action async sendPayments(destinations: Destination[], text: string, amount: number, chat_id: number, update_meta: boolean) {
-    await relay.post('stream', {
-      destinations,
-      text,
-      amount,
-      chat_id,
-      update_meta
-    })
-    if(chat_id && update_meta && text) {
+  @action async sendPayments(args: SendPaymentArgs) {
+    if(!args) return
+    console.log("SENDING PAYMENT TO = ", args.text)
+    console.log("AMOUNT === ", args.amount)
+    await relay.post('stream', args)
+    if(args.chat_id && args.update_meta && args.text) {
       let meta
       try {
-        meta = JSON.parse(text)
+        meta = JSON.parse(args.text)
       } catch(e) {}
       if(meta) {
-        chatStore.updateChatMeta(chat_id, meta)
+        chatStore.updateChatMeta(args.chat_id, meta)
       }
     }
-    if (amount) detailsStore.addToBalance(amount * -1)
+
+    if (args.amount) detailsStore.addToBalance(args.amount * -1)
     // asyncForEach(dests, async (d: Destination) => {
     //   const amt = Math.max(Math.round((d.split / 100) * price), 1)
     //   if (d.type === 'node') {

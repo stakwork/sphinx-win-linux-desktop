@@ -6,13 +6,19 @@ import { IconButton } from 'react-native-paper';
 import Controls from './controls'
 import useInterval from '../../utils/useInterval'
 import EE, { CLIP_PAYMENT, PLAY_ANIMATION } from '../../utils/ee'
-import { Destination, StreamPayment, NUM_SECONDS } from '../../../store/feed'
+import { Destination, StreamPayment, NUM_SECONDS, SendPaymentArgs } from '../../../store/feed'
 import PodBar from './podBar'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image'
 import Replay from './replay'
 import { getPosition, setPosition } from './position'
+import * as interval from '../../interval'
+import {
+  useTrackPlayerProgress,
+  useTrackPlayerEvents,
+} from "react-native-track-player/lib/hooks"
+import {TrackPlayerEvents, STATE_PLAYING} from 'react-native-track-player';
 
 export default function Pod({ pod, show, chat, onBoost, podError }) {
   const theme = useTheme()
@@ -31,9 +37,6 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   const [currentlyPlayingPod, setCurrentlyPlayingPod] = useState(null)
 
   const episode = selectedEpisodeID && pod && pod.episodes && pod.episodes.length && pod.episodes.find(e => e.id === selectedEpisodeID)
-  // console.log("OG EPISODE === ", JSON.stringify(episode))
-  // console.log("POD === ", pod)
-  console.log("selectedEpisodeID === ", selectedEpisodeID)
 
   function getAndSetDuration() {
     setTimeout(async () => {
@@ -45,31 +48,38 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
   async function onToggle() {
 
     const trackID = await TrackPlayer.getCurrentTrack()
+
     if(trackID && parseInt(trackID)!==selectedEpisodeID) {
-      console.log("RESET HERE FOR TRACK")
+      // console.log("RESET HERE FOR TRACK")
       await TrackPlayer.reset()
       await addEpisodeToQueue(episode)
     }
     if (playing && trackID && parseInt(trackID)===selectedEpisodeID) {
       TrackPlayer.pause()
-      setCurrentlyPlayingPod(null)
+      // setCurrentlyPlayingPod(null)
+      interval.pause()
     }
     else if (playing && trackID && parseInt(trackID)!==selectedEpisodeID){
-      console.log("PLAY NEW!")
+      // console.log("PLAY NEW!")
       selectEpisode(episode)
       setCurrentlyPlayingPod(pod)
+      const args = await makeSendPaymentArgs(pod)
+      interval.setArgs(args)
     }
     else {
-      console.log("PLAY!")
+      // console.log("PLAY!")
       TrackPlayer.play()
       setCurrentlyPlayingPod(pod)
-      if (!duration) getAndSetDuration()
+      getAndSetDuration()
+      const args = await makeSendPaymentArgs(pod)
+      interval.setArgs(args)
+
     }
     setPlaying(!playing)
   }
 
   async function addEpisodeToQueue(episode) {
-    console.log("ADDING! = ", episode.title)
+    // console.log("ADDING! = ", episode.title)
     await TrackPlayer.add({
       id: episode.id,
       url: episode.enclosureUrl,
@@ -85,6 +95,8 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     setSelectedEpisodeID(episode.id)
     await addEpisodeToQueue(episode)
     await TrackPlayer.play();
+    const args = await makeSendPaymentArgs()
+    interval.setArgs(args)
     setPlaying(true)
     getAndSetDuration()
   }
@@ -98,38 +110,42 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     TrackPlayer.setRate(1)
   }
 
-  async function initialSelect(ps) {    
 
-      console.log("IM INITIAL SELECTING!")
+  useTrackPlayerEvents([TrackPlayerEvents.PLAYBACK_STATE], async event => {
+    console.log("EVENT === ", event)
+      if (event.state === TrackPlayer.STATE_STOPPED) {
+      console.log("STOPPING")
+      interval.pause();
+      TrackPlayer.pause()
+      setPlaying(false)
+      await TrackPlayer.seekTo(0);
+      setPosition()
+    }
+  });
+
+  async function initialSelect(ps) {    
+      console.log("PLaying? ", playing)
+      // console.log("IM INITIAL SELECTING!")
       let theID = queuedTrackID
-      console.log("the first ID === ", theID)
       if (chat.meta && chat.meta.itemID) {
         theID = chat.meta.itemID
       }
-      console.log("the secondID === ", theID)
       if(playing){
         theID = await TrackPlayer.getCurrentTrack()
-        console.log("the thirdID === ", theID)
       }
       let episode = ps && ps.episodes && ps.episodes.length && ps.episodes[0]
-      console.log("EP === ", JSON.stringify(episode))
-      console.log("THEID === ", theID)
       if (theID) {
         const qe = ps && ps.episodes && ps.episodes.length && ps.episodes.find(e => e.id == theID)
-        console.log("QE === ", JSON.stringify(qe))
         if (qe) episode = qe
         else {
           if(!playing){
-            console.log("INITIAL RESETTING")
+            // console.log("INITIAL RESETTING")
             TrackPlayer.reset()
           }
         }
       }
 
     if (!episode) return
-
-    console.log("QUEUED === ", queuedTrackID)
-    console.log("EPISODE === ", episode.id)
     
     setSelectedEpisodeID(episode.id)
     setCurrentlyPlayingPod(ps)
@@ -138,11 +154,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     if (!duration) getAndSetDuration()
 
     // if its the same, dont seek
-    console.log("QUEDTRACKID === ", queuedTrackID)
-    console.log("EP ID === ", episode.id)
-
     if (!playing && queuedTrackID && parseInt(queuedTrackID) !== episode.id) {
-      console.log("IM IN THE SAME")
       const ts = chat.meta && chat.meta.ts
       if (!playing && ts || ts === 0) {
         await TrackPlayer.seekTo(ts);
@@ -185,49 +197,69 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
     pricePerMinute = Math.round(parseFloat(pod.value.model.suggested) * 100000000)
   }
 
-  async function sendPayments(mult: number) {
-    if (!pricePerMinute) return
-    console.log('=> sendPayments!')
-    const pos = await TrackPlayer.getPosition()
-    const dests = currentlyPlayingPod && currentlyPlayingPod.value && currentlyPlayingPod.value.destinations
-    const trackID = await TrackPlayer.getCurrentTrack()
-    if (!dests) return
-    if (!currentlyPlayingPod.id || !trackID) return
-    console.log("Episode Paid === ", trackID)
-    const sp: StreamPayment = {
-      feedID: currentlyPlayingPod.id,
-      itemID: parseInt(trackID),
-      ts: Math.round(pos) || 0,
-      speed: speed,
-    }
-    const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, (pricePerMinute * mult || 1), chatID, true)
+  async function makeSendPaymentArgs(cpp?, multiplier?: number): Promise<SendPaymentArgs> {
+    const mult = multiplier || 1
+      const thePod = cpp || currentlyPlayingPod
+      if (!pricePerMinute) return
+      // console.log('=> sendArgs!')
+      const pos = await TrackPlayer.getPosition()
+      const dests = thePod && thePod.value && thePod.value.destinations
+      const trackID = await TrackPlayer.getCurrentTrack()
+      if (!dests) return
+      if (!thePod.id || !trackID) return
+      // console.log("Episode Sent === ", trackID)
+      const sp: StreamPayment = {
+        feedID: thePod.id,
+        itemID: parseInt(trackID),
+        ts: Math.round(pos) || 0,
+        speed: speed,
+      }
+      const memo = JSON.stringify(sp)
+      console.log("PPM === ", pricePerMinute)
+      console.log("MULT === ", mult)
+      return {
+        destinations: dests,
+        text: memo,
+        amount: (pricePerMinute * mult || 1),
+        chat_id: chatID,
+        update_meta: true
+      }
+
   }
+
+  useEffect(()=>{
+    interval.setNumSeconds(NUM_SECONDS)
+  }, [])
 
   const count = useRef(0)
   const storedTime = useRef(0)
   useInterval(async() => {
-    console.log("playing? === ", playing)
-    const state = await TrackPlayer.getState()
-    console.log("state === ", state)
-    if (state === TrackPlayer.STATE_PLAYING) {
-      const c = count.current
-      if (c && c % NUM_SECONDS === 0) {
-        sendPayments(1)
-      }
-      count.current += 1
-    }
     if(playing) setPosition()
   }, 1000)
 
   const appState = useRef(AppState.currentState);
-  function handleAppStateChange(nextAppState) {
+  async function handleAppStateChange(nextAppState) {
     if (appState.current.match(/inactive|background/) && nextAppState === "active") {
       const now = Math.round(Date.now().valueOf() / 1000)
       const gap = now - storedTime.current
       if (gap > 0) {
         const n = Math.floor(gap / NUM_SECONDS)
-        if (n) sendPayments(n)
+        if (n) {
+          try{
+            const fetchedArgs = interval.getArgs()
+            const newText = JSON.parse(fetchedArgs.text)
+            const pos = await TrackPlayer.getPosition()
+            newText.ts = Math.round(pos)
+            console.log("STATE CHANGE")
+            feed.sendPayments({
+              destinations: fetchedArgs.destinations,
+              text: JSON.stringify(newText),
+              amount: (fetchedArgs.amount * n),
+              chat_id: fetchedArgs.chat_id,
+              update_meta: fetchedArgs.update_meta
+            })
+          } catch(e){}
+        }
       }
     }
     if (appState.current.match(/active/) && nextAppState === "background") {
@@ -267,7 +299,8 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
       }
       if (d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
-      feed.sendPayments(finalDests, memo, pricePerMinute, chatID, false)
+      console.log("CLIP PAYMENT")
+      feed.sendPayments({destinations: finalDests, text: memo, amount: pricePerMinute, chat_id: chatID, update_meta:false})
     }
   }
 
@@ -347,7 +380,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
       if (!dests) return
       if (!pod.id || !selectedEpisodeID) return
       const memo = JSON.stringify(sp)
-      feed.sendPayments(dests, memo, amount, chatID, false)
+      feed.sendPayments({destinations: dests, text: memo, amount: amount, chat_id: chatID, update_meta: false})
     })
   }
 
@@ -543,3 +576,6 @@ const styles = StyleSheet.create({
   }
 })
 
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

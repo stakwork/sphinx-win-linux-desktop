@@ -115,7 +115,13 @@ export default function Pod({ url, chat, onBoost }) {
     if (!dests) return
     if (!pod.id || !selectedEpisodeID) return
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, amount, chatID, false)
+    feed.sendPayments({
+      destinations: dests,
+      text: memo,
+      amount: amount,
+      chat_id: chatID,
+      update_meta: false
+    })
   }
 
   async function sendPayments(ts: number) {
@@ -136,7 +142,13 @@ export default function Pod({ url, chat, onBoost }) {
       ts: Math.round(pos),
     }
     const memo = JSON.stringify(sp)
-    feed.sendPayments(dests, memo, item.price || pricePerMinute, item.chatID || chatID, true)
+    feed.sendPayments({
+      destinations: dests,
+      text: memo,
+      amount: item.price || pricePerMinute,
+      chat_id: item.chatID,
+      update_meta: true
+    })
   }
 
   function onClipPayment(d) {
@@ -155,7 +167,13 @@ export default function Pod({ url, chat, onBoost }) {
       if (d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
       const finalDests: Destination[] = dests.concat(extraDest)
-      feed.sendPayments(finalDests, memo, pricePerMinute, chatID, false)
+      feed.sendPayments({
+        destinations: dests,
+        text: memo,
+        amount: pricePerMinute,
+        chat_id: chatID,
+        update_meta: false
+      })
     }
   }
 
