@@ -25,7 +25,7 @@ export default function Replay({ msgs, playing }) {
       getPosition()
     }
   }, 1000)
-  console.log("MESSAGES", messages)
+  // console.log("MESSAGES", messages)
   const renderItem: any = ({ item, index }) => {
     const isBoost = item.type === 'boost'
     const bg = isBoost ? '#35806d' : 'white'

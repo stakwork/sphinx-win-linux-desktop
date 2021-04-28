@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Alert } from 'react-native'
 import { useStores, useTheme } from '../../../store'
 import shared from './sharedStyles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -97,6 +97,21 @@ export default function MediaMsg(props) {
 
   const onLongPressHandler = () => props.onLongPress(props)
 
+
+  const confirmButton = () =>
+    Alert.alert(
+      "Confirm Purchase",
+      "Confirm Purchase?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Confirm", onPress: () => onButtonPressHandler() }
+      ]
+    );
+
   return <View collapsable={false}>
     <TouchableOpacity style={{ ...styles.wrap, minHeight: wrapHeight }}
       //onPressIn={tap} onPressOut={untap}
@@ -138,7 +153,7 @@ export default function MediaMsg(props) {
       {showBoostRow && <BoostRow {...props} pad myAlias={props.myAlias}/>}
 
       {showPurchaseButton && <Button style={styles.payButton} mode="contained" dark={true}
-        onPress={onButtonPressHandler}
+        onPress={confirmButton}
         loading={buying}
         icon={purchased ? 'check' : 'arrow-top-right'}>
         <Text style={{ fontSize: 11 }}>

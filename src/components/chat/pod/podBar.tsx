@@ -12,16 +12,42 @@ import useInterval from '../../utils/useInterval'
 export default function PodBar({ duration, episode, onToggle, playing, onShowFull, boost, loading, podError }) {
   const theme = useTheme()
   const [pos, setPos] = useState(0)
+  const [isItSame, setIsItSame] = useState(null)
+
+  async function isSame(){
+    const episodeId = episode && episode.id
+    const trackID = await TrackPlayer.getCurrentTrack()
+    // console.log(episodeId, "----", trackID)
+    return episodeId === parseInt(trackID)
+  }
+
+  async function positionSet(){
+    const same = await isSame()
+    setIsItSame(same)
+    if (!same) return
+    const p = getPosition()
+    // console.log("P === ", p)
+    // console.log("POS === ", pos)
+    if (p !== pos) setPos(p)
+  }
 
   useEffect(() => {
-    const p = getPosition()
-    if (p !== pos) setPos(p)
+    positionSet()
   }, [])
 
   useInterval(() => {
-    const p = getPosition()
-    if (p !== pos) setPos(p)
+    positionSet()
   }, 1000)
+
+  // useEffect(() => {
+  //   const p = getPosition()
+  //   if (p !== pos) setPos(p)
+  // }, [])
+
+  // useInterval(() => {
+  //   const p = getPosition()
+  //   if (p !== pos) setPos(p)
+  // }, 1000)
 
   function getProgress() {
     if (!duration || !pos) return 0;
@@ -35,6 +61,8 @@ export default function PodBar({ duration, episode, onToggle, playing, onShowFul
   }
 
   const height = 58
+
+  // console.log("PODBAR PLAYING? === ", playing)
 
   if (loading || podError) {
     return <View style={{ ...styles.wrap, backgroundColor: theme.dark ? theme.deep : theme.bg, borderTopColor: theme.border, height }}>
@@ -58,7 +86,7 @@ export default function PodBar({ duration, episode, onToggle, playing, onShowFul
           </Text>
         </View>
         <View style={styles.iconz}>
-          <IconButton icon={playing ? 'pause' : 'play'}
+          <IconButton icon={playing && isItSame ? 'pause' : 'play'}
             color={theme.title} size={26}
             onPress={onToggle} style={{ marginRight: 15 }}
           />
