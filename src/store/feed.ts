@@ -38,8 +38,8 @@ export class FeedStore {
 
   @action async sendPayments(args: SendPaymentArgs) {
     if(!args) return
-    console.log("SENDING PAYMENT TO = ", args.text)
-    console.log("AMOUNT === ", args.amount)
+    // console.log("SENDING PAYMENT TO = ", args.text)
+    // console.log("AMOUNT === ", args.amount)
     await relay.post('stream', args)
     if(args.chat_id && args.update_meta && args.text) {
       let meta

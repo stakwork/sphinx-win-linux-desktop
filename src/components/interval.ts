@@ -18,8 +18,8 @@ async function tick(){
       const newText = JSON.parse(args.text)
       const pos = await TrackPlayer.getPosition()
       newText.ts = Math.round(pos)
-      console.log("TICK PAY")
-      console.log("C === ", c)
+      // console.log("TICK PAY")
+      // console.log("C === ", c)
       feedStore.sendPayments({
         destinations: args.destinations,
         text: JSON.stringify(newText),
