@@ -112,9 +112,9 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
 
 
   useTrackPlayerEvents([TrackPlayerEvents.PLAYBACK_STATE], async event => {
-    console.log("EVENT === ", event)
+    // console.log("EVENT === ", event)
       if (event.state === TrackPlayer.STATE_STOPPED) {
-      console.log("STOPPING")
+      // console.log("STOPPING")
       interval.pause();
       TrackPlayer.pause()
       setPlaying(false)
@@ -215,8 +215,8 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
         speed: speed,
       }
       const memo = JSON.stringify(sp)
-      console.log("PPM === ", pricePerMinute)
-      console.log("MULT === ", mult)
+      // console.log("PPM === ", pricePerMinute)
+      // console.log("MULT === ", mult)
       return {
         destinations: dests,
         text: memo,
@@ -250,7 +250,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
             const newText = JSON.parse(fetchedArgs.text)
             const pos = await TrackPlayer.getPosition()
             newText.ts = Math.round(pos)
-            console.log("STATE CHANGE")
+            // console.log("STATE CHANGE")
             feed.sendPayments({
               destinations: fetchedArgs.destinations,
               text: JSON.stringify(newText),
@@ -299,7 +299,7 @@ export default function Pod({ pod, show, chat, onBoost, podError }) {
       }
       if (d.uuid) sp.uuid = d.uuid
       const memo = JSON.stringify(sp)
-      console.log("CLIP PAYMENT")
+      // console.log("CLIP PAYMENT")
       feed.sendPayments({destinations: finalDests, text: memo, amount: pricePerMinute, chat_id: chatID, update_meta:false})
     }
   }
