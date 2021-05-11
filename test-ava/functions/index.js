@@ -37,6 +37,7 @@ var updateProfile = require('./update-profile')
 var getFailNewMsgs = require('./get/get-fail-newMsgs')
 var getCheckNewJoin = require('./get/get-check-newJoin')
 var appRejMember = require('./approve-member')
+var getLatest = require('./get/get-latest')
 
 module.exports = {
     addContact,
@@ -78,4 +79,5 @@ module.exports = {
     getFailNewMsgs,
     getCheckNewJoin,
     appRejMember,
+    getLatest
 }

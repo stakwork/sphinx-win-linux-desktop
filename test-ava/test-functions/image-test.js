@@ -15,21 +15,25 @@ async function imageTest(t, index1, index2) {
         t.true(added, "n1 should add n2 as contact")
 
         //NODE1 SEND IMAGE TO NODE2
+        console.log("first")
         const image = b.greenSquare
         const imageSent = await f.sendImage(t, node1, node2, image)
         t.true(imageSent, "image should have been sent")
         
         //NODE2 SENDS AN IMAGE TO NODE1
+        console.log("second")
         const image2 = b.pinkSquare
         const imageSent2 = await f.sendImage(t, node2, node1, image2)
         t.true(imageSent2, "image should have been sent")
 
         //NODE1 SEND IMAGE TO NODE2
+        console.log("third")
         const price = 11
         const paidImageSent = await f.sendImage(t, node1, node2, image, null, price)
         t.true(paidImageSent, "paid image should have been sent")
         
         //NODE2 SENDS AN IMAGE TO NODE1
+        console.log("fourth")
         const price2 = 12
         const paidImageSent2 = await f.sendImage(t, node2, node1, image2, null, price2)
         t.true(paidImageSent2, "paid image should have been sent")

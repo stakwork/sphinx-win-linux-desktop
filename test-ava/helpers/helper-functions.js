@@ -1,5 +1,11 @@
 var http = require('ava-http');
 var ra = require('../run-ava')
+var moment = require("moment")
+
+function getTimestamp(){
+    const dateq = moment().utc().format('YYYY-MM-DD%20HH:mm:ss')
+    return dateq
+}
 
 async function getToken(t, node){
 //A NODE GETS A SERVER TOKEN FOR POSTING TO MEME SERVER
@@ -95,4 +101,4 @@ async function runTest(t, testFunction, nodeArray, iterate){
     }
 }
 
-module.exports = {getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest, memeProtocol}
+module.exports = {getTimestamp, getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest, memeProtocol}
