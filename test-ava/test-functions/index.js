@@ -18,6 +18,7 @@ var botCreation = require('./bot-creation')
 var tribe3Private = require('./tribe3-private')
 var tribe3Profile = require('./tribe3-profile')
 var paidMsgs = require('./paid-msgs')
+var latestTest = require('./latest-test')
 
 module.exports = {
     clearAllChats, 
@@ -40,4 +41,5 @@ module.exports = {
     tribe3Private,
     tribe3Profile,
     paidMsgs,
+    latestTest
 }

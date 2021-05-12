@@ -33,13 +33,13 @@ async function chatPayment(t, index1, index2) {
     t.true(check2, "node1 should have read and decrypted node2 message")
 
     //NODE1 SENDS PAYMENT TO NODE2
-    const amount = 11
+    const amount = 101
     const paymentText = "this eleven payment"
     const payment = await f.sendPayment(t, node1, node2, amount, paymentText)
     t.true(payment, 'payment should be sent')
 
     //NODE2 SENDS PAYMENT TO NODE1
-    const amount2 = 12
+    const amount2 = 102
     const paymentText2 = "that twelve payment"
     const payment2 = await f.sendPayment(t, node2, node1, amount2, paymentText2)
     t.true(payment2, 'payment should be sent')

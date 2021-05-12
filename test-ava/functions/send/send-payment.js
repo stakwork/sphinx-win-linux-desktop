@@ -51,6 +51,8 @@ async function sendPayment(t, node1, node2, amount, text){
     const pmnt = await http.post(node1.ip+'/payment', h.makeArgs(node1, v))
     t.true(pmnt.success, 'payment should have been posted')
 
+    await h.sleep(1000)
+
     //get node1 balance after payment
     node1bal = await http.get(node1.ip+'/balance', h.makeArgs(node1))
     t.true(node1bal.success, "should get node1 balance")
@@ -61,12 +63,12 @@ async function sendPayment(t, node1, node2, amount, text){
     t.true(node2bal.success, "should get node2 balance")
     const node2afterBalance = node2bal.response.balance
 
-    // console.log("NODE1 BEFORE BALANCE === ", node1beforeBalance)
-    // console.log("NODE1 AFTER BALANCE === ", node1afterBalance)
-    // console.log("NODE2 BEFORE BALANCE === ", node2beforeBalance)
-    // console.log("NODE2 AFTER BALANCE === ", node2afterBalance)
-    // console.log("NODE1 === ", (node1beforeBalance - node1afterBalance) - amount)
-    // console.log("NODE2 === ", (node2afterBalance - node2beforeBalance) -  amount)
+    console.log("NODE1 BEFORE BALANCE === ", node1beforeBalance)
+    console.log("NODE1 AFTER BALANCE === ", node1afterBalance)
+    console.log("NODE2 BEFORE BALANCE === ", node2beforeBalance)
+    console.log("NODE2 AFTER BALANCE === ", node2afterBalance)
+    console.log("NODE1 === ", (node1beforeBalance - node1afterBalance) - amount)
+    console.log("NODE2 === ", (node2afterBalance - node2beforeBalance) -  amount)
 
     //check that node1 sent payment and node2 received payment based on balances
     t.true(Math.abs(((node1beforeBalance - node1afterBalance) - amount)) <= r.allowedFee, "node1 should have paid amount")
