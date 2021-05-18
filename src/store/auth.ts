@@ -60,6 +60,17 @@ class AuthStore {
     return r
   }
 
+  @action
+  async verifyExternal(): Promise<VerifyExternalResponse> {
+    const r = await relay.post(`verify_external`)
+    return r
+  }
+
+}
+
+interface VerifyExternalResponse {
+  info: {[k:string]:any}
+  token: string
 }
 
 export const authStore = new AuthStore()

@@ -7,22 +7,28 @@ import {useStores} from '../../src/store'
 import Button from '../utils/button'
 
 export default function BridgeModal({ params }) {
-  const {ui, auth} = useStores()
+  const {ui, auth, user} = useStores()
   const [loading, setLoading] = useState(false)
   function onClose(){
     ui.setTribesAuthParams(null)
   }
   async function authorize(j){
     setLoading(true)
-    const ts = await auth.externalTokens();
-    const protocol = j.host.includes("localhost") ? "http" : "https";
-    await fetch(`${protocol}://${j.host}/verify/${j.challenge}`, {
-      method: "POST",
-      body: JSON.stringify(ts),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const data = await auth.verifyExternal();
+      if(data.info && data.token) {
+        const body = data.info
+        body.url = user.currentIP
+        const protocol = j.host.includes("localhost") ? "http" : "https";
+        await fetch(`${protocol}://${j.host}/verify/${j.challenge}?token=${data.token}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+    } catch(e) {}
     setLoading(false)
     onClose()
   }
