@@ -15,11 +15,12 @@ export default function setupDeeplink() {
 
 async function runAction(url) {
   const j = jsonFromUrl(url);
+  console.log(j)
   switch (j.action) {
     case "tribe":
       const tribe = await chatStore.getTribeDetails(j.host, j.uuid);
       uiStore.setViewTribe(tribe);
-    case "tokens":
+    case "auth":
       console.log(j);
       if (j.challenge && j.host) {
         uiStore.setTribesAuthParams(j)
