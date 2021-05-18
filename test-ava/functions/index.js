@@ -79,5 +79,5 @@ module.exports = {
     getFailNewMsgs,
     getCheckNewJoin,
     appRejMember,
-    getLatest
+    getLatest,
 }

@@ -4,7 +4,7 @@ var h = require('../../helpers/helper-functions')
 var getCheckContacts = require('../get/get-check-contacts')
 var getCheckNewMsgs = require('../get/get-check-newMsgs')
 
-async function sendMessage(t, node1, node2, text, msgPrice){
+async function sendMessage(t, node1, node2, text, options){
 //NODE1 SENDS TEXT MESSAGE TO NODE2
   const [node1contact, node2contact] = await getCheckContacts(t, node1, node2)
 
@@ -18,13 +18,13 @@ async function sendMessage(t, node1, node2, text, msgPrice){
         chat_id: null,
         text: encryptedText,
         remote_text_map: {[node2contact.id]: remoteText},
-        amount: 0,
+        amount: options && options.amount || 0,
         reply_uuid: "",
         boost: false,
     }
 
     // if(msgPrice) {
-    //     v.message_price = msgPrice,
+    //     v.message_price = options && options.msgPrice,
     //     v.id = -1,
     //     v.sender = 1, 
     //     v.amount = 0,

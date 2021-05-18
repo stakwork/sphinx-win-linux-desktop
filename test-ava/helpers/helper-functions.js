@@ -55,6 +55,13 @@ function makeArgs(node, body) {
         body
     }
     }
+
+function makeJwtArgs(jwt, body) {
+    return {
+        headers : {'x-jwt':jwt},
+        body
+    }
+    }
     
 function arraysEqual(a, b) {
     if (a === b) return true;
@@ -101,4 +108,4 @@ async function runTest(t, testFunction, nodeArray, iterate){
     }
 }
 
-module.exports = {getTimestamp, getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest, memeProtocol}
+module.exports = {makeJwtArgs, getTimestamp, getToken, randomText, asyncForEach, makeArgs, arraysEqual, sleep, runTest, memeProtocol}

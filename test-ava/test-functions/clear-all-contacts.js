@@ -13,7 +13,7 @@ async function clearAllContacts(t, index1, index2, index3){
         if(!node) return
 
         //get all contacts from node
-        var res = await http.get(node.ip+'/contacts', h.makeArgs(node));
+        var res = await http.get(node.ip+'/contacts?unmet=include', h.makeArgs(node));
         var contacts = res.response.contacts
         t.truthy(contacts, "should have at least one contact")
 
