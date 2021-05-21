@@ -8,6 +8,7 @@ const run = {
     active: "threeNodes",
     iterate: false,
     memeHost: "localhost:5000",
+    tribeHost: "localhost:5002",
     allowedFee: 4,
 }
 

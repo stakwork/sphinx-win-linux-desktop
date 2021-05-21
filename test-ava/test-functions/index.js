@@ -19,6 +19,9 @@ var tribe3Private = require('./tribe3-private')
 var tribe3Profile = require('./tribe3-profile')
 var paidMsgs = require('./paid-msgs')
 var latestTest = require('./latest-test')
+var paidMeet = require('./paid-meet')
+var sphinxPeople = require('./sphinx-people')
+var tribeEdit = require('./tribe-edit')
 
 module.exports = {
     clearAllChats, 
@@ -41,5 +44,8 @@ module.exports = {
     tribe3Private,
     tribe3Profile,
     paidMsgs,
-    latestTest
+    latestTest,
+    paidMeet,
+    sphinxPeople,
+    tribeEdit
 }
