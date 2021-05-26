@@ -79,9 +79,9 @@ export default function Person({visible}) {
             {owner_alias}
           </Text>}
 
-          <Text style={{marginTop:10,marginBottom:10,paddingLeft:15,paddingRight:15,color:theme.title}}>
+          {(description?true:false) && <Text style={{marginTop:10,marginBottom:10,paddingLeft:15,paddingRight:15,color:theme.title}}>
             {description}
-          </Text>
+          </Text>}
 
           <TextInput mode="outlined"
             placeholder={`Initial message to ${owner_alias}`}
@@ -89,6 +89,10 @@ export default function Person({visible}) {
             value={message}
             style={styles.input}
           />
+
+          {(price_to_meet?true:false) && <Text style={{marginTop:10,marginBottom:10,paddingLeft:15,paddingRight:15,color:theme.title}}>
+            {`Price To Meet: ${price_to_meet} sats`}
+          </Text>}
 
           <Button onPress={addContactAndSendInitialMessage} mode="contained"
             dark={true} style={{...styles.button,top:h-250}} loading={loading}>
