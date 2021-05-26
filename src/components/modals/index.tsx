@@ -19,6 +19,8 @@ import ShareTribe from './shareTribe'
 import Redeem from './redeem'
 import VidViewer from './vidViewer'
 import AddSats from './addSats'
+import TribesAuth from './tribesAuth'
+import Person from './person'
 
 export default function Modals(){
   const {ui} = useStores()
@@ -35,6 +37,8 @@ export default function Modals(){
     const showRedeemModal = ui.redeemModalParams?true:false
     const showVid = ui.vidViewerParams?true:false
     const showAddSats = ui.addSatsModal?true:false
+    const showTribesAuth = ui.tribesAuthParams?true:false
+    const showPerson = ui.personParams?true:false
     return <>
       {showAddFriendModal && <AddFriend visible={true} />}
       {ui.showPayModal && <Payment visible={true} />}
@@ -54,6 +58,8 @@ export default function Modals(){
       {showShareTribeUUID && <ShareTribe visible={true} />}
       {showVid && <VidViewer params={ui.vidViewerParams} />}
       {showAddSats && <AddSats visible={true} />}
+      {showTribesAuth && <TribesAuth visible={true} />}
+      {showPerson && <Person visible={true} />}
     </>
   })
 }
