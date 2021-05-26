@@ -38,6 +38,8 @@ var getFailNewMsgs = require('./get/get-fail-newMsgs')
 var getCheckNewJoin = require('./get/get-check-newJoin')
 var appRejMember = require('./approve-member')
 var getLatest = require('./get/get-latest')
+var editTribe = require('./edit-tribe')
+var tribeHost = require('./tribeHost')
 
 module.exports = {
     addContact,
@@ -80,4 +82,6 @@ module.exports = {
     getCheckNewJoin,
     appRejMember,
     getLatest,
+    editTribe,
+    tribeHost
 }

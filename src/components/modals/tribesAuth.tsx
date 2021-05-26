@@ -19,6 +19,7 @@ export default function TribesAuth({visible}) {
       const data = await auth.verifyExternal();
       if(data.info && data.token) {
         const body = data.info
+        console.log("user ip === ", user.currentIP)
         body.url = user.currentIP
         const protocol = j.host.includes("localhost") ? "http" : "https";
         await fetch(`${protocol}://${j.host}/verify/${j.challenge}?token=${data.token}`, {
