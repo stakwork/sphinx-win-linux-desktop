@@ -272,6 +272,10 @@ class ContactStore {
     this.contacts = []
   }
 
+  @action findExistingContactByPubkey(pubkey:string) {
+    return this.contacts.find(c=> c.public_key===pubkey)
+  }
+
 }
 
 export const contactStore = new ContactStore()
