@@ -6,7 +6,7 @@ import theme from '../theme'
 import {useStores} from '../../src/store'
 import Button from '../utils/button'
 
-export default function BridgeModal({ params }) {
+export default function TribesAuthModal({ params }) {
   const {ui, auth, user} = useStores()
   const [loading, setLoading] = useState(false)
   function onClose(){

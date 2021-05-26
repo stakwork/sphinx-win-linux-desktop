@@ -267,6 +267,7 @@ class MsgStore {
         const r = await relay.post('messages', v)
         if (!r) return
         this.gotNewMessage(r)
+        return r
       } else {
         const putInMsgType = boost?constants.message_types.boost:constants.message_types.message
         const amt = boost&&message_price&&message_price<amount ? amount-message_price : amount
@@ -276,6 +277,7 @@ class MsgStore {
         // console.log("RESULT")
         this.messagePosted(r)
         if (amount) detailsStore.addToBalance(amount * -1)
+        return r
       }
     } catch (e) {
       console.log(e)

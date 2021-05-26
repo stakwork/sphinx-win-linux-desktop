@@ -16,6 +16,7 @@ import Onchain from './onchain'
 import {uiStore} from '../../src/store/ui'
 import VersionModal from './versionModal'
 import TribesAuthModal from './tribesAuthModal'
+import PersonModal from './person'
 
 const electron = window.require ? window.require("electron") : {}
 if(electron.ipcRenderer) {
@@ -44,6 +45,7 @@ export default function Modals(){
       {ui.showVersionDialog && <VersionModal />}
       {ui.tribeInfo && <TribeInfo />}
       {ui.tribesAuthParams && <TribesAuthModal params={ui.tribesAuthParams} />}
+      {ui.personParams && <PersonModal params={ui.personParams} />}
     </Wrap>
   })
 }

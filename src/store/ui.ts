@@ -298,6 +298,21 @@ export class UiStore {
   @action setTribesAuthParams(o) {
     this.tribesAuthParams = o
   }
+
+  @observable personParams: PersonParams = null
+  @action setPersonParams(o) {
+    this.personParams = o
+  }
+}
+
+export interface PersonParams {
+  owner_pubkey: string
+  owner_alias: string
+  owner_route_hint: string
+  owner_contact_key: string
+  price_to_meet: number
+  img: string
+  description: string
 }
 
 export const uiStore = new UiStore()

@@ -21,9 +21,18 @@ async function runAction(url) {
       const tribe = await chatStore.getTribeDetails(j.host, j.uuid);
       uiStore.setViewTribe(tribe);
     case "auth":
-      console.log(j);
       if (j.challenge && j.host) {
         uiStore.setTribesAuthParams(j)
+      }
+    case "person":
+      if (j.host && j.pubkey) {
+        try {
+          const r = await fetch('https://'+j.host+'/person/'+j.pubkey)
+          const jj = await r.json()
+          uiStore.setPersonParams(jj)
+        } catch(e) {
+          console.log(e)
+        }
       }
   }
 }
