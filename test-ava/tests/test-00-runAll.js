@@ -1,5 +1,5 @@
 var test = require('ava');
-var h = require('../helpers/helper-functions')
+var h = require('../utils/helpers')
 var i = require('./index')
 var r = require('../run-ava')
 

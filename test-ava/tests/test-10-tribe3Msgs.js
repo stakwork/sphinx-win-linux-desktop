@@ -1,8 +1,8 @@
 var test = require('ava');
-var h = require('../helpers/helper-functions')
+var h = require('../utils/helpers')
 var r = require('../run-ava')
 var nodes = require('../nodes.json')
-var f = require('../functions')
+var f = require('../utils')
 
 /*
 npx ava test-10-tribe3Msgs.js --verbose --serial --timeout=2m

@@ -1,5 +1,5 @@
 var test = require('ava');
-var h = require('../helpers/helper-functions')
+var h = require('../utils/helpers')
 var r = require('../run-ava')
 var http = require('ava-http');
 var nodes = require('../nodes.json')
