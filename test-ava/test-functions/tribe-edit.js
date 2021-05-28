@@ -1,9 +1,11 @@
 var nodes = require('../nodes.json')
 var f = require('../functions')
 var h = require('../helpers/helper-functions')
+var http = require('ava-http');
+var r = require("../run-ava")
 
 async function tribeEdit(t, index1, index2) {
-//TWO NODES SEND TEXT MESSAGES WITHIN A TRIBE ===>
+//A NODE MAKES EDITS TO A TRIBE IT CREATED ===>
 
     let node1 = nodes[index1]
     let node2 = nodes[index2]
@@ -19,23 +21,44 @@ async function tribeEdit(t, index1, index2) {
     let join = await f.joinTribe(t, node2, tribe)
     t.true(join, "node2 should join tribe")
 
-    //NODE1 SENDS A TEXT MESSAGE IN TRIBE
-    const text = h.randomText()
-    let tribeMessage = await f.sendTribeMessage(t, node1, tribe, text)
-    t.true(tribeMessage.success, "node1 should send message to tribe")
+    //GET TRIBE ID FROM NODE1 PERSPECTIVE
+    const tribeId = await f.getTribeId(t, node1, tribe)
+    t.true(typeof tribeId === "number")
 
-    //CHECK THAT NODE1'S DECRYPTED MESSAGE IS SAME AS INPUT
-    const check = await f.checkDecrypt(t, node2, text, tribeMessage.message)
-    t.true(check, "node2 should have read and decrypted node1 message")
+    //CREATE TRIBE BODY WITH EDITED PRICE_TO_JOIN
+    const newPriceToJoin = 12
+    const newDescription = "Edited Description"
+    const body = {
+        name: tribe.name || 0,
+        price_per_message: tribe.price_per_message || 0,
+        price_to_join: newPriceToJoin,
+        escrow_amount: tribe.escrow_amount || 0,
+        escrow_millis: tribe.escrow_millis || 0,
+        img: tribe.img || '',
+        description: newDescription,
+        tags: [],
+        unlisted: true,
+        app_url: '',
+        feed_url: '',
+      }
 
-    //NODE2 SENDS A TEXT MESSAGE IN TRIBE
-    const text2 = h.randomText()
-    let tribeMessage2 = await f.sendTribeMessage(t, node2, tribe, text2)
-    t.true(tribeMessage2.success, "node2 should send message to tribe")
+    //USE TRIBE ID AND EDITED BODY TO EDIT THE TRIBE
+    const edit = await f.editTribe(t, node1, tribeId, body)
+    t.true(edit.success, "edit should have succeeded")
+    t.true(edit.tribe.price_to_join === newPriceToJoin, "new price to join should be included in edit")
 
-    //CHECK THAT NODE2'S DECRYPTED MESSAGE IS SAME AS INPUT
-    const check2 = await f.checkDecrypt(t, node1, text2, tribeMessage2.message)
-    t.true(check2, "node1 should have read and decrypted node2 message")
+    //GET ALL CHATS FROM NODE1 PERSPECTIVE
+    const node1Chats = await f.getChats(t, node1)
+    const editedTribe = await node1Chats.find(c => c.id === tribeId)
+    t.truthy(editedTribe, "tribe should be listed in node1 chats")
+    t.true(editedTribe.price_to_join === newPriceToJoin, "fetched chat should show edit")
+
+    //FETCH TRIBE FROM TRIBE SERVER TO CHECK EDITS
+    const tribeFetch = await f.tribeHost.getByUuid(t, tribe)
+    console.log("tribeFetch === ", tribeFetch)
+    t.true(typeof tribeFetch === "object", "fetched tribe object should exist")
+    t.true(tribeFetch.price_to_join === newPriceToJoin, "tribe server should show new price")
+    t.true(tribeFetch.description === newDescription, "tribe server should show new description")
 
     //NODE2 LEAVES THE TRIBE
     let left = await f.leaveTribe(t, node2, tribe)

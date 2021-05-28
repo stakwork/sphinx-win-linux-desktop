@@ -21,6 +21,7 @@ export async function qrActions(j, ui, chats){
         ui.setJoinTribeParams(tribeParams)
       }catch(e){}
       case "auth":
+        console.log("QR AUTH == ", j)
         if (j.challenge && j.host) {
           ui.setTribesAuthParams(j)
         }
