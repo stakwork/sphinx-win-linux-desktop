@@ -52,6 +52,8 @@ function Chat() {
     if (useHasReplyContent()) footHeight = 120
     const chat = ui.selectedChat
 
+    // console.log("CHAT",chat)
+
     // this the boost MESSAGE (doesnt actually include the boost amount),
     // the actual boost amount is sent by feed.sendPayments by the podcast XML
     function onBoostPod(sp:StreamPayment){
@@ -81,6 +83,7 @@ function Chat() {
           }
           ui.setLoadingChat(false)
         }
+
         const r = await chats.checkRoute(chat.id, user.myid)
         if(r && r.success_prob && r.success_prob>0.01) {
           setStatus('active')
