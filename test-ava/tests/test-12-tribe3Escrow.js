@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-12-tribe3Escrow.js --verbose --serial --timeout=2m
 */
 
-test('create tribe, two nodes join tribe, send messages, check escrow, delete tribe', async t => {
+test('test-12-tribe3Escrow: create tribe, two nodes join tribe, send messages, check escrow, delete tribe', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, tribe3Escrow, nodeArray, r.iterate)
 })

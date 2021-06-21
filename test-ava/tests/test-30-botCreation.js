@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-30-botCreation.js --verbose --serial --timeout=2m
 */
 
-test('create tribe, create bot, add bot to tribe, delete bot, delete tribe', async t => {
+test('test-30-botCreation: create tribe, create bot, add bot to tribe, delete bot, delete tribe', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, botCreation, nodeArray, false)
 })

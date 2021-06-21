@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-99-clearAllChats.js --verbose --serial --timeout=2m
 */
 
-test('clear all chats from nodes', async t => {
+test('test-99-clearAllChats: clear all chats from nodes', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, clearAllChats, nodeArray, false) //always iterate: false
 })

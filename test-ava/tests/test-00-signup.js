@@ -13,7 +13,7 @@ const CLEAR = false
 npx ava test-00-signup.js --verbose --serial --timeout=2m
 */
 
-test('check node signup', async t => {
+test('test-00-signup: check node signup', async t => {
     var nodes1 = require(path)
     await asyncForEach(nodes1, async n=> {
         const token = await signup(t, n)

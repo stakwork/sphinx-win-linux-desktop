@@ -10,7 +10,7 @@ var clearAllContacts = require('./test-98-clearAllContacts')
 npx ava test-41-paidMeet.js --verbose --serial --timeout=2m
 */
 
-test('update price_to_meet, add contact paid/unpaid, reset contact', async t => {
+test('test-41-paidMeet: update price_to_meet, add contact paid/unpaid, reset contact', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, paidMeet, nodeArray, false)
 })
@@ -47,15 +47,10 @@ async function paidMeet(t, index1, index2) {
 
     //GET CONTACTS FROM NODE1 INCLUDING UNMET, NODE2 WILL BE LISTED
     const contacts2 = await http.get(node1.ip+'/contacts?unmet=include', h.makeArgs(node1));
+    // console.log("contacts2 === ", JSON.stringify(contacts2.response.contacts))
     t.truthy(contacts2.response.contacts.find(c => c.public_key === node2.pubkey), "node2 will be listed in unmet contacts")
 
-    //DELETE ALL CONTACTS
-    const clear = await clearAllContacts(t, index1, index2)
-    t.truthy(clear, "all contacts should be cleared")
-
-    //NODE2 ADDS NODE1 AS A CONTACT WITH CORRECT PRICE TO MEET
-    let added2 = await f.addContact(t, node2, node1)
-    t.true(added2, "node2 should add node1 as contact again")
+    //ATTEMPT CONTACT AGAIN
 
     //NODE2 SENDS A TEXT MESSAGE TO NODE1
     const text2 = h.randomText()
@@ -65,7 +60,27 @@ async function paidMeet(t, index1, index2) {
 
     //GET CONTACTS FROM NODE1, NODE2 WILL BE LISTED
     const contacts3 = await http.get(node1.ip+'/contacts', h.makeArgs(node1));
+    // console.log("contacts3 === ", JSON.stringify(contacts3.response.contacts))
     t.truthy(contacts3.response.contacts.find(c => c.public_key === node2.pubkey), "node2 will be listed in contacts")
+
+    //DELETE ALL CONTACTS
+    const clear = await clearAllContacts(t, index1, index2)
+    t.truthy(clear, "all contacts should be cleared")
+
+    //NODE2 ADDS NODE1 AS A CONTACT WITH CORRECT PRICE TO MEET
+    let added3 = await f.addContact(t, node2, node1)
+    t.true(added3, "node2 should add node1 as contact again")
+
+    //NODE2 SENDS A TEXT MESSAGE TO NODE1
+    const text3 = h.randomText()
+    const amount2 = 13
+    let messageSent3 = await f.sendMessage(t, node2, node1, text3, {amount: amount2})
+    t.true(messageSent3.success, "node2 should send text message to node1 with correct amount")
+
+    //GET CONTACTS FROM NODE1, NODE2 WILL BE LISTED
+    const contacts5 = await http.get(node1.ip+'/contacts', h.makeArgs(node1));
+    // console.log("contacts5 === ", JSON.stringify(contacts5.response.contacts))
+    t.truthy(contacts5.response.contacts.find(c => c.public_key === node2.pubkey), "node2 will be listed in contacts")
 
     //NODE1 RESETS PROFILE
     const meetPrice2 = {price_to_meet: 0}

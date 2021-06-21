@@ -8,7 +8,7 @@ var http = require('ava-http');
 npx ava test-98-clearAllContacts.js --verbose --serial --timeout=2m
 */
 
-test('clear all contacts from nodes', async t => {
+test('test-98-clearAllContacts: clear all contacts from nodes', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, clearAllContacts, nodeArray, false) //always iterate: false
 })

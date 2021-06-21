@@ -8,7 +8,7 @@ var http = require('ava-http');
 npx ava test-01-queryRoutes.js --verbose --serial --timeout=2m
 */
 
-test('check query routes between nodes', async t => {
+test('test-01-queryRoutes: check query routes between nodes', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, queryRoutes, nodeArray, false) //always iterate: false
 })

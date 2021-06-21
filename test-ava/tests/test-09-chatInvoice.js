@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-09-chatInvoice.js --verbose --serial --timeout=2m
 */
 
-test('add contact, send invoices, pay invoices, delete contact', async t => {
+test('test-09-chatInvoice: add contact, send invoices, pay invoices, delete contact', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, chatInvoice, nodeArray, r.iterate)
 })

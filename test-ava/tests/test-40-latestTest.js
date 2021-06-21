@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-40-latestTest.js --verbose --serial --timeout=2m
 */
 
-test('create timestamp, add contact and chat, get latest, delete contacts', async t => {
+test('test-40-latestTest: create timestamp, add contact and chat, get latest, delete contacts', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, latestTest, nodeArray, false)
 })

@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-15-tribeEdit.js --verbose --serial --timeout=2m
 */
 
-test('create tribe, edit tribe, check edits, delete tribe', async t => {
+test('test-15-tribeEdit: create tribe, edit tribe, check edits, delete tribe', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, tribeEdit, nodeArray, r.iterate)
 })

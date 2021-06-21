@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-13-tribe3Private.js --verbose --serial --timeout=2m
 */
 
-test('create private tribe, nodes ask to join, reject and accept, delete tribe', async t => {
+test('test-13-tribe3Private: create private tribe, nodes ask to join, reject and accept, delete tribe', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, tribe3Private, nodeArray, r.iterate)
 })

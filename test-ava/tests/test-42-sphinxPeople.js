@@ -8,7 +8,7 @@ var nodes = require('../nodes.json')
 npx ava test-42-sphinxPeople.js --verbose --serial --timeout=2m
 */
 
-test('Sphinx People testing', async t => {
+test('test-42-sphinxPeople: Sphinx People testing', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, sphinxPeople, nodeArray, false)
 })
@@ -47,12 +47,14 @@ async function sphinxPeople(t, index1) {
     //POST PROFILE TO RELAY
     const priceToMeet = 13
     const postProfile = await http.post(node1.ip+"/profile", h.makeJwtArgs(poll.jwt, {
+        pubkey: node1.pubkey,
         host: r.tribeHost,
         owner_alias: node1.alias,
         description: "this description",
         img: poll.photo_url,
         tags: [],
-        price_to_meet: priceToMeet
+        price_to_meet: priceToMeet,
+        extras: {twitter: "mytwitter"}
     })
     );
     t.true(postProfile.success, "post to profile should succeed")
@@ -61,6 +63,7 @@ async function sphinxPeople(t, index1) {
 
     //GET PERSON FROM TRIBE SERVER
     const person = await http.get("http://"+r.tribeHost+"/person/"+poll.pubkey)
+    t.truthy(person.extras.twitter === "mytwitter", "extra should exist")
 
     //GET PERSON FROM RELAY
     const res = await http.get(node1.ip+'/contacts', h.makeArgs(node1));
@@ -74,6 +77,7 @@ async function sphinxPeople(t, index1) {
     //UPDATE AND RESET PRICE_TO_MEET WITH PROFILE POST ID
     const newPriceToMeet = 0
     const postProfile2 = await http.post(node1.ip+`/profile`, h.makeJwtArgs(poll.jwt, {
+        pubkey: node1.pubkey,
         id: person.id,
         host: r.tribeHost,
         owner_alias: node1.alias,
@@ -114,7 +118,6 @@ async function sphinxPeople(t, index1) {
     }catch(e){ }
 
     //DELETE PERSON PROFILE AT END OF TEST
-    console.log("deletion")
     const del = await http.del(node1.ip+"/profile", h.makeArgs(node1, {id: person2.id, host: r.tribeHost}))
     t.true(del.success, "profile should be deleted")
 

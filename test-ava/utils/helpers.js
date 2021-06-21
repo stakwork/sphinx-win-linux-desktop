@@ -80,7 +80,7 @@ async function sleep(ms) {
 
 async function runTest(t, testFunction, nodeArray, iterate){
     if(iterate){
-        console.log("ITERATE")
+        if(testFunction.name!=='clearAllContacts'||testFunction.name!=='clearAllChats'){console.log("ITERATE")}
         await asyncForEach(nodeArray, async n1 => {
             if(nodeArray.length === 1){
                 await testFunction(t, n1)
@@ -103,7 +103,7 @@ async function runTest(t, testFunction, nodeArray, iterate){
             }
         })
     } else {
-        console.log("NO ITERATE")
+        if(testFunction.name!=='clearAllContacts'&&testFunction.name!=='clearAllChats'){console.log("NO ITERATE")}
         await testFunction(t, nodeArray[0], nodeArray[1], nodeArray[2])
     }
 }

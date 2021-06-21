@@ -9,7 +9,7 @@ var b = require('../b64-images')
 npx ava test-06-paidImages.js --verbose --serial --timeout=2m
 */
 
-test('create tribe, join tribe, send paid images, leave tribe, delete tribe', async t => {
+test('test-06-paidImages: create tribe, join tribe, send paid images, leave tribe, delete tribe', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, paidImages, nodeArray, r.iterate)
 })

@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-21-boostPayment.js --verbose --serial --timeout=2m
 */
 
-test('create tribe, join tribe, send messages, boost messages, leave tribe, delete tribe', async t => {
+test('test-21-boostPayment: create tribe, join tribe, send messages, boost messages, leave tribe, delete tribe', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, boostPayment, nodeArray, r.iterate)
 })

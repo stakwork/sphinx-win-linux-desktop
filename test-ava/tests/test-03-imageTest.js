@@ -9,7 +9,7 @@ var b = require('../b64-images')
 npx ava test-03-imageTest.js --verbose --serial --timeout=2m
 */
 
-test('add contact, send images, delete contacts', async t => {
+test('test-03-imageTest: add contact, send images, delete contacts', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, imageTest, nodeArray, r.iterate)
 })

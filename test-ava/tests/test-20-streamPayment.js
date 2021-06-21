@@ -8,7 +8,7 @@ var f = require('../utils')
 npx ava test-20-streamPayment.js --verbose --serial --timeout=2m
 */
 
-test('establish chat, node1 streams payment, node1 streams split payment, delete contacts', async t => {
+test('test-20-streamPayment: establish chat, node1 streams payment, node1 streams split payment, delete contacts', async t => {
     const nodeArray = r[r.active]
     await h.runTest(t, streamPayment, nodeArray, r.iterate)
 })
