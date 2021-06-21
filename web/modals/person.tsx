@@ -75,6 +75,9 @@ export default function PersonModal({ params }:{ params:PersonParams }) {
           onChange={e=> setMessage(e.target.value)}
         />
       </TextareaWrap>
+      {price_to_meet && <H3>
+        {`Price to Meet: ${price_to_meet} sats`}  
+      </H3>}
       <ButtonsWrap>
         <Button onClick={onClose} style={{marginRight:10}}>CANCEL</Button>
         <Button color="primary" loading={loading}
