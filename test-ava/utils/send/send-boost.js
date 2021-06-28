@@ -1,6 +1,6 @@
 var http = require('ava-http');
 var h = require('../helpers')
-var r = require('../../run-ava')
+var r = require('../../test-config')
 var getBalance = require('../get/get-balance')
 var getCheckNewMsgs = require('../get/get-check-newMsgs')
 var getTribeId = require('../get/get-tribe-id')

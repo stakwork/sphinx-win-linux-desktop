@@ -28,9 +28,9 @@ async function payInvoice(t, node1, node2, amount, payment_request){
     //get node2 balance after payment
     const node2afterBalance = await getBalance(t, node2)
 
-    // console.log("amount", amount)
-    // console.log("NODE1 === ", (node1beforeBalance - node1afterBalance))
-    // console.log("NODE2 === ", (node2afterBalance - node2beforeBalance))
+    console.log("amount", amount)
+    console.log("NODE1 === ", (node1beforeBalance - node1afterBalance))
+    console.log("NODE2 === ", (node2afterBalance - node2beforeBalance))
 
     //check that node1 sent payment and node2 received payment based on balances
     //3 SAT ARE ADDED AS A MESSAGE FEE

@@ -16,7 +16,7 @@ async function sendTribeMessage(t, node, tribe, text){
     const remoteText = rsa.encrypt(tribe.group_key, text)
 
     const tribeId = await getTribeId(t, node, tribe)
-    t.truthy(tribeId, "node should get tribe id")
+    t.true(typeof tribeId === "number", "node should get tribe id")
 
     //create test tribe message object
     const v = {

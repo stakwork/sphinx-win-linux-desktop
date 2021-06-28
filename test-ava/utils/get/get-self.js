@@ -8,7 +8,7 @@ async function getSelf(t, node){
     const res = await http.get(node.ip+'/contacts', h.makeArgs(node));
     //create node contact object from node perspective
     let nodeContact = res.response.contacts.find(contact => contact.public_key === node.pubkey)
-    t.truthy(nodeContact)
+    t.true(typeof nodeContact === "object", "node should be its own first contact")
 
     return nodeContact
 }

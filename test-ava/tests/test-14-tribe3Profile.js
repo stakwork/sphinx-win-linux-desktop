@@ -1,6 +1,6 @@
 var test = require('ava');
 var h = require('../utils/helpers')
-var r = require('../run-ava')
+var r = require('../test-config')
 var nodes = require('../nodes.json')
 var f = require('../utils')
 
@@ -39,6 +39,7 @@ async function tribe3Profile(t, index1, index2, index3) {
 
     //GET NODE1 PROFILE INFO
     const oldSelf = await f.getSelf(t, node1)
+    console.log("OOOLD SELF === ", oldSelf)
     var oldName = oldSelf.alias
     var oldPic = oldSelf.photo_url || ''
 
@@ -52,6 +53,11 @@ async function tribe3Profile(t, index1, index2, index3) {
     t.true(n2check, "node2 should have read and decrypted node1 message")
 
     const lastMsg = await f.getCheckNewMsgs(t, node2, tribeMessage.message.uuid)
+    console.log("oldName === ", oldName)
+    console.log("lastMsg.sender_alias === ", oldName)
+    console.log("oldPic === ", oldPic)
+    console.log("lastMsg.sender_pic === ", oldName)
+
     t.true(lastMsg.sender_alias === oldName, "message alias should equal node1 old name")
     t.true(lastMsg.sender_pic === oldPic, "message profile pic should equal node1 old pic")
 

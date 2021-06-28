@@ -1,6 +1,6 @@
 var test = require('ava');
 var h = require('../utils/helpers')
-var r = require('../run-ava')
+var r = require('../test-config')
 var nodes = require('../nodes.json')
 var http = require('ava-http');
 
@@ -30,8 +30,9 @@ async function queryRoutes(t, index1, index2, index3){
                 q += `&route_hint=${checkee.routeHint}`
             }
             var route = await http.get(checker.ip+`/route?${q}`, h.makeArgs(checker))
-            t.truthy(route.response.success_prob, "success prob should be greater than 0")
-
+            t.truthy(route.response.success_prob, "route response success prob should exist")
+            t.true(typeof route.response.success_prob === "number", "route response success prob should be a number")
+            t.true(route.response.success_prob > 0, "route response should be greater than 0")
             console.log(`${checker.alias} routed to ${checkee.alias}`)
         })
     })

@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var r = require("../../run-ava")
+var r = require("../../test-config")
 
 async function getPoll(t, challenge){
     //GET POLL FROM TRIBES SERVER

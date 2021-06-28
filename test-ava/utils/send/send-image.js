@@ -11,7 +11,7 @@ var getCheckContacts = require('../get/get-check-contacts')
 var getCheckNewPaidMsgs = require('../get/get-check-newPaidMsgs')
 var getSelf = require('../get/get-self')
 var h = require('../helpers')
-var r = require('../../run-ava')
+var r = require('../../test-config')
 
 async function sendImage(t, node1, node2, image, tribe, price){
 //NODE1 SENDS AN IMAGE TO NODE2
@@ -24,9 +24,9 @@ async function sendImage(t, node1, node2, image, tribe, price){
     var isPublic = false
 
     const upload = await meme.uploadMeme(fileBase64, typ, host, token, filename, isPublic)
-    t.truthy(upload, "meme should have been uploaded")
-    t.truthy(upload.media_key, "upload should have media key")
-    t.truthy(upload.muid, "upload should have muid")
+    t.true(typeof upload === "object", "meme should have been uploaded")
+    t.true(typeof upload.media_key === "string", "upload should have media key")
+    t.true(typeof upload.muid === "string", "upload should have muid")
 
     var n1contactP1 = {}
     var n2contactP1 = {}
@@ -127,7 +127,7 @@ async function sendImage(t, node1, node2, image, tribe, price){
         //get media key from payment accepted message
         //(Last message by token.media_key, type 8, purchase message)
         node2MediaKey = paymentMsg.media_key
-        t.truthy(node2MediaKey, "node2MediaKey should exist")
+        t.true(typeof node2MediaKey === 'string', "node2MediaKey should exist")
         //create url with media_token
         const protocol = h.memeProtocol(r.memeHost)
         url = `${protocol}://${r.memeHost}/file/${paymentMsg.media_token}`
@@ -139,7 +139,7 @@ async function sendImage(t, node1, node2, image, tribe, price){
       const lastMessage2 = await getCheckNewMsgs(t, node2, imgUuid)
       //get media_key from received image message
       node2MediaKey = lastMessage2.media_key
-      t.truthy(node2MediaKey, "node2MediaKey should exist")
+      t.true(typeof node2MediaKey === "string", "node2MediaKey should exist")
       //create url with media_token
       const protocol = h.memeProtocol(r.memeHost)
       url = `${protocol}://${r.memeHost}/file/${lastMessage2.media_token}`
@@ -147,11 +147,11 @@ async function sendImage(t, node1, node2, image, tribe, price){
 
     //DECRYPT IMAGE
           decryptMediaKey = rsa.decrypt(node2.privkey, node2MediaKey)
-          t.truthy(decryptMediaKey, "decryptMediaKey should exist")
+          t.true(typeof decryptMediaKey === "string", "decryptMediaKey should exist")
           var token = await h.getToken(t, node2)
-          t.truthy(token, "should get media token")
+          t.true(typeof token === "string", "should get media token")
           const res2 = await fetch(url, {headers: {Authorization: `Bearer ${token}`}})
-          t.truthy(res2, "res2 should exist")
+          t.true(typeof res2 === "object", "res2 should exist")
           const blob = await res2.buffer()
           t.true(blob.length > 0, "blob should exist")
           //media_key needs to be decrypted with your private key
@@ -161,7 +161,6 @@ async function sendImage(t, node1, node2, image, tribe, price){
           t.true(dec.toString("base64") === image)
 
     return true
-
 }
 
 module.exports = sendImage

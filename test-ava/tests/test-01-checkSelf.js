@@ -1,14 +1,12 @@
 var test = require('ava');
 var h = require('../utils/helpers')
-var r = require('../run-ava')
+var r = require('../test-config')
 var nodes = require('../nodes.json')
 var f = require('../utils')
 
 /*
 npx ava test-01-checkSelf.js --verbose --serial --timeout=2m
 */
-
-// async function firstTest(test, h, r, nodes, f){
 
 test('test-01-checkSelf: check node exists, is own first contact', async t => {
     const nodeArray = r[r.active]
@@ -36,5 +34,5 @@ async function checkSelf(t, index1, index2, index3){
 
     })
 }
-// }
+
 module.exports = checkSelf

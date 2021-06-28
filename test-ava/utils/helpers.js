@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var ra = require('../run-ava')
+var ra = require('../test-config')
 var moment = require("moment")
 
 function getTimestamp(){

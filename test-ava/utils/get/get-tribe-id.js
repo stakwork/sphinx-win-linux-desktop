@@ -8,8 +8,9 @@ async function getTribeId(t, node, tribe){
     let con = await http.get(node.ip+'/contacts', h.makeArgs(node));
     //get test tribe id as node
     let findTribe = con.response.chats.find(chat=> chat.uuid === tribe.uuid)
+    t.true(typeof findTribe === "object", "tribe object should exist")
     let tribeId = findTribe.id
-    t.truthy(tribeId, "there should be a tribe id")
+    t.true(typeof tribeId === "number", "there should be a tribe id")
 
     return tribeId
 }

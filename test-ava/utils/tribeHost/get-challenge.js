@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var r = require("../../run-ava")
+var r = require("../../test-config")
 
 async function getChallenge(t){
     //GET TRIBE FROM TRIBES SERVER BY UUID

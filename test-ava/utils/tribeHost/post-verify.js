@@ -1,5 +1,5 @@
 var http = require('ava-http');
-var r = require("../../run-ava")
+var r = require("../../test-config")
 
 async function  postVerify(t, challenge, token, info){
     //GET TRIBE FROM TRIBES SERVER BY UUID

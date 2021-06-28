@@ -5,7 +5,7 @@ var getTribeId = require('../get/get-tribe-id')
 var getCheckNewMsgs = require('../get/get-check-newMsgs')
 var getBalance = require('../get/get-balance')
 var h = require('../helpers')
-var r = require('../../run-ava')
+var r = require('../../test-config')
 
 async function sendEscrowMsg(t, node, admin, tribe, text){
 //NODE POSTS MESSAGE TO TRIBE ===>

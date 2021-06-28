@@ -1,6 +1,6 @@
 var http = require('ava-http');
 var h = require('./helpers')
-var r = require('../run-ava')
+var r = require('../test-config')
 var getBalance = require('./get/get-balance')
 var getChats = require('./get/get-chats')
 var getCheckNewStream = require('./get/get-check-newStream')

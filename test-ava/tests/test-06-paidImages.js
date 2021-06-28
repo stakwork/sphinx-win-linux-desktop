@@ -1,6 +1,6 @@
 var test = require('ava');
 var h = require('../utils/helpers')
-var r = require('../run-ava')
+var r = require('../test-config')
 var nodes = require('../nodes.json')
 var f = require('../utils')
 var b = require('../b64-images')

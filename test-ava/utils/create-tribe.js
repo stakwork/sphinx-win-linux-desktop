@@ -29,14 +29,10 @@ async function createTribe(t, node, escrowAmount, escrowMillis, ppm, privacy) {
 
   //save id of test tribe
   const newTribeId = c.response.id
-
-  // //node1 gets list of contacts and chats
-  // let res = await http.get(node.ip+'/contacts', h.makeArgs(node));
-  // //find the new tribe by id
-  // let r = res.response.chats.find(chat => chat.id === newTribeId)
+  //get new tribe by Id
   const r = await getCheckTribe(t, node, newTribeId)
   //check that the chat was found
-  t.truthy(r, "the newly created chat should be found")
+  t.true(typeof r === "object", "the newly created chat should be found")
 
   //create tribe object
   const tribe = {
