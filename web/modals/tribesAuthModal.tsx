@@ -19,7 +19,10 @@ export default function TribesAuthModal({ params }) {
       if(data.info && data.token) {
         const body = data.info
         body.url = user.currentIP
+        const vsig = await auth.signBase64('U3BoaW54IFZlcmlmaWNhdGlvbg==')
+        body.verification_signature = vsig
         const protocol = j.host.includes("localhost") ? "http" : "https";
+        console.log("BOY", body)
         await fetch(`${protocol}://${j.host}/verify/${j.challenge}?token=${data.token}`, {
           method: "POST",
           body: JSON.stringify(body),

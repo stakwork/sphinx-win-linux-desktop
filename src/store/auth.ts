@@ -66,6 +66,13 @@ class AuthStore {
     return r
   }
 
+  @action // U3BoaW54IFZlcmlmaWNhdGlvbg==
+  async signBase64(b64:string): Promise<string> {
+    const r2 = await relay.get(`signer/${b64}`)
+    if (!(r2 && r2.sig)) return
+    return r2.sig
+  }
+
 }
 
 interface VerifyExternalResponse {
