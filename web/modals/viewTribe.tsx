@@ -9,7 +9,7 @@ import TextField from "@material-ui/core/TextField";
 import Dropzone from "react-dropzone";
 import { uploadFile } from "../utils/meme";
 import { tentIcon, avatarIcon } from "../images";
-import ClearIcon from '@material-ui/icons/Clear';
+import ClearIcon from "@material-ui/icons/Clear";
 
 export default function ViewTribe() {
   const { msg, ui, chats, meme, user } = useStores();
@@ -80,7 +80,10 @@ export default function ViewTribe() {
       }}
     >
       <Content bg={theme.bg}>
-        <ClearIcon onClick={handleClose} style={{cursor: "pointer", position: "absolute", top: 4, right: 4 }}/>
+        <ClearIcon
+          onClick={handleClose}
+          style={{ cursor: "pointer", position: "absolute", top: 4, right: 4 }}
+        />
         <Header>JOIN TRIBE</Header>
         <Image
           style={{ backgroundImage: `url(${tribe.img || tentIcon})` }}
@@ -170,7 +173,7 @@ function Row({ name, value }) {
 }
 
 const Content = styled.div`
-  position:relative;
+  position: relative;
   padding: 40px 20px;
   border-radius: 8px;
   width: 400px;

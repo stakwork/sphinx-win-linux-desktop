@@ -28,59 +28,59 @@ const newTribeSchema = [
     required: true,
     validator: Yup.string().required(rq),
   },
-  {
-    name: "tags",
-    type: "tags",
-    label: "Tags",
-    validator: Yup.array(),
-  },
-  {
-    name: "price_to_join",
-    type: "number",
-    label: "Price to Join",
-    validator: Yup.number(),
-  },
-  {
-    name: "price_per_message",
-    type: "number",
-    label: "Price per Message",
-    validator: Yup.number(),
-  },
-  {
-    name: "escrow_amount",
-    type: "number",
-    label: "Amount to Stake",
-    validator: Yup.number(),
-    description:
-      "A spam protection mechanism: every subscriber pays this fee for each message, which is returned to them after after the amount of hours specific in Escrow Time",
-  },
-  {
-    name: "escrow_time",
-    type: "number",
-    label: "Time to Stake (Hours)",
-    validator: Yup.number(),
-    description:
-      "The number of hours before the Escrow Amount is returned to the subscriber",
-  },
-  {
-    name: "feed_url",
-    type: "text",
-    label: "RSS Feed URL",
-    validator: Yup.string(),
-  },
-  {
-    name: "unlisted",
-    type: "radio",
-    // inverted:true,
-    label: "Unlisted (do not show on tribes registry)",
-    required: false,
-  },
-  {
-    name: "is_private",
-    type: "radio",
-    label: "Private (requires permission to join)",
-    required: false,
-  },
+  // {
+  //   name: "tags",
+  //   type: "tags",
+  //   label: "Tags",
+  //   validator: Yup.array(),
+  // },
+  // {
+  //   name: "price_to_join",
+  //   type: "number",
+  //   label: "Price to Join",
+  //   validator: Yup.number(),
+  // },
+  // {
+  //   name: "price_per_message",
+  //   type: "number",
+  //   label: "Price per Message",
+  //   validator: Yup.number(),
+  // },
+  // {
+  //   name: "escrow_amount",
+  //   type: "number",
+  //   label: "Amount to Stake",
+  //   validator: Yup.number(),
+  //   description:
+  //     "A spam protection mechanism: every subscriber pays this fee for each message, which is returned to them after after the amount of hours specific in Escrow Time",
+  // },
+  // {
+  //   name: "escrow_time",
+  //   type: "number",
+  //   label: "Time to Stake (Hours)",
+  //   validator: Yup.number(),
+  //   description:
+  //     "The number of hours before the Escrow Amount is returned to the subscriber",
+  // },
+  // {
+  //   name: "feed_url",
+  //   type: "text",
+  //   label: "RSS Feed URL",
+  //   validator: Yup.string(),
+  // },
+  // {
+  //   name: "unlisted",
+  //   type: "radio",
+  //   // inverted:true,
+  //   label: "Unlisted (do not show on tribes registry)",
+  //   required: false,
+  // },
+  // {
+  //   name: "is_private",
+  //   type: "radio",
+  //   label: "Private (requires permission to join)",
+  //   required: false,
+  // },
 ];
 
 export default function NewTribe() {
@@ -109,7 +109,15 @@ export default function NewTribe() {
           <Form
             onSubmit={async (values) => {
               setLoading(true);
-              await await chats.createTribe(values);
+              values.unlisted = false;
+              values.is_private = false;
+              values.tags = ["Sphinx"];
+              (values.price_to_join = parseInt(values.price_to_join) || 0),
+                (values.price_per_message =
+                  parseInt(values.price_per_message) || 0),
+                (values.escrow_amount = parseInt(values.escrow_amount) || 0),
+                (values.escrow_time = parseInt(values.escrow_time) || 0),
+                await await chats.createTribe(values);
               setLoading(false);
               handleCloseModal();
             }}
