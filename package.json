@@ -7,17 +7,13 @@
   "homepage": "./",
   "scripts": {
     "start": "react-native start",
-    "android": "BABEL_ENV=dev react-native run-android && adb logcat *:S ReactNative:V ReactNativeJS:V",
-    "ios": "react-native run-ios",
     "web": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "jetify": "jetify",
     "electron": "ELECTRON_DEV_URL=http://localhost:3000 electron .",
     "install-app-deps": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
     "dist:linux": "./node_modules/.bin/electron-builder --linux",
     "dist:win": "./node_modules/.bin/electron-builder --win",
-    "postinstall": "jetify",
     "test": "mocha"
   },
   "rnpm": {
