@@ -378,6 +378,10 @@ export class ChatStore {
     if (!host || !uuid) return;
     let theHost = host.includes("localhost") ? "tribes.sphinx.chat" : host;
     let protocol = "https";
+    if (host.includes("host.docker.internal")) {
+      protocol = "http";
+      theHost = "localhost:13000";
+    }
     if (host.includes("localhost:13000")) {
       protocol = "http";
       theHost = "localhost:13000";

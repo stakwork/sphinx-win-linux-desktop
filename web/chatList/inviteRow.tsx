@@ -62,7 +62,7 @@ export default function InviteRow(props) {
             background: theme.bg,
     }}>
         <QrCode>
-            <img style={{ height: 40, width: 40, backgroundColor: 'white', border: '1px solid white' }} src={require('../../android_assets/invite_qr.png')} />
+            <img style={{ height: 40, width: 40, backgroundColor: 'white', border: '1px solid white' }} src={require('../images/invite_qr.png')} />
         </QrCode>
         <InviteText>
             <Name>Invite: {name}</Name>

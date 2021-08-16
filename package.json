@@ -55,8 +55,7 @@
     },
     "files": [
       "build/**/*",
-      "node_modules/**/*",
-      "node_modules/realm/**/*"
+      "node_modules/**/*"
     ],
     "directories": {
       "buildResources": "build"
@@ -128,7 +127,6 @@
     "react-scripts": "^3.4.1",
     "react-tiny-link-electron": "^3.6.1",
     "readable-stream": "^1.0.33",
-    "realm": "^10.0.1",
     "rn-fetch-blob": "^0.12.0",
     "rn-rncryptor": "^1.0.12",
     "sdp-transform": "^2.14.0",
