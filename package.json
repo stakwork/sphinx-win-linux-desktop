@@ -124,6 +124,7 @@
     "react-linkify": "^1.0.0-alpha",
     "react-lottie": "^1.2.3",
     "react-moment": "^0.9.7",
+    "react-native": "^0.63.4",
     "react-navigation": "^4.3.7",
     "react-scripts": "^3.4.1",
     "react-tiny-link-electron": "^3.6.1",
