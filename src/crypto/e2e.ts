@@ -1,21 +1,8 @@
-import * as rsaMobile from "./rsa";
-import * as aesMobile from "./aes";
 import * as rsaWeb from "../../web/crypto/rsa";
 import * as aesWeb from "../../web/crypto/aes";
 
-const rsaConfig = {
-  ios: rsaMobile,
-  android: rsaMobile,
-  web: rsaWeb,
-};
-const aesConfig = {
-  ios: aesMobile,
-  android: aesMobile,
-  web: aesWeb,
-};
-
-const rsa = rsaConfig["web"];
-const aes = aesConfig["web"];
+const rsa = rsaWeb;
+const aes = aesWeb;
 
 /*
 File attachments are encrypted with a password,
