@@ -27,8 +27,10 @@ React / Electron Desktop app for Sphinx
 - Desktop dev:
   - `npm run install-app-deps`
   - `npm run web`
+  - if you are developing on a windows machine, change the `electron` script in `package.json` to: `set ELECTRON_DEV_URL=http://localhost:3000 && electron .`
   - in another terminal `npm run electron`
-  - if you are developing on a windows machine, change the `electron` script in `package.json` to start with the word `set` (`set ELECTRON_DEV_URL=...`)
+
+If you hit an error saying `electron-deeplink: unable to lock instance`, you can comment out the deeplink stuff in `public/electronjs/main.js` lines 35-45
 
 **Desktop build**
 
