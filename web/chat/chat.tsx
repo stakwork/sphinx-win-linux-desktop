@@ -239,6 +239,7 @@ function ChatContent({
     const chat = ui.selectedChat;
 
     const msgs = useMsgs(chat) || [];
+    // console.log(msgs);
     const isTribe = chat && chat.type === constants.chat_types.tribe;
     const h = `calc(100% - ${headHeight + footHeight}px)`;
 
