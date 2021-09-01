@@ -34,7 +34,7 @@ export default function BoostRow(props) {
   }
 
   let fromText;
-  const showAvatars = boosts && boosts.length > 1;
+  const showAvatars = true; //boosts && boosts.length > 1;
   if (showAvatars) {
     if (boosts.length > 3) fromText = `+${boosts.length - 3}`;
   } else {
