@@ -16,6 +16,7 @@ import Onchain from "./onchain";
 import { uiStore } from "../../src/store/ui";
 import VersionModal from "./versionModal";
 import TribesAuthModal from "./tribesAuthModal";
+import TribesSaveModal from "./tribesSaveModal";
 import PersonModal from "./person";
 import NewTribeModal from "./newTribe";
 
@@ -53,6 +54,9 @@ export default function Modals() {
         {ui.tribeInfo && <TribeInfo />}
         {ui.tribesAuthParams && (
           <TribesAuthModal params={ui.tribesAuthParams} />
+        )}
+        {ui.tribesSaveParams && (
+          <TribesSaveModal params={ui.tribesSaveParams} />
         )}
         {ui.personParams && <PersonModal params={ui.personParams} />}
         {ui.newGroupModal && <NewTribeModal />}
