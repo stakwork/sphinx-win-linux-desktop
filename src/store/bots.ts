@@ -1,5 +1,6 @@
 import { observable, action } from "mobx";
 import { relay } from "../api";
+import * as e2e from "../crypto/e2e";
 
 export interface Bot {
   id: string;
@@ -45,6 +46,20 @@ class BotStore {
   //     this.bots = r.bots;
   //   }
   // }
+
+  @action async postPat(pat: string) {
+    try {
+      const r1 = await relay.get("request_transport_key");
+      const key = r1.transport_key;
+      const encrypted_pat = await e2e.encryptPublic(pat, key);
+      const r = await relay.post("bot/git", {
+        encrypted_pat,
+      });
+      if (r) console.log(r);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   @action reset() {
     this.bots = [];

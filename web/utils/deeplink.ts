@@ -38,6 +38,11 @@ async function runAction(url) {
           console.log(e);
         }
       }
+    case "challenge":
+      if (j.challenge && j.id) {
+        const url = await authStore.verify(j.id, j.challenge);
+        console.log("URL:", url);
+      }
   }
 }
 

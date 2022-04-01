@@ -20,7 +20,7 @@ class AuthStore {
   }
 
   @action
-  async verify(id, challenge) {
+  async verify(id, challenge): Promise<string> {
     const pubkey = userStore.publicKey;
     if (!pubkey) return;
 
@@ -35,6 +35,7 @@ class AuthStore {
       pubkey: pubkey,
     }).toString();
     const url = "https://" + authServer.host + "/oauth_verify?" + q;
+    return url;
   }
 
   @action
