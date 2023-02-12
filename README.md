@@ -43,6 +43,7 @@ If you hit an error saying `electron-deeplink: unable to lock instance`, you can
   - yarn && yarn dist:win (or npm i && npm run dist:win)
 
 - Linux:
+  - install `libsecret-1-dev` using `apt` (`apt-get`) 
   - npm run build
   - on mac? use docker image from here https://www.electron.build/multi-platform-build `electronuserland/builder`
   - package.json postinstall script: `electron-builder install-app-deps --platform=linux`
